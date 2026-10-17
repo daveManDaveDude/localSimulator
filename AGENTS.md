@@ -1,10 +1,10 @@
 # Project instructions
 
-TVW-004, TVW-005, and TVW-006 are complete and independently reviewed; M0 and M1 are complete. The user authorized a 1,000 m × 1,000 m AOI revision followed by TVW-007, and the size revision passed independent review. TVW-007's initial EA DTM inspection has an EA-only 1% threshold pass and is pending independent review. OSM/OS building and road feature counts remain unchecked, so do not call the AOI approved or frozen. TVW-007 is the current issue; do not begin TVW-008 or later without separate user instruction. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` status.
+TVW-004, TVW-005, TVW-006 and TVW-007 are complete and independently reviewed; M0 and M1 are complete. The user authorized a 1,000 m × 1,000 m AOI revision followed by TVW-007, and both the size revision and TVW-007 passed independent review. TVW-007 establishes only the EA DTM 1% threshold; OSM/OS building and road feature counts remain unchecked, so do not call the AOI approved or frozen. Do not begin TVW-008 or later without separate user instruction. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` status.
 
 ## Working protocol
 
-1. Work on **one milestone and one focused issue** at a time. M0 and M1 are complete. The 1,000 m AOI revision passed independent review; TVW-007 is authorized and current. Its initial implementation reports a passing EA DTM threshold result, but overall AOI coverage remains pending until planned OSM/OS feature checks are complete and the work is reviewed. Do not begin TVW-008 or later without separate authorization.
+1. Work on **one milestone and one focused issue** at a time. M0 and M1 are complete. The 1,000 m AOI revision and TVW-007 passed independent review. TVW-007 closes the EA DTM check only; overall AOI coverage remains pending until planned OSM/OS feature checks are complete. Do not begin TVW-008 or later without separate authorization.
 2. Start with an implementation plan, concrete files touched, tests and proof of completion.
 3. Keep geographic calculations in tested Python modules and typed, documented asset contracts. No ad-hoc coordinate transforms scattered across React/Three.js render logic.
 4. Maintain a **fully functioning synthetic world** at all times.

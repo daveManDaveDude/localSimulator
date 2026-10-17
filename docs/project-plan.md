@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 and M1 complete; TVW-001 through TVW-006 passed independent review. The user-authorized 1,000 m AOI revision passed independent review; TVW-007 EA DTM inspection is the current authorized issue. TVW-008 and later are not authorized.
+**Status:** M0 and M1 complete; TVW-001 through TVW-007 passed independent review. The user-authorized 1,000 m AOI revision also passed independent review. TVW-007 completes the EA DTM inspection only; overall AOI coverage remains pending for OSM/OS feature counts. TVW-008 and later are not authorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -161,7 +161,7 @@ Useful references: https://www.nationalarchives.gov.uk/doc/open-government-licen
 
 The original TVW-006 scope derived a **500 m × 500 m EPSG:27700 candidate** at the same centre; its bounds and dated screenshot remain historical in `docs/milestones/TVW-006.md`. On 2026-10-17 the user approved a **1,000 m × 1,000 m revision** without changing the WGS84 or projected centre. Current bounds are `[290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931]` in `[west, south, east, north]` order. The tool pins non-ballpark EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid), reporting 2 m accuracy; the selected operation uses no grid. PROJ network access is disabled. In this environment the preferred 1 m operation is unavailable because `uk_os_OSTN15_NTv2_OSGBtoETRS.tif` is missing; the tool records `best_available`, missing operation/grid names, and the selected operation definition in `docs/aoi-selection.json`. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 
-The current config status remains `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. TVW-007 measured full EA DTM center coverage on the 1 m AOI grid and passed its 1% missing-cell threshold; see `docs/milestones/TVW-007.md`. OSM/OS building and road feature counts remain unchecked. Do not describe this candidate as overall coverage-approved or frozen, and do not mark the M2 exit gate complete until the remaining checks are reviewed.
+The current config status remains `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. TVW-007's independently reviewed EA DTM center-coverage check passes its 1% missing-cell threshold; see `docs/milestones/TVW-007.md`. OSM/OS building and road feature counts remain unchecked. Do not describe this candidate as overall coverage-approved or frozen, and do not mark the M2 exit gate complete until the remaining checks are reviewed.
 
 **Selection protocol (Codex task):**
 
@@ -169,7 +169,7 @@ The current config status remains `selection_status: selected_pending_coverage` 
 2. Transform WGS84 longitude/latitude to EPSG:27700 with `pyproj` and `always_xy=True`.
 3. Construct the user-approved **1,000 m × 1,000 m candidate AOI in British National Grid metres** around that transformed centre.
 4. Generate RFC 7946 WGS84 QA GeoJSON with a closed exterior polygon and anchor point.
-5. **TVW-007 status:** the EA 1 m DTM center-grid coverage check is complete and passed; inspect candidate OSM/OS building and road counts in the next authorized issue.
+5. **TVW-007 status:** PASS after Luna fix 1 and independent Sol re-review. The EA 1 m DTM center-grid check passes its threshold; inspect candidate OSM/OS building and road counts only in the next separately authorized issue.
 6. Keep the editable anchor, dimensions, and regenerated projected centre/bounds in `config/aoi.torquay.json`; publish operation metadata and QA output under `docs/`.
 7. Allow moving the candidate square by changing the input config alone and rerunning the selection CLI.
 
@@ -177,7 +177,7 @@ The current config status remains `selection_status: selected_pending_coverage` 
 
 The current validated input config stores the editable WGS84 anchor, fixed candidate dimensions, pending-coverage statuses, and the current projected centre/bounds. The CLI refreshes those derived values after an anchor change and publishes operation metadata in `docs/aoi-selection.json`; the QA polygon is `docs/aoi-selection.geojson`. The input config contains no null placeholder coordinates.
 
-**Coverage note:** the candidate coordinates are real transformation outputs derived from the documented postcode centroid. EA DTM coverage passes the configured 1% missing-cell threshold. OSM/OS building and road counts and any final AOI freeze remain pending in M2.
+**Coverage note:** the candidate coordinates are real transformation outputs derived from the documented postcode centroid. The independently reviewed EA DTM report passes the configured 1% missing-cell threshold. OSM/OS building and road counts and any final AOI freeze remain pending in M2.
 
 ---
 
@@ -449,7 +449,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M1 — Asset schema and deterministic heightfield renderer
 
-**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete. TVW-006, including the approved 1,000 m candidate-size revision, passed independent review. TVW-007 initial implementation now measures a passing EA DTM result and is pending independent review. M2 remains incomplete until OSM/OS feature-count checks and the remaining review gates are complete.
+**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete. TVW-006, including the approved 1,000 m candidate-size revision, passed independent review. TVW-007 also passed independent review after Luna fix 1; it establishes the EA DTM result only. M2 remains incomplete until OSM/OS feature-count checks and the remaining review gates are complete.
 
 **User-visible result:** browser loads a **synthetic terrain hill** from a `heightfield.f32` fixture rather than constructing it ad hoc.
 
@@ -476,7 +476,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 1,000 m AOI drawn on it. The browser can still run synthetic scene.
 
-**TVW-007 status:** Initial implementation complete; pending independent review. The public EA LIDAR Composite DTM 1 m (2022) `SX96nw` and `SX96sw` archives were acquired and verified. The aligned 1 m AOI analysis reports 1,000,000/1,000,000 valid cell centers, no uncovered/NoData/nonfinite cells, and a pass against the 1% DTM missing threshold. The overall AOI remains pending because OSM/OS building and road counts are not part of this issue and remain unchecked. See `docs/data-sources.md`, `data/source-manifest.json`, and `docs/milestones/TVW-007.md`.
+**TVW-007 status:** PASS after Luna fix 1 and independent Sol re-review. The public EA LIDAR Composite DTM 1 m (2022) `SX96nw` and `SX96sw` archives were acquired and verified, with extracted TIFF/XML files cryptographically bound to named archive members. The aligned 1 m AOI report measures 1,000,000/1,000,000 valid cell centers, no uncovered/NoData/nonfinite cells, and a pass against the 1% DTM missing threshold. The overall AOI remains pending because OSM/OS building and road counts are not part of this issue and remain unchecked. See `docs/data-sources.md`, `data/source-manifest.json`, and `docs/milestones/TVW-007.md`.
 
 **Work:**
 
