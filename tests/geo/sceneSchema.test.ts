@@ -3,7 +3,11 @@ import {
   MAX_HEIGHTFIELD_SAMPLES,
   validateSceneManifest,
 } from '../../src/geo/sceneSchema';
-import { createValidManifest, readSyntheticFixtureManifest } from './fixtures';
+import {
+  createRealManifest,
+  createValidManifest,
+  readSyntheticFixtureManifest,
+} from './fixtures';
 
 type TestRecord = Record<string, unknown>;
 
@@ -54,7 +58,7 @@ describe('validateSceneManifest', () => {
     ['formatVersion', 2, 'formatVersion'],
     ['id', '   ', 'id'],
     ['name', null, 'name'],
-    ['worldType', 'real', 'worldType'],
+    ['worldType', 'unknown', 'worldType'],
     ['sourceCrs', 'EPSG:27700', 'sourceCrs'],
     ['axisConvention', '+X east, +Y up, +Z north', 'axisConvention'],
     ['origin', null, 'origin'],
@@ -198,5 +202,59 @@ describe('validateSceneManifest', () => {
     manifest.roads = 'roads/data.json';
     const result = validateSceneManifest(manifest);
     expect(result.ok).toBe(true);
+  });
+
+  it('accepts a fully attributed, pending real EA terrain manifest', () => {
+    const result = validateSceneManifest(createRealManifest());
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.manifest.worldType).toBe('real');
+      expect(result.manifest.sourceCrs).toBe('EPSG:27700');
+      if (result.manifest.worldType === 'real') {
+        expect(result.manifest.provenance.sources[0]?.archiveRasterMember).toBe(
+          'SX96nw_DTM_1m.tif',
+        );
+        expect(result.manifest.aoi.coverageStatus).toBe('not_checked');
+      }
+    }
+  });
+
+  it.each([
+    ['provenance.attribution', ''],
+    ['provenance.verticalReference', ''],
+    ['provenance.selectionStatus', 'approved'],
+    ['provenance.coverageStatus', 'pass'],
+    ['provenance.sources[0].archiveSha256', 'invalid'],
+    ['aoi.boundsM', [0, 0, 1000, 1000]],
+  ])('rejects invalid real manifest field %s', (path, value) => {
+    const manifest: unknown = structuredClone(createRealManifest());
+    const segments = path.replaceAll('[', '.').replaceAll(']', '').split('.');
+    let current: unknown = manifest;
+    for (const segment of segments.slice(0, -1)) {
+      if (Array.isArray(current)) {
+        current = current[Number(segment)];
+      } else if (isTestRecord(current)) {
+        current = current[segment];
+      } else {
+        throw new Error(`Missing test path ${segment}`);
+      }
+    }
+    const finalSegment = segments.at(-1)!;
+    if (Array.isArray(current)) {
+      current[Number(finalSegment)] = value;
+    } else if (isTestRecord(current)) {
+      current[finalSegment] = value;
+    } else {
+      throw new Error(`Missing test path ${finalSegment}`);
+    }
+
+    const result = validateSceneManifest(manifest);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.map(({ path: issuePath }) => issuePath)).toContain(
+        path,
+      );
+    }
   });
 });

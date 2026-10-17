@@ -107,6 +107,43 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.world-selector {
+  position: absolute;
+  top: 66px;
+  left: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.world-selector button,
+.world-selector a {
+  min-height: 29px;
+  padding: 5px 9px;
+  border: 1px solid rgb(165 223 206 / 34%);
+  border-radius: 7px;
+  color: #c9e7dc;
+  background: rgb(12 20 24 / 76%);
+  font: inherit;
+  font-size: 10px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.world-selector button:hover,
+.world-selector a:hover,
+.world-selector button[aria-pressed='true'] {
+  color: #10201c;
+  background: #a5dfce;
+}
+
+.world-selector button:focus-visible,
+.world-selector a:focus-visible {
+  outline: 2px solid #e2b17f;
+  outline-offset: 2px;
+}
+
 .terrain-loading,
 .world-error {
   position: absolute;
@@ -494,7 +531,8 @@ kbd {
   pointer-events: none;
 }
 
-.viewer-shell[data-world-mode='terrain'] .corner-note {
+.viewer-shell[data-world-mode='synthetic'] .corner-note,
+.viewer-shell[data-world-mode='real'] .corner-note {
   right: auto;
   left: 26px;
 }
@@ -523,8 +561,13 @@ kbd {
     text-align: left;
   }
 
+  .world-selector {
+    top: 122px;
+    left: 18px;
+  }
+
   .debug-hud {
-    top: 105px;
+    top: 164px;
     right: 14px;
     width: min(350px, calc(100vw - 28px));
     padding: 13px 14px;
@@ -591,7 +634,8 @@ kbd {
     font-size: 8px;
   }
 
-  .viewer-shell[data-world-mode='terrain'] .corner-note {
+  .viewer-shell[data-world-mode='synthetic'] .corner-note,
+  .viewer-shell[data-world-mode='real'] .corner-note {
     right: auto;
     left: 16px;
   }

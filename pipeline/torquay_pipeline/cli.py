@@ -20,6 +20,7 @@ from .terrain_coverage import (
     analyze_coverage,
     atomic_write_json,
 )
+from .terrain_export import TerrainExportError, build_terrain_package
 from .terrain_preview import write_terrain_preview
 from .terrain_sources import TerrainSourceError, verify_source_manifest
 
@@ -37,7 +38,7 @@ def _parser() -> argparse.ArgumentParser:
                 default=Path("../docs"),
                 help="directory for aoi-selection.{json,geojson,md} (default: ../docs)",
             )
-    for name in ("inspect-sources", "preview-terrain"):
+    for name in ("inspect-sources", "preview-terrain", "build-terrain"):
         command = commands.add_parser(name)
         command.add_argument("--config", type=Path, default=Path("../config/aoi.torquay.json"))
         command.add_argument("--manifest", type=Path, default=Path("../data/source-manifest.json"))
@@ -54,11 +55,28 @@ def _parser() -> argparse.ArgumentParser:
                 type=Path,
                 default=Path("../docs/milestones/artifacts/TVW-007-coverage.json"),
             )
-        else:
+        elif name == "preview-terrain":
             command.add_argument(
                 "--output",
                 type=Path,
                 default=Path("../docs/milestones/screenshots/TVW-007-ea-dtm-preview.png"),
+            )
+        else:
+            command.add_argument(
+                "--package-dir",
+                type=Path,
+                default=Path("../public/worlds/torquay-poc-001"),
+                help="ignored local browser package output directory",
+            )
+            command.add_argument(
+                "--report",
+                type=Path,
+                default=Path("../docs/milestones/artifacts/TVW-008-qa.json"),
+            )
+            command.add_argument(
+                "--preview",
+                type=Path,
+                default=Path("../docs/milestones/screenshots/TVW-008-terrain-preview.png"),
             )
     return parser
 
@@ -183,6 +201,38 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"Wrote candidate selection outputs to {args.output_dir.resolve()}")
             print("selection_status=selected_pending_coverage; coverage_status=not_checked")
             return 0
+        if args.command == "build-terrain":
+            config = _validated_selection_config(args.config)
+            source_manifest, raster_paths, verified = _verified_sources(
+                args.manifest, args.source_dir
+            )
+            coverage = analyze_coverage(config, raster_paths, args.missing_threshold)
+            coverage_report = coverage.report
+            if coverage_report["analysis"]["ea_dtm_threshold_result"] != "pass":
+                raise TerrainExportError(
+                    "EA DTM coverage did not meet the configured missing-cell threshold; "
+                    "real browser terrain was not published"
+                )
+            built = build_terrain_package(
+                config,
+                raster_paths,
+                source_manifest,
+                verified,
+                args.package_dir,
+                args.report,
+                args.preview,
+            )
+            print(f"Built verified local terrain package at {args.package_dir.resolve()}")
+            print(
+                f"Grid {built['qa']['outputGrid']['columns']} × "
+                f"{built['qa']['outputGrid']['rows']} vertices; "
+                f"source missing fraction {coverage_report['coverage']['missing_fraction']:.3%}."
+            )
+            print(
+                f"Wrote deterministic QA to {args.report.resolve()} and preview to "
+                f"{args.preview.resolve()}. AOI coverage_status remains not_checked."
+            )
+            return 0
         result = _coverage_report(
             args.config, args.manifest, args.source_dir, args.missing_threshold
         )
@@ -205,6 +255,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         AoiConfigError,
         TerrainCoverageError,
         TerrainSourceError,
+        TerrainExportError,
         ValueError,
         OSError,
         RuntimeError,

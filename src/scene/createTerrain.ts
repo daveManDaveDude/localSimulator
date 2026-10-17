@@ -1,6 +1,7 @@
 import {
   BufferAttribute,
   BufferGeometry,
+  Color,
   FrontSide,
   InterleavedBufferAttribute,
   Mesh,
@@ -70,6 +71,7 @@ function assertUnitNormals(
 /** Build one indexed vertex per height sample with upward-wound grid triangles. */
 export function createTerrain(
   grid: TerrainGrid,
+  appearance: 'synthetic' | 'real' = 'synthetic',
 ): Mesh<BufferGeometry, MeshStandardMaterial> {
   const vertexCount = grid.columns * grid.rows;
   const coordinateCount = vertexCount * 3;
@@ -80,6 +82,19 @@ export function createTerrain(
   }
 
   const positions = new Float32Array(coordinateCount);
+  const colors =
+    appearance === 'real' ? new Float32Array(coordinateCount) : undefined;
+  let minimumHeight = Number.POSITIVE_INFINITY;
+  let maximumHeight = Number.NEGATIVE_INFINITY;
+  if (colors) {
+    for (const height of grid.heights) {
+      minimumHeight = Math.min(minimumHeight, height);
+      maximumHeight = Math.max(maximumHeight, height);
+    }
+  }
+  const lowColor = new Color('#254b4d');
+  const middleColor = new Color('#6c9875');
+  const highColor = new Color('#ded0a0');
   let offset = 0;
   const halfWidth = grid.widthM / 2;
   const halfDepth = grid.depthM / 2;
@@ -89,20 +104,45 @@ export function createTerrain(
       positions[offset++] = column * grid.spacingM - halfWidth;
       positions[offset++] = grid.heights[sampleIndex]!;
       positions[offset++] = row * grid.spacingM - halfDepth;
+      if (colors) {
+        const span = maximumHeight - minimumHeight || 1;
+        const amount = Math.max(
+          0,
+          Math.min(1, (grid.heights[sampleIndex]! - minimumHeight) / span),
+        );
+        const color =
+          amount < 0.55
+            ? lowColor.clone().lerp(middleColor, amount / 0.55)
+            : middleColor.clone().lerp(highColor, (amount - 0.55) / 0.45);
+        colors[sampleIndex * 3] = color.r;
+        colors[sampleIndex * 3 + 1] = color.g;
+        colors[sampleIndex * 3 + 2] = color.b;
+      }
     }
   }
 
   const geometry = new BufferGeometry();
-  const material = new MeshStandardMaterial({
-    color: '#708d7a',
-    roughness: 0.94,
-    metalness: 0,
-    side: FrontSide,
-  });
+  const material = new MeshStandardMaterial(
+    appearance === 'real'
+      ? {
+          color: '#ffffff',
+          vertexColors: true,
+          roughness: 0.96,
+          metalness: 0,
+          side: FrontSide,
+        }
+      : {
+          color: '#708d7a',
+          roughness: 0.94,
+          metalness: 0,
+          side: FrontSide,
+        },
+  );
 
   try {
     assertPositiveGridSeparation(positions, grid.columns, grid.rows);
     geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    if (colors) geometry.setAttribute('color', new BufferAttribute(colors, 3));
     geometry.setIndex(
       new BufferAttribute(createTerrainIndices(grid.columns, grid.rows), 1),
     );
@@ -119,6 +159,7 @@ export function createTerrain(
     }
     assertFiniteArray(position, 'position');
     assertFiniteArray(normal, 'normal');
+    if (colors) assertFiniteArray(geometry.getAttribute('color'), 'color');
     assertUnitNormals(normal);
     if (!geometry.boundingBox || !geometry.boundingSphere) {
       throw new Error('terrain geometry bounds could not be computed');

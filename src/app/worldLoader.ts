@@ -2,6 +2,7 @@ import { decodeFloat32Heightfield } from '../geo/heightfield';
 import {
   isSafeLocalAssetPath,
   validateSceneManifest,
+  type RealTerrainSceneManifest,
   type SyntheticSceneManifest,
 } from '../geo/sceneSchema';
 
@@ -30,6 +31,13 @@ export interface LoadedSyntheticWorld {
   manifest: SyntheticSceneManifest;
   heights: Float32Array;
 }
+
+export interface LoadedRealWorld {
+  manifest: RealTerrainSceneManifest;
+  heights: Float32Array;
+}
+
+export type LoadedWorld = LoadedSyntheticWorld | LoadedRealWorld;
 
 export type WorldFetch = (input: URL, init?: RequestInit) => Promise<Response>;
 
@@ -126,12 +134,12 @@ async function sha256Hex(bytes: ArrayBuffer): Promise<string> {
   ).join('');
 }
 
-/** Load and validate one synthetic v1 world without creating Three.js objects. */
-export async function loadSyntheticWorld(
+/** Load and validate one local v1 world without creating Three.js objects. */
+export async function loadWorld(
   manifestLocation: string | URL,
   fetcher: WorldFetch = browserFetch,
   signal?: AbortSignal,
-): Promise<LoadedSyntheticWorld> {
+): Promise<LoadedWorld> {
   const manifestUrl = resolveManifestUrl(manifestLocation);
   const manifestResponse = await fetchResponse(
     fetcher,
@@ -197,5 +205,23 @@ export async function loadSyntheticWorld(
     throw new WorldLoadError('heightfield decode', messageFrom(error));
   }
 
-  return { manifest: validation.manifest, heights };
+  return validation.manifest.worldType === 'synthetic'
+    ? { manifest: validation.manifest, heights }
+    : { manifest: validation.manifest, heights };
+}
+
+/** Preserve the typed synthetic-only loader used by the M0/M1 fixtures and tests. */
+export async function loadSyntheticWorld(
+  manifestLocation: string | URL,
+  fetcher: WorldFetch = browserFetch,
+  signal?: AbortSignal,
+): Promise<LoadedSyntheticWorld> {
+  const loaded = await loadWorld(manifestLocation, fetcher, signal);
+  if (loaded.manifest.worldType !== 'synthetic') {
+    throw new WorldLoadError(
+      'manifest validation',
+      'loadSyntheticWorld accepts only synthetic package manifests',
+    );
+  }
+  return { manifest: loaded.manifest, heights: loaded.heights };
 }

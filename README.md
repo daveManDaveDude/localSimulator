@@ -1,8 +1,8 @@
 # Torquay Virtual World
 
-A Windows-friendly browser proof of concept for a future real-data view of Torquay. The default viewer loads a small, checked-in synthetic Float32 heightfield and renders its terrain mesh, hill, ridge, grid and north cue. The prior M0 analytic scene remains available at `/?world=m0`.
+A Windows-friendly browser proof of concept for a future real-data view of Torquay. The default viewer loads a checked-in synthetic Float32 heightfield and renders its terrain mesh, hill, ridge, grid and north cue. The prior M0 analytic scene remains available at `/?world=m0`. The **EA terrain** selector loads a locally generated 2 m Float32 heightfield from the verified Environment Agency DTM tiles when that ignored package exists in `public/worlds/torquay-poc-001/`.
 
-Every browser world is fictional and marked **SYNTHETIC**. The heightfield, hill, ridge, analytic slope, blocks, dimensions and elevations are invented examples; they are not Torquay measurements. Both local fixtures use zero-valued local origins and contain no geographic coordinates. The browser does not load EA DTM, OSM/OS extracts, real roads or other geographic data. Separately, the offline Python pipeline has inspected the EA DTM tiles for the candidate AOI; the EA cell-coverage check passed, while overall AOI coverage remains pending because OSM/OS feature counts have not been checked.
+The synthetic heightfield, hill, ridge, analytic slope, blocks and their measurements are fictional; they are not Torquay measurements. The real terrain mode uses the actual Environment Agency DTM source tiles and displays their source attribution and Ordnance Survey Newlyn vertical reference. Its heights are stored relative to a deterministic center origin. The local EA raster coverage and resampling checks passed for the candidate square, while overall AOI approval remains pending because OSM/OS feature counts have not been checked. The viewer does not load OSM/OS data, real roads or buildings.
 
 ## Requirements
 
@@ -44,10 +44,10 @@ npm run format:check # Check formatting with Prettier
 npm run test         # Run movement, asset, terrain-grid, and mesh unit tests
 npm run generate:synthetic-heightfield # Rebuild both deterministic synthetic fixture packages
 npm run test:e2e:install # Download Playwright's Chromium browser (first time only)
-npm run test:e2e     # Run real-browser M0 and M1 smoke/navigation tests
+npm run test:e2e     # Run real-browser synthetic and local EA terrain regressions
 ```
 
-The generator writes the original 3 × 3 loader fixture plus a separate 25 × 19, 2 m-spaced terrain demo. The latter contains a fictional base slope, Gaussian hill and narrow ridge, with little-endian Float32 samples and a SHA-256 in its manifest. `docs/asset-contract.md` documents the manifest, local-path and sampling contracts. The loader validates the manifest and binary before the viewer creates geometry; it does not import geographic data.
+The generator writes the original 3 × 3 loader fixture plus a separate 25 × 19, 2 m-spaced terrain demo. The latter contains a fictional base slope, Gaussian hill and narrow ridge, with little-endian Float32 samples and a SHA-256 in its manifest. `docs/asset-contract.md` documents both manifest variants, local-path and sampling contracts. The synthetic viewer loads the checked-in fixture; the EA mode loads only the generated local package and does not fetch geographic data from a service.
 
 ## AOI and EA DTM inspection
 
@@ -89,7 +89,21 @@ Pop-Location
 
 `inspect-sources` verifies archive and raster hashes/metadata, then samples the source pixel containing each AOI-aligned 1 m cell center. It does not interpolate or fill missing cells. The measured report is `docs/milestones/artifacts/TVW-007-coverage.json`; its current result is 1,000,000 valid cells out of 1,000,000, no uncovered, masked, NoData or nonfinite cells, and an EA DTM-only pass against the 1% threshold. The sample range is 29.529–98.171 m; the configured center sample is 47.620 m. The candidate `coverage_status` remains `not_checked` until other planned local sources, including OSM/OS features, are inspected.
 
-`preview-terrain` writes an actual north-up PNG from those measured samples at `docs/milestones/screenshots/TVW-007-ea-dtm-preview.png`. It shows the exact AOI border, BNG metre axes, 250 m scale bar, centre sample, measured elevation colorbar and Environment Agency attribution. This raster preview is a separate Python QA artifact; the browser continues to load synthetic fixtures only.
+`preview-terrain` writes an actual north-up PNG from those measured samples at `docs/milestones/screenshots/TVW-007-ea-dtm-preview.png`. It shows the exact AOI border, BNG metre axes, 250 m scale bar, centre sample, measured elevation colorbar and Environment Agency attribution. This raster preview is a separate Python QA artifact; TVW-008 adds a locally generated browser heightfield without changing the synthetic default.
+
+### TVW-008 local terrain package and viewer
+
+After restoring the source archives and extracted rasters as described in `docs/data-sources.md`, build the local browser package from the `pipeline` folder:
+
+```powershell
+Push-Location pipeline
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli build-terrain
+Pop-Location
+```
+
+The builder verifies the source archive, TIFF and XML hashes, rechecks EA DTM coverage, bilinearly samples the 1 m area-pixel centers onto the exact 501 × 501, 2 m AOI vertex grid, and writes a center-relative little-endian Float32 field. It refuses missing positive-weight contributors, does not fill or extrapolate, and publishes the manifest last. QA and the actual-data north-up PNG are written to `docs/milestones/artifacts/TVW-008-qa.json` and `docs/milestones/screenshots/TVW-008-terrain-preview.png`.
+
+The generated browser package at `public/worlds/torquay-poc-001/` is intentionally ignored by Git because it is derived from locally restored publisher data. On a clean clone the default synthetic viewer continues to work; the EA selector explains how to restore sources and rebuild the package. To open the real mode directly after building it, use `http://localhost:5173/?world=torquay-poc-001`. To return to the retained analytic demo, use `/?world=m0`. The real mode stays local to the Vite app and adds no network service. The EA cell-level result does not approve the broader candidate AOI; `coverage_status` remains `not_checked` pending OSM/OS feature checks, and M2 remains incomplete.
 
 Playwright's install command downloads a local Chromium build and requires internet access. After installation, the browser tests use local files. The persistent Chromium suite covers both the retained M0 viewer and loaded terrain, pointer lock and movement, terrain grid and wireframe controls, ground-height telemetry, error retry/return, resize, Escape release, and held-key cleanup. Vitest covers movement, manifest validation, binary decoding/loading, terrain grid/sampling, and Three.js mesh geometry.
 
@@ -103,12 +117,13 @@ Playwright's install command downloads a local Chromium build and requires inter
 - `docs/milestones/M1.md` records TVW-005 terrain and browser evidence.
 - `docs/milestones/TVW-006.md` records the candidate AOI calculation, CLI and verification.
 - `docs/milestones/TVW-007.md` records EA DTM acquisition, exact cell coverage and preview evidence.
+- `docs/milestones/TVW-008.md` records the resampling/export QA, local viewer behavior and browser evidence.
 - `docs/data-sources.md` documents publisher provenance, local source-file restoration and the current inspection result.
 - `data/source-manifest.json` records actual source URLs, archive checksums, raster metadata, licence and attribution.
 - `docs/milestones/screenshots/TVW-006-postcode-context.png` is the dated, attributed OSM anchor-context screenshot.
 - `docs/milestones/screenshots/TVW-006-aoi-boundary.png` preserves the original 500 m candidate square over an attributed OSM map as historical evidence.
 - `docs/milestones/screenshots/TVW-006-aoi-boundary-1km.png` shows the user-approved 1,000 m candidate square over an attributed OSM map.
 - `config/aoi.torquay.json` is the editable candidate anchor and size; generated bounds and provenance are in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
-- `docs/asset-contract.md` describes synthetic fixture provenance, coordinates, triangulation and sampling semantics.
+- `docs/asset-contract.md` describes synthetic and real manifest provenance, coordinates, triangulation and sampling semantics.
 
 The original plan remains preserved unchanged at `docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md`; the canonical copy records the verified anchor and user-approved 1,000 m pending candidate square. EA DTM cell coverage has been measured and passes its 1% threshold. OSM/OS building and road counts remain M2 work, so the candidate remains pending and is not coverage-approved or frozen.

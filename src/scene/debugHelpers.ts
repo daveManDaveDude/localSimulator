@@ -62,9 +62,11 @@ export function createDrapedGrid(
   return createLineSegments(positions, '#b4d2c7', 0.22);
 }
 
-export function createWorldAxes(heightAt: TerrainHeight): Line[] {
+export function createWorldAxes(
+  heightAt: TerrainHeight,
+  axisLength = 14,
+): Line[] {
   const axisY = 0.065;
-  const axisLength = 14;
   const specifications = [
     {
       from: new Vector3(0, 0, 0),
@@ -134,16 +136,17 @@ function createNorthLabel(): Sprite | null {
 export function createNorthArrow(
   heightAt: TerrainHeight,
   position: Readonly<{ x: number; z: number }> = { x: 19, z: 12 },
+  scale = 1,
 ): Group {
   const { x, z } = position;
-  const origin = new Vector3(x, heightAt(x, z) + 0.16, z);
+  const origin = new Vector3(x, heightAt(x, z) + 0.16 * scale, z);
   const arrow = new ArrowHelper(
     new Vector3(0, 0, -1),
     origin,
-    4.2,
+    4.2 * scale,
     '#d5f3e9',
-    1.1,
-    0.65,
+    1.1 * scale,
+    0.65 * scale,
   );
   arrow.name = 'North cue pointing to -Z';
   const northCue = new Group();
@@ -152,7 +155,12 @@ export function createNorthArrow(
   const label = createNorthLabel();
 
   if (label) {
-    label.position.set(x, heightAt(x, z - 4.9) + 0.7, z - 4.9);
+    label.scale.multiplyScalar(scale);
+    label.position.set(
+      x,
+      heightAt(x, z - 4.9 * scale) + 0.7 * scale,
+      z - 4.9 * scale,
+    );
     label.name = 'North label N';
     northCue.add(label);
   }

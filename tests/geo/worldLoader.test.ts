@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { loadSyntheticWorld, type WorldFetch } from '../../src/app/worldLoader';
 import {
+  loadSyntheticWorld,
+  loadWorld,
+  type WorldFetch,
+} from '../../src/app/worldLoader';
+import {
+  createRealManifest,
   readSyntheticFixtureBytes,
   readSyntheticFixtureManifest,
 } from './fixtures';
@@ -88,6 +93,41 @@ describe('loadSyntheticWorld', () => {
     expect([...result.heights]).toEqual([
       -2.5, 0, 1.25, 10, 11.5, 12, 20, 21, 22.75,
     ]);
+  });
+
+  it('loads an attributed real v1 manifest through local relative asset URLs', async () => {
+    const bytes = new ArrayBuffer(501 * 501 * Float32Array.BYTES_PER_ELEMENT);
+    const digest = await sha256Hex(bytes);
+    const manifest = createRealManifest(digest);
+    const realManifestUrl = new URL(
+      'https://local.test/worlds/torquay-poc-001/manifest.json',
+    );
+    const { fetcher, requests } = createFetcher({
+      manifest,
+      heightfieldBytes: bytes,
+    });
+
+    const loaded = await loadWorld(realManifestUrl, fetcher);
+
+    expect(loaded.manifest.worldType).toBe('real');
+    expect(loaded.manifest.id).toBe('torquay-poc-001');
+    expect(loaded.heights).toHaveLength(501 * 501);
+    expect(requests).toEqual([
+      realManifestUrl.href,
+      'https://local.test/worlds/torquay-poc-001/heightfield.f32',
+    ]);
+  });
+
+  it('keeps the typed synthetic loader from accepting a real package', async () => {
+    const bytes = new ArrayBuffer(501 * 501 * Float32Array.BYTES_PER_ELEMENT);
+    const manifest = createRealManifest(await sha256Hex(bytes));
+    const { fetcher } = createFetcher({ manifest, heightfieldBytes: bytes });
+
+    await expect(
+      loadSyntheticWorld(manifestUrl, fetcher),
+    ).rejects.toMatchObject({
+      stage: 'manifest validation',
+    });
   });
 
   it('does not request binary data when manifest validation fails', async () => {

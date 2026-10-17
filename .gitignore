@@ -11,6 +11,7 @@ test-results/
 data/raw/
 data/intermediate/
 data/generated/
+public/worlds/torquay-poc-001/
 
 # Local environment and editor files
 .venv/

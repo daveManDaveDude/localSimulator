@@ -60,6 +60,36 @@ function sampleFixtureHeight(bytes: Buffer, x: number, z: number): number {
     : d + (c - d) * (1 - u) + (b - d) * (1 - v);
 }
 
+function sampleTerrainHeight(
+  bytes: Buffer,
+  columns: number,
+  rows: number,
+  spacing: number,
+  width: number,
+  depth: number,
+  x: number,
+  z: number,
+): number | null {
+  if (x < -width / 2 || x > width / 2 || z < -depth / 2 || z > depth / 2) {
+    return null;
+  }
+  const gridX = (x + width / 2) / spacing;
+  const gridZ = (z + depth / 2) / spacing;
+  const column = Math.min(Math.floor(gridX), columns - 2);
+  const row = Math.min(Math.floor(gridZ), rows - 2);
+  const u = gridX - column;
+  const v = gridZ - row;
+  const valueAt = (sampleRow: number, sampleColumn: number): number =>
+    bytes.readFloatLE((sampleRow * columns + sampleColumn) * 4);
+  const a = valueAt(row, column);
+  const b = valueAt(row, column + 1);
+  const c = valueAt(row + 1, column);
+  const d = valueAt(row + 1, column + 1);
+  return u + v <= 1
+    ? a + (b - a) * u + (c - a) * v
+    : d + (c - d) * (1 - u) + (b - d) * (1 - v);
+}
+
 async function holdKey(
   page: Page,
   key: string,
@@ -533,8 +563,7 @@ test('loads and navigates the local synthetic heightfield terrain', async ({
       ),
     )
     .toBe(true);
-  const resetButton = page.getByTestId('reset-button');
-  await resetButton.click();
+  await page.getByTestId('reset-button').click();
   await expect
     .poll(async () => distance(spawn, await readPosition(page)))
     .toBeLessThan(0.03);
@@ -628,4 +657,286 @@ test('shows missing and corrupt asset errors, retries, and returns to M0', async
     'data-renderer-ready',
     'true',
   );
+});
+
+test('loads and navigates the local EA terrain package', async ({ page }) => {
+  const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
+  const failedRequests: string[] = [];
+  const badResponses: string[] = [];
+  const requestedUrls: string[] = [];
+  page.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  page.on('pageerror', (error) =>
+    pageErrors.push(`${error.name}: ${error.message}`),
+  );
+  page.on('requestfailed', (request) =>
+    failedRequests.push(`${request.method()} ${request.url()}`),
+  );
+  page.on('request', (request) => requestedUrls.push(request.url()));
+  page.on('response', (response) => {
+    if (response.status() >= 400) {
+      badResponses.push(`${response.status()} ${response.url()}`);
+    }
+  });
+
+  await page.goto('/?world=torquay-poc-001');
+  const shell = page.locator('.viewer-shell');
+  await expect(shell).toHaveAttribute('data-load-state', 'loaded');
+  await expect(shell).toHaveAttribute('data-renderer-ready', 'true');
+  await expect(shell).toHaveAttribute('data-world-source', 'heightfield');
+  await expect(shell).toHaveAttribute(
+    'data-world-name',
+    'REAL EA DTM · TQ1 4HN candidate area of interest',
+  );
+  await expect(page.getByTestId('world-type')).toContainText('REAL EA DTM');
+  await expect(page.getByTestId('world-source-mode')).toContainText(
+    'EPSG:27700',
+  );
+  await expect(page.getByTestId('world-provenance')).toContainText(
+    'REAL DATA · EA DTM 2022 composite',
+  );
+  await expect(page.getByTestId('provenance-badge')).toContainText(
+    'REAL DATA · EA DTM 2022 composite',
+  );
+  await expect(page.getByTestId('vertical-reference')).toContainText('Newlyn');
+  await expect(page.getByTestId('world-attribution')).toContainText(
+    'Environment Agency copyright',
+  );
+  await expect(page.getByTestId('terrain-details')).toHaveAttribute(
+    'data-columns',
+    '501',
+  );
+  await expect(page.getByTestId('terrain-details')).toHaveAttribute(
+    'data-rows',
+    '501',
+  );
+  await expect(page.getByTestId('ground-height')).toHaveAttribute(
+    'data-orthometric-meters',
+    /^-?\d+\.\d{4}$/,
+  );
+  expect(requestedUrls).toContain(
+    'http://127.0.0.1:4173/worlds/torquay-poc-001/manifest.json',
+  );
+  expect(requestedUrls).toContain(
+    'http://127.0.0.1:4173/worlds/torquay-poc-001/heightfield.f32',
+  );
+
+  const realHeightfield = await readFile(
+    resolve(process.cwd(), 'public/worlds/torquay-poc-001/heightfield.f32'),
+  );
+  const resetPosition = await readPosition(page);
+  const resetOrientation = await readOrientation(page);
+  const initialLocalGround = Number(
+    await page.getByTestId('ground-height').getAttribute('data-height-meters'),
+  );
+  const initialGroundAtCamera = sampleTerrainHeight(
+    realHeightfield,
+    501,
+    501,
+    2,
+    1000,
+    1000,
+    resetPosition.x,
+    resetPosition.z,
+  );
+  expect(initialGroundAtCamera).not.toBeNull();
+  expect(initialLocalGround).toBeCloseTo(initialGroundAtCamera!, 3);
+
+  await page.getByTestId('grid-toggle').click();
+  await expect(shell).toHaveAttribute('data-grid-visible', 'false');
+  await page.getByTestId('grid-toggle').click();
+  await expect(shell).toHaveAttribute('data-grid-visible', 'true');
+  await page.getByTestId('wireframe-toggle').click();
+  await expect(shell).toHaveAttribute('data-wireframe-visible', 'true');
+  await page.getByTestId('wireframe-toggle').click();
+
+  await page.getByRole('button', { name: 'Start exploring' }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.pointerLockElement === document.querySelector('canvas'),
+      ),
+    )
+    .toBe(true);
+  const screenshotPath = resolve(
+    process.cwd(),
+    'docs/milestones/screenshots/TVW-008-real-terrain.png',
+  );
+  await mkdir(dirname(screenshotPath), { recursive: true });
+  await page.screenshot({ path: screenshotPath, animations: 'disabled' });
+
+  const beforeMove = await readPosition(page);
+  await holdKey(page, 'w', 350);
+  const afterMove = await readPosition(page);
+  expect(afterMove.z).toBeLessThan(beforeMove.z - 0.5);
+  expect(distance(beforeMove, afterMove)).toBeGreaterThan(0.5);
+  const groundAfterMove = Number(
+    await page.getByTestId('ground-height').getAttribute('data-height-meters'),
+  );
+  const expectedGroundAfterMove = sampleTerrainHeight(
+    realHeightfield,
+    501,
+    501,
+    2,
+    1000,
+    1000,
+    afterMove.x,
+    afterMove.z,
+  );
+  expect(expectedGroundAfterMove).not.toBeNull();
+  expect(groundAfterMove).toBeCloseTo(expectedGroundAfterMove!, 3);
+  await page.keyboard.down('Shift');
+  await expect(page.getByTestId('flight-speed')).toHaveAttribute(
+    'data-boosting',
+    'true',
+  );
+  const speed = await readSpeed(page);
+  await page.keyboard.up('Shift');
+  expect(speed).toBeGreaterThan(0);
+
+  const beforeLook = await readOrientation(page);
+  await page.mouse.move(600, 420);
+  await page.mouse.move(710, 480, { steps: 8 });
+  await expect
+    .poll(async () => (await readOrientation(page)).bearing)
+    .not.toBeCloseTo(beforeLook.bearing, 0);
+  await expect
+    .poll(async () => (await readOrientation(page)).pitch)
+    .not.toBeCloseTo(beforeLook.pitch, 0);
+
+  await page.keyboard.press('r');
+  await expect
+    .poll(async () => distance(resetPosition, await readPosition(page)))
+    .toBeLessThan(0.03);
+  await expect
+    .poll(async () =>
+      Math.abs(
+        (await readOrientation(page)).bearing - resetOrientation.bearing,
+      ),
+    )
+    .toBeLessThan(0.2);
+  await expect
+    .poll(async () =>
+      Math.abs((await readOrientation(page)).pitch - resetOrientation.pitch),
+    )
+    .toBeLessThan(0.2);
+
+  await page.keyboard.down('w');
+  await page.waitForTimeout(150);
+  await page.keyboard.press('Escape');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.pointerLockElement !== document.querySelector('canvas'),
+      ),
+    )
+    .toBe(true);
+  await expect(page.getByTestId('flight-state')).toHaveAttribute(
+    'data-locked',
+    'false',
+  );
+  const positionAtUnlock = await readPosition(page);
+  await page.waitForTimeout(250);
+  expect(distance(positionAtUnlock, await readPosition(page))).toBeLessThan(
+    0.03,
+  );
+  await page.keyboard.up('w');
+
+  await page.waitForTimeout(2_500);
+  const fpsSamples: number[] = [];
+  for (let sample = 0; sample < 7; sample += 1) {
+    const value = Number(
+      await page.getByTestId('frames-per-second').getAttribute('data-fps'),
+    );
+    if (Number.isFinite(value) && value > 0) fpsSamples.push(value);
+    await page.waitForTimeout(250);
+  }
+  expect(fpsSamples.length).toBeGreaterThanOrEqual(3);
+  const sortedFps = [...fpsSamples].sort((left, right) => left - right);
+  const medianFps = sortedFps[Math.floor(sortedFps.length / 2)]!;
+  const browserEvidence = await page.evaluate(() => {
+    const canvas = document.querySelector<HTMLCanvasElement>(
+      'canvas.viewer-canvas',
+    );
+    if (!canvas) throw new Error('The renderer canvas is missing.');
+    const context = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    const rendererExtension = context?.getExtension(
+      'WEBGL_debug_renderer_info',
+    );
+    return {
+      userAgent: navigator.userAgent,
+      webglRenderer: context
+        ? rendererExtension
+          ? context.getParameter(rendererExtension.UNMASKED_RENDERER_WEBGL)
+          : context.getParameter(context.RENDERER)
+        : 'WebGL unavailable',
+      viewport: { width: innerWidth, height: innerHeight },
+      devicePixelRatio,
+      canvas: {
+        cssWidth: canvas.clientWidth,
+        cssHeight: canvas.clientHeight,
+        width: canvas.width,
+        height: canvas.height,
+      },
+    };
+  });
+  expect(browserEvidence.canvas.width).toBe(1440);
+  expect(browserEvidence.canvas.height).toBe(900);
+  await mkdir(resolve(process.cwd(), 'test-results'), { recursive: true });
+  await writeFile(
+    resolve(process.cwd(), 'test-results/tvw-008-browser-evidence.json'),
+    JSON.stringify(
+      {
+        ...browserEvidence,
+        browserVersion: page.context().browser()?.version(),
+        initialPosition: resetPosition,
+        afterMove,
+        initialLocalGround,
+        groundAfterMove,
+        fpsSamples,
+        medianFps,
+        screenshotPath,
+      },
+      null,
+      2,
+    ),
+  );
+
+  expect(consoleErrors).toEqual([]);
+  expect(pageErrors).toEqual([]);
+  expect(failedRequests).toEqual([]);
+  expect(badResponses).toEqual([]);
+});
+
+test('explains an unavailable local EA package and recovers to synthetic terrain', async ({
+  page,
+}) => {
+  await page.route('**/worlds/torquay-poc-001/manifest.json', (route) =>
+    route.fulfill({ status: 404, body: 'package not generated' }),
+  );
+  await page.goto('/');
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-load-state',
+    'loaded',
+  );
+  await page.getByTestId('world-select-real').click();
+  await expect(page.getByTestId('world-load-error')).toBeVisible();
+  await expect(page.getByTestId('world-error-message')).toContainText(
+    'HTTP 404',
+  );
+  await expect(page.getByTestId('world-error-message')).toContainText(
+    'build-terrain',
+  );
+  await page.getByTestId('recover-synthetic').click();
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-load-state',
+    'loaded',
+  );
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-renderer-ready',
+    'true',
+  );
+  await expect(page.getByTestId('world-provenance')).toContainText('SYNTHETIC');
 });
