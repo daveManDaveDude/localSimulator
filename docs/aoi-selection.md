@@ -20,20 +20,21 @@
 
 ## Transformation evidence
 
-PROJ network access was disabled. These records describe the operations actually used for the forward centre transform and inverse corner transform.
+PROJ network access was disabled. The tool pins EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid) by operation identity, so local grid availability cannot reorder or replace the selected 2 m fallback.
 
-- WGS84 → BNG operation: `pipeline` — Inverse of OSGB36 to WGS 84 (6) + British National Grid (with axis order normalized for visualization)
-  - Reported accuracy: 2.000 m; grids: no grid files listed for the operation used.
-- BNG → WGS84 operation: `pipeline` — Inverse of British National Grid + OSGB36 to WGS 84 (6) (with axis order normalized for visualization)
-  - Reported accuracy: 2.000 m; grids: no grid files listed for the operation used.
+- WGS84 → BNG operation: `EPSG:1314 + EPSG:19916` — Inverse of OSGB36 to WGS 84 (6) + British National Grid (with axis order normalized for visualization)
+  - Reported accuracy: 2.000 m; chosen operation uses grids: `false`; selected EPSG:1314 + EPSG:19916 operation uses no grid files.
+  - Preferred operation set best available: `false`; missing preferred operations/grids: Inverse of OSGB36 to WGS 84 (9) + British National Grid (uk_os_OSTN15_NTv2_OSGBtoETRS.tif available=false).
+- BNG → WGS84 operation: `EPSG:1314 + EPSG:19916` — Inverse of British National Grid + OSGB36 to WGS 84 (6) (with axis order normalized for visualization)
+  - Reported accuracy: 2.000 m; chosen operation uses grids: `false`; selected EPSG:1314 + EPSG:19916 operation uses no grid files.
+  - Preferred operation set best available: `false`; missing preferred operations/grids: Inverse of British National Grid + OSGB36 to WGS 84 (9) (uk_os_OSTN15_NTv2_OSGBtoETRS.tif available=false).
 
 ## Map context and limits
 
-An independent OpenStreetMap view centred on the postcode showed Wrights Lane, Haslam Road, Chatto Way and Charito Road in a built-up inland context (viewed 2026-10-17, zoom 18). This check confirms map context only. EA DTM coverage, OSM/OS feature counts and local data availability have not been checked; those remain TVW-007 work.
+This link is generated from the configured WGS84 anchor and centres OpenStreetMap on the current candidate. It is a visual map-context link only; regenerated reports make no fixed road or landmark assertions. EA DTM coverage, OSM/OS feature counts and local data availability have not been checked; those remain TVW-007 work.
 
-Map: [OpenStreetMap view](https://www.openstreetmap.org/?mlat=50.477853&mlon=-3.536013#map=18/50.477853/-3.536013). © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright). The saved screenshot is a dated map-context reference, not source geometry.
+Map: [OpenStreetMap view](https://www.openstreetmap.org/?mlat=50.47785300&mlon=-3.53601300#map=17/50.47785300/-3.53601300). © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 Provider reference: [Postcodes.io API documentation](https://postcodes.io/docs/).
 Coordinate reference: [pyproj Transformer documentation](https://pyproj4.github.io/pyproj/stable/api/transformer.html).
-Saved map context: [TVW-006 postcode screenshot](milestones/screenshots/TVW-006-postcode-context.png).
 
 To regenerate after changing only the configured anchor or AOI parameters from PowerShell, run `.\.venv\Scripts\python.exe -m torquay_pipeline.cli select-aoi --config ..\config\aoi.torquay.json --output-dir ..\docs` from `pipeline/`.

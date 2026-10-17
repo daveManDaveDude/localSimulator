@@ -85,7 +85,8 @@ Playwright's install command downloads a local Chromium build and requires inter
 - `docs/milestones/TVW-004.md` records the synthetic manifest, binary fixture and loader evidence.
 - `docs/milestones/M1.md` records TVW-005 terrain and browser evidence.
 - `docs/milestones/TVW-006.md` records the candidate AOI calculation, CLI and verification.
-- `docs/milestones/screenshots/TVW-006-postcode-context.png` is the dated, attributed OSM map-context screenshot.
+- `docs/milestones/screenshots/TVW-006-postcode-context.png` is the dated, attributed OSM anchor-context screenshot.
+- `docs/milestones/screenshots/TVW-006-aoi-boundary.png` shows the generated candidate square over an attributed OSM map.
 - `config/aoi.torquay.json` is the editable candidate anchor and size; generated bounds and provenance are in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 - `docs/asset-contract.md` describes synthetic fixture provenance, coordinates, triangulation and sampling semantics.
 

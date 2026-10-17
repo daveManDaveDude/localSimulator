@@ -157,9 +157,9 @@ Useful references: https://www.nationalarchives.gov.uk/doc/open-government-licen
 
 ## 4. Define and freeze a concrete area of interest (AOI)
 
-**Candidate anchor:** postcode **TQ1 4HN**. Postcodes.io returned quality 1 and WGS84 longitude `-3.536013`, latitude `50.477853` on 2026-10-17; these are postcode-centroid coordinates, not a property or survey point. The provider's rounded BNG values were easting `291110`, northing `65355`. An independent OpenStreetMap map inspection at zoom 18 showed Wrights Lane, Haslam Road, Chatto Way and Charito Road in a built-up inland context. See the saved, attributed reference at `docs/milestones/screenshots/TVW-006-postcode-context.png`.
+**Candidate anchor:** postcode **TQ1 4HN**. Postcodes.io returned quality 1 and WGS84 longitude `-3.536013`, latitude `50.477853` on 2026-10-17; these are postcode-centroid coordinates, not a property or survey point. The provider's rounded BNG values were easting `291110`, northing `65355`. Independent OpenStreetMap context was inspected at zoom 18 around the anchor and zoom 17 with the generated candidate boundary overlaid. The dated marker-only and boundary screenshots are `docs/milestones/screenshots/TVW-006-postcode-context.png` and `docs/milestones/screenshots/TVW-006-aoi-boundary.png`.
 
-TVW-006 used pyproj with `always_xy=True` to derive a **500 m × 500 m EPSG:27700 candidate** centred at easting `291108.9018176432`, northing `65353.48350844931`, with bounds `[290858.9018176432, 65103.48350844931, 291358.9018176432, 65603.48350844931]` in `[west, south, east, north]` order. PROJ selected the OSGB36 Helmert / British National Grid operation and reported 2 m accuracy; no grids were listed for the operation used, and PROJ network access was disabled. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
+TVW-006 used pyproj with `always_xy=True` to derive a **500 m × 500 m EPSG:27700 candidate** centred at easting `291108.9018176432`, northing `65353.48350844931`, with bounds `[290858.9018176432, 65103.48350844931, 291358.9018176432, 65603.48350844931]` in `[west, south, east, north]` order. The tool pins non-ballpark EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid), reporting 2 m accuracy; the selected operation uses no grid. PROJ network access is disabled. In this environment the preferred 1 m operation is unavailable because `uk_os_OSTN15_NTv2_OSGBtoETRS.tif` is missing; the tool records `best_available`, missing operation/grid names, and the selected operation definition in `docs/aoi-selection.json`. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 
 The current config status is `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. The map inspection confirms anchor context only; EA DTM coverage, OSM/OS feature counts and local data availability have not been checked. Do not describe this candidate as coverage-approved or frozen, and do not mark the M2 exit gate complete before TVW-007.
 
@@ -472,7 +472,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M2 — Freeze Torquay AOI and verify elevation acquisition
 
-**TVW-006 status:** IMPLEMENTED — independent review pending. It produced a postcode-centred candidate AOI, validation tooling and QA GeoJSON. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 has not been authorized.
+**TVW-006 status:** Luna fix 1 implemented and verified; independent re-review pending. It produced a postcode-centred candidate AOI, strict config validation, deterministic operation/grid diagnostics, and QA GeoJSON. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 has not been authorized.
 
 **User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 500 m AOI drawn on it. The browser can still run synthetic scene.
 

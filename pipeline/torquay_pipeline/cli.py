@@ -11,7 +11,7 @@ from pathlib import Path
 from pyproj.network import is_network_enabled
 
 from .aoi import generate_selection, write_selection
-from .config import AoiConfigError, load_aoi_config
+from .config import AoiConfigError, load_aoi_config, validate_stored_selection
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -38,6 +38,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         if is_network_enabled():
             raise RuntimeError("PROJ network access unexpectedly remained enabled")
         if args.command == "validate-aoi":
+            validate_stored_selection(
+                config,
+                selection["aoi"]["center_easting_m"],
+                selection["aoi"]["center_northing_m"],
+                selection["aoi"]["bbox_m"],
+            )
             print(json.dumps(selection, ensure_ascii=False, indent=2, allow_nan=False))
             print("AOI config valid; candidate coverage remains not_checked.", file=sys.stderr)
             return 0

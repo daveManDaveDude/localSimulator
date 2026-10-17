@@ -73,3 +73,20 @@ def test_rejects_malformed_json_with_context(tmp_path: Path) -> None:
 def test_rejects_unknown_config_fields(tmp_path: Path) -> None:
     with pytest.raises(AoiConfigError, match="unsupported field.*unexpected"):
         load_aoi_config(_write_config(tmp_path, {"unexpected": True}))
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("aoi.center_bng_m", None, "aoi.center_bng_m must contain exactly 2 finite numbers"),
+        ("aoi.bbox_m", None, "aoi.bbox_m must contain exactly 4 finite numbers"),
+        ("aoi.center_bng_m", [1, 2], "aoi.bbox_m easting midpoint"),
+        ("aoi.bbox_m", [0, 0, 500, 500], "aoi.bbox_m easting midpoint"),
+        ("aoi.bbox_m", [500, 0, 0, 500], "aoi.bbox_m must be ordered"),
+    ],
+)
+def test_rejects_missing_or_malformed_stored_projected_values(
+    tmp_path: Path, field: str, value: object, message: str
+) -> None:
+    with pytest.raises(AoiConfigError, match=message):
+        load_aoi_config(_write_config(tmp_path, {field: value}))

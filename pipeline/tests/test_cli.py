@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from torquay_pipeline.cli import main
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,6 +41,27 @@ def test_invalid_config_returns_actionable_nonzero_status(tmp_path: Path, capsys
     assert "format_version" in capsys.readouterr().err
 
 
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("center_bng_m", None, "aoi.center_bng_m"),
+        ("bbox_m", None, "aoi.bbox_m"),
+        ("center_bng_m", [1, 2], "aoi.bbox_m"),
+        ("bbox_m", [0, 0, 500, 500], "aoi.bbox_m"),
+    ],
+)
+def test_validate_rejects_invalid_or_stale_stored_projection(
+    tmp_path: Path, capsys, field: str, value: object, message: str
+) -> None:
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    config["aoi"][field] = value
+    edited = tmp_path / "stale.json"
+    edited.write_text(json.dumps(config), encoding="utf-8")
+
+    assert main(["validate-aoi", "--config", str(edited)]) == 2
+    assert message in capsys.readouterr().err
+
+
 def test_changing_only_configured_anchor_regenerates_aoi_outputs(tmp_path: Path) -> None:
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     edited_config = tmp_path / "edited-aoi.json"
@@ -61,3 +84,10 @@ def test_changing_only_configured_anchor_regenerates_aoi_outputs(tmp_path: Path)
 
     assert moved_selection["aoi"]["bbox_m"] != first_selection["aoi"]["bbox_m"]
     assert moved_geojson != first_geojson
+    assert main(["validate-aoi", "--config", str(edited_config)]) == 0
+    refreshed = json.loads(edited_config.read_text(encoding="utf-8"))
+    assert refreshed["aoi"]["bbox_m"] == moved_selection["aoi"]["bbox_m"]
+    assert refreshed["aoi"]["center_bng_m"] == [
+        moved_selection["aoi"]["center_easting_m"],
+        moved_selection["aoi"]["center_northing_m"],
+    ]

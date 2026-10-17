@@ -55,22 +55,54 @@
   "transformations": {
     "network_grids_enabled": false,
     "wgs84_to_bng": {
-      "name": "pipeline",
+      "name": "EPSG:1314 + EPSG:19916",
       "description": "Inverse of OSGB36 to WGS 84 (6) + British National Grid (with axis order normalized for visualization)",
       "definition": "proj=pipeline step proj=unitconvert xy_in=deg xy_out=rad step proj=push v_3 step proj=cart ellps=WGS84 step inv proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=airy step proj=pop v_3 step proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy",
       "reported_accuracy_m": 2.0,
       "accuracy_m": 2.0,
-      "grid_status": "no grid files listed for the operation used",
-      "grids": []
+      "grid_status": "selected EPSG:1314 + EPSG:19916 operation uses no grid files",
+      "uses_grids": false,
+      "grids": [],
+      "best_available": false,
+      "preferred_missing_operations": [
+        {
+          "name": "Inverse of OSGB36 to WGS 84 (9) + British National Grid",
+          "reported_accuracy_m": 1.0,
+          "grids": [
+            {
+              "short_name": "uk_os_OSTN15_NTv2_OSGBtoETRS.tif",
+              "full_name": "",
+              "available": false,
+              "url": "https://cdn.proj.org/uk_os_OSTN15_NTv2_OSGBtoETRS.tif"
+            }
+          ]
+        }
+      ]
     },
     "bng_to_wgs84": {
-      "name": "pipeline",
+      "name": "EPSG:1314 + EPSG:19916",
       "description": "Inverse of British National Grid + OSGB36 to WGS 84 (6) (with axis order normalized for visualization)",
       "definition": "proj=pipeline step inv proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy step proj=push v_3 step proj=cart ellps=airy step proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=WGS84 step proj=pop v_3 step proj=unitconvert xy_in=rad xy_out=deg",
       "reported_accuracy_m": 2.0,
       "accuracy_m": 2.0,
-      "grid_status": "no grid files listed for the operation used",
-      "grids": []
+      "grid_status": "selected EPSG:1314 + EPSG:19916 operation uses no grid files",
+      "uses_grids": false,
+      "grids": [],
+      "best_available": false,
+      "preferred_missing_operations": [
+        {
+          "name": "Inverse of British National Grid + OSGB36 to WGS 84 (9)",
+          "reported_accuracy_m": 1.0,
+          "grids": [
+            {
+              "short_name": "uk_os_OSTN15_NTv2_OSGBtoETRS.tif",
+              "full_name": "",
+              "available": false,
+              "url": "https://cdn.proj.org/uk_os_OSTN15_NTv2_OSGBtoETRS.tif"
+            }
+          ]
+        }
+      ]
     }
   }
 }

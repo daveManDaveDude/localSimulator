@@ -59,3 +59,14 @@ def test_geojson_coordinates_are_wgs84_ranges() -> None:
     )
     ring = geojson["features"][0]["geometry"]["coordinates"][0]
     assert all(-180 <= longitude <= 180 and -90 <= latitude <= 90 for longitude, latitude in ring)
+
+
+def test_generated_report_uses_configured_center_without_fixed_road_claims() -> None:
+    config = load_aoi_config(ROOT / "config" / "aoi.torquay.json")
+    moved = replace(config, anchor=replace(config.anchor, longitude=-3.4, latitude=50.5))
+    _selection, _geojson, markdown = generate_selection(moved)
+
+    assert "?mlat=50.50000000&mlon=-3.40000000#map=17/50.50000000/-3.40000000" in markdown
+    assert "Wrights Lane" not in markdown
+    assert "Haslam Road" not in markdown
+    assert "generated from the configured WGS84 anchor" in markdown

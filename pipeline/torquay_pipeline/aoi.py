@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from .config import AoiConfig
+from .config import AoiConfig, parse_aoi_config, validate_stored_selection
 from .coordinates import transform_bng_to_wgs84, transform_wgs84_to_bng
 
 
@@ -168,6 +168,28 @@ def render_selection_markdown(selection: dict[str, Any]) -> str:
         f"- Bounds `[west, south, east, north]`: "
         f"`[{west:.3f}, {south:.3f}, {east:.3f}, {north:.3f}] m`"
     )
+
+    def missing_operation_text(operation: dict[str, Any]) -> str:
+        missing = operation["preferred_missing_operations"]
+        if not missing:
+            return "none reported by the local PROJ database"
+        return "; ".join(
+            f"{item['name']} ("
+            + ", ".join(
+                f"{grid['short_name'] or grid['full_name']} available="
+                f"{str(grid['available']).lower()}"
+                for grid in item["grids"]
+            )
+            + ")"
+            for item in missing
+        )
+
+    longitude = anchor["coordinates"]["longitude"]
+    latitude = anchor["coordinates"]["latitude"]
+    map_url = (
+        "https://www.openstreetmap.org/"
+        f"?mlat={latitude:.8f}&mlon={longitude:.8f}#map=17/{latitude:.8f}/{longitude:.8f}"
+    )
     lines = [
         "# AOI selection candidate",
         "",
@@ -192,37 +214,48 @@ def render_selection_markdown(selection: dict[str, Any]) -> str:
         "## Transformation evidence",
         "",
         (
-            "PROJ network access was disabled. These records describe the operations actually used "
-            "for the forward centre transform and inverse corner transform."
+            "PROJ network access was disabled. The tool pins EPSG operation 1314 "
+            "(OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid) "
+            "by operation identity, so local grid "
+            "availability cannot reorder or replace the selected 2 m fallback."
         ),
         "",
         f"- WGS84 → BNG operation: `{forward['name']}` — {forward['description']}",
-        f"  - Reported accuracy: {accuracy_text(forward)}; grids: {grid_text(forward)}.",
+        (
+            f"  - Reported accuracy: {accuracy_text(forward)}; chosen operation uses grids: "
+            f"`{str(forward['uses_grids']).lower()}`; {grid_text(forward)}."
+        ),
+        (
+            f"  - Preferred operation set best available: "
+            f"`{str(forward['best_available']).lower()}`; missing preferred operations/grids: "
+            f"{missing_operation_text(forward)}."
+        ),
         f"- BNG → WGS84 operation: `{inverse['name']}` — {inverse['description']}",
-        f"  - Reported accuracy: {accuracy_text(inverse)}; grids: {grid_text(inverse)}.",
+        (
+            f"  - Reported accuracy: {accuracy_text(inverse)}; chosen operation uses grids: "
+            f"`{str(inverse['uses_grids']).lower()}`; {grid_text(inverse)}."
+        ),
+        (
+            f"  - Preferred operation set best available: "
+            f"`{str(inverse['best_available']).lower()}`; missing preferred operations/grids: "
+            f"{missing_operation_text(inverse)}."
+        ),
         "",
         "## Map context and limits",
         "",
         (
-            "An independent OpenStreetMap view centred on the postcode showed Wrights Lane, "
-            "Haslam Road, Chatto Way and Charito Road in a built-up inland context "
-            "(viewed 2026-10-17, zoom 18). This check confirms map context only. EA DTM coverage, "
-            "OSM/OS feature counts and local data availability have not been checked; those remain "
-            "TVW-007 work."
+            "This link is generated from the configured WGS84 anchor and centres OpenStreetMap "
+            "on the current candidate. It is a visual map-context link only; regenerated reports "
+            "make no fixed road or landmark assertions. EA DTM coverage, OSM/OS feature counts and "
+            "local data availability have not been checked; those remain TVW-007 work."
         ),
         "",
         (
-            "Map: [OpenStreetMap view](https://www.openstreetmap.org/?mlat=50.477853&mlon=-3.536013"
-            "#map=18/50.477853/-3.536013). © OpenStreetMap contributors, "
-            "[ODbL](https://www.openstreetmap.org/copyright). The saved screenshot is a dated "
-            "map-context reference, not source geometry."
+            f"Map: [OpenStreetMap view]({map_url}). © OpenStreetMap contributors, "
+            "[ODbL](https://www.openstreetmap.org/copyright)."
         ),
         "Provider reference: [Postcodes.io API documentation](https://postcodes.io/docs/).",
         "Coordinate reference: [pyproj Transformer documentation](https://pyproj4.github.io/pyproj/stable/api/transformer.html).",
-        (
-            "Saved map context: [TVW-006 postcode screenshot]"
-            "(milestones/screenshots/TVW-006-postcode-context.png)."
-        ),
         "",
         (
             "To regenerate after changing only the configured anchor or AOI parameters from "
@@ -283,5 +316,12 @@ def write_selection(
             selection["aoi"]["center_northing_m"],
         ]
         raw_config["aoi"]["bbox_m"] = selection["aoi"]["bbox_m"]
+        refreshed_config = parse_aoi_config(raw_config)
+        validate_stored_selection(
+            refreshed_config,
+            selection["aoi"]["center_easting_m"],
+            selection["aoi"]["center_northing_m"],
+            selection["aoi"]["bbox_m"],
+        )
         outputs[config_path] = _encode_json(raw_config)
     atomic_write_outputs(outputs)
