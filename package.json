@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run typecheck && vite build",
+    "build:share": "npm run typecheck && vite build --mode share",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

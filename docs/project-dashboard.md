@@ -2,6 +2,8 @@
 
 The dashboard is available at `/progress.html` while the local Vite server is running. It refreshes `public/project-progress.json` on page load and when **Refresh status** is selected. The request bypasses the browser cache, so a new snapshot appears without restarting Vite.
 
+For a shareable static build, run `npm run build:share`. It includes the dashboard, synthetic viewer and public synthetic assets, and omits the ignored local EA terrain package. On a hosted copy, **Refresh status** reloads the snapshot included in that deployment; updating the hosted report requires building and publishing a new snapshot.
+
 ## Updating the snapshot
 
 Update the JSON after a milestone handback or a material plan change:

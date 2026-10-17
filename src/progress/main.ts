@@ -287,7 +287,7 @@ function render(data: ProjectProgress): void {
             .join('')}
         </div>
         <div class="button-row">
-          <a class="primary-link" href="/?world=torquay-poc-001">Open EA terrain <span aria-hidden="true">↗</span></a>
+          <a class="primary-link terrain-unavailable" id="real-terrain-link" aria-disabled="true" tabindex="-1">Checking EA terrain availability…</a>
           <a class="secondary-link" href="/">Open synthetic viewer</a>
         </div>
       </article>
@@ -336,11 +336,42 @@ function render(data: ProjectProgress): void {
       <div class="evidence-list">${renderEvidence(data.evidence)}</div>
     </section>`;
   dashboard.setAttribute('aria-busy', 'false');
+  void updateTerrainLink();
+}
+
+async function updateTerrainLink(): Promise<void> {
+  const link = requiredElement<HTMLAnchorElement>('#real-terrain-link');
+  try {
+    const response = await fetch('/worlds/torquay-poc-001/manifest.json', {
+      method: 'HEAD',
+      cache: 'no-store',
+    });
+    const contentType = response.headers.get('content-type') ?? '';
+    if (!response.ok || !contentType.toLowerCase().includes('json')) {
+      link.removeAttribute('href');
+      link.setAttribute('aria-disabled', 'true');
+      link.setAttribute('tabindex', '-1');
+      link.classList.add('terrain-unavailable');
+      link.textContent = 'EA terrain available in local workspace only';
+      return;
+    }
+    link.href = '/?world=torquay-poc-001';
+    link.removeAttribute('aria-disabled');
+    link.removeAttribute('tabindex');
+    link.classList.remove('terrain-unavailable');
+    link.textContent = 'Open EA terrain ↗';
+  } catch {
+    link.removeAttribute('href');
+    link.setAttribute('aria-disabled', 'true');
+    link.setAttribute('tabindex', '-1');
+    link.classList.add('terrain-unavailable');
+    link.textContent = 'EA terrain unavailable in this build';
+  }
 }
 
 async function refreshProgress(): Promise<void> {
   refreshButton.disabled = true;
-  liveMessage.textContent = 'Refreshing the local project snapshot…';
+  liveMessage.textContent = 'Refreshing the project snapshot…';
   try {
     const response = await fetch(
       `/project-progress.json?refresh=${Date.now()}`,
@@ -356,7 +387,7 @@ async function refreshProgress(): Promise<void> {
       hour: 'numeric',
       minute: '2-digit',
     }).format(new Date());
-    liveMessage.textContent = `Updated from the local project snapshot. Report date: ${formatDate(payload.asOf)}.`;
+    liveMessage.textContent = `Updated from the project snapshot. Report date: ${formatDate(payload.asOf)}.`;
   } catch (error) {
     dashboard.setAttribute('aria-busy', 'false');
     liveMessage.textContent = `Could not refresh project status: ${error instanceof Error ? error.message : 'unknown error'}`;

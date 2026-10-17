@@ -409,6 +409,11 @@ h1 span {
 .primary-link:hover {
   background: #a2f0d3;
 }
+.primary-link.terrain-unavailable {
+  background: #26313b;
+  color: #a7b3bd;
+  cursor: not-allowed;
+}
 .secondary-link {
   border: 1px solid #344750;
   color: #b8c7c8;
