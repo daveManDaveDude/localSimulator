@@ -1,10 +1,10 @@
 # Project instructions
 
-TVW-004, TVW-005, TVW-006 and TVW-007 are complete and independently reviewed; M0 and M1 are complete. The user authorized TVW-008/M3 on 2026-10-17; it is the current issue. The TVW-007 EA DTM threshold passes, but OSM/OS building and road feature counts remain unchecked, so do not call the AOI approved or frozen. Do not begin TVW-009 or later without separate user instruction. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` / `not_checked` status.
+TVW-004 through TVW-008 are complete and independently reviewed; M0, M1 and the M3 terrain-only issue are complete. The TVW-007 EA DTM threshold passes, but OSM/OS building and road feature counts remain unchecked, so do not call the AOI approved or frozen. No later issue is authorized; do not begin TVW-009 or beyond without separate user instruction. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` / `not_checked` status.
 
 ## Working protocol
 
-1. Work on **one milestone and one focused issue** at a time. M0 and M1 are complete. The 1,000 m AOI revision and TVW-007 passed independent review; the user has separately authorized TVW-008/M3 only. TVW-008 must preserve the pending overall AOI status and synthetic worlds. Do not begin TVW-009 or later without separate authorization.
+1. Work on **one milestone and one focused issue** at a time. M0, M1 and TVW-008/M3 are complete and independently reviewed. TVW-008 preserved the pending overall AOI status and synthetic worlds. Do not begin TVW-009 or later without separate authorization.
 2. Start with an implementation plan, concrete files touched, tests and proof of completion.
 3. Keep geographic calculations in tested Python modules and typed, documented asset contracts. No ad-hoc coordinate transforms scattered across React/Three.js render logic.
 4. Maintain a **fully functioning synthetic world** at all times.

@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 and M1 complete; TVW-001 through TVW-007 passed independent review. The user-authorized 1,000 m AOI revision also passed independent review. TVW-007 completes the EA DTM inspection only; overall AOI coverage remains pending for OSM/OS feature counts. The user separately authorized TVW-008/M3; TVW-009 and later are not authorized.
+**Status:** M0, M1 and TVW-001 through TVW-008 passed independent review. The 1,000 m AOI revision and EA DTM inspection passed; overall AOI coverage remains pending for OSM/OS feature counts, so the AOI is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. No TVW-009 or later issue is authorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -497,7 +497,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M3 — Render real Torquay terrain
 
-**TVW-008 status:** User-authorized on 2026-10-17; implementation in progress. The deliverable is a selectable, local-only EA DTM terrain package for the current 1,000 m pending candidate; this does not freeze or otherwise approve the full AOI.
+**TVW-008 status:** PASS after two focused fixes and independent Sol review on 2026-10-17. The delivered terrain-only feature is a selectable, local EA DTM package for the current 1,000 m pending candidate; this does not freeze or otherwise approve the full AOI. See the [TVW-008 handback](milestones/TVW-008.md).
 
 **User-visible result:** replace synthetic ground with **true Torquay LiDAR-derived topography** in browser. Fly over recognisable slopes.
 
@@ -518,6 +518,8 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 - The scene draws at a usable interactive rate; record machine, viewport size and median FPS.
 
 **Exit gate:** saved screenshot of real Torquay terrain in the browser.
+
+**TVW-008 issue gate:** Passed. The 501 × 501 real terrain loaded locally, passed source-sampling QA and browser recovery checks, and has an independently reviewed browser screenshot. Chrome on the host RTX 4070 SUPER / Direct3D11 measured a 60 FPS median; the SwiftShader test path measured 9.1 FPS and remains a documented software-renderer limitation. M2 remains incomplete pending OSM/OS feature checks.
 
 ### M4 — Real building footprints (3D blocks)
 
