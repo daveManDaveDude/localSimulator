@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 and M1 complete — TVW-001 through TVW-005 implemented, independently reviewed, and verified; TVW-006 implementation is awaiting independent review; TVW-007 and later require separate authorization
+**Status:** M0 and M1 complete; TVW-001 through TVW-006 implemented, independently reviewed, and verified; TVW-007 and later require separate authorization
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -449,7 +449,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M1 — Asset schema and deterministic heightfield renderer
 
-**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete. TVW-006 is authorized and in progress; TVW-007 remains outside the current scope.
+**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete. TVW-006 is complete after independent review; TVW-007 remains outside the current scope.
 
 **User-visible result:** browser loads a **synthetic terrain hill** from a `heightfield.f32` fixture rather than constructing it ad hoc.
 
@@ -472,7 +472,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M2 — Freeze Torquay AOI and verify elevation acquisition
 
-**TVW-006 status:** Luna fix 1 implemented and verified; independent re-review pending. It produced a postcode-centred candidate AOI, strict config validation, deterministic operation/grid diagnostics, and QA GeoJSON. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 has not been authorized.
+**TVW-006 status:** PASS after Luna fix 1 and independent re-review. It produced a postcode-centred candidate AOI, strict config validation, deterministic operation/grid diagnostics, and QA GeoJSON. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 has not been authorized.
 
 **User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 500 m AOI drawn on it. The browser can still run synthetic scene.
 
