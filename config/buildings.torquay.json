@@ -1,0 +1,20 @@
+{
+  "format_version": 1,
+  "id": "torquay-poc-001",
+  "source": {
+    "relative_path": "data/raw/osm/devon-261016.osm.pbf",
+    "manifest_namespace": "osm"
+  },
+  "acquisition_buffer_m": 50.0,
+  "minimum_clipped_area_m2": 1.0,
+  "height_policy": {
+    "levels_to_metres": 3.0,
+    "default_height_m": 8.0,
+    "minimum_height_m": 1.0,
+    "maximum_height_m": 150.0
+  },
+  "intermediate_path": "data/intermediate/osm/torquay-poc-001/assembled-buffered.geojson",
+  "package_path": "data/generated/buildings/torquay-poc-001",
+  "qa_path": "docs/milestones/artifacts/TVW-009-buildings-qa.json",
+  "preview_path": "docs/milestones/screenshots/TVW-009-buildings-preview.png"
+}

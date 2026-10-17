@@ -1,10 +1,12 @@
-"""Offline CLI for AOI checks and the TVW-007 EA DTM coverage inspection."""
+"""Offline CLI for AOI, terrain, and OSM building source/asset checks."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -12,6 +14,19 @@ from typing import Any
 from pyproj.network import is_network_enabled
 
 from .aoi import generate_selection, write_selection
+from .building_export import (
+    BuildingExportError,
+    build_building_package,
+    validate_building_package,
+)
+from .building_heights import HeightPolicy
+from .building_preview import render_building_preview
+from .building_sources import (
+    BuildingSourceError,
+    inspect_building_source,
+    verify_building_source,
+)
+from .buildings import BuildingConfig, BuildingImportError, import_osm_buildings
 from .config import AoiConfig, AoiConfigError, load_aoi_config, validate_stored_selection
 from .terrain_coverage import (
     DEFAULT_MISSING_THRESHOLD,
@@ -78,7 +93,163 @@ def _parser() -> argparse.ArgumentParser:
                 type=Path,
                 default=Path("../docs/milestones/screenshots/TVW-008-terrain-preview.png"),
             )
+    for name in (
+        "inspect-building-source",
+        "import-buildings",
+        "validate-buildings",
+        "preview-buildings",
+    ):
+        command = commands.add_parser(name)
+        command.add_argument(
+            "--config", type=Path, default=Path("../config/buildings.torquay.json")
+        )
+        command.add_argument(
+            "--source-manifest", type=Path, default=Path("../data/source-manifest.json")
+        )
+        command.add_argument("--source", type=Path)
+        if name in {"import-buildings", "validate-buildings", "preview-buildings"}:
+            command.add_argument(
+                "--aoi-config", type=Path, default=Path("../config/aoi.torquay.json")
+            )
+        if name == "import-buildings":
+            command.add_argument(
+                "--terrain-package", type=Path, default=Path("../public/worlds/torquay-poc-001")
+            )
+            command.add_argument(
+                "--aoi-geojson", type=Path, default=Path("../docs/aoi-selection.geojson")
+            )
+        elif name in {"validate-buildings", "preview-buildings"}:
+            command.add_argument(
+                "--package", type=Path, default=Path("../data/generated/buildings/torquay-poc-001")
+            )
+        if name == "preview-buildings":
+            command.add_argument(
+                "--qa",
+                type=Path,
+                default=Path("../docs/milestones/artifacts/TVW-009-buildings-qa.json"),
+            )
+            command.add_argument(
+                "--output",
+                type=Path,
+                default=Path("../docs/milestones/screenshots/TVW-009-buildings-preview.png"),
+            )
     return parser
+
+
+def _building_config(path: Path) -> tuple[BuildingConfig, Path, dict[str, Any]]:
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise BuildingImportError(f"cannot read building config '{path}': {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise BuildingImportError(f"building config '{path}' is invalid JSON: {exc}") from exc
+    if not isinstance(raw, dict) or raw.get("format_version") != 1:
+        raise BuildingImportError("building config must be a JSON object with format_version=1")
+    root = path.resolve().parent.parent
+    height = raw.get("height_policy")
+    if not isinstance(height, dict):
+        raise BuildingImportError("height_policy must be a JSON object")
+    try:
+        config = BuildingConfig(
+            acquisition_buffer_m=float(raw["acquisition_buffer_m"]),
+            minimum_clipped_area_m2=float(raw["minimum_clipped_area_m2"]),
+            height_policy=HeightPolicy(
+                levels_to_metres=float(height["levels_to_metres"]),
+                default_height_m=float(height["default_height_m"]),
+                minimum_height_m=float(height["minimum_height_m"]),
+                maximum_height_m=float(height["maximum_height_m"]),
+            ),
+        )
+        config.validate()
+        return config, root, raw
+    except (KeyError, TypeError, ValueError) as exc:
+        raise BuildingImportError(f"invalid building configuration: {exc}") from exc
+
+
+def _root_path(root: Path, value: str | Path) -> Path:
+    candidate = Path(value)
+    return candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+
+
+def _write_bytes_atomic(path: Path, content: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with tempfile.NamedTemporaryFile(
+            prefix=f".{path.name}.", suffix=".stage", dir=path.parent, delete=False
+        ) as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+            stage = Path(handle.name)
+        os.replace(stage, path)
+    except OSError as exc:
+        raise OSError(f"cannot atomically write '{path}': {exc}") from exc
+
+
+def _building_command(args: argparse.Namespace) -> int:
+    height_config, root, raw_config = _building_config(args.config)
+    default_source = _root_path(root, raw_config.get("source", {}).get("relative_path", ""))
+    source_path = (args.source or default_source).resolve()
+    source_manifest_path = args.source_manifest.resolve()
+    if args.command == "inspect-building-source":
+        observed = inspect_building_source(source_path)
+        verified = verify_building_source(source_path, source_manifest_path)
+        print(json.dumps({"source": observed, "manifestVerified": verified == observed}, indent=2))
+        print("OSM source bytes and PBF metadata match the separate source-manifest namespace.")
+        return 0
+    if args.command == "validate-buildings":
+        verify_building_source(source_path, source_manifest_path)
+        result = validate_building_package(args.package.resolve())
+        print(json.dumps(result, indent=2))
+        return 0
+    if args.command == "preview-buildings":
+        verify_building_source(source_path, source_manifest_path)
+        package_status = validate_building_package(args.package.resolve())
+        data = json.loads((args.package / "buildings.json").read_text(encoding="utf-8"))
+        qa = json.loads(args.qa.read_text(encoding="utf-8"))
+        content = render_building_preview(data["buildings"], qa)
+        _write_bytes_atomic(args.output.resolve(), content)
+        print(f"Regenerated QA map: {args.output.resolve()}")
+        print(json.dumps(package_status, indent=2))
+        return 0
+
+    aoi_config = load_aoi_config(args.aoi_config)
+    selection, _geojson, _markdown = generate_selection(aoi_config)
+    validate_stored_selection(
+        aoi_config,
+        selection["aoi"]["center_easting_m"],
+        selection["aoi"]["center_northing_m"],
+        selection["aoi"]["bbox_m"],
+    )
+    imported = import_osm_buildings(source_path, source_manifest_path, aoi_config, height_config)
+    path_config = {
+        key: _root_path(root, raw_config[key])
+        for key in ("intermediate_path", "package_path", "qa_path", "preview_path")
+    }
+    output = build_building_package(
+        imported,
+        aoi_config,
+        source_path,
+        source_manifest_path,
+        args.terrain_package.resolve(),
+        args.aoi_geojson.resolve(),
+        path_config["package_path"],
+        path_config["qa_path"],
+        path_config["preview_path"],
+        path_config["intermediate_path"],
+    )
+    counts = output["qa"]["counts"]
+    print(
+        f"Imported {counts['exported_buildings']} local buildings to {path_config['package_path']}"
+    )
+    print(f"Wrote QA: {path_config['qa_path']}")
+    print(f"Wrote preview: {path_config['preview_path']}")
+    print(f"Wrote raw-tag buffered intermediate: {path_config['intermediate_path']}")
+    print(
+        "AOI selection_status remains selected_pending_coverage; "
+        "coverage_status remains not_checked."
+    )
+    return 0
 
 
 def _verified_sources(
@@ -182,10 +353,17 @@ def _coverage_report(
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        config = load_aoi_config(args.config)
-        selection, geojson, markdown = generate_selection(config)
         if is_network_enabled():
             raise RuntimeError("PROJ network access unexpectedly remained enabled")
+        if args.command in {
+            "inspect-building-source",
+            "import-buildings",
+            "validate-buildings",
+            "preview-buildings",
+        }:
+            return _building_command(args)
+        config = load_aoi_config(args.config)
+        selection, geojson, markdown = generate_selection(config)
         if args.command == "validate-aoi":
             validate_stored_selection(
                 config,
@@ -253,6 +431,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0 if result.report["analysis"]["ea_dtm_threshold_result"] == "pass" else 2
     except (
         AoiConfigError,
+        BuildingExportError,
+        BuildingImportError,
+        BuildingSourceError,
         TerrainCoverageError,
         TerrainSourceError,
         TerrainExportError,

@@ -151,6 +151,19 @@ def _group(source: CRS, target: CRS) -> tuple[Transformer, TransformerGroup]:
         ) from exc
 
 
+def pinned_transformer(source_epsg: int, target_epsg: int) -> tuple[Transformer, OperationInfo]:
+    """Return the deterministic non-ballpark project transform used by this pipeline."""
+    try:
+        source = CRS.from_epsg(source_epsg)
+        target = CRS.from_epsg(target_epsg)
+        transformer, group = _group(source, target)
+        return transformer, _operation_info(transformer, group)
+    except ProjError as exc:
+        raise ValueError(
+            f"cannot construct pinned EPSG:{source_epsg} to EPSG:{target_epsg} operation: {exc}"
+        ) from exc
+
+
 def transform_wgs84_to_bng(longitude: float, latitude: float) -> tuple[float, float, OperationInfo]:
     """Transform longitude/latitude with explicit x/y order and pinned EPSG operations."""
     if not isfinite(longitude) or not isfinite(latitude):

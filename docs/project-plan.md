@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0, M1 and TVW-001 through TVW-008 passed independent review. The 1,000 m AOI revision and EA DTM inspection passed; overall AOI coverage remains pending for OSM/OS feature counts, so the AOI is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. No TVW-009 or later issue is authorized.
+**Status:** M0, M1 and TVW-001 through TVW-008 passed independent review. The 1,000 m AOI revision and EA DTM inspection passed; initial TVW-009 building import and QA evidence are awaiting independent review. Mapped building counts do not establish completeness; road and remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-010 and later are not authorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -161,7 +161,7 @@ Useful references: https://www.nationalarchives.gov.uk/doc/open-government-licen
 
 The original TVW-006 scope derived a **500 m × 500 m EPSG:27700 candidate** at the same centre; its bounds and dated screenshot remain historical in `docs/milestones/TVW-006.md`. On 2026-10-17 the user approved a **1,000 m × 1,000 m revision** without changing the WGS84 or projected centre. Current bounds are `[290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931]` in `[west, south, east, north]` order. The tool pins non-ballpark EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid), reporting 2 m accuracy; the selected operation uses no grid. PROJ network access is disabled. In this environment the preferred 1 m operation is unavailable because `uk_os_OSTN15_NTv2_OSGBtoETRS.tif` is missing; the tool records `best_available`, missing operation/grid names, and the selected operation definition in `docs/aoi-selection.json`. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 
-The current config status remains `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. TVW-007's independently reviewed EA DTM center-coverage check passes its 1% missing-cell threshold; see `docs/milestones/TVW-007.md`. OSM/OS building and road feature counts remain unchecked. Do not describe this candidate as overall coverage-approved or frozen, and do not mark the M2 exit gate complete until the remaining checks are reviewed.
+The current config status remains `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. TVW-007's independently reviewed EA DTM center-coverage check passes its 1% missing-cell threshold; see `docs/milestones/TVW-007.md`. TVW-009 adds local OSM building-footprint counts and placement QA, but these counts do not establish completeness; road/remaining feature checks and the M2 exit gate remain pending. Do not describe this candidate as overall coverage-approved or frozen.
 
 **Selection protocol (Codex task):**
 
@@ -177,7 +177,7 @@ The current config status remains `selection_status: selected_pending_coverage` 
 
 The current validated input config stores the editable WGS84 anchor, fixed candidate dimensions, pending-coverage statuses, and the current projected centre/bounds. The CLI refreshes those derived values after an anchor change and publishes operation metadata in `docs/aoi-selection.json`; the QA polygon is `docs/aoi-selection.geojson`. The input config contains no null placeholder coordinates.
 
-**Coverage note:** the candidate coordinates are real transformation outputs derived from the documented postcode centroid. The independently reviewed EA DTM report passes the configured 1% missing-cell threshold. OSM/OS building and road counts and any final AOI freeze remain pending in M2.
+**Coverage note:** the candidate coordinates are real transformation outputs derived from the documented postcode centroid. The independently reviewed EA DTM report passes the configured 1% missing-cell threshold. TVW-009 records OSM building footprints and mapped counts; road/remaining feature checks, any final AOI freeze, and M2 completion remain pending.
 
 ---
 
@@ -523,6 +523,8 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M4 — Real building footprints (3D blocks)
 
+**TVW-009 status:** Initial implementation and local QA evidence prepared; independent review pending. Scope is building import, height policy and QA only. Preserve the current 1,000 m AOI and pending overall coverage status; mapped building counts do not establish completeness. Roads and remaining feature checks are not included. The combined M4 renderer/terrain-footing gate remains pending TVW-010 authorization.
+
 **User-visible result:** **real buildings** stand on the slopes at approximately correct plan positions and shapes.
 
 **Work:**
@@ -837,7 +839,7 @@ Publisher and official documentation checked during planning on **17 October 202
 15. OpenStreetMap licence and attribution — https://www.openstreetmap.org/copyright
 16. OGL v3 — https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
 
-**What has not yet been checked:** whether the relevant local OSM extracts contain enough building footprints or roads, and real GPU performance on the user's PC. TVW-007 has checked EA DTM cell-center coverage and recorded the current source tile names; the DTM-only result does not imply complete coverage for other sources or a frozen AOI.
+**What has not yet been checked:** completeness of local OSM building footprints, OSM/OS road coverage and real GPU performance on the user's PC. TVW-009 records counts and placement spot checks for the dated OSM extract, but those do not show whether all relevant features are present. TVW-007 has checked EA DTM cell-center coverage; that DTM-only result does not imply complete coverage for other sources or a frozen AOI.
 
 ---
 

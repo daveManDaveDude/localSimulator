@@ -5,13 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "torquay-aoi-pipeline"
 version = "0.1.0"
-description = "Offline AOI validation and EA DTM coverage inspection utilities"
+description = "Offline Torquay AOI, EA terrain, and OSM building GIS pipeline"
 requires-python = ">=3.12"
 dependencies = [
   "matplotlib==3.11.2",
   "numpy==2.5.4",
+  "osmium==4.3.1",
   "pyproj==3.8.0",
   "rasterio==1.5.2",
+  "shapely==2.2.0",
 ]
 
 [project.optional-dependencies]

@@ -163,5 +163,48 @@
         "reuse_attribution": "Environment Agency copyright and/or database right 2022. All rights reserved."
       }
     }
-  ]
+  ],
+  "osm": {
+    "product": {
+      "name": "OpenStreetMap regional extract — Devon",
+      "publisher": "OpenStreetMap contributors; extract prepared by Geofabrik GmbH",
+      "download_page_url": "https://download.geofabrik.de/europe/united-kingdom/england/devon.html",
+      "licence": "Open Database Licence 1.0 (ODbL)",
+      "licence_url": "https://www.openstreetmap.org/copyright",
+      "credit": "Data © OpenStreetMap contributors; extract provided by Geofabrik GmbH.",
+      "attribution_requirement": "© OpenStreetMap contributors, with a link to the ODbL licence; credit Geofabrik as the extract provider.",
+      "metadata_note": "The public Geofabrik file omits OSM user names, user IDs, and changeset IDs. It includes object identifiers, versions, timestamps, tags and geometry."
+    },
+    "acquisition": {
+      "download_date": "2026-10-17",
+      "downloaded_at_utc": "2026-10-17T16:43:51Z",
+      "method": "Direct one-time download of the dated file listed on the current Geofabrik Devon page; not the mutable latest alias.",
+      "source_storage": "data/raw/osm/ is ignored by Git; the source PBF and checksum file are not committed."
+    },
+    "sources": [
+      {
+        "filename": "devon-261016.osm.pbf",
+        "relative_path": "data/raw/osm/devon-261016.osm.pbf",
+        "download_url": "https://download.geofabrik.de/europe/united-kingdom/england/devon-261016.osm.pbf",
+        "publisher_checksum_url": "https://download.geofabrik.de/europe/united-kingdom/england/devon-261016.osm.pbf.md5",
+        "download_date": "2026-10-17",
+        "downloaded_at_utc": "2026-10-17T16:43:51Z",
+        "size_bytes": 58254938,
+        "publisher_md5": "c9c2018b331d8affd6b7be6464444bc5",
+        "sha256": "52942b39636e1cb002e5d78a004668996cb469ee9c9e9b9b93049c66b9ac2cd5",
+        "replication_data_timestamp": "2026-10-16T20:21:21Z",
+        "pbf_header": {
+          "format": "PBF",
+          "generator": "osmium/1.16.0",
+          "replication_timestamp": "2026-10-16T20:21:21Z",
+          "replication_sequence_number": "4932",
+          "bounds_wgs84_lon_lat": [-4.752335, 50.11104, -2.881604, 51.30895]
+        },
+        "archive_member_mapping": "Not archived; the downloaded PBF is the source object.",
+        "licence": "Open Database Licence 1.0 (ODbL)",
+        "attribution": "© OpenStreetMap contributors; Geofabrik GmbH extract provider",
+        "user_metadata": "OSM user names, user IDs and changeset IDs are omitted by the public Geofabrik extract."
+      }
+    ]
+  }
 }
