@@ -24,6 +24,7 @@ from matplotlib.colors import Normalize
 from matplotlib.patches import Rectangle
 from rasterio.windows import Window
 
+from .aoi import generate_selection
 from .config import AoiConfig
 from .coordinates import transform_wgs84_to_bng
 from .terrain_sources import inspect_raster
@@ -483,6 +484,85 @@ def _source_seam_probe_indexes(grid: ResampledGrid, raster_paths: list[Path]) ->
     return probes
 
 
+def _load_wgs84_aoi_boundary(config: AoiConfig, geojson_path: Path | None = None) -> dict[str, Any]:
+    """Read the generated geographic ring and verify it still matches this AOI."""
+    source_path = (
+        geojson_path or Path(__file__).resolve().parents[2] / "docs" / "aoi-selection.geojson"
+    )
+    try:
+        source = json.loads(source_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise TerrainExportError(
+            f"cannot read generated AOI boundary from {source_path}: {exc}"
+        ) from exc
+    features = source.get("features") if isinstance(source, dict) else None
+    _selection, generated, _markdown = generate_selection(config)
+    feature_id = f"{config.id}-aoi"
+    source_features = (
+        [
+            feature
+            for feature in features or []
+            if isinstance(feature, dict) and feature.get("id") == feature_id
+        ]
+        if isinstance(features, list)
+        else []
+    )
+    generated_features = [
+        feature
+        for feature in generated.get("features", [])
+        if isinstance(feature, dict) and feature.get("id") == feature_id
+    ]
+    if (
+        not isinstance(source, dict)
+        or source.get("type") != "FeatureCollection"
+        or len(source_features) != 1
+        or len(generated_features) != 1
+        or source_features[0] != generated_features[0]
+    ):
+        raise TerrainExportError(
+            f"{source_path} candidate polygon does not match the configured AOI"
+        )
+    geometry = source_features[0].get("geometry")
+    coordinates = geometry.get("coordinates") if isinstance(geometry, dict) else None
+    if (
+        not isinstance(geometry, dict)
+        or geometry.get("type") != "Polygon"
+        or not isinstance(coordinates, list)
+        or len(coordinates) != 1
+    ):
+        raise TerrainExportError(
+            f"{source_path} must contain one Polygon exterior ring for {feature_id}"
+        )
+    ring = coordinates[0]
+    if (
+        not isinstance(ring, list)
+        or len(ring) != 5
+        or ring[0] != ring[-1]
+        or any(
+            not isinstance(position, list)
+            or len(position) != 2
+            or any(
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                for value in position
+            )
+            or not -180 <= position[0] <= 180
+            or not -90 <= position[1] <= 90
+            for position in ring
+        )
+    ):
+        raise TerrainExportError(
+            f"{source_path} candidate polygon must contain a finite, closed WGS84 ring"
+        )
+    return {
+        "crs": "EPSG:4326",
+        "coordinateOrder": "longitude-latitude",
+        "geometryType": "Polygon",
+        "ring": ring,
+    }
+
+
 def _manifest(
     config: AoiConfig,
     grid: ResampledGrid,
@@ -505,6 +585,7 @@ def _manifest(
         raise TerrainExportError(
             "configured WGS84 anchor does not match its pinned EPSG:1314 + EPSG:19916 BNG center"
         )
+    boundary_wgs84 = _load_wgs84_aoi_boundary(config)
     product = source_manifest.get("product")
     if not isinstance(product, dict):
         raise TerrainExportError("source manifest is missing publisher product metadata")
@@ -621,6 +702,7 @@ def _manifest(
             "widthM": east - west,
             "heightM": north - south,
             "anchorWgs84": anchor_wgs84,
+            "boundaryWgs84": boundary_wgs84,
             "selectionStatus": config.selection_status,
             "coverageStatus": config.coverage_status,
         },

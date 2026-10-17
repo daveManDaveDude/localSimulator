@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from torquay_pipeline.config import AoiConfig, load_aoi_config
 from torquay_pipeline.terrain_export import (
     TerrainExportError,
     _build_qa,
+    _load_wgs84_aoi_boundary,
     _publish_transaction,
     resample_vertices,
 )
@@ -211,3 +213,34 @@ def test_fixture_config_remains_pending_and_exactly_one_kilometer() -> None:
         291608.9018176432,
         65853.48350844931,
     )
+
+
+def test_real_manifest_boundary_uses_generated_attributable_geojson_ring() -> None:
+    config = load_aoi_config(CONFIG_PATH)
+    geojson_path = ROOT / "docs" / "aoi-selection.geojson"
+    geojson = json.loads(geojson_path.read_text(encoding="utf-8"))
+    aoi_feature = next(
+        feature for feature in geojson["features"] if feature["id"] == f"{config.id}-aoi"
+    )
+
+    boundary = _load_wgs84_aoi_boundary(config, geojson_path)
+
+    assert boundary["crs"] == "EPSG:4326"
+    assert boundary["coordinateOrder"] == "longitude-latitude"
+    assert boundary["geometryType"] == "Polygon"
+    assert boundary["ring"] == aoi_feature["geometry"]["coordinates"][0]
+    assert boundary["ring"][0] == boundary["ring"][-1]
+
+
+def test_real_manifest_boundary_rejects_stale_geojson_ring(tmp_path: Path) -> None:
+    config = load_aoi_config(CONFIG_PATH)
+    source = json.loads((ROOT / "docs" / "aoi-selection.geojson").read_text(encoding="utf-8"))
+    aoi_feature = next(
+        feature for feature in source["features"] if feature["id"] == f"{config.id}-aoi"
+    )
+    aoi_feature["geometry"]["coordinates"][0][1][0] += 0.001
+    stale_geojson = tmp_path / "stale-aoi-selection.geojson"
+    stale_geojson.write_text(json.dumps(source), encoding="utf-8")
+
+    with pytest.raises(TerrainExportError, match="does not match the configured AOI"):
+        _load_wgs84_aoi_boundary(config, stale_geojson)

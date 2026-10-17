@@ -92,6 +92,150 @@ export interface RealTerrainAnchorWgs84 {
   retrievedDate: string;
 }
 
+type Wgs84Coordinate = [longitude: number, latitude: number];
+
+export interface RealTerrainBoundaryWgs84 {
+  crs: 'EPSG:4326';
+  coordinateOrder: 'longitude-latitude';
+  geometryType: 'Polygon';
+  ring: Wgs84Coordinate[];
+}
+
+const EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84: readonly Wgs84Coordinate[] = [
+  [-3.542910651853897, 50.47326489870257],
+  [-3.528823875124863, 50.473450849062345],
+  [-3.5291139928135884, 50.48244068998469],
+  [-3.5432034396837033, 50.48225468056402],
+  [-3.542910651853897, 50.47326489870257],
+];
+
+const PINNED_BNG_OPERATION_DEFINITION = [
+  'proj=pipeline',
+  'step proj=unitconvert xy_in=deg xy_out=rad',
+  'step proj=push v_3',
+  'step proj=cart ellps=WGS84',
+  'step inv proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector',
+  'step inv proj=cart ellps=airy',
+  'step proj=pop v_3',
+  'step proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy',
+].join(' ');
+
+function validateRealBoundaryWgs84(
+  value: unknown,
+  issues: ManifestValidationIssue[],
+): RealTerrainBoundaryWgs84 | undefined {
+  const path = 'aoi.boundaryWgs84';
+  if (!isRecord(value)) {
+    issues.push({
+      path,
+      message: 'must contain the generated EPSG:4326 candidate polygon ring',
+    });
+    return undefined;
+  }
+  if (value.crs !== 'EPSG:4326') {
+    issues.push({ path: `${path}.crs`, message: 'must be EPSG:4326' });
+  }
+  if (value.coordinateOrder !== 'longitude-latitude') {
+    issues.push({
+      path: `${path}.coordinateOrder`,
+      message: 'must be longitude-latitude (GeoJSON coordinate order)',
+    });
+  }
+  if (value.geometryType !== 'Polygon') {
+    issues.push({
+      path: `${path}.geometryType`,
+      message: 'must be Polygon with one closed exterior ring',
+    });
+  }
+
+  const ringValue = value.ring;
+  if (
+    !Array.isArray(ringValue) ||
+    ringValue.length !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84.length
+  ) {
+    issues.push({
+      path: `${path}.ring`,
+      message: 'must contain the four candidate corners and a closing position',
+    });
+    return undefined;
+  }
+
+  const parsedRing: Wgs84Coordinate[] = [];
+  let validRing = true;
+  ringValue.forEach((position, index) => {
+    const positionPath = `${path}.ring[${index}]`;
+    if (
+      !Array.isArray(position) ||
+      position.length !== 2 ||
+      !isFiniteNumber(position[0]) ||
+      !isFiniteNumber(position[1])
+    ) {
+      issues.push({
+        path: positionPath,
+        message: 'must be a two-number [longitude, latitude] coordinate pair',
+      });
+      validRing = false;
+      return;
+    }
+    const longitude = position[0];
+    const latitude = position[1];
+    if (longitude < -180 || longitude > 180) {
+      issues.push({
+        path: `${positionPath}[0]`,
+        message: 'longitude must be between -180 and 180 degrees',
+      });
+      validRing = false;
+    }
+    if (latitude < -90 || latitude > 90) {
+      issues.push({
+        path: `${positionPath}[1]`,
+        message: 'latitude must be between -90 and 90 degrees',
+      });
+      validRing = false;
+    }
+    parsedRing.push([longitude, latitude]);
+  });
+
+  if (
+    !validRing ||
+    parsedRing.length !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84.length
+  ) {
+    return undefined;
+  }
+  const first = parsedRing[0]!;
+  const last = parsedRing.at(-1)!;
+  if (first[0] !== last[0] || first[1] !== last[1]) {
+    issues.push({
+      path: `${path}.ring`,
+      message: 'must be closed by repeating its first coordinate as its last',
+    });
+    validRing = false;
+  }
+  if (
+    parsedRing.some(
+      (position, index) =>
+        position[0] !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84[index]![0] ||
+        position[1] !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84[index]![1],
+    )
+  ) {
+    issues.push({
+      path: `${path}.ring`,
+      message:
+        'must match the generated TQ1 4HN polygon corresponding to the reviewed EPSG:27700 bounds',
+    });
+    validRing = false;
+  }
+
+  return validRing
+    ? {
+        crs: 'EPSG:4326',
+        coordinateOrder: 'longitude-latitude',
+        geometryType: 'Polygon',
+        ring: parsedRing,
+      }
+    : undefined;
+}
+
 function validateRealAnchorWgs84(
   value: unknown,
   issues: ManifestValidationIssue[],
@@ -317,6 +461,7 @@ export interface RealTerrainSceneManifest {
     widthM: number;
     heightM: number;
     anchorWgs84: RealTerrainAnchorWgs84;
+    boundaryWgs84: RealTerrainBoundaryWgs84;
     selectionStatus: 'selected_pending_coverage';
     coverageStatus: 'not_checked';
   };
@@ -1065,26 +1210,14 @@ function validateRealCoordinateOperation(
       message: 'must identify the pinned EPSG:1314 + EPSG:19916 operation',
     });
   }
-  if (
-    definition !== undefined &&
-    (!definition.startsWith('proj=pipeline') ||
-      !definition.includes('proj=helmert') ||
-      ![
-        'x=446.448',
-        'y=-125.157',
-        'z=542.06',
-        'rx=0.15',
-        'ry=0.247',
-        'rz=0.842',
-        's=-20.489',
-        'convention=position_vector',
-        'proj=tmerc',
-      ].every((part) => definition.includes(part)))
-  ) {
+  const normalizedDefinition = definition?.trim().split(/\s+/).join(' ');
+  const hasPinnedDefinition =
+    normalizedDefinition === PINNED_BNG_OPERATION_DEFINITION;
+  if (definition !== undefined && !hasPinnedDefinition) {
     issues.push({
       path: `${path}.definition`,
       message:
-        'must record the selected EPSG:1314 Helmert and EPSG:19916 BNG pipeline definition',
+        'must match every parameter in the pinned EPSG:1314 + EPSG:19916 pipeline definition',
     });
   }
   if (reportedAccuracyM !== undefined && reportedAccuracyM !== 2) {
@@ -1154,9 +1287,8 @@ function validateRealCoordinateOperation(
 
   if (
     name === 'EPSG:1314 + EPSG:19916' &&
-    definition !== undefined &&
-    definition.startsWith('proj=pipeline') &&
-    definition.includes('proj=helmert') &&
+    hasPinnedDefinition &&
+    normalizedDefinition !== undefined &&
     reportedAccuracyM === 2 &&
     value.selectedUsesGrids === false &&
     value.bestAvailable === false &&
@@ -1166,7 +1298,7 @@ function validateRealCoordinateOperation(
     return {
       name,
       authorityCodes: ['EPSG:1314', 'EPSG:19916'],
-      definition,
+      definition: normalizedDefinition,
       reportedAccuracyM: 2,
       selectedUsesGrids: false,
       bestAvailable: false,
@@ -1638,6 +1770,10 @@ function validateRealSceneManifest(
       }
     }
     const anchorWgs84 = validateRealAnchorWgs84(aoiInput.anchorWgs84, issues);
+    const boundaryWgs84 = validateRealBoundaryWgs84(
+      aoiInput.boundaryWgs84,
+      issues,
+    );
 
     let eastingSpan: number | undefined;
     let northingSpan: number | undefined;
@@ -1793,6 +1929,7 @@ function validateRealSceneManifest(
       northingSpan === 1000 &&
       centerBngM &&
       anchorWgs84 &&
+      boundaryWgs84 &&
       extentWidthM === 1000 &&
       extentDepthM === 1000 &&
       syntheticBase.ok &&
@@ -1812,6 +1949,7 @@ function validateRealSceneManifest(
         widthM,
         heightM,
         anchorWgs84,
+        boundaryWgs84,
         selectionStatus: 'selected_pending_coverage',
         coverageStatus: 'not_checked',
       };

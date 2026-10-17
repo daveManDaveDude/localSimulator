@@ -252,7 +252,99 @@ describe('validateSceneManifest', () => {
         expect(result.manifest.aoi.centerBngM).toEqual([
           291108.9018176432, 65353.48350844931,
         ]);
+        expect(result.manifest.aoi.boundaryWgs84).toEqual({
+          crs: 'EPSG:4326',
+          coordinateOrder: 'longitude-latitude',
+          geometryType: 'Polygon',
+          ring: [
+            [-3.542910651853897, 50.47326489870257],
+            [-3.528823875124863, 50.473450849062345],
+            [-3.5291139928135884, 50.48244068998469],
+            [-3.5432034396837033, 50.48225468056402],
+            [-3.542910651853897, 50.47326489870257],
+          ],
+        });
       }
+    }
+  });
+
+  it('accepts whitespace-normalized full pinned coordinate-operation metadata', () => {
+    const manifest = createRealManifest();
+    manifest.provenance.coordinateOperation.definition = `  ${manifest.provenance.coordinateOperation.definition.replaceAll(' step ', '   step  ')}  `;
+
+    const result = validateSceneManifest(manifest);
+
+    expect(result.ok).toBe(true);
+  });
+
+  it.each([
+    ['central meridian', 'lon_0=-2', 'lon_0=20'],
+    ['Helmert translation', 'x=446.448', 'x=446.4489'],
+  ])(
+    'rejects a changed pinned coordinate-operation %s parameter',
+    (_label, original, changed) => {
+      const definition =
+        createRealManifest().provenance.coordinateOperation.definition;
+      const result = validateSceneManifest(
+        withRealValue(
+          'provenance.coordinateOperation.definition',
+          definition.replace(original, changed),
+        ),
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(
+          result.issues.some(
+            (issue) =>
+              issue.path === 'provenance.coordinateOperation.definition',
+          ),
+        ).toBe(true);
+      }
+    },
+  );
+
+  it('rejects a missing geographic AOI boundary', () => {
+    const result = validateSceneManifest(withoutRealValue('aoi.boundaryWgs84'));
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(
+        result.issues.some((issue) => issue.path === 'aoi.boundaryWgs84'),
+      ).toBe(true);
+    }
+  });
+
+  it.each([
+    ['malformed coordinate pair', 'aoi.boundaryWgs84.ring', [[-3, 50]]],
+    ['non-finite coordinate', 'aoi.boundaryWgs84.ring[2][1]', Number.NaN],
+    ['out-of-range longitude', 'aoi.boundaryWgs84.ring[0][0]', 181],
+    ['unclosed ring', 'aoi.boundaryWgs84.ring[4][1]', 50.48],
+    [
+      'ring inconsistent with the configured bounds',
+      'aoi.boundaryWgs84.ring[1][0]',
+      -3.5279,
+    ],
+  ])('rejects a %s', (_label, path, value) => {
+    const result = validateSceneManifest(withRealValue(path, value));
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(
+        result.issues.some((issue) =>
+          issue.path.startsWith('aoi.boundaryWgs84.ring'),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it.each([
+    ['aoi.boundaryWgs84.crs', 'EPSG:3857'],
+    ['aoi.boundaryWgs84.coordinateOrder', 'latitude-longitude'],
+    ['aoi.boundaryWgs84.geometryType', 'MultiPolygon'],
+  ])('rejects invalid geographic boundary metadata %s', (path, value) => {
+    const result = validateSceneManifest(withRealValue(path, value));
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some((issue) => issue.path === path)).toBe(true);
     }
   });
 
@@ -355,6 +447,7 @@ describe('validateSceneManifest', () => {
     'provenance.coordinateOperation',
     'aoi.centerBngM',
     'aoi.anchorWgs84',
+    'aoi.boundaryWgs84',
   ])('rejects missing real provenance field %s', (path) => {
     const result = validateSceneManifest(withoutRealValue(path));
     expect(result.ok).toBe(false);

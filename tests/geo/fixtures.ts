@@ -199,6 +199,18 @@ export function createRealManifest(
         sourceLicense: 'OS OpenData licence (provider documentation)',
         retrievedDate: '2026-10-17',
       },
+      boundaryWgs84: {
+        crs: 'EPSG:4326',
+        coordinateOrder: 'longitude-latitude',
+        geometryType: 'Polygon',
+        ring: [
+          [-3.542910651853897, 50.47326489870257],
+          [-3.528823875124863, 50.473450849062345],
+          [-3.5291139928135884, 50.48244068998469],
+          [-3.5432034396837033, 50.48225468056402],
+          [-3.542910651853897, 50.47326489870257],
+        ],
+      },
       selectionStatus: 'selected_pending_coverage',
       coverageStatus: 'not_checked',
     },
