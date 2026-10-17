@@ -1,0 +1,34 @@
+{
+  "formatVersion": 1,
+  "id": "synthetic-terrain-demo",
+  "name": "Synthetic Hill and Ridge Demo",
+  "worldType": "synthetic",
+  "sourceCrs": "LOCAL_SYNTHETIC",
+  "axisConvention": "+X east, +Y up, -Z north",
+  "origin": {
+    "eastingM": 0,
+    "northingM": 0,
+    "elevationM": 0
+  },
+  "extentM": {
+    "width": 48,
+    "depth": 36
+  },
+  "heightfield": {
+    "path": "heightfield.f32",
+    "columns": 25,
+    "rows": 19,
+    "spacingM": 2,
+    "rowOrder": "north-to-south",
+    "byteOrder": "little-endian",
+    "encoding": "float32",
+    "valueMeaning": "world Y in metres relative to origin elevation",
+    "sha256": "cf57dd9d5551eaad413c5e1ea43c8d2f9acb709c410bb016e8fbf7afd95dcd3b"
+  },
+  "provenance": {
+    "kind": "synthetic",
+    "generator": "scripts/generate-synthetic-heightfield.mjs",
+    "generatorVersion": "1.0.0",
+    "note": "Fictional deterministic base slope, Gaussian hill, and narrow ridge; not measured terrain."
+  }
+}

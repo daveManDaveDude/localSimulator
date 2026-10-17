@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 complete — TVW-001, TVW-002, and TVW-003 implemented, independently reviewed, and verified; M1 remains incomplete — TVW-004 manifest/heightfield loader foundation complete, TVW-005 terrain generation outstanding
+**Status:** M0 and M1 complete — TVW-001 through TVW-005 implemented, independently reviewed, and verified; M2 has not started and requires separate authorization
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -458,6 +458,8 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 **Exit gate:** a reviewer can navigate synthetic blocks without any GIS setup.
 
 ### M1 — Asset schema and deterministic heightfield renderer
+
+**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete; TVW-006 requires separate authorization.
 
 **User-visible result:** browser loads a **synthetic terrain hill** from a `heightfield.f32` fixture rather than constructing it ad hoc.
 

@@ -31,9 +31,9 @@ export interface LoadedSyntheticWorld {
   heights: Float32Array;
 }
 
-export type WorldFetch = (input: URL) => Promise<Response>;
+export type WorldFetch = (input: URL, init?: RequestInit) => Promise<Response>;
 
-const browserFetch: WorldFetch = (input) => globalThis.fetch(input);
+const browserFetch: WorldFetch = (input, init) => globalThis.fetch(input, init);
 
 function messageFrom(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -86,10 +86,14 @@ async function fetchResponse(
   fetcher: WorldFetch,
   url: URL,
   stage: 'manifest request' | 'heightfield request',
+  signal?: AbortSignal,
 ): Promise<Response> {
   let response: Response;
   try {
-    response = await fetcher(url);
+    response = await fetcher(
+      url,
+      signal === undefined ? undefined : { signal },
+    );
   } catch (error) {
     throw new WorldLoadError(
       stage,
@@ -126,12 +130,14 @@ async function sha256Hex(bytes: ArrayBuffer): Promise<string> {
 export async function loadSyntheticWorld(
   manifestLocation: string | URL,
   fetcher: WorldFetch = browserFetch,
+  signal?: AbortSignal,
 ): Promise<LoadedSyntheticWorld> {
   const manifestUrl = resolveManifestUrl(manifestLocation);
   const manifestResponse = await fetchResponse(
     fetcher,
     manifestUrl,
     'manifest request',
+    signal,
   );
 
   let unknownManifest: unknown;
@@ -160,6 +166,7 @@ export async function loadSyntheticWorld(
     fetcher,
     heightfieldUrl,
     'heightfield request',
+    signal,
   );
 
   let bytes: ArrayBuffer;

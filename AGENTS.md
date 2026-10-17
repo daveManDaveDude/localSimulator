@@ -1,10 +1,10 @@
 # Project instructions
 
-TVW-004 is complete and independently reviewed; M0 is complete. No further issue is currently authorized. Do not begin TVW-005 or later, add geographic data/AOI coordinates, or load real-world datasets without separate user instruction. TQ1 4HN remains an unverified candidate for M2 only.
+TVW-004 and TVW-005 are complete and independently reviewed; M0 and M1 are complete. No further issue is currently authorized. Do not begin TVW-006 or later, add geographic data/AOI coordinates, or load real-world datasets without separate user instruction. TQ1 4HN remains an unverified candidate for M2 only.
 
 ## Working protocol
 
-1. Work on **one milestone and one focused issue** at a time. TVW-004 is complete; begin no further issue until separately authorized.
+1. Work on **one milestone and one focused issue** at a time. M1 is complete; do not begin TVW-006 or later without separate authorization.
 2. Start with an implementation plan, concrete files touched, tests and proof of completion.
 3. Keep geographic calculations in tested Python modules and typed, documented asset contracts. No ad-hoc coordinate transforms scattered across React/Three.js render logic.
 4. Maintain a **fully functioning synthetic world** at all times.

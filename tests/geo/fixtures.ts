@@ -6,6 +6,10 @@ export const syntheticFixtureDirectory = resolve(
   process.cwd(),
   'public/worlds/synthetic-heightfield',
 );
+export const syntheticTerrainDemoDirectory = resolve(
+  process.cwd(),
+  'public/worlds/synthetic-terrain-demo',
+);
 
 export function readSyntheticFixtureManifest(): unknown {
   const text = readFileSync(
@@ -18,6 +22,23 @@ export function readSyntheticFixtureManifest(): unknown {
 export function readSyntheticFixtureBytes(): ArrayBuffer {
   const source = readFileSync(
     resolve(syntheticFixtureDirectory, 'heightfield.f32'),
+  );
+  const copy = new Uint8Array(source.byteLength);
+  copy.set(source);
+  return copy.buffer;
+}
+
+export function readSyntheticTerrainDemoManifest(): unknown {
+  const text = readFileSync(
+    resolve(syntheticTerrainDemoDirectory, 'manifest.json'),
+    'utf8',
+  );
+  return JSON.parse(text) as unknown;
+}
+
+export function readSyntheticTerrainDemoBytes(): ArrayBuffer {
+  const source = readFileSync(
+    resolve(syntheticTerrainDemoDirectory, 'heightfield.f32'),
   );
   const copy = new Uint8Array(source.byteLength);
   copy.set(source);

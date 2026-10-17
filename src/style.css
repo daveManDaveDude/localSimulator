@@ -107,6 +107,80 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.terrain-loading,
+.world-error {
+  position: absolute;
+  top: 82px;
+  left: 26px;
+  width: min(410px, calc(100vw - 52px));
+  margin: 0;
+  padding: 13px 16px;
+  border: 1px solid rgb(165 223 206 / 28%);
+  border-radius: 10px;
+  color: #d6e7e0;
+  background: rgb(12 20 24 / 88%);
+  box-shadow: 0 18px 55px rgb(0 0 0 / 20%);
+  font-size: 12px;
+  line-height: 1.55;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+}
+
+.terrain-loading[hidden],
+.world-error[hidden] {
+  display: none;
+}
+
+.world-error {
+  z-index: 2;
+  border-color: rgb(230 158 133 / 56%);
+  color: #ffe0ce;
+}
+
+.world-error h2 {
+  margin: 0 0 8px;
+  color: #ffc8b7;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.world-error p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.world-error-actions,
+.terrain-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.world-error-actions a,
+.world-error-actions button,
+.terrain-actions button {
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid rgb(165 223 206 / 38%);
+  border-radius: 6px;
+  color: #d6e7e0;
+  background: rgb(255 255 255 / 6%);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.world-error-actions a:hover,
+.world-error-actions button:hover,
+.terrain-actions button:hover {
+  color: #10201c;
+  background: #a5dfce;
+}
+
 .is-locked .flight-status {
   color: #a9d8c8;
 }
@@ -231,6 +305,16 @@ body {
   border: 1px solid transparent;
   border-radius: 5px;
   color: #a9d8c8;
+}
+
+.terrain-actions {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(205 239 226 / 12%);
+}
+
+.terrain-actions[hidden] {
+  display: none;
 }
 
 .controls-help {
@@ -410,6 +494,11 @@ kbd {
   pointer-events: none;
 }
 
+.viewer-shell[data-world-mode='terrain'] .corner-note {
+  right: auto;
+  left: 26px;
+}
+
 .renderer-error {
   margin: 0 0 18px;
   padding: 15px;
@@ -500,5 +589,10 @@ kbd {
     right: 16px;
     bottom: 16px;
     font-size: 8px;
+  }
+
+  .viewer-shell[data-world-mode='terrain'] .corner-note {
+    right: auto;
+    left: 16px;
   }
 }

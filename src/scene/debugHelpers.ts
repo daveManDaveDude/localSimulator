@@ -4,6 +4,7 @@ import {
   CanvasTexture,
   Color,
   Float32BufferAttribute,
+  Group,
   Line,
   LineBasicMaterial,
   LineSegments,
@@ -130,9 +131,11 @@ function createNorthLabel(): Sprite | null {
   return sprite;
 }
 
-export function createNorthArrow(heightAt: TerrainHeight): ArrowHelper {
-  const x = 19;
-  const z = 12;
+export function createNorthArrow(
+  heightAt: TerrainHeight,
+  position: Readonly<{ x: number; z: number }> = { x: 19, z: 12 },
+): Group {
+  const { x, z } = position;
   const origin = new Vector3(x, heightAt(x, z) + 0.16, z);
   const arrow = new ArrowHelper(
     new Vector3(0, 0, -1),
@@ -142,12 +145,17 @@ export function createNorthArrow(heightAt: TerrainHeight): ArrowHelper {
     1.1,
     0.65,
   );
+  arrow.name = 'North cue pointing to -Z';
+  const northCue = new Group();
+  northCue.name = 'North cue pointing to -Z';
+  northCue.add(arrow);
   const label = createNorthLabel();
 
   if (label) {
-    label.position.set(0, heightAt(x, z - 4.9) - heightAt(x, z) + 0.7, -4.9);
-    arrow.add(label);
+    label.position.set(x, heightAt(x, z - 4.9) + 0.7, z - 4.9);
+    label.name = 'North label N';
+    northCue.add(label);
   }
 
-  return arrow;
+  return northCue;
 }
