@@ -2,7 +2,7 @@
 
 A Windows-friendly browser proof of concept for a future real-data view of Torquay. The default viewer loads a small, checked-in synthetic Float32 heightfield and renders its terrain mesh, hill, ridge, grid and north cue. The prior M0 analytic scene remains available at `/?world=m0`.
 
-Every browser world is fictional and marked **SYNTHETIC**. The heightfield, hill, ridge, analytic slope, blocks, dimensions and elevations are invented examples; they are not Torquay measurements. Both local fixtures use zero-valued local origins and contain no geographic coordinates. No EA DTM, OSM/OS extract, real roads or other geographic dataset is loaded into the browser. The offline Python tool records TQ1 4HN as a postcode-centroid anchor for a 500 m candidate AOI, with data coverage still unchecked.
+Every browser world is fictional and marked **SYNTHETIC**. The heightfield, hill, ridge, analytic slope, blocks, dimensions and elevations are invented examples; they are not Torquay measurements. Both local fixtures use zero-valued local origins and contain no geographic coordinates. No EA DTM, OSM/OS extract, real roads or other geographic dataset is loaded into the browser. The offline Python tool records TQ1 4HN as a postcode-centroid anchor for the user-approved 1,000 m candidate AOI revision; coverage remains unchecked.
 
 ## Requirements
 
@@ -51,7 +51,7 @@ The generator writes the original 3 × 3 loader fixture plus a separate 25 × 19
 
 ## AOI candidate tooling
 
-The Python pipeline is separate from the browser and uses no online grid downloads. It derives a 500 m × 500 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. The anchor is a postcode centroid, not a property or survey point. The candidate is `selected_pending_coverage`; EA DTM coverage and local OSM/OS feature density have not been checked, and this is not a frozen AOI.
+The Python pipeline is separate from the browser and uses no online grid downloads. The 2026-10-17 user-approved revision derives a 1,000 m × 1,000 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. It keeps the previously verified WGS84 and BNG centre unchanged. The anchor is a postcode centroid, not a property or survey point. The candidate remains `selected_pending_coverage`; EA DTM coverage and local OSM/OS feature density have not been checked, and this is not a frozen AOI.
 
 Create the isolated Python environment in PowerShell:
 
@@ -86,8 +86,9 @@ Playwright's install command downloads a local Chromium build and requires inter
 - `docs/milestones/M1.md` records TVW-005 terrain and browser evidence.
 - `docs/milestones/TVW-006.md` records the candidate AOI calculation, CLI and verification.
 - `docs/milestones/screenshots/TVW-006-postcode-context.png` is the dated, attributed OSM anchor-context screenshot.
-- `docs/milestones/screenshots/TVW-006-aoi-boundary.png` shows the generated candidate square over an attributed OSM map.
+- `docs/milestones/screenshots/TVW-006-aoi-boundary.png` preserves the original 500 m candidate square over an attributed OSM map as historical evidence.
+- `docs/milestones/screenshots/TVW-006-aoi-boundary-1km.png` shows the user-approved 1,000 m candidate square over an attributed OSM map.
 - `config/aoi.torquay.json` is the editable candidate anchor and size; generated bounds and provenance are in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 - `docs/asset-contract.md` describes synthetic fixture provenance, coordinates, triangulation and sampling semantics.
 
-The original plan remains preserved unchanged at `docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md`; the canonical copy records the verified anchor and pending candidate square. Coverage inspection, data availability and any final frozen AOI remain M2 work for a separately authorized issue.
+The original plan remains preserved unchanged at `docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md`; the canonical copy records the verified anchor and user-approved 1,000 m pending candidate square. Coverage inspection, data availability and any final frozen AOI remain M2 work for TVW-007 after independent review of this size revision.

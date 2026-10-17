@@ -1,10 +1,10 @@
 # Project instructions
 
-TVW-004, TVW-005 and TVW-006 are complete and independently reviewed; M0 and M1 are complete. Do not begin TVW-007 or later without separate user instruction. The TQ1 4HN postcode-centroid anchor is recorded for a candidate AOI; no EA DTM, OSM extract or OS dataset was acquired in TVW-006. Keep the candidate `selected_pending_coverage` until the coverage checks assigned to TVW-007.
+TVW-004, TVW-005 and the original 500 m TVW-006 scope are complete and independently reviewed; M0 and M1 are complete. On 2026-10-17 the user explicitly authorized a 1,000 m × 1,000 m AOI revision followed by TVW-007 EA DTM inspection. The size revision is in progress and must pass independent review before TVW-007 begins. Do not begin TVW-007 before that review or TVW-008 and later without separate user instruction. Preserve the TQ1 4HN centroid and keep the candidate `selected_pending_coverage` until actual coverage checks pass.
 
 ## Working protocol
 
-1. Work on **one milestone and one focused issue** at a time. M0 and M1 are complete; TVW-006 is complete. Do not begin TVW-007 or later without separate authorization.
+1. Work on **one milestone and one focused issue** at a time. M0 and M1 are complete. Complete the authorized 1,000 m AOI revision and independent review, then TVW-007; do not start TVW-007 before review or begin TVW-008 or later without separate authorization.
 2. Start with an implementation plan, concrete files touched, tests and proof of completion.
 3. Keep geographic calculations in tested Python modules and typed, documented asset contracts. No ad-hoc coordinate transforms scattered across React/Three.js render logic.
 4. Maintain a **fully functioning synthetic world** at all times.

@@ -184,8 +184,8 @@ def parse_aoi_config(raw: Any) -> AoiConfig:
         raise AoiConfigError("aoi.crs must be EPSG:27700")
     width_m = _required_number(aoi_raw.get("width_m"), "aoi.width_m")
     height_m = _required_number(aoi_raw.get("height_m"), "aoi.height_m")
-    if width_m != 500 or height_m != 500:
-        raise AoiConfigError("TVW-006 candidate dimensions must be exactly 500 m by 500 m")
+    if width_m != 1000 or height_m != 1000:
+        raise AoiConfigError("TVW-006 candidate dimensions must be exactly 1,000 m by 1,000 m")
     stored_values: dict[str, tuple[float, ...]] = {}
     for field, count in (("center_bng_m", 2), ("bbox_m", 4)):
         values = aoi_raw.get(field)
@@ -202,7 +202,7 @@ def parse_aoi_config(raw: Any) -> AoiConfig:
     if not math.isclose(east - west, width_m, rel_tol=0, abs_tol=1e-7) or not math.isclose(
         north - south, height_m, rel_tol=0, abs_tol=1e-7
     ):
-        raise AoiConfigError("aoi.bbox_m must describe the configured 500 m by 500 m square")
+        raise AoiConfigError("aoi.bbox_m must describe the configured 1,000 m by 1,000 m square")
     if not math.isclose((west + east) / 2, center[0], rel_tol=0, abs_tol=1e-7):
         raise AoiConfigError("aoi.bbox_m easting midpoint must match aoi.center_bng_m[0]")
     if not math.isclose((south + north) / 2, center[1], rel_tol=0, abs_tol=1e-7):
@@ -247,5 +247,5 @@ def validate_stored_selection(
         for stored, expected in zip(config.bbox_m, bbox_m, strict=True)
     ):
         raise AoiConfigError(
-            "aoi.bbox_m does not match the configured anchor's 500 m EPSG:27700 square"
+            "aoi.bbox_m does not match the configured anchor's 1,000 m EPSG:27700 square"
         )

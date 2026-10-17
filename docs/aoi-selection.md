@@ -14,8 +14,8 @@
 ## Candidate square
 
 - Projected centre: `291108.902 m E, 65353.484 m N` (EPSG:27700)
-- Bounds `[west, south, east, north]`: `[290858.902, 65103.484, 291358.902, 65603.484] m`
-- Dimensions: `500.0 m × 500.0 m`
+- Bounds `[west, south, east, north]`: `[290608.902, 64853.484, 291608.902, 65853.484] m`
+- Dimensions: `1000.0 m × 1000.0 m`
 - This is a derived postcode-centred candidate. It is not coverage-approved or frozen.
 
 ## Transformation evidence
@@ -33,7 +33,7 @@ PROJ network access was disabled. The tool pins EPSG operation 1314 (OSGB36 to W
 
 This link is generated from the configured WGS84 anchor and centres OpenStreetMap on the current candidate. It is a visual map-context link only; regenerated reports make no fixed road or landmark assertions. EA DTM coverage, OSM/OS feature counts and local data availability have not been checked; those remain TVW-007 work.
 
-Map: [OpenStreetMap view](https://www.openstreetmap.org/?mlat=50.47785300&mlon=-3.53601300#map=17/50.47785300/-3.53601300). © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
+Map: [OpenStreetMap view](https://www.openstreetmap.org/?mlat=50.47785300&mlon=-3.53601300#map=16/50.47785300/-3.53601300). © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 Provider reference: [Postcodes.io API documentation](https://postcodes.io/docs/).
 Coordinate reference: [pyproj Transformer documentation](https://pyproj4.github.io/pyproj/stable/api/transformer.html).
 

@@ -34,7 +34,7 @@ def test_loads_verified_postcode_candidate_config() -> None:
     assert config.anchor.longitude == -3.536013
     assert config.anchor.latitude == 50.477853
     assert config.crs == "EPSG:27700"
-    assert (config.width_m, config.height_m) == (500, 500)
+    assert (config.width_m, config.height_m) == (1000, 1000)
     assert config.selection_status == "selected_pending_coverage"
     assert config.coverage_status == "not_checked"
 
@@ -46,7 +46,8 @@ def test_loads_verified_postcode_candidate_config() -> None:
         ("anchor.latitude", float("nan"), "anchor.latitude must be a finite number"),
         ("anchor.longitude", 181, "between -180 and 180"),
         ("anchor.latitude", -91, "between -90 and 90"),
-        ("aoi.width_m", 499, "exactly 500 m by 500 m"),
+        ("aoi.width_m", 999, "exactly 1,000 m by 1,000 m"),
+        ("aoi.height_m", 1001, "exactly 1,000 m by 1,000 m"),
         ("aoi.crs", "EPSG:3857", "aoi.crs must be EPSG:27700"),
         ("selection_status", "approved", "selected_pending_coverage"),
         ("coverage_status", "checked", "must remain 'not_checked'"),
@@ -81,7 +82,7 @@ def test_rejects_unknown_config_fields(tmp_path: Path) -> None:
         ("aoi.center_bng_m", None, "aoi.center_bng_m must contain exactly 2 finite numbers"),
         ("aoi.bbox_m", None, "aoi.bbox_m must contain exactly 4 finite numbers"),
         ("aoi.center_bng_m", [1, 2], "aoi.bbox_m easting midpoint"),
-        ("aoi.bbox_m", [0, 0, 500, 500], "aoi.bbox_m easting midpoint"),
+        ("aoi.bbox_m", [0, 0, 1000, 1000], "aoi.bbox_m easting midpoint"),
         ("aoi.bbox_m", [500, 0, 0, 500], "aoi.bbox_m must be ordered"),
     ],
 )

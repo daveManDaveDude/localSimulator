@@ -47,7 +47,7 @@ def test_invalid_config_returns_actionable_nonzero_status(tmp_path: Path, capsys
         ("center_bng_m", None, "aoi.center_bng_m"),
         ("bbox_m", None, "aoi.bbox_m"),
         ("center_bng_m", [1, 2], "aoi.bbox_m"),
-        ("bbox_m", [0, 0, 500, 500], "aoi.bbox_m"),
+        ("bbox_m", [0, 0, 1000, 1000], "aoi.bbox_m"),
     ],
 )
 def test_validate_rejects_invalid_or_stale_stored_projection(

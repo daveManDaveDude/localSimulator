@@ -19,8 +19,16 @@ def test_selection_is_exact_square_with_closed_counter_clockwise_geojson() -> No
     ring = geojson["features"][0]["geometry"]["coordinates"][0]
     point = geojson["features"][1]["geometry"]["coordinates"]
 
-    assert east - west == 500
-    assert north - south == 500
+    assert east - west == 1000
+    assert north - south == 1000
+    assert selection["aoi"]["center_easting_m"] == 291108.9018176432
+    assert selection["aoi"]["center_northing_m"] == 65353.48350844931
+    assert selection["aoi"]["bbox_m"] == [
+        290608.9018176432,
+        64853.48350844931,
+        291608.9018176432,
+        65853.48350844931,
+    ]
     assert ring[0] == ring[-1]
     assert len(ring) == 5
     assert signed_ring_area(ring) > 0
@@ -66,7 +74,7 @@ def test_generated_report_uses_configured_center_without_fixed_road_claims() -> 
     moved = replace(config, anchor=replace(config.anchor, longitude=-3.4, latitude=50.5))
     _selection, _geojson, markdown = generate_selection(moved)
 
-    assert "?mlat=50.50000000&mlon=-3.40000000#map=17/50.50000000/-3.40000000" in markdown
+    assert "?mlat=50.50000000&mlon=-3.40000000#map=16/50.50000000/-3.40000000" in markdown
     assert "Wrights Lane" not in markdown
     assert "Haslam Road" not in markdown
     assert "generated from the configured WGS84 anchor" in markdown

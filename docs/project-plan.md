@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 and M1 complete; TVW-001 through TVW-006 implemented, independently reviewed, and verified; TVW-007 and later require separate authorization
+**Status:** M0 and M1 complete; TVW-001 through TVW-006 originally passed independent review. A user-authorized 1,000 m AOI revision is in progress and must pass independent review before TVW-007.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -11,7 +11,7 @@
 
 **Build this in TypeScript, Three.js and Vite, not Unreal Engine.** Use a small offline Python GIS pipeline to transform real Torquay elevation and mapping data into lightweight local scene assets. The browser renders those assets and provides a moveable camera. No imagery streaming, Google Maps API key, Unity or Unreal installation is required for the PoC.
 
-The first proof is deliberately modest: **a recognisable 500 m × 500 m section of Torquay**, showing believable real elevation, real building outlines as simple extruded blocks, real road alignments, and a camera controllable by mouse and keyboard. The first release is a **world viewer**, not a complete game or driving simulator.
+The first proof is deliberately modest: **a recognisable 1,000 m × 1,000 m section of Torquay**, showing believable real elevation, real building outlines as simple extruded blocks, real road alignments, and a camera controllable by mouse and keyboard. The first release is a **world viewer**, not a complete game or driving simulator.
 
 **Non-negotiable rule:** each milestone must produce something directly viewable and testable. Build and demonstrate synthetic data **before** relying on geographic downloads. Codex should not attempt the full town before a small scene is working.
 
@@ -19,7 +19,7 @@ The first proof is deliberately modest: **a recognisable 500 m × 500 m section 
 
 A user runs `npm run dev`, opens a local URL, and can:
 
-1. See actual hills and slopes for the selected 500 m Torquay area.
+1. See actual hills and slopes for the selected 1,000 m Torquay area.
 2. Recognise local streets from road positions and building footprints.
 3. Move a camera with WASD, steer with the mouse, and switch between free-flight and ground-following walking modes.
 4. Read position, elevation, FPS, and current data-source information in a small on-screen debug panel.
@@ -157,9 +157,9 @@ Useful references: https://www.nationalarchives.gov.uk/doc/open-government-licen
 
 ## 4. Define and freeze a concrete area of interest (AOI)
 
-**Candidate anchor:** postcode **TQ1 4HN**. Postcodes.io returned quality 1 and WGS84 longitude `-3.536013`, latitude `50.477853` on 2026-10-17; these are postcode-centroid coordinates, not a property or survey point. The provider's rounded BNG values were easting `291110`, northing `65355`. Independent OpenStreetMap context was inspected at zoom 18 around the anchor and zoom 17 with the generated candidate boundary overlaid. The dated marker-only and boundary screenshots are `docs/milestones/screenshots/TVW-006-postcode-context.png` and `docs/milestones/screenshots/TVW-006-aoi-boundary.png`.
+**Candidate anchor:** postcode **TQ1 4HN**. Postcodes.io returned quality 1 and WGS84 longitude `-3.536013`, latitude `50.477853` on 2026-10-17; these are postcode-centroid coordinates, not a property or survey point. The provider's rounded BNG values were easting `291110`, northing `65355`. Independent OpenStreetMap context was inspected at zoom 18 around the anchor and zoom 17 with the original 500 m candidate boundary overlaid. The dated marker-only and 500 m boundary screenshots are historical: `docs/milestones/screenshots/TVW-006-postcode-context.png` and `docs/milestones/screenshots/TVW-006-aoi-boundary.png`. On 2026-10-17 the user approved a 1,000 m square around the same centroid; its boundary capture is `docs/milestones/screenshots/TVW-006-aoi-boundary-1km.png`.
 
-TVW-006 used pyproj with `always_xy=True` to derive a **500 m × 500 m EPSG:27700 candidate** centred at easting `291108.9018176432`, northing `65353.48350844931`, with bounds `[290858.9018176432, 65103.48350844931, 291358.9018176432, 65603.48350844931]` in `[west, south, east, north]` order. The tool pins non-ballpark EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid), reporting 2 m accuracy; the selected operation uses no grid. PROJ network access is disabled. In this environment the preferred 1 m operation is unavailable because `uk_os_OSTN15_NTv2_OSGBtoETRS.tif` is missing; the tool records `best_available`, missing operation/grid names, and the selected operation definition in `docs/aoi-selection.json`. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
+The original TVW-006 scope derived a **500 m × 500 m EPSG:27700 candidate** at the same centre; its bounds and dated screenshot remain historical in `docs/milestones/TVW-006.md`. On 2026-10-17 the user approved a **1,000 m × 1,000 m revision** without changing the WGS84 or projected centre. Current bounds are `[290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931]` in `[west, south, east, north]` order. The tool pins non-ballpark EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid), reporting 2 m accuracy; the selected operation uses no grid. PROJ network access is disabled. In this environment the preferred 1 m operation is unavailable because `uk_os_OSTN15_NTv2_OSGBtoETRS.tif` is missing; the tool records `best_available`, missing operation/grid names, and the selected operation definition in `docs/aoi-selection.json`. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 
 The current config status is `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. The map inspection confirms anchor context only; EA DTM coverage, OSM/OS feature counts and local data availability have not been checked. Do not describe this candidate as coverage-approved or frozen, and do not mark the M2 exit gate complete before TVW-007.
 
@@ -167,7 +167,7 @@ The current config status is `selection_status: selected_pending_coverage` and `
 
 1. The TQ1 4HN postcode centroid and independent OSM map context are documented in TVW-006 evidence.
 2. Transform WGS84 longitude/latitude to EPSG:27700 with `pyproj` and `always_xy=True`.
-3. Construct a **500 m × 500 m candidate AOI in British National Grid metres** around that transformed centre.
+3. Construct the user-approved **1,000 m × 1,000 m candidate AOI in British National Grid metres** around that transformed centre.
 4. Generate RFC 7946 WGS84 QA GeoJSON with a closed exterior polygon and anchor point.
 5. **Pending TVW-007:** verify EA 1 m DTM coverage and inspect candidate building/road counts.
 6. Keep the editable anchor, dimensions, and regenerated projected centre/bounds in `config/aoi.torquay.json`; publish operation metadata and QA output under `docs/`.
@@ -236,11 +236,11 @@ public/worlds/torquay-poc-001/
   "sourceCrs": "EPSG:27700",
   "axisConvention": "+X east, +Y up, -Z north",
   "origin": { "eastingM": 0, "northingM": 0, "elevationM": 0 },
-  "extentM": { "width": 500, "depth": 500 },
+  "extentM": { "width": 1000, "depth": 1000 },
   "heightfield": {
     "path": "heightfield.f32",
-    "columns": 251,
-    "rows": 251,
+    "columns": 501,
+    "rows": 501,
     "spacingM": 2,
     "rowOrder": "north-to-south",
     "byteOrder": "little-endian",
@@ -254,7 +254,7 @@ public/worlds/torquay-poc-001/
 
 **IMPORTANT:** `origin` values of zero above are just schema examples, not valid real-scene values. Real generated files must contain measured AOI-local projected coordinates and a documented local elevation origin. The manifest should additionally include geographic AOI bounds, source provenance, input hashes and asset checksums in the implementation.
 
-At 2 m spacing, a 500 m square has **251 × 251 = 63,001 height samples**, about **252 KB** of uncompressed float32 height data. This is small enough for straightforward local browser loading. Retain the **1 m DTM source** for later resampling/LOD rather than discarding it.
+At 2 m spacing, the 1,000 m square has **501 × 501 = 251,001 height samples**, about **1.00 MB** of uncompressed float32 height data. This is small enough for straightforward local browser loading. Retain the **1 m DTM source** for later resampling/LOD rather than discarding it.
 
 For `buildings.json`, store polygon rings in world **XZ metres**, `heightM`, `heightMethod`, footprint provenance and unique ID. Keep a typed schema and validation. For `roads.json`, store line vertices in XZ, name, classification, approximate width, and a non-ground flag for bridges/tunnels when known. **Do not store absolute projected easting/northing** in every browser vertex.
 
@@ -472,9 +472,9 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M2 — Freeze Torquay AOI and verify elevation acquisition
 
-**TVW-006 status:** PASS after Luna fix 1 and independent re-review. It produced a postcode-centred candidate AOI, strict config validation, deterministic operation/grid diagnostics, and QA GeoJSON. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 has not been authorized.
+**TVW-006 status:** Original 500 m scope passed after Luna fix 1 and independent re-review. The user authorized a 1,000 m size revision on 2026-10-17; that revision is in progress and awaiting independent review. It retains the same postcode-centred candidate and deterministic operation/grid diagnostics. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 may start only after the size revision passes review.
 
-**User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 500 m AOI drawn on it. The browser can still run synthetic scene.
+**User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 1,000 m AOI drawn on it. The browser can still run synthetic scene.
 
 **Work:**
 
@@ -486,7 +486,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **Acceptance:**
 
-- AOI exactly 500 m × 500 m in EPSG:27700; preview confirms known nearby roads/landmarks fall inside.
+- AOI exactly 1,000 m × 1,000 m in EPSG:27700; preview confirms known nearby roads/landmarks fall inside.
 - Report identifies correct source GeoTIFF(s) and sane elevations; no guessed or silently patched coverage.
 - Python tests cover coordinate transformations, bounds and NoData.
 - Changing AOI config changes the preview without code changes.
@@ -508,7 +508,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 **Acceptance:**
 
 - Browser loads terrain without external mapping services.
-- Grid dimensions and extent are 251×251 and 500 m per side if 2 m spacing is selected.
+- Grid dimensions and extent are 501×501 and 1,000 m per side if 2 m spacing is selected.
 - 10 randomly sampled points agree with source elevations to within a documented **resampling** tolerance (target ≤0.25 m at terrain grid vertices when comparing like-for-like sampling), rather than falsely claiming survey-grade accuracy.
 - No inverted hills, mirrored orientation, giant cliffs from NoData or unexpected vertical exaggeration.
 - The scene draws at a usable interactive rate; record machine, viewport size and median FPS.
@@ -645,7 +645,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 | Error case (missing dataset) | Visible error text and passing negative test |
 | Performance | Browser/version/GPU/viewport/FPS log in milestone notes |
 
-**Initial performance aspiration:** steady ~60 FPS on the developer's Windows desktop at 1080p with the 500 m AOI; 30 FPS may be acceptable while profiling. These are **targets to measure**, not promises and not automated pass/fail gates until the target machine is defined.
+**Initial performance aspiration:** steady ~60 FPS on the developer's Windows desktop at 1080p with the 1,000 m AOI; 30 FPS may be acceptable while profiling. These are **targets to measure**, not promises and not automated pass/fail gates until the target machine is defined.
 
 ---
 
@@ -768,7 +768,7 @@ Use the following order, splitting into sub-issues if implementation grows beyon
 | ADR-003 | EPSG:27700 to local metre coordinates | UK data alignment, stable precision | Expanding far beyond Devon |
 | ADR-004 | Download/compile geodata offline | No API keys, streaming artefacts or per-frame API costs | Frequent map updates become core requirement |
 | ADR-005 | Heightfield + JSON first, GLB optional | Inspectable, testable, easy to change | Asset size or loading becomes a bottleneck |
-| ADR-006 | 500 m AOI, 2 m render grid | Small, fast, recognisable scene | M6 signed off and performance measured |
+| ADR-006 | 1,000 m AOI, 2 m render grid | User-approved area with a manageable 501×501 render grid | M6 signed off and performance measured |
 | ADR-007 | OSM footprints, OS fallback | Start with adaptable coverage, preserve a richer fallback | Inspection reveals insufficient buildings |
 | ADR-008 | Ground-following camera before physics | Matches initial objective with little complexity | Building collisions or vehicles are required |
 
@@ -779,7 +779,7 @@ Use the following order, splitting into sub-issues if implementation grows beyon
 The following are all required:
 
 - [ ] Real AOI chosen and frozen, with its geographic location independently checked.
-- [ ] Real EA terrain dataset documented and transformed into a **500 × 500 m** scene.
+- [ ] Real EA terrain dataset documented and transformed into a **1,000 × 1,000 m** scene.
 - [ ] Actual building footprints rendered; estimated heights explicitly identified.
 - [ ] Roads displayed with their geographic alignment verified at three local points.
 - [ ] Freely moveable camera and functioning 1.7 m ground-following walk mode.
@@ -792,15 +792,15 @@ The following are all required:
 
 ### Go/no-go after M6
 
-**Go:** the terrain silhouette and street/building relationships look recognisably like the selected area; movement is smooth; regeneration is repeatable. Expand to 1 km and test chunking.
+**Go:** the terrain silhouette and street/building relationships look recognisably like the selected area; movement is smooth; regeneration is repeatable. Test chunking and performance at the selected 1 km extent.
 
-**No-go / investigate:** multiple datasets are clearly misaligned, large areas of elevation are missing, road/building detail is insufficient to recognise the neighbourhood, or the browser cannot handle the geometry. Fix data quality, coordinate issues or rendering strategy **before** enlarging the map. Moving to Unreal is not the default remedy for source-data problems.
+**No-go / investigate:** multiple datasets are clearly misaligned, large areas of elevation are missing, road/building detail is insufficient to recognise the neighbourhood, or the browser cannot handle the geometry. Fix data quality, coordinate issues or rendering strategy before expanding beyond the selected 1 km square. Moving to Unreal is not the default remedy for source-data problems.
 
 ---
 
 ## 18. First Codex prompt (paste directly into Codex)
 
-> You are the implementation engineer for the **Torquay Virtual World Browser PoC**. Read `docs/project-plan.md` in full and follow its architecture, data-source provenance, acceptance gates and Codex protocol. The application will eventually render a 500 m × 500 m section of Torquay using EA DTM elevation and OSM/OS building and road geometry, but **for this assignment implement M0 only**.
+> You are the implementation engineer for the **Torquay Virtual World Browser PoC**. Read `docs/project-plan.md` in full and follow its architecture, data-source provenance, acceptance gates and Codex protocol. The application will eventually render a 1,000 m × 1,000 m section of Torquay using EA DTM elevation and OSM/OS building and road geometry, but **for this assignment implement M0 only**.
 >
 > **M0 scope:** scaffold a clean Windows-friendly Vite + strict TypeScript + Three.js project; create a beautiful but deliberately simple synthetic 3D demo with a sloped ground plane, grid, a few blocks, lighting, debug HUD, pointer-lock mouse look, WASD free flight, vertical movement, speed modifier and reset. It must work on a clean clone **without downloaded GIS datasets**. Include npm scripts for dev, build, typecheck, lint and unit/e2e tests; README; `AGENTS.md`; sensible `.gitignore`; and an automated Playwright smoke test. Use current official docs for APIs and check installed package versions before coding. Keep the implementation modular for later binary heightfield loading. Do not bring in React, Cesium, APIs, paid services or unrelated dependencies.
 >

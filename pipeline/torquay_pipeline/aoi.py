@@ -188,7 +188,7 @@ def render_selection_markdown(selection: dict[str, Any]) -> str:
     latitude = anchor["coordinates"]["latitude"]
     map_url = (
         "https://www.openstreetmap.org/"
-        f"?mlat={latitude:.8f}&mlon={longitude:.8f}#map=17/{latitude:.8f}/{longitude:.8f}"
+        f"?mlat={latitude:.8f}&mlon={longitude:.8f}#map=16/{latitude:.8f}/{longitude:.8f}"
     )
     lines = [
         "# AOI selection candidate",
