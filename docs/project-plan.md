@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 and M1 complete; TVW-001 through TVW-006 originally passed independent review. A user-authorized 1,000 m AOI revision is in progress and must pass independent review before TVW-007.
+**Status:** M0 and M1 complete; TVW-001 through TVW-006 passed independent review. The user-authorized 1,000 m AOI revision passed independent review; TVW-007 EA DTM inspection is the current authorized issue. TVW-008 and later are not authorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -449,7 +449,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M1 — Asset schema and deterministic heightfield renderer
 
-**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete. TVW-006 is complete after independent review; TVW-007 remains outside the current scope.
+**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete. TVW-006, including the approved 1,000 m candidate-size revision, passed independent review. TVW-007 is the current authorized issue; M2 remains incomplete pending actual source coverage and subsequent feature-count checks.
 
 **User-visible result:** browser loads a **synthetic terrain hill** from a `heightfield.f32` fixture rather than constructing it ad hoc.
 
@@ -472,7 +472,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M2 — Freeze Torquay AOI and verify elevation acquisition
 
-**TVW-006 status:** Original 500 m scope passed after Luna fix 1 and independent re-review. The user authorized a 1,000 m size revision on 2026-10-17; that revision is in progress and awaiting independent review. It retains the same postcode-centred candidate and deterministic operation/grid diagnostics. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 may start only after the size revision passes review.
+**TVW-006 status:** Original 500 m scope passed after Luna fix 1 and independent re-review. The user authorized a 1,000 m size revision on 2026-10-17; that revision passed independent review by Sol on 2026-10-17. It retains the same postcode-centred candidate and deterministic operation/grid diagnostics. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 is now authorized and current.
 
 **User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 1,000 m AOI drawn on it. The browser can still run synthetic scene.
 
