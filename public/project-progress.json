@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-10-17",
+  "project": "Torquay Virtual World",
+  "currentIssue": "TVW-008",
+  "currentNote": "Implementation handback recorded",
+  "nextAction": "Independent review and M3 sign-off",
+  "currentWork": [
+    { "label": "Terrain export and QA completed", "state": "done" },
+    { "label": "Local browser evidence recorded", "state": "done" },
+    { "label": "Independent review and M3 sign-off", "state": "next" }
+  ],
+  "mvpMilestone": "M6",
+  "polishMilestone": "M7",
+  "issues": [
+    {
+      "id": "TVW-001",
+      "milestone": "M0",
+      "title": "Project scaffold",
+      "status": "complete",
+      "summary": "Vite, strict TypeScript, Three.js, scripts and Windows setup."
+    },
+    {
+      "id": "TVW-002",
+      "milestone": "M0",
+      "title": "Synthetic world and flight",
+      "status": "complete",
+      "summary": "Synthetic scene, free-flight controls, lighting and camera."
+    },
+    {
+      "id": "TVW-003",
+      "milestone": "M0",
+      "title": "HUD and browser smoke test",
+      "status": "complete",
+      "summary": "Help overlay, telemetry and initial browser coverage."
+    },
+    {
+      "id": "TVW-004",
+      "milestone": "M1",
+      "title": "Scene asset contract",
+      "status": "complete",
+      "summary": "Manifest validation and binary heightfield loading."
+    },
+    {
+      "id": "TVW-005",
+      "milestone": "M1",
+      "title": "Synthetic terrain renderer",
+      "status": "complete",
+      "summary": "Terrain mesh, normals, height sampling and synthetic fixture."
+    },
+    {
+      "id": "TVW-006",
+      "milestone": "M2",
+      "title": "AOI selection and coordinate checks",
+      "status": "complete",
+      "summary": "Reviewed 1 km candidate around the preserved TQ1 4HN centroid."
+    },
+    {
+      "id": "TVW-007",
+      "milestone": "M2",
+      "title": "EA DTM inspection",
+      "status": "complete",
+      "summary": "1,000,000 of 1,000,000 terrain cells covered; DTM threshold passes."
+    },
+    {
+      "id": "TVW-008",
+      "milestone": "M3",
+      "title": "Real terrain package and viewer",
+      "status": "review",
+      "summary": "Implementation handback and checks recorded; independent review pending."
+    },
+    {
+      "id": "TVW-009",
+      "milestone": "M4",
+      "title": "Building source and quality report",
+      "status": "not-started",
+      "summary": "Inspect building coverage, source counts and height policy; needs separate authorization."
+    },
+    {
+      "id": "TVW-010",
+      "milestone": "M4",
+      "title": "Render terrain-following buildings",
+      "status": "not-started",
+      "summary": "Extrude real footprints with wall bases that follow the terrain."
+    },
+    {
+      "id": "TVW-011",
+      "milestone": "M5",
+      "title": "Extract and render roads",
+      "status": "not-started",
+      "summary": "Inspect road coverage and drape road ribbons over the terrain."
+    },
+    {
+      "id": "TVW-012",
+      "milestone": "M5",
+      "title": "Compare map alignment",
+      "status": "not-started",
+      "summary": "Check roads and buildings against an independent map at three locations."
+    },
+    {
+      "id": "TVW-013",
+      "milestone": "M6",
+      "title": "Ground-following walk mode",
+      "status": "not-started",
+      "summary": "Add a 1.7 m eye-height walk mode and switch between walking and flight."
+    },
+    {
+      "id": "TVW-014",
+      "milestone": "M7",
+      "title": "Profile and package the PoC",
+      "status": "not-started",
+      "summary": "Final performance notes, clean-checkout guidance, attribution and handback."
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M0",
+      "title": "Synthetic world",
+      "status": "complete",
+      "detail": "A working browser world runs without GIS downloads."
+    },
+    {
+      "id": "M1",
+      "title": "Heightfield renderer",
+      "status": "complete",
+      "detail": "Typed terrain assets load and render with tested height sampling."
+    },
+    {
+      "id": "M2",
+      "title": "AOI and elevation coverage",
+      "status": "open",
+      "detail": "EA DTM passes; overall AOI gate stays open until OSM/OS building and road counts are checked."
+    },
+    {
+      "id": "M3",
+      "title": "Real Torquay terrain",
+      "status": "review",
+      "detail": "Terrain package and browser evidence are ready for independent review."
+    },
+    {
+      "id": "M4",
+      "title": "Real buildings",
+      "status": "not-started",
+      "detail": "Planned after separate user authorization."
+    },
+    {
+      "id": "M5",
+      "title": "Roads and alignment",
+      "status": "not-started",
+      "detail": "Planned after separate user authorization."
+    },
+    {
+      "id": "M6",
+      "title": "Walkable PoC",
+      "status": "not-started",
+      "detail": "Plan's playable MVP exit gate: navigate on foot and from above."
+    },
+    {
+      "id": "M7",
+      "title": "Review and package",
+      "status": "not-started",
+      "detail": "Final profile, clean-checkout verification and demo handback."
+    }
+  ],
+  "forecast": [
+    {
+      "id": "TVW-008",
+      "title": "Independent review and closeout",
+      "minDays": 1,
+      "maxDays": 2,
+      "group": "mvp"
+    },
+    {
+      "id": "TVW-009",
+      "title": "Building source checks and QA",
+      "minDays": 2,
+      "maxDays": 4,
+      "group": "mvp"
+    },
+    {
+      "id": "TVW-010",
+      "title": "Building renderer",
+      "minDays": 1,
+      "maxDays": 3,
+      "group": "mvp"
+    },
+    {
+      "id": "TVW-011",
+      "title": "Road extraction and renderer",
+      "minDays": 2,
+      "maxDays": 4,
+      "group": "mvp"
+    },
+    {
+      "id": "TVW-012",
+      "title": "Three-point map comparison",
+      "minDays": 1,
+      "maxDays": 2,
+      "group": "mvp"
+    },
+    {
+      "id": "TVW-013",
+      "title": "Walk mode",
+      "minDays": 2,
+      "maxDays": 3,
+      "group": "mvp"
+    },
+    {
+      "id": "TVW-014",
+      "title": "Final profile and package",
+      "minDays": 1,
+      "maxDays": 3,
+      "group": "polish"
+    }
+  ],
+  "risks": [
+    {
+      "level": "open",
+      "title": "Overall AOI coverage is not approved",
+      "detail": "OSM/OS building and road feature counts have not been checked. Keep selection_status selected_pending_coverage and coverage_status not_checked."
+    },
+    {
+      "level": "watch",
+      "title": "Performance depends on the graphics path",
+      "detail": "The TVW-008 handback records 60 FPS on this host's hardware-accelerated Chrome and a 9.4 FPS median on SwiftShader software rendering."
+    },
+    {
+      "level": "watch",
+      "title": "Real source package is local",
+      "detail": "EA source downloads and the generated terrain package are not committed; a clean clone uses synthetic terrain until sources are restored and rebuilt."
+    }
+  ],
+  "forecastNotes": [
+    "Ranges include implementation, quality gates and one independent review/fix cycle; assume public OSM coverage is usable and no account-gated fallback is needed.",
+    "These are planning ranges, not calendar commitments. Sparse source coverage or extra performance/review fixes can extend them."
+  ],
+  "evidence": [
+    {
+      "label": "TVW-008 implementation handback",
+      "path": "docs/milestones/TVW-008.md"
+    },
+    { "label": "Canonical project plan", "path": "docs/project-plan.md" },
+    {
+      "label": "TVW-008 terrain QA report",
+      "path": "docs/milestones/artifacts/TVW-008-qa.json"
+    }
+  ]
+}

@@ -28,6 +28,8 @@ npm run dev
 
 Open the local address printed by Vite. `npm ci` restores the exact dependencies in `package-lock.json`; the initial clean install needs access to the npm registry. Once installed, the application uses local files only and does not call a hosted service.
 
+The refreshable project dashboard is at `/progress.html` on the same local server. It reads `public/project-progress.json`; update that snapshot as milestone handbacks change, then use **Refresh status** to load the latest project position and forecast. See [docs/project-dashboard.md](docs/project-dashboard.md) for the update fields and status rules.
+
 Click **Start exploring** to enter pointer lock. Move the mouse to look; use **W/S** to fly along the full camera direction, **A/D** to strafe, **Space/Ctrl** to rise and descend, **Shift** to move faster, **R** to restore the spawn position and view, and **Esc** to release the pointer. The camera stays inside the finite synthetic terrain bounds; the status pill signals when you reach an edge. Click the scene or **Resume flying** to relock after pressing Esc. Use **G** or the terrain-grid button to toggle grid and north cues; the wireframe button changes the terrain mesh display.
 
 The live HUD reports the loaded world, source mode, grid dimensions, sampled ground height, camera position and bearing/pitch, lock state, speed, FPS and boundary state. A load error identifies the failing stage and offers retry and a link to the M0 analytic demo.
