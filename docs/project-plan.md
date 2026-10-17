@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 and M1 complete — TVW-001 through TVW-005 implemented, independently reviewed, and verified; M2 has not started and requires separate authorization
+**Status:** M0 and M1 complete — TVW-001 through TVW-005 implemented, independently reviewed, and verified; TVW-006 implementation is awaiting independent review; TVW-007 and later require separate authorization
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -157,37 +157,27 @@ Useful references: https://www.nationalarchives.gov.uk/doc/open-government-licen
 
 ## 4. Define and freeze a concrete area of interest (AOI)
 
-**User-preferred candidate anchor:** postcode **TQ1 4HN**. Its exact location, inland suitability, independent map context, and EA DTM / OSM / OS data coverage must be verified in M2 before selecting and freezing a 500 m × 500 m AOI. Do not treat the postcode itself as a coordinate or hardcode an unverified bounding box.
+**Candidate anchor:** postcode **TQ1 4HN**. Postcodes.io returned quality 1 and WGS84 longitude `-3.536013`, latitude `50.477853` on 2026-10-17; these are postcode-centroid coordinates, not a property or survey point. The provider's rounded BNG values were easting `291110`, northing `65355`. An independent OpenStreetMap map inspection at zoom 18 showed Wrights Lane, Haslam Road, Chatto Way and Charito Road in a built-up inland context. See the saved, attributed reference at `docs/milestones/screenshots/TVW-006-postcode-context.png`.
+
+TVW-006 used pyproj with `always_xy=True` to derive a **500 m × 500 m EPSG:27700 candidate** centred at easting `291108.9018176432`, northing `65353.48350844931`, with bounds `[290858.9018176432, 65103.48350844931, 291358.9018176432, 65603.48350844931]` in `[west, south, east, north]` order. PROJ selected the OSGB36 Helmert / British National Grid operation and reported 2 m accuracy; no grids were listed for the operation used, and PROJ network access was disabled. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
+
+The current config status is `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. The map inspection confirms anchor context only; EA DTM coverage, OSM/OS feature counts and local data availability have not been checked. Do not describe this candidate as coverage-approved or frozen, and do not mark the M2 exit gate complete before TVW-007.
 
 **Selection protocol (Codex task):**
 
-1. Independently locate the preferred postcode TQ1 4HN or a suitable nearby landmark on a map; confirm the location and record verified WGS84 longitude/latitude.
-2. Transform it with `pyproj` to EPSG:27700 (`always_xy=True`).
-3. Construct a **500 m × 500 m AOI in British National Grid metres** around that transformed centre.
-4. Generate a GeoJSON polygon for viewing the AOI on an independent map.
-5. Verify that EA 1 m DTM covers the AOI and inspect candidate building/road counts.
-6. Publish actual AOI values and known landmarks to `config/aoi.torquay.json` and `docs/aoi-selection.md`.
-7. Allow moving this 500 m square by changing config alone.
+1. The TQ1 4HN postcode centroid and independent OSM map context are documented in TVW-006 evidence.
+2. Transform WGS84 longitude/latitude to EPSG:27700 with `pyproj` and `always_xy=True`.
+3. Construct a **500 m × 500 m candidate AOI in British National Grid metres** around that transformed centre.
+4. Generate RFC 7946 WGS84 QA GeoJSON with a closed exterior polygon and anchor point.
+5. **Pending TVW-007:** verify EA 1 m DTM coverage and inspect candidate building/road counts.
+6. Keep the editable anchor, dimensions, and regenerated projected centre/bounds in `config/aoi.torquay.json`; publish operation metadata and QA output under `docs/`.
+7. Allow moving the candidate square by changing the input config alone and rerunning the selection CLI.
 
 **Hard rule:** use precisely the same frozen AOI for terrain, buildings, roads, diagnostics, screenshots and tests. Add a small acquisition buffer around it for features crossing boundaries; clip final exports consistently.
 
-Suggested config schema (illustrative only; coordinate values must be resolved during M2 selection, not invented):
+The current validated input config stores the editable WGS84 anchor, fixed candidate dimensions, pending-coverage statuses, and the current projected centre/bounds. The CLI refreshes those derived values after an anchor change and publishes operation metadata in `docs/aoi-selection.json`; the QA polygon is `docs/aoi-selection.geojson`. The input config contains no null placeholder coordinates.
 
-```json
-{
-  "id": "torquay-poc-001",
-  "name": "Torquay initial neighbourhood",
-  "crs": "EPSG:27700",
-  "bbox_m": [null, null, null, null],
-  "dimensions_m": [500, 500],
-  "terrain_sample_spacing_m": 2,
-  "fallback_building_height_m": 8,
-  "eye_height_m": 1.7,
-  "world_units": "metres"
-}
-```
-
-**Note:** this null-valued illustration is not a build input. M0 must not create an AOI config or commit placeholder coordinates. Actual AOI resolution, coverage checks, and a valid `config/aoi.torquay.json` belong to M2; a future validator must reject null coordinates.
+**Coverage note:** the candidate coordinates are real transformation outputs derived from the documented postcode centroid. Coverage checks and any final AOI freeze remain pending in M2.
 
 ---
 
@@ -459,7 +449,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M1 — Asset schema and deterministic heightfield renderer
 
-**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete; TVW-006 requires separate authorization.
+**TVW-005 status:** PASS after independent review and final coordinator gates. M1 is complete. TVW-006 is authorized and in progress; TVW-007 remains outside the current scope.
 
 **User-visible result:** browser loads a **synthetic terrain hill** from a `heightfield.f32` fixture rather than constructing it ad hoc.
 
@@ -481,6 +471,8 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 **Exit gate:** browser terrain renderer does not depend on real-world files.
 
 ### M2 — Freeze Torquay AOI and verify elevation acquisition
+
+**TVW-006 status:** IMPLEMENTED — independent review pending. It produced a postcode-centred candidate AOI, validation tooling and QA GeoJSON. Coverage remains unverified; do not call the AOI coverage-approved or mark the M2 exit gate complete. TVW-007 has not been authorized.
 
 **User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 500 m AOI drawn on it. The browser can still run synthetic scene.
 

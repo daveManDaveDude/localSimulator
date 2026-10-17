@@ -1,0 +1,35 @@
+{
+  "format_version": 1,
+  "id": "torquay-poc-001",
+  "name": "TQ1 4HN candidate area of interest",
+  "selection_status": "selected_pending_coverage",
+  "coverage_status": "not_checked",
+  "anchor": {
+    "postcode": "TQ1 4HN",
+    "longitude": -3.536013,
+    "latitude": 50.477853,
+    "coordinate_crs": "EPSG:4326",
+    "coordinate_meaning": "Postcode centroid; not a property or survey point.",
+    "quality": 1,
+    "source_name": "Postcodes.io",
+    "source_url": "https://api.postcodes.io/postcodes/TQ1%204HN",
+    "source_license": "OS OpenData licence (provider documentation)",
+    "retrieved_date": "2026-10-17"
+  },
+  "aoi": {
+    "crs": "EPSG:27700",
+    "width_m": 500.0,
+    "height_m": 500.0,
+    "center_bng_m": [
+      291108.9018176432,
+      65353.48350844931
+    ],
+    "bbox_m": [
+      290858.9018176432,
+      65103.48350844931,
+      291358.9018176432,
+      65603.48350844931
+    ]
+  },
+  "world_units": "metres"
+}

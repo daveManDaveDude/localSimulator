@@ -13,6 +13,11 @@ data/intermediate/
 data/generated/
 
 # Local environment and editor files
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+pipeline/.venv/
 .env
 .env.*
 !.env.example

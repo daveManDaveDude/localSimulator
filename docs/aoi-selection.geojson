@@ -1,0 +1,61 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "torquay-poc-001-aoi",
+      "properties": {
+        "name": "TQ1 4HN candidate area of interest — candidate square",
+        "selection_status": "selected_pending_coverage",
+        "coverage_status": "not_checked",
+        "projected_crs": "EPSG:27700",
+        "width_m": 500.0,
+        "height_m": 500.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -3.539461987722519,
+              50.475558996667104
+            ],
+            [
+              -3.5324182656327765,
+              50.47565197922922
+            ],
+            [
+              -3.5325636582478555,
+              50.480146892333146
+            ],
+            [
+              -3.539608047872868,
+              50.48005389500582
+            ],
+            [
+              -3.539461987722519,
+              50.475558996667104
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "torquay-poc-001-anchor",
+      "properties": {
+        "name": "TQ1 4HN postcode centroid (candidate anchor)",
+        "selection_status": "selected_pending_coverage",
+        "source_name": "Postcodes.io",
+        "coordinate_meaning": "Postcode centroid; not a property or survey point."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.536013,
+          50.477853
+        ]
+      }
+    }
+  ]
+}
