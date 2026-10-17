@@ -57,6 +57,8 @@
       },
       "archive_filename": "lidar_composite_dtm-2022-1-SX96nw.zip",
       "raster_relative_path": "SX96nw/SX96nw_DTM_1m.tif",
+      "raster_archive_member": "SX96nw_DTM_1m.tif",
+      "metadata_sidecar_relative_path": "SX96nw/SX96nw_DTM_1m.tif.xml",
       "archive": {
         "size_bytes": 68662575,
         "sha256": "22ac2c453ea79ca050a5c1b5a382ba1409a1f9f2c795ab274e6b78fffb4aecf6"
@@ -93,6 +95,7 @@
       },
       "metadata_sidecar": {
         "filename": "SX96nw_DTM_1m.tif.xml",
+        "archive_member": "SX96nw_DTM_1m.tif.xml",
         "size_bytes": 20545,
         "sha256": "4e24fa849e7b2a50a1446122de00fc30c29571248fa8bb0110a7f3283c9fb500",
         "creation_date": "2022-09-05",
@@ -112,6 +115,8 @@
       },
       "archive_filename": "lidar_composite_dtm-2022-1-SX96sw.zip",
       "raster_relative_path": "SX96sw/SX96sw_DTM_1m.tif",
+      "raster_archive_member": "SX96sw_DTM_1m.tif",
+      "metadata_sidecar_relative_path": "SX96sw/SX96sw_DTM_1m.tif.xml",
       "archive": {
         "size_bytes": 57405975,
         "sha256": "46caf90e77dafc3bca95bf7cc0a81bc13601eb9593f7cb9818c25565d9020e6e"
@@ -148,6 +153,7 @@
       },
       "metadata_sidecar": {
         "filename": "SX96sw_DTM_1m.tif.xml",
+        "archive_member": "SX96sw_DTM_1m.tif.xml",
         "size_bytes": 20545,
         "sha256": "6122fd3fe59b6b64b57a0273dc926f29387736ee070886fe353ad7993e658d33",
         "creation_date": "2022-09-05",

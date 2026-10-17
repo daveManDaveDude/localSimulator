@@ -83,7 +83,17 @@
           "SX96nw_DTM_1m.tif.aux.xml",
           "SX96nw_DTM_1m.tif.xml",
           "SX96nw_DTM_1m_Metadata.gpkg"
-        ]
+        ],
+        "raster_member": {
+          "member": "SX96nw_DTM_1m.tif",
+          "size_bytes": 69538064,
+          "sha256": "665441c4022f06044e17b501e6e1fe4bf3a2c25f87a7f2fea91c01c1054ba8e1"
+        },
+        "metadata_sidecar_member": {
+          "member": "SX96nw_DTM_1m.tif.xml",
+          "size_bytes": 20545,
+          "sha256": "4e24fa849e7b2a50a1446122de00fc30c29571248fa8bb0110a7f3283c9fb500"
+        }
       },
       "raster_metadata": {
         "filename": "SX96nw_DTM_1m.tif",
@@ -158,7 +168,17 @@
           "SX96sw_DTM_1m.tif.aux.xml",
           "SX96sw_DTM_1m.tif.xml",
           "SX96sw_DTM_1m_Metadata.gpkg"
-        ]
+        ],
+        "raster_member": {
+          "member": "SX96sw_DTM_1m.tif",
+          "size_bytes": 57969482,
+          "sha256": "8438a544a9f4b4c675d72fd16824d5b75802899e7291edb585e98334da53211f"
+        },
+        "metadata_sidecar_member": {
+          "member": "SX96sw_DTM_1m.tif.xml",
+          "size_bytes": 20545,
+          "sha256": "6122fd3fe59b6b64b57a0273dc926f29387736ee070886fe353ad7993e658d33"
+        }
       },
       "raster_metadata": {
         "filename": "SX96sw_DTM_1m.tif",

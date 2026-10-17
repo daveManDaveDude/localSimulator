@@ -94,6 +94,30 @@ def test_samples_aoi_cell_centers_without_interpolation_and_reports_center(
     assert result.report["analysis"]["overall_aoi_coverage_status"] == "not_checked"
 
 
+def test_exact_unit_affine_center_and_half_open_raster_boundaries(tmp_path: Path) -> None:
+    path = write_raster(
+        tmp_path / "boundaries.tif",
+        np.asarray([[1, 2], [3, 4]], dtype=np.float32),
+        west=0,
+        north=2,
+    )
+    config = small_config(width=2, height=2, west=0, south=0)
+
+    result = analyze_coverage(config, [path])
+    assert result.elevations_m.tolist() == [[1.0, 2.0], [3.0, 4.0]]
+    # The AOI center lies on an interior source-pixel edge; floor indexing selects SE.
+    assert result.report["elevation_m"]["center"]["value_m"] == 4.0
+
+    west_north_edge = replace(config, center_bng_m=(0, 2))
+    assert (
+        analyze_coverage(west_north_edge, [path]).report["elevation_m"]["center"]["value_m"] == 1.0
+    )
+    east_edge = replace(config, center_bng_m=(2, 1))
+    south_edge = replace(config, center_bng_m=(1, 0))
+    assert analyze_coverage(east_edge, [path]).report["elevation_m"]["center"]["value_m"] is None
+    assert analyze_coverage(south_edge, [path]).report["elevation_m"]["center"]["value_m"] is None
+
+
 def test_finite_zero_and_negative_elevations_are_valid(tmp_path: Path) -> None:
     values = np.zeros((4, 4), dtype=np.float32)
     values[1, 0] = -3.25
@@ -240,6 +264,24 @@ def test_unsupported_raster_metadata_is_rejected(
     )
 
     with pytest.raises(TerrainSourceError, match=match):
+        analyze_coverage(small_config(), [path])
+
+
+@pytest.mark.parametrize(
+    "transform",
+    [
+        Affine(1.0000000005, 0, 0, 0, -1, 3),
+        Affine(1, 0, 0, 0, -1.0000000005, 3),
+    ],
+)
+def test_near_unit_pixel_scale_is_rejected_on_both_axes(tmp_path: Path, transform: Affine) -> None:
+    path = write_raster(
+        tmp_path / "near-unit.tif",
+        np.ones((4, 4), dtype=np.float32),
+        transform=transform,
+    )
+
+    with pytest.raises(TerrainSourceError, match="exact north-up, unrotated 1 m pixels"):
         analyze_coverage(small_config(), [path])
 
 

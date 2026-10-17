@@ -52,13 +52,16 @@ def _source_extent(dataset: rasterio.io.DatasetReader) -> tuple[float, float, fl
         raise TerrainCoverageError(f"raster '{Path(dataset.name).name}' must use EPSG:27700")
     transform = dataset.transform
     if not (
-        math.isclose(transform.a, 1.0, rel_tol=0, abs_tol=1e-9)
-        and math.isclose(transform.e, -1.0, rel_tol=0, abs_tol=1e-9)
-        and math.isclose(transform.b, 0.0, rel_tol=0, abs_tol=1e-12)
-        and math.isclose(transform.d, 0.0, rel_tol=0, abs_tol=1e-12)
+        transform.a == 1.0
+        and transform.e == -1.0
+        and transform.b == 0.0
+        and transform.d == 0.0
+        and transform.c == round(transform.c)
+        and transform.f == round(transform.f)
     ):
         raise TerrainCoverageError(
-            f"raster '{Path(dataset.name).name}' must be north-up with unrotated 1 m pixels"
+            f"raster '{Path(dataset.name).name}' must use the exact supported affine "
+            "(a=1, b=0, d=0, e=-1) with integer-aligned origin"
         )
     bounds = dataset.bounds
     return bounds.left, bounds.bottom, bounds.right, bounds.top

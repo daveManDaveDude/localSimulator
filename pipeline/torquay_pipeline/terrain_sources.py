@@ -130,19 +130,17 @@ def inspect_raster(path: Path) -> tuple[RasterMetadata, dict[str, Any] | None]:
             if not all(math.isfinite(value) for value in values):
                 raise TerrainSourceError(f"raster '{path.name}' has a non-finite transform")
             if not (
-                math.isclose(transform.a, 1.0, rel_tol=0, abs_tol=1e-9)
-                and math.isclose(transform.e, -1.0, rel_tol=0, abs_tol=1e-9)
-                and math.isclose(transform.b, 0.0, rel_tol=0, abs_tol=1e-12)
-                and math.isclose(transform.d, 0.0, rel_tol=0, abs_tol=1e-12)
+                transform.a == 1.0
+                and transform.e == -1.0
+                and transform.b == 0.0
+                and transform.d == 0.0
             ):
                 raise TerrainSourceError(
                     f"raster '{path.name}' has unsupported transform/resolution; "
-                    "expected north-up, unrotated 1 m pixels"
+                    "expected exact north-up, unrotated 1 m pixels "
+                    "(a=1, b=0, d=0, e=-1)"
                 )
-            if not all(
-                math.isclose(value, round(value), rel_tol=0, abs_tol=1e-6)
-                for value in (transform.c, transform.f)
-            ):
+            if not all(value == round(value) for value in (transform.c, transform.f)):
                 raise TerrainSourceError(
                     f"raster '{path.name}' origin is not aligned to integer EPSG:27700 metres"
                 )
@@ -245,6 +243,64 @@ def _safe_file_path(root: Path, relative: object, label: str) -> Path:
     return path
 
 
+def _verify_archive_member_binding(
+    archive_file: zipfile.ZipFile,
+    archive_path: Path,
+    member_name: object,
+    extracted_path: Path,
+    label: str,
+) -> dict[str, Any]:
+    """Stream a ZIP member digest and require its extracted copy to match byte-for-byte."""
+    if not isinstance(member_name, str) or not member_name.strip():
+        raise TerrainSourceError(f"{label} must name an exact ZIP archive member")
+    try:
+        member = archive_file.getinfo(member_name)
+    except KeyError as exc:
+        raise TerrainSourceError(
+            f"{label} ZIP member '{member_name}' is missing from '{archive_path.name}'"
+        ) from exc
+    if member.is_dir():
+        raise TerrainSourceError(f"{label} ZIP member '{member_name}' is a directory")
+
+    extracted_size = extracted_path.stat().st_size
+    if member.file_size != extracted_size:
+        raise TerrainSourceError(
+            f"{label} byte length mismatch: ZIP member '{member_name}' has "
+            f"{member.file_size} bytes but extracted '{extracted_path.name}' has "
+            f"{extracted_size} bytes"
+        )
+
+    digest = hashlib.sha256()
+    streamed_size = 0
+    try:
+        with archive_file.open(member, "r") as source_member:
+            for chunk in iter(lambda: source_member.read(1024 * 1024), b""):
+                streamed_size += len(chunk)
+                digest.update(chunk)
+    except (OSError, RuntimeError, zipfile.BadZipFile) as exc:
+        raise TerrainSourceError(
+            f"cannot hash ZIP member '{member_name}' in '{archive_path.name}': {exc}"
+        ) from exc
+    if streamed_size != member.file_size:
+        raise TerrainSourceError(
+            f"{label} streamed byte length mismatch for ZIP member '{member_name}': "
+            f"directory lists {member.file_size} bytes, stream produced {streamed_size}"
+        )
+
+    member_sha256 = digest.hexdigest()
+    extracted_sha256 = sha256_file(extracted_path)
+    if extracted_sha256 != member_sha256:
+        raise TerrainSourceError(
+            f"{label} SHA-256 mismatch between ZIP member '{member_name}' and "
+            f"extracted file '{extracted_path.name}'"
+        )
+    return {
+        "member": member_name,
+        "size_bytes": streamed_size,
+        "sha256": member_sha256,
+    }
+
+
 def verify_source_manifest(
     manifest_path: Path, source_dir: Path
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -324,11 +380,49 @@ def verify_source_manifest(
                     raise TerrainSourceError(
                         f"{label} archive member list differs from the source manifest"
                     )
+                if len(actual_members) != len(set(actual_members)):
+                    raise TerrainSourceError(f"{label} archive contains duplicate member names")
                 corrupt_member = archive_file.testzip()
                 if corrupt_member is not None:
                     raise TerrainSourceError(
                         f"{label} archive CRC check failed for member '{corrupt_member}'"
                     )
+                raster_binding = _verify_archive_member_binding(
+                    archive_file,
+                    archive_path,
+                    record.get("raster_archive_member"),
+                    raster_path,
+                    f"{label} extracted GeoTIFF",
+                )
+                sidecar_expected = record.get("metadata_sidecar")
+                if not isinstance(sidecar_expected, dict):
+                    raise TerrainSourceError(
+                        f"{label}.metadata_sidecar must identify the required XML sidecar"
+                    )
+                sidecar_member = sidecar_expected.get("archive_member")
+                sidecar_relative_path = record.get("metadata_sidecar_relative_path")
+                sidecar_path = _safe_file_path(
+                    source_dir,
+                    sidecar_relative_path,
+                    f"{label}.metadata_sidecar_relative_path",
+                )
+                inferred_sidecar_path = raster_path.with_suffix(raster_path.suffix + ".xml")
+                if sidecar_path != inferred_sidecar_path:
+                    raise TerrainSourceError(
+                        f"{label}.metadata_sidecar_relative_path must identify the XML sidecar "
+                        f"next to '{raster_path.name}'"
+                    )
+                if not sidecar_path.is_file():
+                    raise TerrainSourceError(
+                        f"{label} XML metadata sidecar is missing: '{sidecar_path}'"
+                    )
+                sidecar_binding = _verify_archive_member_binding(
+                    archive_file,
+                    archive_path,
+                    sidecar_member,
+                    sidecar_path,
+                    f"{label} XML metadata sidecar",
+                )
         except (OSError, zipfile.BadZipFile) as exc:
             raise TerrainSourceError(f"cannot read source archive '{archive_path}': {exc}") from exc
 
@@ -354,17 +448,15 @@ def verify_source_manifest(
                     f"manifest {raster_expected[field]}, actual {actual[field]}"
                 )
         expected_sidecar = record.get("metadata_sidecar")
-        if isinstance(expected_sidecar, dict):
-            if sidecar is None:
+        if sidecar is None:
+            raise TerrainSourceError(f"{label} expected its XML metadata sidecar but none exists")
+        sidecar["archive_member"] = sidecar_binding["member"]
+        for field in ("filename", "size_bytes", "sha256"):
+            if field in expected_sidecar and sidecar.get(field) != expected_sidecar[field]:
                 raise TerrainSourceError(
-                    f"{label} expected its XML metadata sidecar but none exists"
+                    f"{label} metadata sidecar mismatch for {field}: "
+                    f"manifest {expected_sidecar[field]}, actual {sidecar.get(field)}"
                 )
-            for field in ("filename", "size_bytes", "sha256"):
-                if field in expected_sidecar and sidecar.get(field) != expected_sidecar[field]:
-                    raise TerrainSourceError(
-                        f"{label} metadata sidecar mismatch for {field}: "
-                        f"manifest {expected_sidecar[field]}, actual {sidecar.get(field)}"
-                    )
         measured = measure_raster_values(raster_path)
         expected_measurement = raster_expected.get("measured_full_tile")
         if isinstance(expected_measurement, dict):
@@ -393,6 +485,8 @@ def verify_source_manifest(
                     "size_bytes": archive_path.stat().st_size,
                     "sha256": sha256_file(archive_path),
                     "members": actual_members,
+                    "raster_member": raster_binding,
+                    "metadata_sidecar_member": sidecar_binding,
                 },
                 "raster": actual,
                 "measured_full_tile": measured,
