@@ -13,6 +13,7 @@ from torquay_pipeline.building_export import (
     build_building_package,
     validate_building_package,
 )
+from torquay_pipeline.building_heights import HeightPolicy, resolve_building_height
 from torquay_pipeline.buildings import BuildingImportResult
 from torquay_pipeline.config import load_aoi_config
 from torquay_pipeline.coordinates import pinned_transformer
@@ -229,6 +230,15 @@ def _build_fixture_package(tmp_path, monkeypatch):
     return package, aoi, terrain_path, source_path, source_manifest_path
 
 
+def _set_resolved_height(feature: dict, raw_height: str) -> None:
+    feature["tags"]["height"] = raw_height
+    resolved = resolve_building_height(feature["tags"], HeightPolicy())
+    feature["heightM"] = resolved.height_m
+    feature["heightMethod"] = resolved.method
+    feature["heightConfidence"] = resolved.confidence
+    feature["heightProvenance"] = resolved.as_dict()
+
+
 def _refresh_building_package_integrity(package: Path) -> None:
     manifest = json.loads((package / "manifest.json").read_text(encoding="utf-8"))
     data = json.loads((package / "buildings.json").read_text(encoding="utf-8"))
@@ -347,10 +357,13 @@ def test_building_package_detects_corrupt_payload(tmp_path, monkeypatch):
         ("null-geometry", "geometry"),
         ("boolean-height-source-id", "osmId"),
         ("boolean-geometry-coordinate", "finite JSON number"),
-        ("inconsistent-height-confidence", "method and confidence"),
+        ("inconsistent-height-confidence", "heightConfidence does not match"),
         ("unhashable-height-method", "heightMethod"),
-        ("unhashable-parsed-unit", "parsedUnit must be text"),
+        ("unhashable-parsed-unit", "heightProvenance.parsedUnit differs"),
         ("unhashable-source-type", "source.objectType"),
+        ("tag-inconsistent-default", "heightMethod does not match"),
+        ("tagged-height-reported-as-eight", "heightM does not match"),
+        ("parsed-height-only-mismatch", "heightProvenance.parsedHeightM"),
     ],
 )
 def test_validator_rejects_adversarial_feature_copies(tmp_path, monkeypatch, mutation, message):
@@ -373,6 +386,26 @@ def test_validator_rejects_adversarial_feature_copies(tmp_path, monkeypatch, mut
         feature["heightProvenance"]["parsedUnit"] = []
     elif mutation == "unhashable-source-type":
         feature["source"]["objectType"] = []
+    elif mutation == "tag-inconsistent-default":
+        feature["tags"]["height"] = "100"
+        feature["heightProvenance"]["rawHeight"] = "100"
+    elif mutation == "tagged-height-reported-as-eight":
+        feature["tags"]["height"] = "100"
+        feature["heightMethod"] = "osm_height"
+        feature["heightConfidence"] = "tagged_but_unverified"
+        feature["heightProvenance"].update(
+            {
+                "method": "osm_height",
+                "confidence": "tagged_but_unverified",
+                "rawHeight": "100",
+                "parsedHeightM": 8.0,
+                "parsedUnit": "metres",
+                "fallbackReason": None,
+            }
+        )
+    elif mutation == "parsed-height-only-mismatch":
+        _set_resolved_height(feature, "100")
+        feature["heightProvenance"]["parsedHeightM"] = 8.0
     else:
         feature["heightConfidence"] = "estimated_from_tagged_levels"
     _dump_json(package / "buildings.json", data)
@@ -393,6 +426,47 @@ def test_validator_rejects_adversarial_feature_copies(tmp_path, monkeypatch, mut
 def test_finite_number_rejects_integer_outside_float_range():
     with pytest.raises(BuildingExportError, match="finite JSON number"):
         export_module._finite_number(10**1000, "fixture.number")
+
+
+@pytest.mark.parametrize(
+    ("distribution", "message"),
+    [
+        ("method", "qa.quality.heightMethodCounts"),
+        ("clamp", "qa.quality.heightClampCounts"),
+    ],
+)
+def test_validator_recomputes_height_distributions_from_features(
+    tmp_path, monkeypatch, distribution, message
+):
+    package, aoi, terrain, source, source_manifest = _build_fixture_package(tmp_path, monkeypatch)
+    data = json.loads((package / "buildings.json").read_text(encoding="utf-8"))
+    qa = json.loads((package / "qa.json").read_text(encoding="utf-8"))
+    feature = data["buildings"][0]
+    _set_resolved_height(feature, "100" if distribution == "method" else "200")
+    if distribution == "clamp":
+        qa["quality"]["heightMethodCounts"] = {"osm_height": 1}
+    resolved_height = feature["heightM"]
+    qa["summary"].update(
+        {
+            "minimumHeightM": resolved_height,
+            "maximumHeightM": resolved_height,
+            "meanHeightM": resolved_height,
+        }
+    )
+    _dump_json(package / "buildings.json", data)
+    _dump_json(package / "qa.json", qa)
+    _refresh_building_package_integrity(package)
+    with pytest.raises(BuildingExportError, match=message):
+        validate_building_package(
+            package,
+            expected_aoi=aoi,
+            expected_aoi_ring=export_module._load_aoi_ring(
+                REPO_ROOT / "docs/aoi-selection.geojson"
+            ),
+            terrain_package_path=terrain,
+            source_path=source,
+            source_manifest_path=source_manifest,
+        )
 
 
 @pytest.mark.parametrize(
@@ -490,7 +564,15 @@ def test_package_validator_detects_corrupted_package_qa(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize(
     "mutation",
-    ["missing-height-provenance", "null-geometry", "boolean-height", "boolean-policy-number"],
+    [
+        "missing-height-provenance",
+        "null-geometry",
+        "boolean-height",
+        "boolean-policy-number",
+        "tag-inconsistent-default",
+        "tagged-height-reported-as-eight",
+        "parsed-height-only-mismatch",
+    ],
 )
 def test_build_side_rejects_mutated_feature_before_publishing(tmp_path, monkeypatch, mutation):
     source_path, source_manifest_path, terrain_path = _write_fixtures(tmp_path, monkeypatch)
@@ -506,6 +588,29 @@ def test_build_side_rejects_mutated_feature_before_publishing(tmp_path, monkeypa
     elif mutation == "boolean-policy-number":
         result.qa["heightPolicy"]["defaultHeightM"] = True
         expected_message = "finite JSON number"
+    elif mutation == "tag-inconsistent-default":
+        feature["tags"]["height"] = "100"
+        feature["heightProvenance"]["rawHeight"] = "100"
+        expected_message = "heightMethod does not match"
+    elif mutation == "tagged-height-reported-as-eight":
+        feature["tags"]["height"] = "100"
+        feature["heightMethod"] = "osm_height"
+        feature["heightConfidence"] = "tagged_but_unverified"
+        feature["heightProvenance"].update(
+            {
+                "method": "osm_height",
+                "confidence": "tagged_but_unverified",
+                "rawHeight": "100",
+                "parsedHeightM": 8.0,
+                "parsedUnit": "metres",
+                "fallbackReason": None,
+            }
+        )
+        expected_message = "heightM does not match"
+    elif mutation == "parsed-height-only-mismatch":
+        _set_resolved_height(feature, "100")
+        feature["heightProvenance"]["parsedHeightM"] = 8.0
+        expected_message = "heightProvenance.parsedHeightM"
     else:
         feature["heightM"] = True
         expected_message = "heightM"

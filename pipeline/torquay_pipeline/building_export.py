@@ -16,6 +16,7 @@ from shapely.geometry import MultiPolygon, Polygon
 
 from . import __version__
 from .aoi import generate_selection
+from .building_heights import HeightPolicy, HeightResult, resolve_building_height
 from .building_preview import OSM_ATTRIBUTION, render_building_preview
 from .building_sources import BuildingSourceError, read_source_manifest, verify_building_source
 from .buildings import BuildingImportResult
@@ -379,123 +380,72 @@ def _validate_policies(value: Any) -> None:
             raise BuildingExportError(f"policies.geometry.{field} is missing or unsupported")
 
 
-def _validate_height(feature: dict[str, Any], index: int, policy: dict[str, Any]) -> None:
-    method = feature.get("heightMethod")
-    confidence = feature.get("heightConfidence")
-    provenance = feature.get("heightProvenance")
-    if not isinstance(method, str) or method not in {
-        "osm_height",
-        "estimated_levels",
-        "estimated_default",
-    }:
-        raise BuildingExportError(f"buildings[{index}].heightMethod is unsupported")
-    provenance = _required_mapping(provenance, f"buildings[{index}].heightProvenance")
-    required_provenance_fields = {
-        "heightM",
-        "method",
-        "confidence",
-        "rawHeight",
-        "parsedHeightM",
-        "parsedUnit",
-        "rawLevels",
-        "clamp",
-        "fallbackReason",
-    }
-    missing_fields = sorted(required_provenance_fields.difference(provenance))
+def _validate_height(feature: dict[str, Any], index: int, policy: dict[str, Any]) -> HeightResult:
+    tags = feature.get("tags")
+    if not isinstance(tags, dict) or any(
+        not isinstance(key, str) or not isinstance(value, str) for key, value in tags.items()
+    ):
+        raise BuildingExportError(
+            f"buildings[{index}].tags must map strings to strings before height validation"
+        )
+    height_policy = HeightPolicy(
+        levels_to_metres=_finite_number(
+            policy.get("levelsToMetres"), "policies.height.levelsToMetres"
+        ),
+        default_height_m=_finite_number(
+            policy.get("defaultHeightM"), "policies.height.defaultHeightM"
+        ),
+        minimum_height_m=_finite_number(
+            policy.get("minimumHeightM"), "policies.height.minimumHeightM"
+        ),
+        maximum_height_m=_finite_number(
+            policy.get("maximumHeightM"), "policies.height.maximumHeightM"
+        ),
+    )
+    try:
+        expected = resolve_building_height(tags, height_policy)
+    except ValueError as exc:
+        raise BuildingExportError(
+            f"buildings[{index}] height tags or effective policy cannot be resolved: {exc}"
+        ) from exc
+
+    if feature.get("heightMethod") != expected.method:
+        raise BuildingExportError(
+            f"buildings[{index}].heightMethod does not match the retained tags and policy"
+        )
+    if feature.get("heightConfidence") != expected.confidence:
+        raise BuildingExportError(
+            f"buildings[{index}].heightConfidence does not match the resolved height method"
+        )
+    height = _finite_number(feature.get("heightM"), f"buildings[{index}].heightM")
+    if not math.isclose(height, expected.height_m, rel_tol=0, abs_tol=1e-9):
+        raise BuildingExportError(
+            f"buildings[{index}].heightM does not match the retained tags and height policy"
+        )
+
+    provenance = _required_mapping(
+        feature.get("heightProvenance"), f"buildings[{index}].heightProvenance"
+    )
+    expected_provenance = expected.as_dict()
+    missing_fields = sorted(set(expected_provenance).difference(provenance))
     if missing_fields:
         raise BuildingExportError(
             f"buildings[{index}].heightProvenance is missing fields: {', '.join(missing_fields)}"
         )
-    expected_confidence = {
-        "osm_height": "tagged_but_unverified",
-        "estimated_levels": "estimated_from_tagged_levels",
-        "estimated_default": "visual_default_estimate",
-    }[method]
-    if confidence != expected_confidence or provenance.get("confidence") != expected_confidence:
-        raise BuildingExportError(
-            f"buildings[{index}] height method and confidence are inconsistent"
-        )
-    if provenance.get("method") != method:
-        raise BuildingExportError(
-            f"buildings[{index}] heightProvenance.method differs from heightMethod"
-        )
-    height = _finite_number(feature.get("heightM"), f"buildings[{index}].heightM")
-    provenance_height = _finite_number(
-        provenance.get("heightM"), f"buildings[{index}].heightProvenance.heightM"
-    )
-    if height <= 0 or not math.isclose(height, provenance_height, rel_tol=0, abs_tol=1e-9):
-        raise BuildingExportError(
-            f"buildings[{index}] heightM must be positive and agree with heightProvenance"
-        )
-    parsed_height = provenance.get("parsedHeightM")
-    if (
-        parsed_height is not None
-        and _finite_number(parsed_height, f"buildings[{index}].heightProvenance.parsedHeightM") <= 0
-    ):
-        raise BuildingExportError(f"buildings[{index}] parsedHeightM must be positive when present")
-    for field in ("rawHeight", "parsedUnit", "rawLevels", "clamp", "fallbackReason"):
-        if provenance.get(field) is not None and not isinstance(provenance[field], str):
+    for field, expected_value in expected_provenance.items():
+        actual_value = provenance.get(field)
+        context = f"buildings[{index}].heightProvenance.{field}"
+        if field in {"heightM", "parsedHeightM"} and expected_value is not None:
+            actual_number = _finite_number(actual_value, context)
+            if not math.isclose(actual_number, expected_value, rel_tol=0, abs_tol=1e-9):
+                raise BuildingExportError(
+                    f"{context} differs from the resolved retained tags and policy"
+                )
+        elif actual_value != expected_value:
             raise BuildingExportError(
-                f"buildings[{index}].heightProvenance.{field} must be text or null"
+                f"{context} differs from the resolved retained tags and policy"
             )
-    parsed_unit = provenance.get("parsedUnit")
-    if parsed_unit is not None and not isinstance(parsed_unit, str):
-        raise BuildingExportError(f"buildings[{index}].heightProvenance.parsedUnit must be text")
-    if parsed_unit not in {None, "metres", "feet", "inches", "feet_inches"}:
-        raise BuildingExportError(f"buildings[{index}].heightProvenance.parsedUnit is unsupported")
-    clamp = provenance.get("clamp")
-    if clamp is not None and not isinstance(clamp, str):
-        raise BuildingExportError(f"buildings[{index}].heightProvenance.clamp must be text")
-    if clamp not in {None, "clamped_low", "clamped_high"}:
-        raise BuildingExportError(f"buildings[{index}].heightProvenance.clamp is unsupported")
-    if method == "osm_height":
-        if not isinstance(provenance.get("rawHeight"), str) or parsed_height is None:
-            raise BuildingExportError(f"buildings[{index}] tagged height provenance is incomplete")
-        if not isinstance(provenance.get("parsedUnit"), str):
-            raise BuildingExportError(f"buildings[{index}] tagged height parsedUnit is missing")
-        candidate_height = float(parsed_height)
-    elif method == "estimated_levels":
-        if (
-            not isinstance(provenance.get("rawLevels"), str)
-            or not provenance["rawLevels"].isdigit()
-        ):
-            raise BuildingExportError(f"buildings[{index}] level estimate provenance is incomplete")
-        candidate_height = int(provenance["rawLevels"]) * _finite_number(
-            policy.get("levelsToMetres"), "policies.height.levelsToMetres"
-        )
-    elif method == "estimated_default" and not isinstance(provenance.get("fallbackReason"), str):
-        raise BuildingExportError(f"buildings[{index}] default estimate needs a fallback reason")
-    else:
-        candidate_height = _finite_number(
-            policy.get("defaultHeightM"), "policies.height.defaultHeightM"
-        )
-    tags = feature.get("tags")
-    if not isinstance(tags, dict):
-        raise BuildingExportError(
-            f"buildings[{index}].tags must be an object before height validation"
-        )
-    if tags.get("height") != provenance.get("rawHeight") or tags.get(
-        "building:levels"
-    ) != provenance.get("rawLevels"):
-        raise BuildingExportError(
-            f"buildings[{index}] raw height inputs do not match selected OSM tags"
-        )
-    minimum = _finite_number(policy.get("minimumHeightM"), "policies.height.minimumHeightM")
-    maximum = _finite_number(policy.get("maximumHeightM"), "policies.height.maximumHeightM")
-    expected_height = min(max(candidate_height, minimum), maximum)
-    expected_clamp = (
-        "clamped_low"
-        if candidate_height < minimum
-        else "clamped_high"
-        if candidate_height > maximum
-        else None
-    )
-    if not math.isclose(height, expected_height, rel_tol=0, abs_tol=1e-9):
-        raise BuildingExportError(
-            f"buildings[{index}] heightM does not follow the recorded height policy"
-        )
-    if provenance.get("clamp") != expected_clamp:
-        raise BuildingExportError(f"buildings[{index}] height clamp provenance is inconsistent")
+    return expected
 
 
 def _validate_feature_geometry(feature: dict[str, Any], index: int) -> None:
@@ -1152,6 +1102,7 @@ def validate_building_package(
     _required_string(generator.get("geosVersion"), "manifest.generator.geosVersion")
 
     seen_ids: set[str] = set()
+    resolved_heights: list[HeightResult] = []
     for index, feature_value in enumerate(features):
         feature = _required_mapping(feature_value, f"buildings[{index}]")
         feature_id = _required_string(feature.get("id"), f"buildings[{index}].id")
@@ -1180,7 +1131,7 @@ def validate_building_package(
             )
         if source.get("timestamp") is not None and not isinstance(source.get("timestamp"), str):
             raise BuildingExportError(f"buildings[{index}].source.timestamp must be text or null")
-        _validate_height(feature, index, height_policy)
+        resolved_heights.append(_validate_height(feature, index, height_policy))
         _validate_feature_geometry(feature, index)
         if not isinstance(feature.get("clippedToAoi"), bool):
             raise BuildingExportError(f"buildings[{index}].clippedToAoi must be boolean")
@@ -1210,6 +1161,33 @@ def validate_building_package(
             )
         if feature_id in duplicates:
             raise BuildingExportError(f"buildings[{index}] cannot reference itself as a duplicate")
+
+    resolved_method_counts: dict[str, int] = {}
+    resolved_clamp_counts: dict[str, int] = {}
+    for resolved in resolved_heights:
+        resolved_method_counts[resolved.method] = resolved_method_counts.get(resolved.method, 0) + 1
+        if resolved.clamp is not None:
+            resolved_clamp_counts[resolved.clamp] = resolved_clamp_counts.get(resolved.clamp, 0) + 1
+    if height_method_counts != resolved_method_counts:
+        raise BuildingExportError(
+            "qa.quality.heightMethodCounts does not match the validated building features"
+        )
+    if height_clamp_counts != resolved_clamp_counts:
+        raise BuildingExportError(
+            "qa.quality.heightClampCounts does not match the validated building features"
+        )
+    resolved_values = [height.height_m for height in resolved_heights]
+    expected_summary = {
+        "minimumHeightM": min(resolved_values),
+        "maximumHeightM": max(resolved_values),
+        "meanHeightM": round(sum(resolved_values) / len(resolved_values), 3),
+    }
+    for field, expected_value in expected_summary.items():
+        actual_value = _finite_number(qa_summary.get(field), f"qa.summary.{field}")
+        if actual_value != expected_value:
+            raise BuildingExportError(
+                f"qa.summary.{field} does not match the validated building features"
+            )
 
     return {
         "worldId": manifest["worldId"],
