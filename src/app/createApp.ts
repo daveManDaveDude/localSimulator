@@ -29,6 +29,8 @@ interface ViewerWorld {
   isReal: boolean;
   verticalReference: string;
   attribution: string;
+  sourceDetailsUrl?: string;
+  licenceUrl?: string;
   originElevationM?: number;
   cameraFar: number;
   columns?: number;
@@ -84,6 +86,7 @@ export function createApp(container: HTMLElement): AppHandle {
             <div><dt>Provenance</dt><dd data-testid="world-provenance">SYNTHETIC · LOCAL FIXTURE</dd></div>
             <div><dt>Vertical reference</dt><dd data-testid="vertical-reference">LOCAL FICTIONAL HEIGHTS</dd></div>
             <div><dt>Attribution</dt><dd data-testid="world-attribution">Fictional local fixture; no geographic data.</dd></div>
+            <div class="provenance-links" data-testid="provenance-links" hidden><dt>Source and licence</dt><dd><a data-testid="source-details-link" target="_blank" rel="noopener noreferrer" hidden>Publisher catalogue</a><a data-testid="licence-details-link" target="_blank" rel="noopener noreferrer" hidden>Open Government Licence v3.0</a></dd></div>
             <div><dt>Grid</dt><dd data-testid="terrain-details" data-columns="" data-rows="">Loading…</dd></div>
             <div><dt>Ground height</dt><dd><output data-testid="ground-height" data-outside="false" data-height-meters="">Waiting for terrain</output></dd></div>
             <div><dt>Flight</dt><dd><output data-testid="flight-state" aria-live="off" data-locked="false">POINTER UNLOCKED · FREE FLY</output></dd></div>
@@ -187,6 +190,15 @@ export function createApp(container: HTMLElement): AppHandle {
   const worldAttribution = container.querySelector<HTMLElement>(
     '[data-testid="world-attribution"]',
   );
+  const provenanceLinks = container.querySelector<HTMLElement>(
+    '[data-testid="provenance-links"]',
+  );
+  const sourceDetailsLink = container.querySelector<HTMLAnchorElement>(
+    '[data-testid="source-details-link"]',
+  );
+  const licenceDetailsLink = container.querySelector<HTMLAnchorElement>(
+    '[data-testid="licence-details-link"]',
+  );
   const terrainDetails = container.querySelector<HTMLElement>(
     '[data-testid="terrain-details"]',
   );
@@ -234,6 +246,9 @@ export function createApp(container: HTMLElement): AppHandle {
     !worldProvenance ||
     !verticalReference ||
     !worldAttribution ||
+    !provenanceLinks ||
+    !sourceDetailsLink ||
+    !licenceDetailsLink ||
     !terrainDetails ||
     !groundHeight ||
     !flightState ||
@@ -421,6 +436,12 @@ export function createApp(container: HTMLElement): AppHandle {
       : 'SYNTHETIC · LOCAL FICTIONAL DATA';
     verticalReference.textContent = world.verticalReference;
     worldAttribution.textContent = world.attribution;
+    sourceDetailsLink.href = world.sourceDetailsUrl ?? '';
+    sourceDetailsLink.hidden = world.sourceDetailsUrl === undefined;
+    licenceDetailsLink.href = world.licenceUrl ?? '';
+    licenceDetailsLink.hidden = world.licenceUrl === undefined;
+    provenanceLinks.hidden =
+      world.sourceDetailsUrl === undefined && world.licenceUrl === undefined;
     const groundHeightLabel = groundHeight.closest('div')?.querySelector('dt');
     if (groundHeightLabel) {
       groundHeightLabel.textContent = world.isReal
@@ -543,6 +564,12 @@ export function createApp(container: HTMLElement): AppHandle {
         isReal: world.isReal,
         verticalReference: world.verticalReference,
         attribution: world.attribution,
+        ...(world.sourceDetailsUrl === undefined
+          ? {}
+          : { sourceDetailsUrl: world.sourceDetailsUrl }),
+        ...(world.licenceUrl === undefined
+          ? {}
+          : { licenceUrl: world.licenceUrl }),
         originElevationM:
           loaded.manifest.worldType === 'real'
             ? loaded.manifest.origin.elevationM

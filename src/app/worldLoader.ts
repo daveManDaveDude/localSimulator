@@ -187,6 +187,16 @@ export async function loadWorld(
     );
   }
 
+  if (
+    validation.manifest.worldType === 'real' &&
+    bytes.byteLength !== validation.manifest.heightfield.byteLength
+  ) {
+    throw new WorldLoadError(
+      'heightfield response',
+      `byte length mismatch for ${heightfieldUrl.href}: expected ${validation.manifest.heightfield.byteLength}, received ${bytes.byteLength}`,
+    );
+  }
+
   const actualHash = await sha256Hex(bytes);
   if (actualHash !== validation.manifest.heightfield.sha256) {
     throw new WorldLoadError(

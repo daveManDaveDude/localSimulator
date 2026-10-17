@@ -21,6 +21,8 @@ export interface HeightfieldWorld {
   isReal: boolean;
   verticalReference: string;
   attribution: string;
+  sourceDetailsUrl?: string;
+  licenceUrl?: string;
   cameraFar: number;
 }
 
@@ -94,6 +96,12 @@ export function createHeightfieldWorld(loaded: LoadedWorld): HeightfieldWorld {
         ? (realProvenance?.attribution ??
           'Environment Agency source attribution unavailable.')
         : 'Fictional local fixture; no geographic data.',
+      ...(isReal && realProvenance
+        ? {
+            sourceDetailsUrl: realProvenance.catalogueUrl,
+            licenceUrl: realProvenance.licenceUrl,
+          }
+        : {}),
       cameraFar: isReal ? 2200 : 180,
     };
   } catch (error) {

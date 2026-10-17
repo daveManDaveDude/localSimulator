@@ -130,6 +130,22 @@ describe('loadSyntheticWorld', () => {
     });
   });
 
+  it('checks real package byte length before checksum and decoding', async () => {
+    const shortBytes = new ArrayBuffer(16);
+    const manifest = createRealManifest(await sha256Hex(shortBytes));
+    const realManifestUrl = new URL(
+      'https://local.test/worlds/torquay-poc-001/manifest.json',
+    );
+    const { fetcher } = createFetcher({
+      manifest,
+      heightfieldBytes: shortBytes,
+    });
+
+    await expect(loadWorld(realManifestUrl, fetcher)).rejects.toThrow(
+      'heightfield response: byte length mismatch',
+    );
+  });
+
   it('does not request binary data when manifest validation fails', async () => {
     const { fetcher, requests } = createFetcher({
       manifest: withManifestValue('worldType', 'real'),

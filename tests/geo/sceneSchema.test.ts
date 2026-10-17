@@ -41,6 +41,38 @@ function withoutValue(path: string): unknown {
   return input;
 }
 
+function withRealValue(path: string, value: unknown): unknown {
+  const input = structuredClone(createRealManifest()) as unknown as TestRecord;
+  const segments = path.replaceAll('[', '.').replaceAll(']', '').split('.');
+  let current: unknown = input;
+  for (const segment of segments.slice(0, -1)) {
+    if (Array.isArray(current)) current = current[Number(segment)];
+    else if (isTestRecord(current)) current = current[segment];
+    else throw new Error(`Missing test path ${segment}`);
+  }
+  const finalSegment = segments.at(-1)!;
+  if (Array.isArray(current)) current[Number(finalSegment)] = value;
+  else if (isTestRecord(current)) current[finalSegment] = value;
+  else throw new Error(`Missing test path ${finalSegment}`);
+  return input;
+}
+
+function withoutRealValue(path: string): unknown {
+  const input = structuredClone(createRealManifest()) as unknown as TestRecord;
+  const segments = path.replaceAll('[', '.').replaceAll(']', '').split('.');
+  let current: unknown = input;
+  for (const segment of segments.slice(0, -1)) {
+    if (Array.isArray(current)) current = current[Number(segment)];
+    else if (isTestRecord(current)) current = current[segment];
+    else throw new Error(`Missing test path ${segment}`);
+  }
+  const finalSegment = segments.at(-1)!;
+  if (Array.isArray(current)) delete current[Number(finalSegment)];
+  else if (isTestRecord(current)) delete current[finalSegment];
+  else throw new Error(`Missing test path ${finalSegment}`);
+  return input;
+}
+
 describe('validateSceneManifest', () => {
   it('accepts the generated 3 × 3 synthetic fixture', () => {
     const result = validateSceneManifest(readSyntheticFixtureManifest());
@@ -216,7 +248,122 @@ describe('validateSceneManifest', () => {
           'SX96nw_DTM_1m.tif',
         );
         expect(result.manifest.aoi.coverageStatus).toBe('not_checked');
+        expect(result.manifest.heightfield.byteLength).toBe(1_004_004);
+        expect(result.manifest.aoi.centerBngM).toEqual([
+          291108.9018176432, 65353.48350844931,
+        ]);
       }
+    }
+  });
+
+  it.each([
+    ['width', 'extentM.width', 500, 'heightfield.columns', 251],
+    ['depth', 'extentM.depth', 500, 'heightfield.rows', 251],
+  ])(
+    'rejects a real grid whose %s extent no longer matches the reviewed AOI',
+    (_axis, extentPath, extent, dimensionPath, dimension) => {
+      let manifest = withRealValue(extentPath, extent);
+      manifest = withRealValueFrom(manifest, dimensionPath, dimension);
+      const result = validateSceneManifest(manifest);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.issues.some((issue) => issue.path === extentPath)).toBe(
+          true,
+        );
+      }
+    },
+  );
+
+  it.each([
+    ['easting bounds overflow', 'aoi.boundsM', [-1e308, 64853, 1e308, 65853]],
+    [
+      'northing bounds overflow',
+      'aoi.boundsM',
+      [290608, -1e308, 291608, 1e308],
+    ],
+  ])(
+    'rejects finite coordinates whose %s span overflows',
+    (_label, path, value) => {
+      const result = validateSceneManifest(withRealValue(path, value));
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(
+          result.issues.some((issue) => issue.path === 'aoi.boundsM'),
+        ).toBe(true);
+      }
+    },
+  );
+
+  it.each([
+    ['heightfield.byteLength', 1_004_000],
+    ['provenance.generator', null],
+    ['provenance.generatorVersion', ''],
+    ['provenance.generator', 'other-exporter'],
+    ['provenance.generatorVersion', 'latest'],
+    ['provenance.generatorVersion', '0.1.1'],
+    ['provenance.licenceUrl', 'http://example.invalid/licence'],
+    ['provenance.catalogueUrl', null],
+    ['provenance.productSurveyPeriod', ''],
+    ['provenance.xmlCopyrightConflict', 'only useLimit says 2022'],
+    ['provenance.coordinateOperation.name', 'automatic operation'],
+    ['provenance.coordinateOperation.definition', ''],
+    [
+      'provenance.coordinateOperation.definition',
+      'proj=pipeline step proj=helmert',
+    ],
+    ['provenance.coordinateOperation.reportedAccuracyM', 1],
+    ['provenance.coordinateOperation.selectedUsesGrids', true],
+    ['provenance.coordinateOperation.preferredMissingGridNames', null],
+    [
+      'provenance.coordinateOperation.missingPreferredGridCaveat',
+      'grid unavailable',
+    ],
+    ['aoi.anchorWgs84.crs', 'EPSG:3857'],
+    ['aoi.anchorWgs84.longitude', 181],
+    ['aoi.anchorWgs84.latitude', '50.477853'],
+    ['aoi.anchorWgs84.postcode', 'TQ1 4HX'],
+    ['aoi.anchorWgs84.retrievedDate', '2026-10-18'],
+    ['aoi.anchorWgs84.sourceName', 'Other provider'],
+    ['aoi.anchorWgs84.sourceUrl', 'https://example.invalid/lookup'],
+    ['provenance.productSurveyPeriod', '2003-2022 only'],
+    ['aoi.centerBngM', [0, 0]],
+    [
+      'aoi.boundsM',
+      [
+        290608.9018176432 + 1000,
+        64853.48350844931,
+        291608.9018176432 + 1000,
+        65853.48350844931,
+      ],
+    ],
+  ])('rejects malformed real provenance field %s', (path, value) => {
+    const result = validateSceneManifest(withRealValue(path, value));
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some((issue) => issue.path === path)).toBe(true);
+    }
+  });
+
+  it.each([
+    'heightfield.byteLength',
+    'provenance.generator',
+    'provenance.generatorVersion',
+    'provenance.licenceUrl',
+    'provenance.catalogueUrl',
+    'provenance.productSurveyPeriod',
+    'provenance.xmlCopyrightConflict',
+    'provenance.coordinateOperation',
+    'aoi.centerBngM',
+    'aoi.anchorWgs84',
+  ])('rejects missing real provenance field %s', (path) => {
+    const result = validateSceneManifest(withoutRealValue(path));
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(
+        result.issues.some(
+          (issue) => issue.path === path || issue.path.startsWith(`${path}.`),
+        ),
+      ).toBe(true);
     }
   });
 
@@ -258,3 +405,22 @@ describe('validateSceneManifest', () => {
     }
   });
 });
+
+function withRealValueFrom(
+  input: unknown,
+  path: string,
+  value: unknown,
+): unknown {
+  const segments = path.replaceAll('[', '.').replaceAll(']', '').split('.');
+  let current: unknown = input;
+  for (const segment of segments.slice(0, -1)) {
+    if (Array.isArray(current)) current = current[Number(segment)];
+    else if (isTestRecord(current)) current = current[segment];
+    else throw new Error(`Missing test path ${segment}`);
+  }
+  const finalSegment = segments.at(-1)!;
+  if (Array.isArray(current)) current[Number(finalSegment)] = value;
+  else if (isTestRecord(current)) current[finalSegment] = value;
+  else throw new Error(`Missing test path ${finalSegment}`);
+  return input;
+}

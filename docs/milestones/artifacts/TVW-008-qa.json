@@ -94,7 +94,7 @@
       "float32QuantizationErrorM": 0.0
     },
     {
-      "label": "north_of_source_seam",
+      "label": "source_seam_1_north",
       "row": 426,
       "column": 250,
       "eastingM": 291108.9018176432,
@@ -106,7 +106,7 @@
       "float32QuantizationErrorM": 1.380944638640358e-07
     },
     {
-      "label": "south_of_source_seam",
+      "label": "source_seam_1_south",
       "row": 427,
       "column": 250,
       "eastingM": 291108.9018176432,

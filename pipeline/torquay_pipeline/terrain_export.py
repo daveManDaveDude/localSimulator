@@ -25,6 +25,7 @@ from matplotlib.patches import Rectangle
 from rasterio.windows import Window
 
 from .config import AoiConfig
+from .coordinates import transform_wgs84_to_bng
 from .terrain_sources import inspect_raster
 
 OUTPUT_SPACING_M = 2.0
@@ -39,6 +40,8 @@ EA_ATTRIBUTION = (
 )
 EA_PRODUCT = "LIDAR Composite DTM 1 m (2022 composite)"
 VERTICAL_REFERENCE = "Ordnance Survey Newlyn using OSTN’15 and OSGM’15 transformation models"
+TERRAIN_GENERATOR = "torquay_pipeline.terrain_export"
+TERRAIN_GENERATOR_VERSION = "0.1.0"
 
 
 class TerrainExportError(ValueError):
@@ -333,11 +336,8 @@ def _build_qa(
         "south_west_corner": (rows - 1) * columns,
         "south_east_corner": rows * columns - 1,
         "center": (rows // 2) * columns + columns // 2,
-        "north_of_source_seam": int(math.floor((grid.northings_m[0] - 65000) / 2)) * columns
-        + columns // 2,
     }
-    seam_row = fixed_indexes["north_of_source_seam"] // columns
-    fixed_indexes["south_of_source_seam"] = min(rows - 1, seam_row + 1) * columns + columns // 2
+    fixed_indexes.update(_source_seam_probe_indexes(grid, raster_paths))
     probes: list[dict[str, Any]] = []
     for label, index in [
         *fixed_indexes.items(),
@@ -412,14 +412,153 @@ def _build_qa(
     }
 
 
+def _source_seam_probe_indexes(grid: ResampledGrid, raster_paths: list[Path]) -> dict[str, int]:
+    """Return probes immediately on either side of source boundaries crossing the grid."""
+    if len(raster_paths) < 2:
+        return {}
+    source_grids = []
+    for path in sorted(raster_paths, key=lambda item: item.as_posix().casefold()):
+        left, top, width, height = _validate_source(path)
+        source_grids.append((left, top - height, left + width, top))
+
+    eastings = grid.eastings_m
+    northings = grid.northings_m
+    columns = len(eastings)
+    grid_west, grid_east = float(eastings[0]), float(eastings[-1])
+    grid_south, grid_north = float(northings[-1]), float(northings[0])
+    probes: dict[str, int] = {}
+    horizontal_seen: set[float] = set()
+    vertical_seen: set[float] = set()
+
+    def add_horizontal(seam: float, overlap_west: float, overlap_east: float) -> None:
+        if seam in horizontal_seen or not grid_south < seam < grid_north:
+            return
+        left = max(overlap_west, grid_west)
+        right = min(overlap_east, grid_east)
+        north_rows = np.flatnonzero(northings > seam)
+        south_rows = np.flatnonzero(northings < seam)
+        if left > right or not len(north_rows) or not len(south_rows):
+            return
+        horizontal_seen.add(seam)
+        column = int(np.argmin(np.abs(eastings - (left + right) / 2)))
+        north_row = int(north_rows[-1])
+        south_row = int(south_rows[0])
+        probes[f"source_seam_{len(horizontal_seen)}_north"] = north_row * columns + column
+        probes[f"source_seam_{len(horizontal_seen)}_south"] = south_row * columns + column
+
+    def add_vertical(seam: float, overlap_south: float, overlap_north: float) -> None:
+        if seam in vertical_seen or not grid_west < seam < grid_east:
+            return
+        lower = max(overlap_south, grid_south)
+        upper = min(overlap_north, grid_north)
+        west_columns = np.flatnonzero(eastings < seam)
+        east_columns = np.flatnonzero(eastings > seam)
+        if lower > upper or not len(west_columns) or not len(east_columns):
+            return
+        vertical_seen.add(seam)
+        row = int(np.argmin(np.abs(northings - (lower + upper) / 2)))
+        west_column = int(west_columns[-1])
+        east_column = int(east_columns[0])
+        probes[f"source_seam_vertical_{len(vertical_seen)}_west"] = row * columns + west_column
+        probes[f"source_seam_vertical_{len(vertical_seen)}_east"] = row * columns + east_column
+
+    for first_index, first in enumerate(source_grids):
+        first_west, first_south, first_east, first_north = first
+        for second in source_grids[first_index + 1 :]:
+            second_west, second_south, second_east, second_north = second
+            overlap_west = max(first_west, second_west)
+            overlap_east = min(first_east, second_east)
+            overlap_south = max(first_south, second_south)
+            overlap_north = min(first_north, second_north)
+            if overlap_west < overlap_east:
+                if math.isclose(first_north, second_south, abs_tol=1e-9):
+                    add_horizontal(first_north, overlap_west, overlap_east)
+                if math.isclose(second_north, first_south, abs_tol=1e-9):
+                    add_horizontal(second_north, overlap_west, overlap_east)
+            if overlap_south < overlap_north:
+                if math.isclose(first_east, second_west, abs_tol=1e-9):
+                    add_vertical(first_east, overlap_south, overlap_north)
+                if math.isclose(second_east, first_west, abs_tol=1e-9):
+                    add_vertical(second_east, overlap_south, overlap_north)
+    return probes
+
+
 def _manifest(
     config: AoiConfig,
     grid: ResampledGrid,
     binary: bytes,
     qa: dict[str, Any],
     sources: list[dict[str, Any]],
+    source_manifest: dict[str, Any],
 ) -> dict[str, Any]:
     west, south, east, north = grid.bounds_m
+    try:
+        anchor_easting, anchor_northing, operation_info = transform_wgs84_to_bng(
+            config.anchor.longitude, config.anchor.latitude
+        )
+    except ValueError as exc:
+        raise TerrainExportError(f"cannot record the configured anchor transform: {exc}") from exc
+    if not (
+        math.isclose(anchor_easting, config.center_bng_m[0], abs_tol=1e-7)
+        and math.isclose(anchor_northing, config.center_bng_m[1], abs_tol=1e-7)
+    ):
+        raise TerrainExportError(
+            "configured WGS84 anchor does not match its pinned EPSG:1314 + EPSG:19916 BNG center"
+        )
+    product = source_manifest.get("product")
+    if not isinstance(product, dict):
+        raise TerrainExportError("source manifest is missing publisher product metadata")
+    catalogue_url = product.get("publisher_dataset_url")
+    product_survey_period = product.get("catalogue_vintage")
+    xml_copyright_conflict = product.get("metadata_note")
+    if not all(
+        isinstance(value, str) and value.strip()
+        for value in (catalogue_url, product_survey_period, xml_copyright_conflict)
+    ):
+        raise TerrainExportError(
+            "source manifest is missing publisher catalogue period or XML copyright details"
+        )
+    preferred_missing_grid_names = sorted(
+        {
+            str(grid_record.get("short_name"))
+            for preferred in operation_info.preferred_missing_operations
+            for grid_record in preferred.get("grids", [])
+            if isinstance(grid_record, dict)
+            and not grid_record.get("available", False)
+            and isinstance(grid_record.get("short_name"), str)
+            and grid_record.get("short_name")
+        }
+    )
+    if not preferred_missing_grid_names:
+        raise TerrainExportError(
+            "pinned coordinate operation did not report its unavailable preferred grid"
+        )
+    anchor_wgs84 = {
+        "postcode": config.anchor.postcode,
+        "crs": "EPSG:4326",
+        "longitude": config.anchor.longitude,
+        "latitude": config.anchor.latitude,
+        "coordinateMeaning": config.anchor.coordinate_meaning,
+        "quality": config.anchor.quality,
+        "sourceName": config.anchor.source_name,
+        "sourceUrl": config.anchor.source_url,
+        "sourceLicense": config.anchor.source_license,
+        "retrievedDate": config.anchor.retrieved_date,
+    }
+    coordinate_operation = {
+        "name": operation_info.name,
+        "authorityCodes": ["EPSG:1314", "EPSG:19916"],
+        "definition": operation_info.definition,
+        "reportedAccuracyM": operation_info.reported_accuracy_m,
+        "selectedUsesGrids": operation_info.uses_grids,
+        "bestAvailable": operation_info.best_available,
+        "preferredMissingGridNames": preferred_missing_grid_names,
+        "missingPreferredGridCaveat": (
+            "PROJ_NETWORK=OFF; the preferred higher-accuracy operation is unavailable because "
+            + ", ".join(preferred_missing_grid_names)
+            + "; the pinned non-ballpark EPSG:1314 + EPSG:19916 operation is recorded above."
+        ),
+    }
     return {
         "formatVersion": 1,
         "id": config.id,
@@ -443,14 +582,22 @@ def _manifest(
             "encoding": "float32",
             "valueMeaning": "world Y in metres relative to origin elevation",
             "sha256": hashlib.sha256(binary).hexdigest(),
+            "byteLength": len(binary),
         },
         "provenance": {
             "kind": "real",
+            "generator": TERRAIN_GENERATOR,
+            "generatorVersion": TERRAIN_GENERATOR_VERSION,
             "publisher": "Environment Agency",
             "product": EA_PRODUCT,
             "licence": "Open Government Licence v3.0",
             "attribution": EA_ATTRIBUTION,
             "verticalReference": VERTICAL_REFERENCE,
+            "licenceUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+            "catalogueUrl": catalogue_url,
+            "productSurveyPeriod": product_survey_period,
+            "xmlCopyrightConflict": xml_copyright_conflict,
+            "coordinateOperation": coordinate_operation,
             "sources": sources,
             "selectionStatus": config.selection_status,
             "coverageStatus": config.coverage_status,
@@ -470,8 +617,10 @@ def _manifest(
         "aoi": {
             "crs": "EPSG:27700",
             "boundsM": [west, south, east, north],
+            "centerBngM": [config.center_bng_m[0], config.center_bng_m[1]],
             "widthM": east - west,
             "heightM": north - south,
+            "anchorWgs84": anchor_wgs84,
             "selectionStatus": config.selection_status,
             "coverageStatus": config.coverage_status,
         },
@@ -714,7 +863,7 @@ def build_terrain_package(
         ),
     }
     provenance_sources = _provenance_sources(source_manifest, verified_sources)
-    manifest = _manifest(config, grid, binary, qa, provenance_sources)
+    manifest = _manifest(config, grid, binary, qa, provenance_sources, source_manifest)
     preview_bytes = _render_preview(grid, preview_path, qa)
     manifest_bytes = _json_bytes(manifest)
     qa_bytes = _json_bytes(qa)

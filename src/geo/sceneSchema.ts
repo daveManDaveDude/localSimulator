@@ -68,6 +68,206 @@ export interface RealTerrainSource {
   xmlVerticalReference: string;
 }
 
+export interface RealTerrainCoordinateOperation {
+  name: 'EPSG:1314 + EPSG:19916';
+  authorityCodes: ['EPSG:1314', 'EPSG:19916'];
+  definition: string;
+  reportedAccuracyM: 2;
+  selectedUsesGrids: false;
+  bestAvailable: false;
+  preferredMissingGridNames: string[];
+  missingPreferredGridCaveat: string;
+}
+
+export interface RealTerrainAnchorWgs84 {
+  postcode: string;
+  crs: 'EPSG:4326';
+  longitude: number;
+  latitude: number;
+  coordinateMeaning: string;
+  quality: number;
+  sourceName: string;
+  sourceUrl: string;
+  sourceLicense: string;
+  retrievedDate: string;
+}
+
+function validateRealAnchorWgs84(
+  value: unknown,
+  issues: ManifestValidationIssue[],
+): RealTerrainAnchorWgs84 | undefined {
+  const path = 'aoi.anchorWgs84';
+  if (!isRecord(value)) {
+    issues.push({
+      path,
+      message: 'must be an object describing the configured WGS84 anchor',
+    });
+    return undefined;
+  }
+  const postcode = addRequiredStringIssue(
+    issues,
+    value,
+    'postcode',
+    `${path}.postcode`,
+  );
+  const longitude = addFiniteNumberIssue(
+    issues,
+    value,
+    'longitude',
+    `${path}.longitude`,
+  );
+  const latitude = addFiniteNumberIssue(
+    issues,
+    value,
+    'latitude',
+    `${path}.latitude`,
+  );
+  const coordinateMeaning = addRequiredStringIssue(
+    issues,
+    value,
+    'coordinateMeaning',
+    `${path}.coordinateMeaning`,
+  );
+  const quality = addPositiveIntegerIssue(
+    issues,
+    value,
+    'quality',
+    `${path}.quality`,
+  );
+  const sourceName = addRequiredStringIssue(
+    issues,
+    value,
+    'sourceName',
+    `${path}.sourceName`,
+  );
+  const sourceUrl = addHttpsIssue(
+    issues,
+    value,
+    'sourceUrl',
+    `${path}.sourceUrl`,
+  );
+  const sourceLicense = addRequiredStringIssue(
+    issues,
+    value,
+    'sourceLicense',
+    `${path}.sourceLicense`,
+  );
+  const retrievedDate = addRequiredStringIssue(
+    issues,
+    value,
+    'retrievedDate',
+    `${path}.retrievedDate`,
+  );
+  if (value.crs !== 'EPSG:4326') {
+    issues.push({ path: `${path}.crs`, message: 'must be EPSG:4326' });
+  }
+  if (longitude !== undefined && (longitude < -180 || longitude > 180)) {
+    issues.push({
+      path: `${path}.longitude`,
+      message: 'must be between -180 and 180 degrees',
+    });
+  }
+  if (latitude !== undefined && (latitude < -90 || latitude > 90)) {
+    issues.push({
+      path: `${path}.latitude`,
+      message: 'must be between -90 and 90 degrees',
+    });
+  }
+  if (postcode !== 'TQ1 4HN') {
+    issues.push({
+      path: `${path}.postcode`,
+      message: 'must match the configured TQ1 4HN anchor',
+    });
+  }
+  if (longitude !== -3.536013 || latitude !== 50.477853) {
+    issues.push({
+      path,
+      message:
+        'WGS84 coordinates must match the configured TQ1 4HN postcode centroid',
+    });
+  }
+  if (
+    coordinateMeaning &&
+    (!coordinateMeaning.toLowerCase().includes('postcode centroid') ||
+      !coordinateMeaning
+        .toLowerCase()
+        .includes('not a property or survey point'))
+  ) {
+    issues.push({
+      path: `${path}.coordinateMeaning`,
+      message:
+        'must identify a postcode centroid, not a property or survey point',
+    });
+  }
+  if (quality !== 1) {
+    issues.push({
+      path: `${path}.quality`,
+      message: 'must preserve the lookup quality value 1',
+    });
+  }
+  if (sourceName !== 'Postcodes.io') {
+    issues.push({
+      path: `${path}.sourceName`,
+      message: 'must identify Postcodes.io',
+    });
+  }
+  if (sourceUrl !== 'https://api.postcodes.io/postcodes/TQ1%204HN') {
+    issues.push({
+      path: `${path}.sourceUrl`,
+      message: 'must identify the recorded TQ1 4HN lookup',
+    });
+  }
+  if (sourceLicense && !sourceLicense.includes('OS OpenData')) {
+    issues.push({
+      path: `${path}.sourceLicense`,
+      message: 'must preserve the OS OpenData licence note',
+    });
+  }
+  if (retrievedDate && !/^\d{4}-\d{2}-\d{2}$/.test(retrievedDate)) {
+    issues.push({
+      path: `${path}.retrievedDate`,
+      message: 'must use YYYY-MM-DD format',
+    });
+  }
+  if (retrievedDate !== '2026-10-17') {
+    issues.push({
+      path: `${path}.retrievedDate`,
+      message: 'must match the recorded anchor lookup date',
+    });
+  }
+  if (
+    postcode === 'TQ1 4HN' &&
+    value.crs === 'EPSG:4326' &&
+    longitude === -3.536013 &&
+    latitude === 50.477853 &&
+    coordinateMeaning?.toLowerCase().includes('postcode centroid') &&
+    coordinateMeaning
+      ?.toLowerCase()
+      .includes('not a property or survey point') &&
+    quality === 1 &&
+    sourceName === 'Postcodes.io' &&
+    sourceUrl === 'https://api.postcodes.io/postcodes/TQ1%204HN' &&
+    sourceLicense?.includes('OS OpenData') &&
+    retrievedDate &&
+    retrievedDate === '2026-10-17' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(retrievedDate)
+  ) {
+    return {
+      postcode,
+      crs: 'EPSG:4326',
+      longitude,
+      latitude,
+      coordinateMeaning,
+      quality: 1,
+      sourceName,
+      sourceUrl,
+      sourceLicense,
+      retrievedDate,
+    };
+  }
+  return undefined;
+}
+
 export interface RealTerrainSceneManifest {
   formatVersion: 1;
   id: string;
@@ -84,14 +284,21 @@ export interface RealTerrainSceneManifest {
     width: number;
     depth: number;
   };
-  heightfield: SyntheticSceneManifest['heightfield'];
+  heightfield: SyntheticSceneManifest['heightfield'] & { byteLength: number };
   provenance: {
     kind: 'real';
+    generator: string;
+    generatorVersion: string;
     publisher: string;
     product: string;
     licence: string;
+    licenceUrl: string;
     attribution: string;
     verticalReference: string;
+    catalogueUrl: string;
+    productSurveyPeriod: string;
+    xmlCopyrightConflict: string;
+    coordinateOperation: RealTerrainCoordinateOperation;
     sources: RealTerrainSource[];
     selectionStatus: 'selected_pending_coverage';
     coverageStatus: 'not_checked';
@@ -106,8 +313,10 @@ export interface RealTerrainSceneManifest {
   aoi: {
     crs: 'EPSG:27700';
     boundsM: [number, number, number, number];
+    centerBngM: [number, number];
     widthM: number;
     heightM: number;
+    anchorWgs84: RealTerrainAnchorWgs84;
     selectionStatus: 'selected_pending_coverage';
     coverageStatus: 'not_checked';
   };
@@ -815,6 +1024,159 @@ function validateRealSource(
   };
 }
 
+function validateRealCoordinateOperation(
+  value: unknown,
+  issues: ManifestValidationIssue[],
+): RealTerrainCoordinateOperation | undefined {
+  const path = 'provenance.coordinateOperation';
+  if (!isRecord(value)) {
+    issues.push({ path, message: 'must be an object' });
+    return undefined;
+  }
+
+  const name = addRequiredStringIssue(issues, value, 'name', `${path}.name`);
+  const definition = addRequiredStringIssue(
+    issues,
+    value,
+    'definition',
+    `${path}.definition`,
+  );
+  const reportedAccuracyM = addFiniteNumberIssue(
+    issues,
+    value,
+    'reportedAccuracyM',
+    `${path}.reportedAccuracyM`,
+  );
+  const expectedCodes = ['EPSG:1314', 'EPSG:19916'];
+  const authorityCodes = value.authorityCodes;
+  if (
+    !Array.isArray(authorityCodes) ||
+    authorityCodes.length !== expectedCodes.length ||
+    !authorityCodes.every((code, index) => code === expectedCodes[index])
+  ) {
+    issues.push({
+      path: `${path}.authorityCodes`,
+      message: 'must identify EPSG:1314 followed by EPSG:19916',
+    });
+  }
+  if (name !== 'EPSG:1314 + EPSG:19916') {
+    issues.push({
+      path: `${path}.name`,
+      message: 'must identify the pinned EPSG:1314 + EPSG:19916 operation',
+    });
+  }
+  if (
+    definition !== undefined &&
+    (!definition.startsWith('proj=pipeline') ||
+      !definition.includes('proj=helmert') ||
+      ![
+        'x=446.448',
+        'y=-125.157',
+        'z=542.06',
+        'rx=0.15',
+        'ry=0.247',
+        'rz=0.842',
+        's=-20.489',
+        'convention=position_vector',
+        'proj=tmerc',
+      ].every((part) => definition.includes(part)))
+  ) {
+    issues.push({
+      path: `${path}.definition`,
+      message:
+        'must record the selected EPSG:1314 Helmert and EPSG:19916 BNG pipeline definition',
+    });
+  }
+  if (reportedAccuracyM !== undefined && reportedAccuracyM !== 2) {
+    issues.push({
+      path: `${path}.reportedAccuracyM`,
+      message: 'must match the selected operation’s reported 2 m accuracy',
+    });
+  }
+  if (value.selectedUsesGrids !== false) {
+    issues.push({
+      path: `${path}.selectedUsesGrids`,
+      message: 'must be false for the pinned fallback operation',
+    });
+  }
+  if (value.bestAvailable !== false) {
+    issues.push({
+      path: `${path}.bestAvailable`,
+      message:
+        'must record that the preferred higher-accuracy operation is unavailable',
+    });
+  }
+
+  const gridNamesValue = value.preferredMissingGridNames;
+  let preferredMissingGridNames: string[] | undefined;
+  if (
+    !Array.isArray(gridNamesValue) ||
+    gridNamesValue.length === 0 ||
+    !gridNamesValue.every(isNonEmptyString)
+  ) {
+    issues.push({
+      path: `${path}.preferredMissingGridNames`,
+      message: 'must list the missing preferred transformation grid files',
+    });
+  } else {
+    preferredMissingGridNames = [...gridNamesValue];
+    if (
+      !preferredMissingGridNames.includes('uk_os_OSTN15_NTv2_OSGBtoETRS.tif')
+    ) {
+      issues.push({
+        path: `${path}.preferredMissingGridNames`,
+        message: 'must record the unavailable OSTN15 transformation grid',
+      });
+    }
+  }
+
+  const missingPreferredGridCaveat = addRequiredStringIssue(
+    issues,
+    value,
+    'missingPreferredGridCaveat',
+    `${path}.missingPreferredGridCaveat`,
+  );
+  if (
+    missingPreferredGridCaveat !== undefined &&
+    (!missingPreferredGridCaveat.includes('PROJ_NETWORK=OFF') ||
+      !missingPreferredGridCaveat.toLowerCase().includes('unavailable') ||
+      (preferredMissingGridNames !== undefined &&
+        !preferredMissingGridNames.every((grid) =>
+          missingPreferredGridCaveat.includes(grid),
+        )))
+  ) {
+    issues.push({
+      path: `${path}.missingPreferredGridCaveat`,
+      message:
+        'must identify the unavailable grid file(s) and state that PROJ_NETWORK=OFF',
+    });
+  }
+
+  if (
+    name === 'EPSG:1314 + EPSG:19916' &&
+    definition !== undefined &&
+    definition.startsWith('proj=pipeline') &&
+    definition.includes('proj=helmert') &&
+    reportedAccuracyM === 2 &&
+    value.selectedUsesGrids === false &&
+    value.bestAvailable === false &&
+    preferredMissingGridNames !== undefined &&
+    missingPreferredGridCaveat !== undefined
+  ) {
+    return {
+      name,
+      authorityCodes: ['EPSG:1314', 'EPSG:19916'],
+      definition,
+      reportedAccuracyM: 2,
+      selectedUsesGrids: false,
+      bestAvailable: false,
+      preferredMissingGridNames,
+      missingPreferredGridCaveat,
+    };
+  }
+  return undefined;
+}
+
 function validateRealSceneManifest(
   input: UnknownRecord,
 ): ManifestValidationResult {
@@ -845,6 +1207,37 @@ function validateRealSceneManifest(
     });
   }
 
+  const heightfieldInput = input.heightfield;
+  let realHeightfield: RealTerrainSceneManifest['heightfield'] | undefined;
+  if (isRecord(heightfieldInput)) {
+    const byteLength = addPositiveIntegerIssue(
+      issues,
+      heightfieldInput,
+      'byteLength',
+      'heightfield.byteLength',
+    );
+    if (syntheticBase.ok) {
+      const expectedByteLength =
+        syntheticBase.manifest.heightfield.columns *
+        syntheticBase.manifest.heightfield.rows *
+        Float32Array.BYTES_PER_ELEMENT;
+      if (byteLength !== undefined && byteLength !== expectedByteLength) {
+        issues.push({
+          path: 'heightfield.byteLength',
+          message: `must equal columns × rows × 4 (${expectedByteLength} bytes)`,
+        });
+      }
+      if (byteLength === expectedByteLength) {
+        realHeightfield = { ...syntheticBase.manifest.heightfield, byteLength };
+      }
+    }
+  } else {
+    issues.push({
+      path: 'heightfield.byteLength',
+      message: 'must be present in the real manifest',
+    });
+  }
+
   const provenanceInput = input.provenance;
   let provenance: RealTerrainSceneManifest['provenance'] | undefined;
   if (!isRecord(provenanceInput)) {
@@ -852,6 +1245,33 @@ function validateRealSceneManifest(
   } else {
     if (provenanceInput.kind !== 'real') {
       issues.push({ path: 'provenance.kind', message: 'must be real' });
+    }
+    const generator = addRequiredStringIssue(
+      issues,
+      provenanceInput,
+      'generator',
+      'provenance.generator',
+    );
+    const generatorVersion = addRequiredStringIssue(
+      issues,
+      provenanceInput,
+      'generatorVersion',
+      'provenance.generatorVersion',
+    );
+    if (
+      generator !== undefined &&
+      generator !== 'torquay_pipeline.terrain_export'
+    ) {
+      issues.push({
+        path: 'provenance.generator',
+        message: 'must identify the TVW-008 Python terrain exporter',
+      });
+    }
+    if (generatorVersion !== undefined && generatorVersion !== '0.1.0') {
+      issues.push({
+        path: 'provenance.generatorVersion',
+        message: 'must match the installed TVW-008 exporter version 0.1.0',
+      });
     }
     const publisher = addRequiredStringIssue(
       issues,
@@ -871,6 +1291,12 @@ function validateRealSceneManifest(
       'licence',
       'provenance.licence',
     );
+    const licenceUrl = addHttpsIssue(
+      issues,
+      provenanceInput,
+      'licenceUrl',
+      'provenance.licenceUrl',
+    );
     const attribution = addRequiredStringIssue(
       issues,
       provenanceInput,
@@ -882,6 +1308,71 @@ function validateRealSceneManifest(
       provenanceInput,
       'verticalReference',
       'provenance.verticalReference',
+    );
+    const catalogueUrl = addHttpsIssue(
+      issues,
+      provenanceInput,
+      'catalogueUrl',
+      'provenance.catalogueUrl',
+    );
+    const productSurveyPeriod = addRequiredStringIssue(
+      issues,
+      provenanceInput,
+      'productSurveyPeriod',
+      'provenance.productSurveyPeriod',
+    );
+    const xmlCopyrightConflict = addRequiredStringIssue(
+      issues,
+      provenanceInput,
+      'xmlCopyrightConflict',
+      'provenance.xmlCopyrightConflict',
+    );
+    if (
+      xmlCopyrightConflict !== undefined &&
+      (!xmlCopyrightConflict.includes('useLimit') ||
+        !xmlCopyrightConflict.includes('idCredit') ||
+        !xmlCopyrightConflict.includes('2022') ||
+        !xmlCopyrightConflict.includes('2020'))
+    ) {
+      issues.push({
+        path: 'provenance.xmlCopyrightConflict',
+        message:
+          'must preserve the XML useLimit 2022 versus idCredit 2020 metadata conflict',
+      });
+    }
+    if (
+      licenceUrl !== undefined &&
+      licenceUrl !==
+        'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/'
+    ) {
+      issues.push({
+        path: 'provenance.licenceUrl',
+        message: 'must link to the Open Government Licence v3.0',
+      });
+    }
+    if (
+      catalogueUrl !== undefined &&
+      catalogueUrl !==
+        'https://www.data.gov.uk/dataset/01b3ee39-da3f-47b6-83da-dc98e73a461f/lidar-composite-dtm-2022-1m'
+    ) {
+      issues.push({
+        path: 'provenance.catalogueUrl',
+        message: 'must link to the publisher-wide EA DTM catalogue',
+      });
+    }
+    if (
+      productSurveyPeriod !== undefined &&
+      productSurveyPeriod !==
+        '2000-06-06 through 2022-04-02 (publisher-wide catalogue dates)'
+    ) {
+      issues.push({
+        path: 'provenance.productSurveyPeriod',
+        message: 'must identify the publisher-wide catalogue survey period',
+      });
+    }
+    const coordinateOperation = validateRealCoordinateOperation(
+      provenanceInput.coordinateOperation,
+      issues,
     );
     const resampling = addRequiredStringIssue(
       issues,
@@ -977,11 +1468,18 @@ function validateRealSceneManifest(
     }
     if (
       provenanceInput.kind === 'real' &&
+      generator &&
+      generatorVersion &&
       publisher &&
       product &&
       licence &&
+      licenceUrl &&
       attribution &&
       verticalReference &&
+      catalogueUrl &&
+      productSurveyPeriod &&
+      xmlCopyrightConflict &&
+      coordinateOperation &&
       resampling &&
       fillPolicy &&
       selectionStatus === 'selected_pending_coverage' &&
@@ -992,11 +1490,18 @@ function validateRealSceneManifest(
     ) {
       provenance = {
         kind: 'real',
+        generator,
+        generatorVersion,
         publisher,
         product,
         licence,
+        licenceUrl,
         attribution,
         verticalReference,
+        catalogueUrl,
+        productSurveyPeriod,
+        xmlCopyrightConflict,
+        coordinateOperation,
         sources,
         selectionStatus: 'selected_pending_coverage',
         coverageStatus: 'not_checked',
@@ -1036,6 +1541,22 @@ function validateRealSceneManifest(
     } else {
       boundsM = bounds as [number, number, number, number];
     }
+    if (boundsM) {
+      const expectedBounds = [
+        290608.9018176432, 64853.48350844931, 291608.9018176432,
+        65853.48350844931,
+      ];
+      if (
+        boundsM.some(
+          (value, index) => !extentMatchesGrid(value, expectedBounds[index]!),
+        )
+      ) {
+        issues.push({
+          path: 'aoi.boundsM',
+          message: 'must match the reviewed 1 km TQ1 4HN AOI bounds',
+        });
+      }
+    }
     const widthM = addFiniteNumberIssue(
       issues,
       aoiInput,
@@ -1048,6 +1569,36 @@ function validateRealSceneManifest(
       'heightM',
       'aoi.heightM',
     );
+    const extentWidthM = syntheticBase.ok
+      ? syntheticBase.manifest.extentM.width
+      : undefined;
+    const extentDepthM = syntheticBase.ok
+      ? syntheticBase.manifest.extentM.depth
+      : undefined;
+    if (extentWidthM !== undefined && extentWidthM !== 1000) {
+      issues.push({
+        path: 'extentM.width',
+        message: 'must match the reviewed 1,000 m AOI',
+      });
+    }
+    if (extentDepthM !== undefined && extentDepthM !== 1000) {
+      issues.push({
+        path: 'extentM.depth',
+        message: 'must match the reviewed 1,000 m AOI',
+      });
+    }
+    if (
+      syntheticBase.ok &&
+      (syntheticBase.manifest.heightfield.columns !== 501 ||
+        syntheticBase.manifest.heightfield.rows !== 501 ||
+        syntheticBase.manifest.heightfield.spacingM !== 2)
+    ) {
+      issues.push({
+        path: 'heightfield',
+        message:
+          'real terrain must use the reviewed 501 × 501 grid at 2 m spacing',
+      });
+    }
     if (widthM !== undefined && widthM !== 1000)
       issues.push({
         path: 'aoi.widthM',
@@ -1058,10 +1609,83 @@ function validateRealSceneManifest(
         path: 'aoi.heightM',
         message: 'must match the reviewed 1,000 m AOI',
       });
+    let centerBngM: [number, number] | undefined;
+    const centerValue = aoiInput.centerBngM;
     if (
-      boundsM &&
+      !Array.isArray(centerValue) ||
+      centerValue.length !== 2 ||
+      !centerValue.every(isFiniteNumber)
+    ) {
+      issues.push({
+        path: 'aoi.centerBngM',
+        message: 'must contain two finite EPSG:27700 coordinates',
+      });
+    } else {
+      centerBngM = [centerValue[0] as number, centerValue[1] as number];
+    }
+    if (centerBngM) {
+      if (!extentMatchesGrid(centerBngM[0], 291108.9018176432)) {
+        issues.push({
+          path: 'aoi.centerBngM',
+          message: 'must match the configured TQ1 4HN BNG easting',
+        });
+      }
+      if (!extentMatchesGrid(centerBngM[1], 65353.48350844931)) {
+        issues.push({
+          path: 'aoi.centerBngM',
+          message: 'must match the configured TQ1 4HN BNG northing',
+        });
+      }
+    }
+    const anchorWgs84 = validateRealAnchorWgs84(aoiInput.anchorWgs84, issues);
+
+    let eastingSpan: number | undefined;
+    let northingSpan: number | undefined;
+    let midpointEasting: number | undefined;
+    let midpointNorthing: number | undefined;
+    if (boundsM) {
+      eastingSpan = boundsM[2] - boundsM[0];
+      northingSpan = boundsM[3] - boundsM[1];
+      if (!Number.isFinite(eastingSpan)) {
+        issues.push({
+          path: 'aoi.boundsM',
+          message: 'easting span must be finite',
+        });
+        eastingSpan = undefined;
+      }
+      if (!Number.isFinite(northingSpan)) {
+        issues.push({
+          path: 'aoi.boundsM',
+          message: 'northing span must be finite',
+        });
+        northingSpan = undefined;
+      }
+      if (eastingSpan !== undefined)
+        midpointEasting = boundsM[0] + eastingSpan / 2;
+      if (northingSpan !== undefined)
+        midpointNorthing = boundsM[1] + northingSpan / 2;
+      if (midpointEasting !== undefined && !Number.isFinite(midpointEasting)) {
+        issues.push({
+          path: 'aoi.boundsM',
+          message: 'easting midpoint must be finite',
+        });
+        midpointEasting = undefined;
+      }
+      if (
+        midpointNorthing !== undefined &&
+        !Number.isFinite(midpointNorthing)
+      ) {
+        issues.push({
+          path: 'aoi.boundsM',
+          message: 'northing midpoint must be finite',
+        });
+        midpointNorthing = undefined;
+      }
+    }
+    if (
+      eastingSpan !== undefined &&
       widthM !== undefined &&
-      !extentMatchesGrid(widthM, boundsM[2] - boundsM[0])
+      !extentMatchesGrid(widthM, eastingSpan)
     ) {
       issues.push({
         path: 'aoi.boundsM',
@@ -1069,21 +1693,40 @@ function validateRealSceneManifest(
       });
     }
     if (
-      boundsM &&
+      northingSpan !== undefined &&
       heightM !== undefined &&
-      !extentMatchesGrid(heightM, boundsM[3] - boundsM[1])
+      !extentMatchesGrid(heightM, northingSpan)
     ) {
       issues.push({
         path: 'aoi.boundsM',
         message: 'northing span must equal aoi.heightM',
       });
     }
-    if (boundsM && syntheticBase.ok) {
+    if (
+      eastingSpan !== undefined &&
+      extentWidthM !== undefined &&
+      !extentMatchesGrid(extentWidthM, eastingSpan)
+    ) {
+      issues.push({
+        path: 'extentM.width',
+        message: 'must equal the AOI easting span',
+      });
+    }
+    if (
+      northingSpan !== undefined &&
+      extentDepthM !== undefined &&
+      !extentMatchesGrid(extentDepthM, northingSpan)
+    ) {
+      issues.push({
+        path: 'extentM.depth',
+        message: 'must equal the AOI northing span',
+      });
+    }
+    if (syntheticBase.ok) {
+      const origin = syntheticBase.manifest.origin;
       if (
-        !extentMatchesGrid(
-          (boundsM[0] + boundsM[2]) / 2,
-          syntheticBase.manifest.origin.eastingM,
-        )
+        midpointEasting !== undefined &&
+        !extentMatchesGrid(midpointEasting, origin.eastingM)
       ) {
         issues.push({
           path: 'aoi.boundsM',
@@ -1091,14 +1734,44 @@ function validateRealSceneManifest(
         });
       }
       if (
-        !extentMatchesGrid(
-          (boundsM[1] + boundsM[3]) / 2,
-          syntheticBase.manifest.origin.northingM,
-        )
+        midpointNorthing !== undefined &&
+        !extentMatchesGrid(midpointNorthing, origin.northingM)
       ) {
         issues.push({
           path: 'aoi.boundsM',
           message: 'northing midpoint must match the projected world origin',
+        });
+      }
+      if (centerBngM && !extentMatchesGrid(centerBngM[0], origin.eastingM)) {
+        issues.push({
+          path: 'aoi.centerBngM',
+          message: 'easting must match the projected world origin',
+        });
+      }
+      if (centerBngM && !extentMatchesGrid(centerBngM[1], origin.northingM)) {
+        issues.push({
+          path: 'aoi.centerBngM',
+          message: 'northing must match the projected world origin',
+        });
+      }
+      if (
+        centerBngM &&
+        midpointEasting !== undefined &&
+        !extentMatchesGrid(centerBngM[0], midpointEasting)
+      ) {
+        issues.push({
+          path: 'aoi.centerBngM',
+          message: 'easting must match the AOI bounds midpoint',
+        });
+      }
+      if (
+        centerBngM &&
+        midpointNorthing !== undefined &&
+        !extentMatchesGrid(centerBngM[1], midpointNorthing)
+      ) {
+        issues.push({
+          path: 'aoi.centerBngM',
+          message: 'northing must match the AOI bounds midpoint',
         });
       }
     }
@@ -1116,6 +1789,16 @@ function validateRealSceneManifest(
     }
     if (
       boundsM &&
+      eastingSpan === 1000 &&
+      northingSpan === 1000 &&
+      centerBngM &&
+      anchorWgs84 &&
+      extentWidthM === 1000 &&
+      extentDepthM === 1000 &&
+      syntheticBase.ok &&
+      syntheticBase.manifest.heightfield.columns === 501 &&
+      syntheticBase.manifest.heightfield.rows === 501 &&
+      syntheticBase.manifest.heightfield.spacingM === 2 &&
       widthM === 1000 &&
       heightM === 1000 &&
       aoiInput.crs === 'EPSG:27700' &&
@@ -1125,15 +1808,23 @@ function validateRealSceneManifest(
       aoi = {
         crs: 'EPSG:27700',
         boundsM,
+        centerBngM,
         widthM,
         heightM,
+        anchorWgs84,
         selectionStatus: 'selected_pending_coverage',
         coverageStatus: 'not_checked',
       };
     }
   }
 
-  if (issues.length > 0 || !syntheticBase.ok || !provenance || !aoi) {
+  if (
+    issues.length > 0 ||
+    !syntheticBase.ok ||
+    !realHeightfield ||
+    !provenance ||
+    !aoi
+  ) {
     return {
       ok: false,
       issues: issues.length
@@ -1147,6 +1838,7 @@ function validateRealSceneManifest(
       ...syntheticBase.manifest,
       worldType: 'real',
       sourceCrs: 'EPSG:27700',
+      heightfield: realHeightfield,
       provenance,
       aoi,
     },

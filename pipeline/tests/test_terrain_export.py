@@ -13,6 +13,7 @@ from rasterio.transform import Affine
 from torquay_pipeline.config import AoiConfig, load_aoi_config
 from torquay_pipeline.terrain_export import (
     TerrainExportError,
+    _build_qa,
     _publish_transaction,
     resample_vertices,
 )
@@ -96,6 +97,53 @@ def test_bilinear_sampling_crosses_the_northing_65000_tile_seam(tmp_path: Path) 
         + 3 * np.asarray([65001.0, 65000.0, 64999.0])[:, None]
     )
     np.testing.assert_allclose(result.elevations_m, expected, atol=1e-9)
+
+
+def test_qa_derives_northing_seam_probes_from_adjacent_source_tiles(tmp_path: Path) -> None:
+    west = 290000
+    north_tile = write_raster(
+        tmp_path / "north-large.tif", np.full((3, 6), 10, dtype=np.float32), west=west, north=65003
+    )
+    south_tile = write_raster(
+        tmp_path / "south-large.tif", np.full((3, 6), 20, dtype=np.float32), west=west, north=65000
+    )
+    grid = resample_vertices(
+        [south_tile, north_tile],
+        (290001.0, 64998.0, 290005.0, 65002.0),
+        columns=5,
+        rows=5,
+        spacing_m=1,
+    )
+
+    qa = _build_qa(grid, [south_tile, north_tile], grid.elevations_m - grid.origin_elevation_m)
+
+    assert {probe["label"] for probe in qa["probes"]} >= {
+        "source_seam_1_north",
+        "source_seam_1_south",
+    }
+    assert qa["status"] == "pass"
+
+
+def test_qa_for_a_single_tile_away_from_known_seam_has_no_seam_probes(tmp_path: Path) -> None:
+    raster = write_raster(
+        tmp_path / "single-tile-away-from-seam.tif",
+        np.full((6, 6), 5, dtype=np.float32),
+        west=0,
+        north=2002,
+    )
+    grid = resample_vertices(
+        [raster],
+        (1.0, 1997.0, 5.0, 2001.0),
+        columns=5,
+        rows=5,
+        spacing_m=1,
+    )
+
+    qa = _build_qa(grid, [raster], grid.elevations_m - grid.origin_elevation_m)
+
+    labels = {probe["label"] for probe in qa["probes"]}
+    assert qa["status"] == "pass"
+    assert not any("seam" in label for label in labels)
 
 
 def test_nodata_with_positive_bilinear_weight_fails_without_filling(tmp_path: Path) -> None:

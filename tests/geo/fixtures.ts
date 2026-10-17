@@ -99,6 +99,7 @@ export function createRealManifest(
       columns: 501,
       rows: 501,
       spacingM: 2,
+      byteLength: 1_004_004,
       rowOrder: 'north-to-south',
       byteOrder: 'little-endian',
       encoding: 'float32',
@@ -107,6 +108,8 @@ export function createRealManifest(
     },
     provenance: {
       kind: 'real',
+      generator: 'torquay_pipeline.terrain_export',
+      generatorVersion: '0.1.0',
       publisher: 'Environment Agency',
       product: 'LIDAR Composite DTM 1 m (2022 composite)',
       licence: 'Open Government Licence v3.0',
@@ -114,6 +117,26 @@ export function createRealManifest(
         'Contains public sector information licensed under the Open Government Licence v3.0. © Environment Agency copyright and/or database right 2022.',
       verticalReference:
         'Ordnance Survey Newlyn using OSTN’15 and OSGM’15 transformation models',
+      licenceUrl:
+        'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/',
+      catalogueUrl:
+        'https://www.data.gov.uk/dataset/01b3ee39-da3f-47b6-83da-dc98e73a461f/lidar-composite-dtm-2022-1m',
+      productSurveyPeriod:
+        '2000-06-06 through 2022-04-02 (publisher-wide catalogue dates)',
+      xmlCopyrightConflict:
+        'TIFF XML useLimit requires 2022 attribution; idCredit says 2020. The explicit reuse instruction is followed.',
+      coordinateOperation: {
+        name: 'EPSG:1314 + EPSG:19916',
+        authorityCodes: ['EPSG:1314', 'EPSG:19916'],
+        definition:
+          'proj=pipeline step proj=unitconvert xy_in=deg xy_out=rad step proj=push v_3 step proj=cart ellps=WGS84 step inv proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=airy step proj=pop v_3 step proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy',
+        reportedAccuracyM: 2,
+        selectedUsesGrids: false,
+        bestAvailable: false,
+        preferredMissingGridNames: ['uk_os_OSTN15_NTv2_OSGBtoETRS.tif'],
+        missingPreferredGridCaveat:
+          'PROJ_NETWORK=OFF; preferred operation unavailable because uk_os_OSTN15_NTv2_OSGBtoETRS.tif is unavailable.',
+      },
       sources: [
         {
           tileName: 'SX96nw',
@@ -161,8 +184,21 @@ export function createRealManifest(
         290608.9018176432, 64853.48350844931, 291608.9018176432,
         65853.48350844931,
       ],
+      centerBngM: [291108.9018176432, 65353.48350844931],
       widthM: 1000,
       heightM: 1000,
+      anchorWgs84: {
+        postcode: 'TQ1 4HN',
+        crs: 'EPSG:4326',
+        longitude: -3.536013,
+        latitude: 50.477853,
+        coordinateMeaning: 'Postcode centroid; not a property or survey point.',
+        quality: 1,
+        sourceName: 'Postcodes.io',
+        sourceUrl: 'https://api.postcodes.io/postcodes/TQ1%204HN',
+        sourceLicense: 'OS OpenData licence (provider documentation)',
+        retrievedDate: '2026-10-17',
+      },
       selectionStatus: 'selected_pending_coverage',
       coverageStatus: 'not_checked',
     },

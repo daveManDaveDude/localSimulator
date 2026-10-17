@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -58,6 +59,47 @@ def test_inspect_sources_reports_missing_manifest(tmp_path: Path, capsys) -> Non
 
     assert result == 2
     assert "source manifest is missing" in capsys.readouterr().err
+
+
+def test_build_terrain_reports_unsupported_source_coverage_cleanly(
+    tmp_path: Path, capsys, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import torquay_pipeline.cli as cli
+    from torquay_pipeline.terrain_export import TerrainExportError
+
+    monkeypatch.setattr(cli, "_verified_sources", lambda _manifest, _source: ({}, [], []))
+    monkeypatch.setattr(
+        cli,
+        "analyze_coverage",
+        lambda *_args: SimpleNamespace(report={"analysis": {"ea_dtm_threshold_result": "pass"}}),
+    )
+
+    def fail_build(*_args, **_kwargs):
+        raise TerrainExportError(
+            "source coverage cannot bilinearly support output vertices outside the available tiles"
+        )
+
+    monkeypatch.setattr(cli, "build_terrain_package", fail_build)
+    result = main(
+        [
+            "build-terrain",
+            "--config",
+            str(CONFIG),
+            "--manifest",
+            str(tmp_path / "manifest.json"),
+            "--source-dir",
+            str(tmp_path / "raw"),
+            "--package-dir",
+            str(tmp_path / "package"),
+            "--report",
+            str(tmp_path / "qa.json"),
+            "--preview",
+            str(tmp_path / "preview.png"),
+        ]
+    )
+
+    assert result == 2
+    assert "source coverage cannot bilinearly support" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize(

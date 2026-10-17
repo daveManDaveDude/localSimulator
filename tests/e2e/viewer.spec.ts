@@ -298,6 +298,20 @@ test('shows live synthetic flight state and supports browser navigation', async 
       })),
     )
     .toEqual({ cssWidth: 960, cssHeight: 600 });
+  await expect
+    .poll(() =>
+      canvas.evaluate((element) => {
+        const canvasElement = element as HTMLCanvasElement;
+        const pixelRatio = Math.min(window.devicePixelRatio, 2);
+        return (
+          canvasElement.width ===
+            Math.round(canvasElement.clientWidth * pixelRatio) &&
+          canvasElement.height ===
+            Math.round(canvasElement.clientHeight * pixelRatio)
+        );
+      }),
+    )
+    .toBe(true);
   const canvasMetrics = await canvas.evaluate((element) => {
     const canvasElement = element as HTMLCanvasElement;
     return {
@@ -704,6 +718,18 @@ test('loads and navigates the local EA terrain package', async ({ page }) => {
   await expect(page.getByTestId('world-attribution')).toContainText(
     'Environment Agency copyright',
   );
+  await expect(
+    page.getByRole('link', { name: 'Publisher catalogue' }),
+  ).toHaveAttribute(
+    'href',
+    'https://www.data.gov.uk/dataset/01b3ee39-da3f-47b6-83da-dc98e73a461f/lidar-composite-dtm-2022-1m',
+  );
+  await expect(
+    page.getByRole('link', { name: 'Open Government Licence v3.0' }),
+  ).toHaveAttribute(
+    'href',
+    'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/',
+  );
   await expect(page.getByTestId('terrain-details')).toHaveAttribute(
     'data-columns',
     '501',
@@ -939,4 +965,50 @@ test('explains an unavailable local EA package and recovers to synthetic terrain
     'true',
   );
   await expect(page.getByTestId('world-provenance')).toContainText('SYNTHETIC');
+});
+
+test('rejects a corrupted real heightfield, retries, and recovers to synthetic terrain', async ({
+  page,
+}) => {
+  let heightfieldRequests = 0;
+  await page.route(
+    '**/worlds/torquay-poc-001/heightfield.f32',
+    async (route) => {
+      heightfieldRequests += 1;
+      if (heightfieldRequests === 1) {
+        const response = await route.fetch();
+        const corrupted = Buffer.from(await response.body());
+        corrupted[0] = corrupted[0]! ^ 0x01;
+        await route.fulfill({ response, body: corrupted });
+      } else {
+        await route.continue();
+      }
+    },
+  );
+
+  await page.goto('/?world=torquay-poc-001');
+  await expect(page.getByTestId('world-load-error')).toBeVisible();
+  await expect(page.getByTestId('world-error-message')).toContainText(
+    'heightfield checksum',
+  );
+  expect(heightfieldRequests).toBe(1);
+
+  await page.getByTestId('retry-world').click();
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-load-state',
+    'loaded',
+  );
+  await expect(page.getByTestId('world-load-error')).toBeHidden();
+  expect(heightfieldRequests).toBeGreaterThanOrEqual(2);
+
+  await page.getByTestId('world-select-synthetic').click();
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-world-source',
+    'heightfield',
+  );
+  await expect(page.getByTestId('world-provenance')).toContainText('SYNTHETIC');
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-renderer-ready',
+    'true',
+  );
 });

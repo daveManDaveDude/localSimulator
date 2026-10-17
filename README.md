@@ -2,7 +2,7 @@
 
 A Windows-friendly browser proof of concept for a future real-data view of Torquay. The default viewer loads a checked-in synthetic Float32 heightfield and renders its terrain mesh, hill, ridge, grid and north cue. The prior M0 analytic scene remains available at `/?world=m0`. The **EA terrain** selector loads a locally generated 2 m Float32 heightfield from the verified Environment Agency DTM tiles when that ignored package exists in `public/worlds/torquay-poc-001/`.
 
-The synthetic heightfield, hill, ridge, analytic slope, blocks and their measurements are fictional; they are not Torquay measurements. The real terrain mode uses the actual Environment Agency DTM source tiles and displays their source attribution and Ordnance Survey Newlyn vertical reference. Its heights are stored relative to a deterministic center origin. The local EA raster coverage and resampling checks passed for the candidate square, while overall AOI approval remains pending because OSM/OS feature counts have not been checked. The viewer does not load OSM/OS data, real roads or buildings.
+The synthetic heightfield, hill, ridge, analytic slope, blocks and their measurements are fictional; they are not Torquay measurements. The real terrain mode uses the actual Environment Agency DTM source tiles and displays their source attribution and Ordnance Survey Newlyn vertical reference. Its heights are stored relative to a deterministic center origin. The HUD links to the publisher catalogue and Open Government Licence v3.0. The local EA raster coverage and resampling checks passed for the candidate square, while overall AOI approval remains pending because OSM/OS feature counts have not been checked. The viewer does not load OSM/OS data, real roads or buildings.
 
 ## Requirements
 
