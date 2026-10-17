@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0 and M1 complete; TVW-001 through TVW-007 passed independent review. The user-authorized 1,000 m AOI revision also passed independent review. TVW-007 completes the EA DTM inspection only; overall AOI coverage remains pending for OSM/OS feature counts. TVW-008 and later are not authorized.
+**Status:** M0 and M1 complete; TVW-001 through TVW-007 passed independent review. The user-authorized 1,000 m AOI revision also passed independent review. TVW-007 completes the EA DTM inspection only; overall AOI coverage remains pending for OSM/OS feature counts. The user separately authorized TVW-008/M3; TVW-009 and later are not authorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -496,6 +496,8 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 **TVW-007 issue gate:** verified EA data for the chosen Torquay square is present locally, the aligned AOI sample coverage is reported, and an attributed preview exists. **The M2 exit gate remains open** until OSM/OS feature checks and overall AOI review are complete. If EA data is unavailable, flag as blocked and keep synthetic world fully working.
 
 ### M3 — Render real Torquay terrain
+
+**TVW-008 status:** User-authorized on 2026-10-17; implementation in progress. The deliverable is a selectable, local-only EA DTM terrain package for the current 1,000 m pending candidate; this does not freeze or otherwise approve the full AOI.
 
 **User-visible result:** replace synthetic ground with **true Torquay LiDAR-derived topography** in browser. Fly over recognisable slopes.
 
