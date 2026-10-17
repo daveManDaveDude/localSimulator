@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 import tempfile
@@ -16,6 +17,7 @@ from pyproj.network import is_network_enabled
 from .aoi import generate_selection, write_selection
 from .building_export import (
     BuildingExportError,
+    _load_aoi_ring,
     build_building_package,
     validate_building_package,
 )
@@ -122,6 +124,12 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument(
                 "--package", type=Path, default=Path("../data/generated/buildings/torquay-poc-001")
             )
+            command.add_argument(
+                "--terrain-package", type=Path, default=Path("../public/worlds/torquay-poc-001")
+            )
+            command.add_argument(
+                "--aoi-geojson", type=Path, default=Path("../docs/aoi-selection.geojson")
+            )
         if name == "preview-buildings":
             command.add_argument(
                 "--qa",
@@ -151,13 +159,25 @@ def _building_config(path: Path) -> tuple[BuildingConfig, Path, dict[str, Any]]:
         raise BuildingImportError("height_policy must be a JSON object")
     try:
         config = BuildingConfig(
-            acquisition_buffer_m=float(raw["acquisition_buffer_m"]),
-            minimum_clipped_area_m2=float(raw["minimum_clipped_area_m2"]),
+            acquisition_buffer_m=_building_config_number(
+                raw["acquisition_buffer_m"], "acquisition_buffer_m"
+            ),
+            minimum_clipped_area_m2=_building_config_number(
+                raw["minimum_clipped_area_m2"], "minimum_clipped_area_m2"
+            ),
             height_policy=HeightPolicy(
-                levels_to_metres=float(height["levels_to_metres"]),
-                default_height_m=float(height["default_height_m"]),
-                minimum_height_m=float(height["minimum_height_m"]),
-                maximum_height_m=float(height["maximum_height_m"]),
+                levels_to_metres=_building_config_number(
+                    height["levels_to_metres"], "height_policy.levels_to_metres"
+                ),
+                default_height_m=_building_config_number(
+                    height["default_height_m"], "height_policy.default_height_m"
+                ),
+                minimum_height_m=_building_config_number(
+                    height["minimum_height_m"], "height_policy.minimum_height_m"
+                ),
+                maximum_height_m=_building_config_number(
+                    height["maximum_height_m"], "height_policy.maximum_height_m"
+                ),
             ),
         )
         config.validate()
@@ -169,6 +189,16 @@ def _building_config(path: Path) -> tuple[BuildingConfig, Path, dict[str, Any]]:
 def _root_path(root: Path, value: str | Path) -> Path:
     candidate = Path(value)
     return candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+
+
+def _building_config_number(value: Any, field: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise BuildingImportError(
+            f"{field} must be a finite JSON number; booleans are not accepted"
+        )
+    if not math.isfinite(value):
+        raise BuildingImportError(f"{field} must be finite")
+    return float(value)
 
 
 def _write_bytes_atomic(path: Path, content: bytes) -> None:
@@ -199,14 +229,50 @@ def _building_command(args: argparse.Namespace) -> int:
         return 0
     if args.command == "validate-buildings":
         verify_building_source(source_path, source_manifest_path)
-        result = validate_building_package(args.package.resolve())
+        aoi_config = load_aoi_config(args.aoi_config)
+        selection, _geojson, _markdown = generate_selection(aoi_config)
+        validate_stored_selection(
+            aoi_config,
+            selection["aoi"]["center_easting_m"],
+            selection["aoi"]["center_northing_m"],
+            selection["aoi"]["bbox_m"],
+        )
+        result = validate_building_package(
+            args.package.resolve(),
+            expected_aoi=aoi_config,
+            expected_aoi_ring=_load_aoi_ring(args.aoi_geojson.resolve()),
+            terrain_package_path=args.terrain_package.resolve(),
+            source_path=source_path,
+            source_manifest_path=source_manifest_path,
+        )
         print(json.dumps(result, indent=2))
         return 0
     if args.command == "preview-buildings":
         verify_building_source(source_path, source_manifest_path)
-        package_status = validate_building_package(args.package.resolve())
+        aoi_config = load_aoi_config(args.aoi_config)
+        selection, _geojson, _markdown = generate_selection(aoi_config)
+        validate_stored_selection(
+            aoi_config,
+            selection["aoi"]["center_easting_m"],
+            selection["aoi"]["center_northing_m"],
+            selection["aoi"]["bbox_m"],
+        )
+        package_status = validate_building_package(
+            args.package.resolve(),
+            expected_aoi=aoi_config,
+            expected_aoi_ring=_load_aoi_ring(args.aoi_geojson.resolve()),
+            terrain_package_path=args.terrain_package.resolve(),
+            source_path=source_path,
+            source_manifest_path=source_manifest_path,
+        )
         data = json.loads((args.package / "buildings.json").read_text(encoding="utf-8"))
-        qa = json.loads(args.qa.read_text(encoding="utf-8"))
+        package_qa = (args.package / "qa.json").read_bytes()
+        external_qa = args.qa.read_bytes()
+        if package_qa != external_qa:
+            raise BuildingExportError(
+                "external QA report differs from integrity-bound package qa.json"
+            )
+        qa = json.loads(package_qa)
         content = render_building_preview(data["buildings"], qa)
         _write_bytes_atomic(args.output.resolve(), content)
         print(f"Regenerated QA map: {args.output.resolve()}")

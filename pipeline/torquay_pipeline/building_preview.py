@@ -130,6 +130,8 @@ def render_building_preview(
         f"Buildings exported: {counts.get('exported_buildings', len(buildings))}",
         f"Footprint area: {summary.get('buildingFootprintAreaM2', 0):,.1f} m²",
         f"Mapped density: {summary.get('footprintAreaPerAoiKm2', 0):,.4f} km²/km²",
+        f"Multipolygon assembly failures: {counts.get('relation_area_assembly_failures', 0)}",
+        f"Non-area relations skipped: {counts.get('building_relations_skipped_non_area_type', 0)}",
         "Mapped OSM coverage only; not a completeness estimate.",
         "Red outline: exact 1,000 m AOI boundary.",
     ]

@@ -2,10 +2,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import osmium
 import pytest
 
 import torquay_pipeline.buildings as building_module
-from torquay_pipeline.buildings import BuildingConfig, import_osm_buildings
+from torquay_pipeline.buildings import (
+    BuildingConfig,
+    BuildingImportError,
+    _map_comparison_candidates,
+    import_osm_buildings,
+)
+from torquay_pipeline.cli import _building_config
 from torquay_pipeline.config import Anchor, AoiConfig
 from torquay_pipeline.coordinates import pinned_transformer
 
@@ -213,3 +220,112 @@ def test_map_candidates_include_spatially_separated_groups(osm_area_fixture, mon
     groups = {item["group"] for item in result.qa["mapComparisonCandidates"]}
     assert len(groups) >= 3
     assert all(item["placementCheckOnly"] for item in result.qa["mapComparisonCandidates"])
+
+
+def test_map_candidate_inverse_matches_local_z_in_all_quadrants():
+    center_easting, center_northing = 291108.9018176432, 65353.48350844931
+    to_wgs84, _info = pinned_transformer(27700, 4326)
+    cases = [
+        ("NE", 100.0, -120.0),
+        ("NW", -100.0, -120.0),
+        ("SE", 100.0, 120.0),
+        ("SW", -100.0, 120.0),
+    ]
+    features = []
+    for index, (_quadrant, center_x, center_z) in enumerate(cases, 1):
+        exterior = [
+            [center_x - 5, center_z - 5],
+            [center_x + 5, center_z - 5],
+            [center_x + 5, center_z + 5],
+            [center_x - 5, center_z + 5],
+            [center_x - 5, center_z - 5],
+        ]
+        features.append(
+            {
+                "id": f"osm:way:{index}",
+                "footprintAreaM2": 100.0,
+                "geometry": {
+                    "type": "MultiPolygon",
+                    "polygons": [{"exteriorXZ": exterior, "interiorRingsXZ": []}],
+                },
+            }
+        )
+    candidates = _map_comparison_candidates(features, center_easting, center_northing, to_wgs84)
+    by_quadrant = {candidate["group"]: candidate for candidate in candidates}
+    assert set(by_quadrant) == {case[0] for case in cases}
+    for quadrant, local_x, local_z in cases:
+        expected = to_wgs84.transform(center_easting + local_x, center_northing - local_z)
+        actual = by_quadrant[quadrant]["representativePointWgs84LonLat"]
+        assert actual == pytest.approx(expected, abs=1e-12)
+
+
+def test_fictional_pbf_assembles_multipolygon_and_reports_non_area_relation(tmp_path, monkeypatch):
+    to_wgs84, _info = pinned_transformer(27700, 4326)
+    points = {
+        1: (-80.0, 30.0),
+        2: (-40.0, 30.0),
+        3: (-40.0, 70.0),
+        4: (-80.0, 70.0),
+        5: (2500.0, 2500.0),
+        6: (2540.0, 2500.0),
+        7: (2540.0, 2540.0),
+        8: (2500.0, 2540.0),
+    }
+    path = tmp_path / "fictional-area.osm.pbf"
+    writer = osmium.SimpleWriter(str(path), overwrite=True)
+    for node_id, (easting, northing) in points.items():
+        longitude, latitude = to_wgs84.transform(easting, northing, errcheck=True)
+        writer.add_node(osmium.osm.mutable.Node(id=node_id, location=(longitude, latitude)))
+    writer.add_way(osmium.osm.mutable.Way(id=100, nodes=[1, 2, 3, 4, 1]))
+    writer.add_way(osmium.osm.mutable.Way(id=200, nodes=[5, 6, 7, 8, 5]))
+    writer.add_relation(
+        osmium.osm.mutable.Relation(
+            id=300,
+            members=[("w", 100, "outer")],
+            tags={"type": "multipolygon", "building": "apartments"},
+        )
+    )
+    writer.add_relation(
+        osmium.osm.mutable.Relation(
+            id=301,
+            members=[("w", 200, "member")],
+            tags={"type": "site", "building": "yes"},
+        )
+    )
+    writer.close()
+    monkeypatch.setattr(building_module, "verify_building_source", _fake_source_verification)
+    result = import_osm_buildings(
+        path, Path("unused-test-manifest.json"), _fixture_aoi(), BuildingConfig()
+    )
+    assert any(feature["id"] == "osm:relation:300" for feature in result.buildings)
+    assert result.qa["counts"]["relation_area_assembly_failures"] == 0
+    assert result.qa["counts"]["building_relations_skipped_non_area_type"] == 1
+    skipped = result.qa["quality"]["unsupportedBuildingRelations"][0]
+    assert skipped["osmRelationId"] == 301
+    assert skipped["relationType"] == "site"
+    assert skipped["memberWayEvidence"][0]["wayId"] == 200
+    assert skipped["memberWayEvidence"][0]["nodeCountWithLocation"] == 5
+    assert skipped["memberWayEvidence"][0]["intersectsAcquisitionEnvelope"] is False
+
+
+@pytest.mark.parametrize(
+    ("field", "message"),
+    [
+        ("acquisition_buffer_m", "acquisition_buffer_m"),
+        ("minimum_clipped_area_m2", "minimum_clipped_area_m2"),
+        ("height_policy.default_height_m", "height_policy.default_height_m"),
+    ],
+)
+def test_building_config_rejects_boolean_numeric_fields(tmp_path, field, message):
+    import json
+
+    root = Path(__file__).resolve().parents[2]
+    raw = json.loads((root / "config/buildings.torquay.json").read_text(encoding="utf-8"))
+    if field.startswith("height_policy."):
+        raw["height_policy"][field.split(".", maxsplit=1)[1]] = True
+    else:
+        raw[field] = True
+    config_path = tmp_path / "buildings.json"
+    config_path.write_text(json.dumps(raw), encoding="utf-8")
+    with pytest.raises(BuildingImportError, match=message):
+        _building_config(config_path)

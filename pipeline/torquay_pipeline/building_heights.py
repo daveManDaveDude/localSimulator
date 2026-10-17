@@ -32,7 +32,13 @@ class HeightPolicy:
             self.minimum_height_m,
             self.maximum_height_m,
         )
-        if not all(isfinite(value) and value > 0 for value in values):
+        if not all(
+            not isinstance(value, bool)
+            and isinstance(value, (int, float))
+            and isfinite(value)
+            and value > 0
+            for value in values
+        ):
             raise ValueError("building height policy values must be finite and positive")
         if self.minimum_height_m > self.maximum_height_m:
             raise ValueError("minimum building height cannot exceed maximum building height")

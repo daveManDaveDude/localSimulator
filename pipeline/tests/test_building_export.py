@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -14,23 +15,42 @@ from torquay_pipeline.building_export import (
 )
 from torquay_pipeline.buildings import BuildingImportResult
 from torquay_pipeline.config import load_aoi_config
+from torquay_pipeline.coordinates import pinned_transformer
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _fixture_result():
+    _to_bng, to_bng_info = pinned_transformer(4326, 27700)
+    _to_wgs, to_wgs_info = pinned_transformer(27700, 4326)
     polygon = {
         "exteriorXZ": [[-2.0, -3.0], [2.0, -3.0], [2.0, 3.0], [-2.0, 3.0], [-2.0, -3.0]],
         "interiorRingsXZ": [],
     }
     feature = {
         "id": "osm:way:101",
-        "source": {"objectType": "way", "osmId": 101, "version": 2, "timestamp": None},
+        "source": {
+            "dataset": "Geofabrik Devon OpenStreetMap extract",
+            "objectType": "way",
+            "osmId": 101,
+            "version": 2,
+            "timestamp": None,
+        },
         "geometry": {"type": "MultiPolygon", "polygons": [polygon]},
         "heightM": 8.0,
         "heightMethod": "estimated_default",
         "heightConfidence": "visual_default_estimate",
-        "heightProvenance": {"rawHeight": None, "rawLevels": None, "clamp": None},
+        "heightProvenance": {
+            "heightM": 8.0,
+            "method": "estimated_default",
+            "confidence": "visual_default_estimate",
+            "rawHeight": None,
+            "parsedHeightM": None,
+            "parsedUnit": None,
+            "rawLevels": None,
+            "clamp": None,
+            "fallbackReason": "no usable height or building:levels tag",
+        },
         "footprintAreaM2": 24.0,
         "clippedToAoi": False,
         "qualityFlags": [],
@@ -42,14 +62,73 @@ def _fixture_result():
         {"type": "FeatureCollection", "features": []},
         {
             "formatVersion": 1,
-            "source": {"filename": "devon-test.osm.pbf", "sha256": "a" * 64, "size_bytes": 1},
-            "coordinateOperation": {},
-            "counts": {"exported_buildings": 1},
-            "quality": {"heightMethodCounts": {"estimated_default": 1}},
+            "aoiId": "torquay-poc-001",
+            "selectionStatus": "selected_pending_coverage",
+            "coverageStatus": "not_checked",
+            "acquisitionBufferM": 50.0,
+            "minimumClippedAreaM2": 1.0,
+            "source": {
+                "filename": "devon-test.osm.pbf",
+                "size_bytes": len(b"test source"),
+                "sha256": "a" * 64,
+                "md5": "b" * 32,
+                "pbf_header": {"replication_timestamp": "2026-01-01T00:00:00Z"},
+            },
+            "coordinateOperation": {
+                "axisOrder": "longitude-latitude for geographic input; easting-northing for BNG",
+                "wgs84ToBng": to_bng_info.as_dict(),
+                "bngToWgs84": to_wgs_info.as_dict(),
+            },
+            "heightPolicy": {
+                "version": 1,
+                "levelsToMetres": 3.0,
+                "defaultHeightM": 8.0,
+                "minimumHeightM": 1.0,
+                "maximumHeightM": 150.0,
+                "precedence": ["height", "building:levels", "configured_default"],
+                "taggedHeightConfidence": "tagged_but_unverified",
+                "defaultConfidence": "visual_default_estimate",
+            },
+            "geometryPolicy": {
+                "version": 1,
+                "acquisitionBufferM": 50.0,
+                "minimumClippedAreaM2": 1.0,
+                "coordinateQuantizationM": 0.001,
+                "exteriorWinding": "counter-clockwise in local XZ coordinates",
+                "interiorWinding": "clockwise in local XZ coordinates",
+                "invalidGeometryPolicy": "reject without automatic repair",
+                "duplicatePolicy": (
+                    "prefer relation then stable identity; collapse exact canonical geometry"
+                ),
+                "nearOverlapPolicy": "report; do not merge",
+            },
+            "counts": {"exported_buildings": 1, "relation_area_assembly_failures": 0},
+            "quality": {
+                "rejectedGeometryCount": 0,
+                "candidateGeometryRejectionCount": 0,
+                "rejectedGeometrySamples": [],
+                "relationAreaAssemblyFailures": 0,
+                "unsupportedBuildingRelations": [],
+                "areaGeometryErrorScope": "Synthetic test fixture; no source area errors.",
+                "exactDuplicateConflicts": [],
+                "nearOverlapCount": 0,
+                "nearOverlapSamples": [],
+                "heightMethodCounts": {"estimated_default": 1},
+                "heightClampCounts": {},
+                "taggedHeightsAreUnverified": True,
+            },
             "summary": {
+                "aoiAreaM2": 1000000.0,
                 "buildingFootprintAreaM2": 24.0,
                 "footprintAreaPerAoiKm2": 0.000024,
+                "densityInterpretation": (
+                    "Mapped OSM coverage only; this is not a completeness estimate."
+                ),
+                "minimumHeightM": 8.0,
+                "maximumHeightM": 8.0,
+                "meanHeightM": 8.0,
             },
+            "mapComparisonCandidates": [],
         },
     )
 
@@ -59,7 +138,7 @@ def _write_fixtures(tmp_path, monkeypatch):
     source_path.write_bytes(b"test source")
     terrain_path = tmp_path / "terrain"
     terrain_path.mkdir()
-    heightfield = b"\0\0\0\0"
+    heightfield = b"\0\0\0\0" * (501 * 501)
     (terrain_path / "heightfield.f32").write_bytes(heightfield)
     terrain_manifest = {
         "id": "torquay-poc-001",
@@ -71,6 +150,10 @@ def _write_fixtures(tmp_path, monkeypatch):
         "heightfield": {
             "sha256": hashlib.sha256(heightfield).hexdigest(),
             "byteLength": len(heightfield),
+            "path": "heightfield.f32",
+            "columns": 501,
+            "rows": 501,
+            "spacingM": 2.0,
         },
         "aoi": {
             "boundsM": [
@@ -121,6 +204,48 @@ def _write_fixtures(tmp_path, monkeypatch):
     return source_path, source_manifest_path, terrain_path
 
 
+def _dump_json(path: Path, value) -> None:
+    path.write_text(
+        json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8"
+    )
+
+
+def _build_fixture_package(tmp_path, monkeypatch):
+    source_path, source_manifest_path, terrain_path = _write_fixtures(tmp_path, monkeypatch)
+    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
+    package = tmp_path / "package"
+    build_building_package(
+        _fixture_result(),
+        aoi,
+        source_path,
+        source_manifest_path,
+        terrain_path,
+        REPO_ROOT / "docs/aoi-selection.geojson",
+        package,
+        tmp_path / "qa.json",
+        tmp_path / "preview.png",
+        tmp_path / "intermediate.geojson",
+    )
+    return package, aoi, terrain_path, source_path, source_manifest_path
+
+
+def _refresh_building_package_integrity(package: Path) -> None:
+    manifest = json.loads((package / "manifest.json").read_text(encoding="utf-8"))
+    data = json.loads((package / "buildings.json").read_text(encoding="utf-8"))
+    content = json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False).encode() + b"\n"
+    (package / "buildings.json").write_bytes(content)
+    manifest["buildings"]["byteLength"] = len(content)
+    manifest["buildings"]["sha256"] = hashlib.sha256(content).hexdigest()
+    qa = json.loads((package / "qa.json").read_text(encoding="utf-8"))
+    qa["package"]["buildingsByteLength"] = len(content)
+    qa["package"]["buildingsSha256"] = manifest["buildings"]["sha256"]
+    qa_content = json.dumps(qa, indent=2, ensure_ascii=False, allow_nan=False).encode() + b"\n"
+    (package / "qa.json").write_bytes(qa_content)
+    manifest["qaReport"]["byteLength"] = len(qa_content)
+    manifest["qaReport"]["sha256"] = hashlib.sha256(qa_content).hexdigest()
+    _dump_json(package / "manifest.json", manifest)
+
+
 def test_building_package_hashes_actual_payload_and_is_deterministic(tmp_path, monkeypatch):
     source_path, source_manifest_path, terrain_path = _write_fixtures(tmp_path, monkeypatch)
     aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
@@ -146,6 +271,7 @@ def test_building_package_hashes_actual_payload_and_is_deterministic(tmp_path, m
         for path in (
             package / "manifest.json",
             package / "buildings.json",
+            package / "qa.json",
             qa_path,
             preview_path,
             intermediate_path,
@@ -157,6 +283,7 @@ def test_building_package_hashes_actual_payload_and_is_deterministic(tmp_path, m
         for path in (
             package / "manifest.json",
             package / "buildings.json",
+            package / "qa.json",
             qa_path,
             preview_path,
             intermediate_path,
@@ -167,7 +294,14 @@ def test_building_package_hashes_actual_payload_and_is_deterministic(tmp_path, m
         first["manifest"]["aoi"]["boundaryWgs84"]["ring"][0]
         == first["manifest"]["aoi"]["boundaryWgs84"]["ring"][-1]
     )
-    validated = validate_building_package(package)
+    validated = validate_building_package(
+        package,
+        expected_aoi=aoi,
+        expected_aoi_ring=export_module._load_aoi_ring(REPO_ROOT / "docs/aoi-selection.geojson"),
+        terrain_package_path=terrain_path,
+        source_path=source_path,
+        source_manifest_path=source_manifest_path,
+    )
     assert validated["buildingCount"] == 1
     assert (
         first["manifest"]["terrainIdentity"]["heightfieldSha256"]
@@ -193,7 +327,204 @@ def test_building_package_detects_corrupt_payload(tmp_path, monkeypatch):
     with (package / "buildings.json").open("ab") as stream:
         stream.write(b"corrupt")
     with pytest.raises(BuildingExportError, match="byteLength"):
-        validate_building_package(package)
+        validate_building_package(
+            package,
+            expected_aoi=load_aoi_config(REPO_ROOT / "config/aoi.torquay.json"),
+            expected_aoi_ring=export_module._load_aoi_ring(
+                REPO_ROOT / "docs/aoi-selection.geojson"
+            ),
+            terrain_package_path=terrain_path,
+            source_path=source_path,
+            source_manifest_path=source_manifest_path,
+        )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("missing-height-provenance", "heightProvenance"),
+        ("boolean-height", "heightM"),
+        ("null-geometry", "geometry"),
+        ("boolean-height-source-id", "osmId"),
+        ("boolean-geometry-coordinate", "finite JSON number"),
+        ("inconsistent-height-confidence", "method and confidence"),
+        ("unhashable-height-method", "heightMethod"),
+        ("unhashable-parsed-unit", "parsedUnit must be text"),
+        ("unhashable-source-type", "source.objectType"),
+    ],
+)
+def test_validator_rejects_adversarial_feature_copies(tmp_path, monkeypatch, mutation, message):
+    package, aoi, terrain, source, source_manifest = _build_fixture_package(tmp_path, monkeypatch)
+    data = json.loads((package / "buildings.json").read_text(encoding="utf-8"))
+    feature = data["buildings"][0]
+    if mutation == "missing-height-provenance":
+        feature.pop("heightProvenance")
+    elif mutation == "boolean-height":
+        feature["heightM"] = True
+    elif mutation == "null-geometry":
+        feature["geometry"] = None
+    elif mutation == "boolean-height-source-id":
+        feature["source"]["osmId"] = True
+    elif mutation == "boolean-geometry-coordinate":
+        feature["geometry"]["polygons"][0]["exteriorXZ"][0][0] = True
+    elif mutation == "unhashable-height-method":
+        feature["heightMethod"] = []
+    elif mutation == "unhashable-parsed-unit":
+        feature["heightProvenance"]["parsedUnit"] = []
+    elif mutation == "unhashable-source-type":
+        feature["source"]["objectType"] = []
+    else:
+        feature["heightConfidence"] = "estimated_from_tagged_levels"
+    _dump_json(package / "buildings.json", data)
+    _refresh_building_package_integrity(package)
+    with pytest.raises(BuildingExportError, match=message):
+        validate_building_package(
+            package,
+            expected_aoi=aoi,
+            expected_aoi_ring=export_module._load_aoi_ring(
+                REPO_ROOT / "docs/aoi-selection.geojson"
+            ),
+            terrain_package_path=terrain,
+            source_path=source,
+            source_manifest_path=source_manifest,
+        )
+
+
+def test_finite_number_rejects_integer_outside_float_range():
+    with pytest.raises(BuildingExportError, match="finite JSON number"):
+        export_module._finite_number(10**1000, "fixture.number")
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("terrain-origin", "terrain identity"),
+        ("unrelated-ring", "approved GeoJSON ring"),
+        ("aoi-bounds", "approved project AOI"),
+        ("terrain-hash", "terrain identity"),
+        ("boolean-policy-number", "finite JSON number"),
+        ("missing-qa", "qa.json"),
+        ("missing-policy", "policies.geometry.coordinateQuantizationM"),
+        ("missing-coordinate-operation", "coordinateOperation"),
+    ],
+)
+def test_validator_binds_manifest_aoi_terrain_policies_and_qa(
+    tmp_path, monkeypatch, mutation, message
+):
+    package, aoi, terrain, source, source_manifest = _build_fixture_package(tmp_path, monkeypatch)
+    manifest = json.loads((package / "manifest.json").read_text(encoding="utf-8"))
+    if mutation == "terrain-origin":
+        manifest["terrainIdentity"]["origin"]["eastingM"] += 1000
+    elif mutation == "unrelated-ring":
+        manifest["aoi"]["boundaryWgs84"]["ring"] = [
+            [-1.0, 50.0],
+            [-0.9, 50.0],
+            [-0.9, 50.1],
+            [-1.0, 50.1],
+            [-1.0, 50.0],
+        ]
+    elif mutation == "aoi-bounds":
+        manifest["aoi"]["boundsM"][0] += 1000
+    elif mutation == "terrain-hash":
+        manifest["terrainIdentity"]["heightfieldSha256"] = "0" * 64
+    elif mutation == "boolean-policy-number":
+        manifest["policies"]["height"]["defaultHeightM"] = True
+    elif mutation == "missing-qa":
+        manifest["qaReport"]["path"] = "../missing.json"
+    elif mutation == "missing-policy":
+        manifest["policies"]["geometry"].pop("coordinateQuantizationM")
+    else:
+        manifest.pop("coordinateOperation")
+    _dump_json(package / "manifest.json", manifest)
+    with pytest.raises(BuildingExportError, match=message):
+        validate_building_package(
+            package,
+            expected_aoi=aoi,
+            expected_aoi_ring=export_module._load_aoi_ring(
+                REPO_ROOT / "docs/aoi-selection.geojson"
+            ),
+            terrain_package_path=terrain,
+            source_path=source,
+            source_manifest_path=source_manifest,
+        )
+
+
+def test_package_validator_detects_modified_local_terrain_origin(tmp_path, monkeypatch):
+    source_path, source_manifest_path, terrain_path = _write_fixtures(tmp_path, monkeypatch)
+    terrain_manifest_path = terrain_path / "manifest.json"
+    terrain_manifest = json.loads(terrain_manifest_path.read_text(encoding="utf-8"))
+    terrain_manifest["origin"]["eastingM"] += 1000
+    _dump_json(terrain_manifest_path, terrain_manifest)
+    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
+    with pytest.raises(BuildingExportError, match="origin eastingM"):
+        build_building_package(
+            _fixture_result(),
+            aoi,
+            source_path,
+            source_manifest_path,
+            terrain_path,
+            REPO_ROOT / "docs/aoi-selection.geojson",
+            tmp_path / "package",
+            tmp_path / "qa.json",
+            tmp_path / "preview.png",
+            tmp_path / "intermediate.geojson",
+        )
+
+
+def test_package_validator_detects_corrupted_package_qa(tmp_path, monkeypatch):
+    package, aoi, terrain, source, source_manifest = _build_fixture_package(tmp_path, monkeypatch)
+    with (package / "qa.json").open("ab") as stream:
+        stream.write(b"corrupt")
+    with pytest.raises(BuildingExportError, match="qa.json byteLength"):
+        validate_building_package(
+            package,
+            expected_aoi=aoi,
+            expected_aoi_ring=export_module._load_aoi_ring(
+                REPO_ROOT / "docs/aoi-selection.geojson"
+            ),
+            terrain_package_path=terrain,
+            source_path=source,
+            source_manifest_path=source_manifest,
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["missing-height-provenance", "null-geometry", "boolean-height", "boolean-policy-number"],
+)
+def test_build_side_rejects_mutated_feature_before_publishing(tmp_path, monkeypatch, mutation):
+    source_path, source_manifest_path, terrain_path = _write_fixtures(tmp_path, monkeypatch)
+    result = _fixture_result()
+    result = copy.deepcopy(result)
+    feature = result.buildings[0]
+    if mutation == "missing-height-provenance":
+        feature.pop("heightProvenance")
+        expected_message = "heightProvenance"
+    elif mutation == "null-geometry":
+        feature["geometry"] = None
+        expected_message = "geometry"
+    elif mutation == "boolean-policy-number":
+        result.qa["heightPolicy"]["defaultHeightM"] = True
+        expected_message = "finite JSON number"
+    else:
+        feature["heightM"] = True
+        expected_message = "heightM"
+    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
+    package = tmp_path / "package"
+    with pytest.raises(BuildingExportError, match=expected_message):
+        build_building_package(
+            result,
+            aoi,
+            source_path,
+            source_manifest_path,
+            terrain_path,
+            REPO_ROOT / "docs/aoi-selection.geojson",
+            package,
+            tmp_path / "qa.json",
+            tmp_path / "preview.png",
+            tmp_path / "intermediate.geojson",
+        )
+    assert not package.exists()
 
 
 def test_atomic_publish_rolls_back_when_a_later_replace_fails(tmp_path, monkeypatch):

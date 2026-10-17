@@ -31,9 +31,19 @@ class BuildingConfig:
     height_policy: HeightPolicy = HeightPolicy()
 
     def validate(self) -> None:
-        if not math.isfinite(self.acquisition_buffer_m) or self.acquisition_buffer_m < 0:
+        if (
+            isinstance(self.acquisition_buffer_m, bool)
+            or not isinstance(self.acquisition_buffer_m, (int, float))
+            or not math.isfinite(self.acquisition_buffer_m)
+            or self.acquisition_buffer_m < 0
+        ):
             raise BuildingImportError("acquisition_buffer_m must be finite and nonnegative")
-        if not math.isfinite(self.minimum_clipped_area_m2) or self.minimum_clipped_area_m2 < 0:
+        if (
+            isinstance(self.minimum_clipped_area_m2, bool)
+            or not isinstance(self.minimum_clipped_area_m2, (int, float))
+            or not math.isfinite(self.minimum_clipped_area_m2)
+            or self.minimum_clipped_area_m2 < 0
+        ):
             raise BuildingImportError("minimum_clipped_area_m2 must be finite and nonnegative")
         try:
             self.height_policy.validate()
@@ -185,6 +195,36 @@ class _AreaHandler(osmium.SimpleHandler):
                 "geometryWgs84": geometry,
             }
         )
+
+
+class _RelationMemberBoundsHandler(osmium.SimpleHandler):
+    """Find locations for the small set of ways referenced by skipped relations."""
+
+    def __init__(self, wanted_way_ids: set[int]) -> None:
+        super().__init__()
+        self.wanted_way_ids = wanted_way_ids
+        self.bounds: dict[int, dict[str, Any]] = {}
+
+    def way(self, way: Any) -> None:
+        way_id = int(way.id)
+        if way_id not in self.wanted_way_ids:
+            return
+        points: list[tuple[float, float]] = []
+        for node in way.nodes:
+            location = node.location
+            if location.valid():
+                points.append((float(location.lon), float(location.lat)))
+        if not points:
+            return
+        self.bounds[way_id] = {
+            "nodeCountWithLocation": len(points),
+            "boundsWgs84": [
+                min(point[0] for point in points),
+                min(point[1] for point in points),
+                max(point[0] for point in points),
+                max(point[1] for point in points),
+            ],
+        }
 
 
 def _ring_is_closed_and_distinct(coordinates: Any) -> bool:
@@ -355,17 +395,17 @@ def _map_comparison_candidates(
         )
         point = geometry.representative_point()
         x = float(point.x)
-        northing = float(-point.y)
-        quadrant = ("N" if northing >= 0 else "S") + ("W" if x < 0 else "E")
+        local_z = float(point.y)
+        quadrant = ("N" if local_z < 0 else "S") + ("W" if x < 0 else "E")
         area = float(building["footprintAreaM2"])
         current = best.get(quadrant)
         if current is None or area > current[0]:
-            best[quadrant] = (area, building, x, northing)
+            best[quadrant] = (area, building, x, local_z)
     candidates = []
-    for quadrant, (area, building, x, northing) in sorted(best.items()):
+    for quadrant, (area, building, x, local_z) in sorted(best.items()):
         longitude, latitude = transformer.transform(
             center_easting_m + x,
-            center_northing_m - northing,
+            center_northing_m - local_z,
         )
         candidates.append(
             {
@@ -413,6 +453,57 @@ def import_osm_buildings(
             f"PyOsmium area assembly failed for '{source_path.name}': {exc}"
         ) from exc
 
+    area_relation_types = {"multipolygon", "boundary"}
+    unsupported_relation_ids = {
+        relation_id
+        for relation_id, relation in handler.candidate_relations.items()
+        if relation["tags"].get("type") not in area_relation_types
+    }
+    unsupported_member_way_ids = {
+        int(member["ref"])
+        for relation_id in unsupported_relation_ids
+        for member in handler.candidate_relations[relation_id]["members"]
+        if member["type"] == "w"
+    }
+    member_bounds: dict[int, dict[str, Any]] = {}
+    member_bounds_error: str | None = None
+    if unsupported_member_way_ids:
+        try:
+            member_handler = _RelationMemberBoundsHandler(unsupported_member_way_ids)
+            member_handler.apply_file(str(source_path), locations=True)
+            member_bounds = member_handler.bounds
+        except Exception as exc:
+            member_bounds_error = f"member way locations unavailable: {exc}"
+
+    unsupported_relation_records: list[dict[str, Any]] = []
+    for relation_id in sorted(unsupported_relation_ids):
+        relation = handler.candidate_relations[relation_id]
+        way_evidence = []
+        for member in relation["members"]:
+            if member["type"] != "w":
+                continue
+            evidence = member_bounds.get(int(member["ref"]))
+            record = {"wayId": int(member["ref"]), "role": member["role"]}
+            if evidence is not None:
+                bounds = evidence["boundsWgs84"]
+                record.update(evidence)
+                record["intersectsAcquisitionEnvelope"] = box(*bounds).intersects(filter_bbox_wgs84)
+            way_evidence.append(record)
+        unsupported_relation_records.append(
+            {
+                "osmRelationId": relation_id,
+                "relationType": relation["tags"].get("type"),
+                "reason": (
+                    "tagged building relation type is not an area-assembly type; "
+                    "it was intentionally excluded from multipolygon area-failure counts"
+                ),
+                "memberCount": len(relation["members"]),
+                "memberWayEvidence": way_evidence,
+                "locationEvidenceNote": member_bounds_error
+                or "Available member way bounds are evidence only, not a building footprint.",
+            }
+        )
+
     accepted_relations = {
         area["sourceId"]
         for area in handler.areas
@@ -438,8 +529,14 @@ def import_osm_buildings(
             "invalid_geometry": 0,
             "below_minimum_area": 0,
             "relation_area_assembly_failures": len(
-                set(handler.candidate_relations).difference(handler.assembled_building_relations)
+                {
+                    relation_id
+                    for relation_id, relation in handler.candidate_relations.items()
+                    if relation["tags"].get("type") in area_relation_types
+                    and relation_id not in handler.assembled_building_relations
+                }
             ),
+            "building_relations_skipped_non_area_type": len(unsupported_relation_ids),
         }
     )
     rejected: list[dict[str, Any]] = list(handler.geometry_errors)
@@ -623,12 +720,40 @@ def import_osm_buildings(
         },
         "acquisitionBufferM": config.acquisition_buffer_m,
         "minimumClippedAreaM2": config.minimum_clipped_area_m2,
+        "heightPolicy": {
+            "version": 1,
+            "levelsToMetres": config.height_policy.levels_to_metres,
+            "defaultHeightM": config.height_policy.default_height_m,
+            "minimumHeightM": config.height_policy.minimum_height_m,
+            "maximumHeightM": config.height_policy.maximum_height_m,
+            "precedence": ["height", "building:levels", "configured_default"],
+            "taggedHeightConfidence": "tagged_but_unverified",
+            "defaultConfidence": "visual_default_estimate",
+        },
+        "geometryPolicy": {
+            "version": 1,
+            "acquisitionBufferM": config.acquisition_buffer_m,
+            "minimumClippedAreaM2": config.minimum_clipped_area_m2,
+            "coordinateQuantizationM": 0.001,
+            "exteriorWinding": "counter-clockwise in local XZ coordinates",
+            "interiorWinding": "clockwise in local XZ coordinates",
+            "invalidGeometryPolicy": "reject without automatic repair",
+            "duplicatePolicy": (
+                "prefer relation then stable identity; collapse exact canonical geometry"
+            ),
+            "nearOverlapPolicy": "report; do not merge",
+        },
         "counts": counts,
         "quality": {
             "rejectedGeometryCount": len(rejected),
             "candidateGeometryRejectionCount": counts["invalid_geometry"],
             "rejectedGeometrySamples": rejected[:200],
             "relationAreaAssemblyFailures": counts["relation_area_assembly_failures"],
+            "unsupportedBuildingRelations": unsupported_relation_records,
+            "unsupportedBuildingRelationLocationEvidence": (
+                member_bounds_error
+                or "Member way bounds are reported when available; they do not assert a footprint."
+            ),
             "areaGeometryErrorScope": (
                 "libosmium WKB creation errors are observed across the entire Devon source; "
                 "when no geometry is returned their AOI location cannot be established."

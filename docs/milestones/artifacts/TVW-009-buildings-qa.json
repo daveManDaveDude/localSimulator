@@ -76,6 +76,31 @@
   },
   "acquisitionBufferM": 50.0,
   "minimumClippedAreaM2": 1.0,
+  "heightPolicy": {
+    "version": 1,
+    "levelsToMetres": 3.0,
+    "defaultHeightM": 8.0,
+    "minimumHeightM": 1.0,
+    "maximumHeightM": 150.0,
+    "precedence": [
+      "height",
+      "building:levels",
+      "configured_default"
+    ],
+    "taggedHeightConfidence": "tagged_but_unverified",
+    "defaultConfidence": "visual_default_estimate"
+  },
+  "geometryPolicy": {
+    "version": 1,
+    "acquisitionBufferM": 50.0,
+    "minimumClippedAreaM2": 1.0,
+    "coordinateQuantizationM": 0.001,
+    "exteriorWinding": "counter-clockwise in local XZ coordinates",
+    "interiorWinding": "clockwise in local XZ coordinates",
+    "invalidGeometryPolicy": "reject without automatic repair",
+    "duplicatePolicy": "prefer relation then stable identity; collapse exact canonical geometry",
+    "nearOverlapPolicy": "report; do not merge"
+  },
   "counts": {
     "building_ways_tagged": 375424,
     "building_no_ways": 17,
@@ -97,7 +122,8 @@
     "outside_aoi": 192,
     "invalid_geometry": 0,
     "below_minimum_area": 3,
-    "relation_area_assembly_failures": 5,
+    "relation_area_assembly_failures": 0,
+    "building_relations_skipped_non_area_type": 5,
     "clipped_building_features": 1000,
     "exported_buildings": 1000,
     "exact_geometry_duplicates_suppressed": 0,
@@ -108,7 +134,223 @@
     "rejectedGeometryCount": 0,
     "candidateGeometryRejectionCount": 0,
     "rejectedGeometrySamples": [],
-    "relationAreaAssemblyFailures": 5,
+    "relationAreaAssemblyFailures": 0,
+    "unsupportedBuildingRelations": [
+      {
+        "osmRelationId": 7660489,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 4,
+        "memberWayEvidence": [
+          {
+            "wayId": 533264603,
+            "role": "part",
+            "nodeCountWithLocation": 12,
+            "boundsWgs84": [
+              -3.3974543,
+              50.7549978,
+              -3.3967888,
+              50.7552908
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 533264604,
+            "role": "part",
+            "nodeCountWithLocation": 19,
+            "boundsWgs84": [
+              -3.3984237,
+              50.7550501,
+              -3.3972173,
+              50.7556855
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 533264605,
+            "role": "part",
+            "nodeCountWithLocation": 22,
+            "boundsWgs84": [
+              -3.399067,
+              50.7552542,
+              -3.3983049,
+              50.7557943
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 369356671,
+            "role": "outline",
+            "nodeCountWithLocation": 48,
+            "boundsWgs84": [
+              -3.399067,
+              50.754983,
+              -3.3967888,
+              50.7557943
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 7726123,
+        "relationType": "site",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 2,
+        "memberWayEvidence": [
+          {
+            "wayId": 539895459,
+            "role": "outer",
+            "nodeCountWithLocation": 60,
+            "boundsWgs84": [
+              -3.8621984,
+              50.3859435,
+              -3.860814,
+              50.386615
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 241248122,
+            "role": "inner",
+            "nodeCountWithLocation": 28,
+            "boundsWgs84": [
+              -3.8620274,
+              50.3863267,
+              -3.8613568,
+              50.3865248
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 9226944,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 3,
+        "memberWayEvidence": [
+          {
+            "wayId": 664045176,
+            "role": "outline",
+            "nodeCountWithLocation": 11,
+            "boundsWgs84": [
+              -3.4532304,
+              50.7999865,
+              -3.4530665,
+              50.8000998
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 664044780,
+            "role": "part",
+            "nodeCountWithLocation": 12,
+            "boundsWgs84": [
+              -3.4532141,
+              50.8000423,
+              -3.4531912,
+              50.8000568
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 664045163,
+            "role": "part",
+            "nodeCountWithLocation": 9,
+            "boundsWgs84": [
+              -3.4532304,
+              50.8000324,
+              -3.4531763,
+              50.8000651
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 9233555,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 2,
+        "memberWayEvidence": [
+          {
+            "wayId": 664541226,
+            "role": "part",
+            "nodeCountWithLocation": 6,
+            "boundsWgs84": [
+              -3.4400095,
+              50.7608042,
+              -3.4398948,
+              50.7608963
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 517385877,
+            "role": "outline",
+            "nodeCountWithLocation": 7,
+            "boundsWgs84": [
+              -3.4400242,
+              50.7607973,
+              -3.4398003,
+              50.7609652
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 9301051,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 3,
+        "memberWayEvidence": [
+          {
+            "wayId": 668590612,
+            "role": "outline",
+            "nodeCountWithLocation": 15,
+            "boundsWgs84": [
+              -3.4618147,
+              50.74283,
+              -3.4613875,
+              50.7430408
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 301573764,
+            "role": "part",
+            "nodeCountWithLocation": 9,
+            "boundsWgs84": [
+              -3.4616058,
+              50.74283,
+              -3.4613875,
+              50.7430408
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 301573763,
+            "role": "part",
+            "nodeCountWithLocation": 9,
+            "boundsWgs84": [
+              -3.4618147,
+              50.742858,
+              -3.4615933,
+              50.7430276
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      }
+    ],
+    "unsupportedBuildingRelationLocationEvidence": "Member way bounds are reported when available; they do not assert a footprint.",
     "areaGeometryErrorScope": "libosmium WKB creation errors are observed across the entire Devon source; when no geometry is returned their AOI location cannot be established.",
     "exactDuplicateConflicts": [],
     "nearOverlapCount": 0,
@@ -126,8 +368,8 @@
       "osmFeatureId": "osm:way:208552436",
       "footprintAreaM2": 973.281,
       "representativePointWgs84LonLat": [
-        -3.5330495665997335,
-        50.4748302988108
+        -3.5332476398607215,
+        50.480951244856804
       ],
       "placementCheckOnly": true,
       "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
@@ -137,8 +379,8 @@
       "osmFeatureId": "osm:way:193285347",
       "footprintAreaM2": 4428.307,
       "representativePointWgs84LonLat": [
-        -3.542737768342496,
-        50.47504990288169
+        -3.54291445782617,
+        50.48047580317829
       ],
       "placementCheckOnly": true,
       "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
@@ -148,8 +390,8 @@
       "osmFeatureId": "osm:way:208877863",
       "footprintAreaM2": 1077.591,
       "representativePointWgs84LonLat": [
-        -3.5350654372252652,
-        50.47895758584844
+        -3.534994701123456,
+        50.476774346206405
       ],
       "placementCheckOnly": true,
       "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
@@ -159,8 +401,8 @@
       "osmFeatureId": "osm:way:181620525",
       "footprintAreaM2": 2751.274,
       "representativePointWgs84LonLat": [
-        -3.541941452022222,
-        50.48042345693848
+        -3.5417691183482414,
+        50.475127986993755
       ],
       "placementCheckOnly": true,
       "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
