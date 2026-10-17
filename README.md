@@ -2,14 +2,14 @@
 
 A Windows-friendly browser proof of concept for a future real-data view of Torquay. The default viewer loads a small, checked-in synthetic Float32 heightfield and renders its terrain mesh, hill, ridge, grid and north cue. The prior M0 analytic scene remains available at `/?world=m0`.
 
-Every browser world is fictional and marked **SYNTHETIC**. The heightfield, hill, ridge, analytic slope, blocks, dimensions and elevations are invented examples; they are not Torquay measurements. Both local fixtures use zero-valued local origins and contain no geographic coordinates. No EA DTM, OSM/OS extract, real roads or other geographic dataset is loaded into the browser. The offline Python tool records TQ1 4HN as a postcode-centroid anchor for the user-approved 1,000 m candidate AOI revision; coverage remains unchecked.
+Every browser world is fictional and marked **SYNTHETIC**. The heightfield, hill, ridge, analytic slope, blocks, dimensions and elevations are invented examples; they are not Torquay measurements. Both local fixtures use zero-valued local origins and contain no geographic coordinates. The browser does not load EA DTM, OSM/OS extracts, real roads or other geographic data. Separately, the offline Python pipeline has inspected the EA DTM tiles for the candidate AOI; the EA cell-coverage check passed, while overall AOI coverage remains pending because OSM/OS feature counts have not been checked.
 
 ## Requirements
 
 - Windows 11 with PowerShell
 - Node.js 22.13 or later within the 22.x line, 24.x, or 26.x and later
 - npm, included with Node.js
-- Python 3.12+ for the offline AOI CLI (TVW-006 tested with Python 3.13.7)
+- Python 3.12+ for the offline AOI and EA raster tools (Windows validation used Python 3.13.7)
 - A recent desktop browser with WebGL support
 
 ## Start locally
@@ -49,9 +49,9 @@ npm run test:e2e     # Run real-browser M0 and M1 smoke/navigation tests
 
 The generator writes the original 3 × 3 loader fixture plus a separate 25 × 19, 2 m-spaced terrain demo. The latter contains a fictional base slope, Gaussian hill and narrow ridge, with little-endian Float32 samples and a SHA-256 in its manifest. `docs/asset-contract.md` documents the manifest, local-path and sampling contracts. The loader validates the manifest and binary before the viewer creates geometry; it does not import geographic data.
 
-## AOI candidate tooling
+## AOI and EA DTM inspection
 
-The Python pipeline is separate from the browser and uses no online grid downloads. The 2026-10-17 user-approved revision derives a 1,000 m × 1,000 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. It keeps the previously verified WGS84 and BNG centre unchanged. The anchor is a postcode centroid, not a property or survey point. The candidate remains `selected_pending_coverage`; EA DTM coverage and local OSM/OS feature density have not been checked, and this is not a frozen AOI.
+The Python pipeline is separate from the browser and uses no online transformation-grid downloads. The 2026-10-17 user-approved revision derives a 1,000 m × 1,000 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. It keeps the previously verified WGS84 and BNG centre unchanged. The anchor is a postcode centroid, not a property or survey point. The candidate remains `selected_pending_coverage`; OSM/OS building and road counts have not been checked, so the AOI is not frozen.
 
 Create the isolated Python environment in PowerShell:
 
@@ -60,7 +60,7 @@ py -3.13 -m venv pipeline\.venv
 pipeline\.venv\Scripts\python.exe -m pip install -r pipeline\requirements.txt
 ```
 
-Validate the source config and regenerate the projected selection, QA GeoJSON, and report from the repository root:
+Install the isolated, pinned Python dependencies and validate the source config or regenerate the projected selection, QA GeoJSON, and report from the repository root:
 
 ```powershell
 Push-Location pipeline
@@ -74,6 +74,23 @@ Pop-Location
 
 `config/aoi.torquay.json` is the editable input. Changing only its anchor coordinates and rerunning `select-aoi` refreshes the projected centre/bounds there and regenerates `docs/aoi-selection.json`, `docs/aoi-selection.geojson`, and `docs/aoi-selection.md`. Outputs are staged and each destination is atomically replaced. The GeoJSON uses RFC 7946 longitude/latitude coordinates, contains a closed counter-clockwise polygon and the anchor point, and has no legacy `crs` member. The transform operation, reported accuracy, listed grid availability and network-grid state are included in the machine-readable report. `docs/aoi-selection.md` records the anchor/map provenance and the still-pending coverage check.
 
+### TVW-007 EA DTM check
+
+The local inspection used two public Environment Agency LIDAR Composite DTM 1 m (2022 composite) tiles. Their exact portal download links, archive names, byte sizes, SHA-256 digests, extracted TIFF metadata and tile-level XML provenance are recorded in [data/source-manifest.json](data/source-manifest.json). The archives and extracted files belong under ignored `data/raw/ea_dtm/`; the tracked manifest does not contain raster data. Follow [docs/data-sources.md](docs/data-sources.md) to restore the exact files on a clean clone.
+
+From PowerShell, after restoring the source files:
+
+```powershell
+Push-Location pipeline
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-sources
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli preview-terrain
+Pop-Location
+```
+
+`inspect-sources` verifies archive and raster hashes/metadata, then samples the source pixel containing each AOI-aligned 1 m cell center. It does not interpolate or fill missing cells. The measured report is `docs/milestones/artifacts/TVW-007-coverage.json`; its current result is 1,000,000 valid cells out of 1,000,000, no uncovered, masked, NoData or nonfinite cells, and an EA DTM-only pass against the 1% threshold. The sample range is 29.529–98.171 m; the configured center sample is 47.620 m. The candidate `coverage_status` remains `not_checked` until other planned local sources, including OSM/OS features, are inspected.
+
+`preview-terrain` writes an actual north-up PNG from those measured samples at `docs/milestones/screenshots/TVW-007-ea-dtm-preview.png`. It shows the exact AOI border, BNG metre axes, 250 m scale bar, centre sample, measured elevation colorbar and Environment Agency attribution. This raster preview is a separate Python QA artifact; the browser continues to load synthetic fixtures only.
+
 Playwright's install command downloads a local Chromium build and requires internet access. After installation, the browser tests use local files. The persistent Chromium suite covers both the retained M0 viewer and loaded terrain, pointer lock and movement, terrain grid and wireframe controls, ground-height telemetry, error retry/return, resize, Escape release, and held-key cleanup. Vitest covers movement, manifest validation, binary decoding/loading, terrain grid/sampling, and Three.js mesh geometry.
 
 ## Project documents
@@ -85,10 +102,13 @@ Playwright's install command downloads a local Chromium build and requires inter
 - `docs/milestones/TVW-004.md` records the synthetic manifest, binary fixture and loader evidence.
 - `docs/milestones/M1.md` records TVW-005 terrain and browser evidence.
 - `docs/milestones/TVW-006.md` records the candidate AOI calculation, CLI and verification.
+- `docs/milestones/TVW-007.md` records EA DTM acquisition, exact cell coverage and preview evidence.
+- `docs/data-sources.md` documents publisher provenance, local source-file restoration and the current inspection result.
+- `data/source-manifest.json` records actual source URLs, archive checksums, raster metadata, licence and attribution.
 - `docs/milestones/screenshots/TVW-006-postcode-context.png` is the dated, attributed OSM anchor-context screenshot.
 - `docs/milestones/screenshots/TVW-006-aoi-boundary.png` preserves the original 500 m candidate square over an attributed OSM map as historical evidence.
 - `docs/milestones/screenshots/TVW-006-aoi-boundary-1km.png` shows the user-approved 1,000 m candidate square over an attributed OSM map.
 - `config/aoi.torquay.json` is the editable candidate anchor and size; generated bounds and provenance are in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 - `docs/asset-contract.md` describes synthetic fixture provenance, coordinates, triangulation and sampling semantics.
 
-The original plan remains preserved unchanged at `docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md`; the canonical copy records the verified anchor and user-approved 1,000 m pending candidate square. Coverage inspection, data availability and any final frozen AOI remain M2 work for TVW-007 after independent review of this size revision.
+The original plan remains preserved unchanged at `docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md`; the canonical copy records the verified anchor and user-approved 1,000 m pending candidate square. EA DTM cell coverage has been measured and passes its 1% threshold. OSM/OS building and road counts remain M2 work, so the candidate remains pending and is not coverage-approved or frozen.

@@ -76,7 +76,10 @@ def generate_selection(config: AoiConfig) -> tuple[dict[str, Any], dict[str, Any
         "name": config.name,
         "selection_status": config.selection_status,
         "coverage_status": config.coverage_status,
-        "coverage_note": "EA DTM and OSM/OS feature coverage have not been checked in TVW-006.",
+        "coverage_note": (
+            "The EA DTM 1 m cell-coverage check in TVW-007 passed its 1% missing threshold. "
+            "OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending."
+        ),
         "anchor": anchor,
         "source_crs": "EPSG:4326",
         "target_crs": config.crs,
@@ -246,8 +249,9 @@ def render_selection_markdown(selection: dict[str, Any]) -> str:
         (
             "This link is generated from the configured WGS84 anchor and centres OpenStreetMap "
             "on the current candidate. It is a visual map-context link only; regenerated reports "
-            "make no fixed road or landmark assertions. EA DTM coverage, OSM/OS feature counts and "
-            "local data availability have not been checked; those remain TVW-007 work."
+            "make no fixed road or landmark assertions. The separate EA DTM check passed its "
+            "1% missing-cell threshold; OSM/OS feature counts and overall AOI coverage remain "
+            "unchecked and pending."
         ),
         "",
         (

@@ -1,0 +1,161 @@
+{
+  "format_version": 1,
+  "product": {
+    "name": "LIDAR Composite DTM 1 m (2022)",
+    "publisher": "Environment Agency",
+    "publisher_dataset_url": "https://www.data.gov.uk/dataset/01b3ee39-da3f-47b6-83da-dc98e73a461f/lidar-composite-dtm-2022-1m",
+    "survey_portal_url": "https://environment.data.gov.uk/survey",
+    "catalogue_vintage": "2000-06-06 through 2022-04-02 (publisher-wide catalogue dates)",
+    "tile_composite_vintage": "2003-02-14 through 2022-05-05 (tile XML metadata)",
+    "licence": "Open Government Licence v3.0",
+    "attribution": "Environment Agency copyright and/or database right 2022. All rights reserved.",
+    "metadata_note": "The TIFF XML useLimit requires 2022 attribution; an XML idCredit field says 2020. The explicit reuse instruction is followed and the conflicting field is retained as a metadata inconsistency."
+  },
+  "acquisition": {
+    "download_date": "2026-10-17",
+    "method": "Public Environment Agency survey portal map search using the reviewed AOI area; each tile endpoint returned the corresponding ZIP archive.",
+    "aoi_selection_bounds_epsg27700_m": [
+      290608.9018176432,
+      64853.48350844931,
+      291608.9018176432,
+      65853.48350844931
+    ],
+    "request_evidence": [
+      "https://environment.data.gov.uk/tiles/collections/survey/lidar_composite_dtm/2022/1/SX9065",
+      "https://environment.data.gov.uk/tiles/collections/survey/lidar_composite_dtm/2022/1/SX9060"
+    ],
+    "source_storage": "data/raw/ea_dtm/ is ignored by Git; archives and extracted members are not committed."
+  },
+  "aoi": {
+    "id": "torquay-poc-001",
+    "crs": "EPSG:27700",
+    "bounds_m_west_south_east_north": [
+      290608.9018176432,
+      64853.48350844931,
+      291608.9018176432,
+      65853.48350844931
+    ],
+    "width_m": 1000,
+    "height_m": 1000
+  },
+  "raster_contract": {
+    "horizontal_crs": "EPSG:27700",
+    "pixel_size_m": 1,
+    "encoding": "single-band float32 GeoTIFF",
+    "vertical_reference": "Ordnance Survey Newlyn; XML metadata names OSTN 15 and OSGM 15 transformation models. This is a publisher/tile metadata claim, not inferred from the horizontal CRS.",
+    "nodata_value": -3.4028234663852886e+38,
+    "analysis_rule": "Use the source pixel containing each AOI analysis-cell center; no interpolation, extrapolation, NoData filling, or reprojection."
+  },
+  "sources": [
+    {
+      "tile_name": "SX96nw",
+      "download_date": "2026-10-17",
+      "download_url": "https://environment.data.gov.uk/tiles/collections/survey/lidar_composite_dtm/2022/1/SX9065",
+      "portal_response": {
+        "http_status": 200,
+        "content_length_bytes": 68662575
+      },
+      "archive_filename": "lidar_composite_dtm-2022-1-SX96nw.zip",
+      "raster_relative_path": "SX96nw/SX96nw_DTM_1m.tif",
+      "archive": {
+        "size_bytes": 68662575,
+        "sha256": "22ac2c453ea79ca050a5c1b5a382ba1409a1f9f2c795ab274e6b78fffb4aecf6"
+      },
+      "archive_members": [
+        "SX96nw_DTM_1m.tfw",
+        "SX96nw_DTM_1m.tif",
+        "SX96nw_DTM_1m.tif.aux.xml",
+        "SX96nw_DTM_1m.tif.xml",
+        "SX96nw_DTM_1m_Metadata.gpkg"
+      ],
+      "raster": {
+        "size_bytes": 69538064,
+        "sha256": "665441c4022f06044e17b501e6e1fe4bf3a2c25f87a7f2fea91c01c1054ba8e1",
+        "width_pixels": 5000,
+        "height_pixels": 5000,
+        "band_count": 1,
+        "dtype": "float32",
+        "crs": "EPSG:27700",
+        "pixel_interpretation": "Area",
+        "transform": [1, 0, 290000, 0, -1, 70000],
+        "bounds_m": [290000, 65000, 295000, 70000],
+        "resolution_m": [1, 1],
+        "nodata": -3.4028234663852886e+38,
+        "mask_flags": ["nodata"],
+        "block_shape_pixels": [128, 128],
+        "measured_full_tile": {
+          "total_pixels": 25000000,
+          "masked_pixels": 0,
+          "nonfinite_pixels": 0,
+          "minimum_m": -3.4670000076293945,
+          "maximum_m": 180.60400390625
+        }
+      },
+      "metadata_sidecar": {
+        "filename": "SX96nw_DTM_1m.tif.xml",
+        "size_bytes": 20545,
+        "sha256": "4e24fa849e7b2a50a1446122de00fc30c29571248fa8bb0110a7f3283c9fb500",
+        "creation_date": "2022-09-05",
+        "metadata_date": "20220909",
+        "vertical_reference": "Ordnance Survey Newlyn using OSTN 15 and OSGM 15 transformation models",
+        "tile_survey_period": "2003-02-14 through 2022-05-05",
+        "reuse_attribution": "Environment Agency copyright and/or database right 2022. All rights reserved."
+      }
+    },
+    {
+      "tile_name": "SX96sw",
+      "download_date": "2026-10-17",
+      "download_url": "https://environment.data.gov.uk/tiles/collections/survey/lidar_composite_dtm/2022/1/SX9060",
+      "portal_response": {
+        "http_status": 200,
+        "content_length_bytes": 57405975
+      },
+      "archive_filename": "lidar_composite_dtm-2022-1-SX96sw.zip",
+      "raster_relative_path": "SX96sw/SX96sw_DTM_1m.tif",
+      "archive": {
+        "size_bytes": 57405975,
+        "sha256": "46caf90e77dafc3bca95bf7cc0a81bc13601eb9593f7cb9818c25565d9020e6e"
+      },
+      "archive_members": [
+        "SX96sw_DTM_1m.tfw",
+        "SX96sw_DTM_1m.tif",
+        "SX96sw_DTM_1m.tif.aux.xml",
+        "SX96sw_DTM_1m.tif.xml",
+        "SX96sw_DTM_1m_Metadata.gpkg"
+      ],
+      "raster": {
+        "size_bytes": 57969482,
+        "sha256": "8438a544a9f4b4c675d72fd16824d5b75802899e7291edb585e98334da53211f",
+        "width_pixels": 5000,
+        "height_pixels": 5000,
+        "band_count": 1,
+        "dtype": "float32",
+        "crs": "EPSG:27700",
+        "pixel_interpretation": "Area",
+        "transform": [1, 0, 290000, 0, -1, 65000],
+        "bounds_m": [290000, 60000, 295000, 65000],
+        "resolution_m": [1, 1],
+        "nodata": -3.4028234663852886e+38,
+        "mask_flags": ["nodata"],
+        "block_shape_pixels": [128, 128],
+        "measured_full_tile": {
+          "total_pixels": 25000000,
+          "masked_pixels": 0,
+          "nonfinite_pixels": 0,
+          "minimum_m": -2.7070000171661377,
+          "maximum_m": 137.25799560546875
+        }
+      },
+      "metadata_sidecar": {
+        "filename": "SX96sw_DTM_1m.tif.xml",
+        "size_bytes": 20545,
+        "sha256": "6122fd3fe59b6b64b57a0273dc926f29387736ee070886fe353ad7993e658d33",
+        "creation_date": "2022-09-05",
+        "metadata_date": "20220909",
+        "vertical_reference": "Ordnance Survey Newlyn using OSTN 15 and OSGM 15 transformation models",
+        "tile_survey_period": "2003-02-14 through 2022-05-05",
+        "reuse_attribution": "Environment Agency copyright and/or database right 2022. All rights reserved."
+      }
+    }
+  ]
+}

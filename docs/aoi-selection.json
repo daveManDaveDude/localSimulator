@@ -4,7 +4,7 @@
   "name": "TQ1 4HN candidate area of interest",
   "selection_status": "selected_pending_coverage",
   "coverage_status": "not_checked",
-  "coverage_note": "EA DTM and OSM/OS feature coverage have not been checked in TVW-006.",
+  "coverage_note": "The EA DTM 1 m cell-coverage check in TVW-007 passed its 1% missing threshold. OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending.",
   "anchor": {
     "postcode": "TQ1 4HN",
     "coordinates": {

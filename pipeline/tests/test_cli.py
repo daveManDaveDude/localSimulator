@@ -41,6 +41,25 @@ def test_invalid_config_returns_actionable_nonzero_status(tmp_path: Path, capsys
     assert "format_version" in capsys.readouterr().err
 
 
+def test_inspect_sources_reports_missing_manifest(tmp_path: Path, capsys) -> None:
+    result = main(
+        [
+            "inspect-sources",
+            "--config",
+            str(CONFIG),
+            "--manifest",
+            str(tmp_path / "missing-manifest.json"),
+            "--source-dir",
+            str(tmp_path / "raw"),
+            "--report",
+            str(tmp_path / "coverage.json"),
+        ]
+    )
+
+    assert result == 2
+    assert "source manifest is missing" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [

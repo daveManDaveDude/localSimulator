@@ -10,6 +10,7 @@ export default tseslint.config(
       'coverage/**',
       'playwright-report/**',
       'test-results/**',
+      'pipeline/.venv/**',
     ],
   },
   eslint.configs.recommended,

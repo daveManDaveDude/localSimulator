@@ -1,7 +1,7 @@
 # AOI selection candidate
 
 **Status:** `selected_pending_coverage`<br>
-**Coverage:** `not_checked` — EA DTM and OSM/OS feature coverage have not been checked in TVW-006.
+**Coverage:** `not_checked` — The EA DTM 1 m cell-coverage check in TVW-007 passed its 1% missing threshold. OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending.
 
 ## Anchor provenance
 
@@ -31,7 +31,7 @@ PROJ network access was disabled. The tool pins EPSG operation 1314 (OSGB36 to W
 
 ## Map context and limits
 
-This link is generated from the configured WGS84 anchor and centres OpenStreetMap on the current candidate. It is a visual map-context link only; regenerated reports make no fixed road or landmark assertions. EA DTM coverage, OSM/OS feature counts and local data availability have not been checked; those remain TVW-007 work.
+This link is generated from the configured WGS84 anchor and centres OpenStreetMap on the current candidate. It is a visual map-context link only; regenerated reports make no fixed road or landmark assertions. The separate EA DTM check passed its 1% missing-cell threshold; OSM/OS feature counts and overall AOI coverage remain unchecked and pending.
 
 Map: [OpenStreetMap view](https://www.openstreetmap.org/?mlat=50.47785300&mlon=-3.53601300#map=16/50.47785300/-3.53601300). © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 Provider reference: [Postcodes.io API documentation](https://postcodes.io/docs/).
