@@ -23,6 +23,7 @@ from .building_export import (
 )
 from .building_heights import HeightPolicy
 from .building_preview import render_building_preview
+from .building_publish import BuildingPublishError, publish_building_package
 from .building_sources import (
     BuildingSourceError,
     inspect_building_source,
@@ -100,6 +101,7 @@ def _parser() -> argparse.ArgumentParser:
         "import-buildings",
         "validate-buildings",
         "preview-buildings",
+        "publish-buildings",
     ):
         command = commands.add_parser(name)
         command.add_argument(
@@ -109,7 +111,12 @@ def _parser() -> argparse.ArgumentParser:
             "--source-manifest", type=Path, default=Path("../data/source-manifest.json")
         )
         command.add_argument("--source", type=Path)
-        if name in {"import-buildings", "validate-buildings", "preview-buildings"}:
+        if name in {
+            "import-buildings",
+            "validate-buildings",
+            "preview-buildings",
+            "publish-buildings",
+        }:
             command.add_argument(
                 "--aoi-config", type=Path, default=Path("../config/aoi.torquay.json")
             )
@@ -120,7 +127,7 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument(
                 "--aoi-geojson", type=Path, default=Path("../docs/aoi-selection.geojson")
             )
-        elif name in {"validate-buildings", "preview-buildings"}:
+        elif name in {"validate-buildings", "preview-buildings", "publish-buildings"}:
             command.add_argument(
                 "--package", type=Path, default=Path("../data/generated/buildings/torquay-poc-001")
             )
@@ -245,6 +252,27 @@ def _building_command(args: argparse.Namespace) -> int:
             source_path=source_path,
             source_manifest_path=source_manifest_path,
         )
+        print(json.dumps(result, indent=2))
+        return 0
+    if args.command == "publish-buildings":
+        verify_building_source(source_path, source_manifest_path)
+        aoi_config = load_aoi_config(args.aoi_config)
+        selection, _geojson, _markdown = generate_selection(aoi_config)
+        validate_stored_selection(
+            aoi_config,
+            selection["aoi"]["center_easting_m"],
+            selection["aoi"]["center_northing_m"],
+            selection["aoi"]["bbox_m"],
+        )
+        result = publish_building_package(
+            args.package.resolve(),
+            args.terrain_package.resolve(),
+            expected_aoi=aoi_config,
+            expected_aoi_ring=_load_aoi_ring(args.aoi_geojson.resolve()),
+            source_path=source_path,
+            source_manifest_path=source_manifest_path,
+        )
+        print(f"Published byte-identical validated buildings to {result['outputDirectory']}")
         print(json.dumps(result, indent=2))
         return 0
     if args.command == "preview-buildings":
@@ -426,6 +454,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "import-buildings",
             "validate-buildings",
             "preview-buildings",
+            "publish-buildings",
         }:
             return _building_command(args)
         config = load_aoi_config(args.config)
@@ -498,6 +527,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (
         AoiConfigError,
         BuildingExportError,
+        BuildingPublishError,
         BuildingImportError,
         BuildingSourceError,
         TerrainCoverageError,

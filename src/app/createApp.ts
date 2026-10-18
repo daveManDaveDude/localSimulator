@@ -1,18 +1,31 @@
-import { PerspectiveCamera, Scene, Timer, Vector3, WebGLRenderer } from 'three';
+import {
+  Group,
+  PerspectiveCamera,
+  Scene,
+  Timer,
+  Vector3,
+  WebGLRenderer,
+} from 'three';
 import { FreeFlyController } from '../camera/FreeFlyController';
 import type { FlightBounds, Vec3Like } from '../camera/movement';
 import { loadWorld } from './worldLoader';
+import { loadBuildingPackage } from './buildingLoader';
+import type { RealTerrainSceneManifest } from '../geo/sceneSchema';
+import type { TerrainGrid } from '../geo/terrainGrid';
 import { createScene } from '../scene/createScene';
 import {
   createSyntheticWorld,
   terrainHeightAt,
 } from '../scene/createSyntheticWorld';
 import { createHeightfieldWorld } from '../scene/createHeightfieldWorld';
+import { createBuildings } from '../scene/createBuildings';
 import { disposeSceneResources } from '../scene/disposeSceneResources';
 import type { HeightfieldWorld } from '../scene/createHeightfieldWorld';
 
 const TERRAIN_MANIFEST_URL = '/worlds/synthetic-terrain-demo/manifest.json';
 const REAL_TERRAIN_MANIFEST_URL = '/worlds/torquay-poc-001/manifest.json';
+const REAL_BUILDINGS_MANIFEST_URL =
+  '/worlds/torquay-poc-001/buildings/manifest.json';
 
 type GroundSampler = (x: number, z: number) => number | null;
 
@@ -37,6 +50,8 @@ interface ViewerWorld {
   rows?: number;
   terrain?: HeightfieldWorld['terrain'];
   gridAndCompass?: HeightfieldWorld['gridAndCompass'];
+  terrainGrid?: TerrainGrid;
+  realManifest?: RealTerrainSceneManifest;
 }
 
 export interface AppHandle {
@@ -49,6 +64,9 @@ export function createApp(container: HTMLElement): AppHandle {
   );
   const m0Mode = requestedWorld === 'm0';
   const initialRealMode = requestedWorld === 'torquay-poc-001';
+  const initialBuildingsMode =
+    initialRealMode &&
+    new URLSearchParams(window.location.search).get('buildings') === '1';
   container.innerHTML = `
     <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-load-state="loading" data-renderer-ready="false">
       <canvas class="viewer-canvas" aria-label="Terrain free-fly world"></canvas>
@@ -60,6 +78,7 @@ export function createApp(container: HTMLElement): AppHandle {
         <nav class="world-selector" aria-label="Choose a local world">
           <button type="button" data-testid="world-select-synthetic" aria-pressed="${!m0Mode && !initialRealMode}">Synthetic terrain</button>
           <button type="button" data-testid="world-select-real" aria-pressed="${initialRealMode}">EA terrain</button>
+          <a href="?world=torquay-poc-001&amp;buildings=1" data-testid="world-select-buildings">EA terrain + OSM buildings</a>
           <a href="?world=m0" data-testid="world-select-m0">M0 synthetic demo</a>
         </nav>
         <p class="terrain-loading" data-testid="terrain-loading" role="status"${m0Mode ? ' hidden' : ''}>${initialRealMode ? 'Loading and validating the local Environment Agency terrain package…' : 'Loading and validating the synthetic terrain package…'}</p>
@@ -101,13 +120,27 @@ export function createApp(container: HTMLElement): AppHandle {
             <button type="button" data-testid="wireframe-toggle" aria-pressed="false">Wireframe: off</button>
           </div>
         </section>
+        <section class="building-controls" data-testid="building-controls" aria-label="Optional OSM building layer" hidden>
+          <div class="building-actions">
+            <button type="button" data-testid="buildings-toggle" aria-pressed="false">Load OSM buildings</button>
+            <button type="button" data-testid="buildings-retry" hidden>Retry building load</button>
+            <button type="button" data-testid="buildings-terrain-only" hidden>Continue with terrain only</button>
+          </div>
+          <p data-testid="building-status" role="status" aria-live="polite" data-state="off" data-building-count="0" data-component-count="0">Optional local OSM layer is off.</p>
+          <div class="building-error" data-testid="building-error" role="alert" hidden>
+            <p data-testid="building-error-message"></p>
+          </div>
+          <p class="building-policy" data-testid="building-policy">Footprints use level roofs at the highest sampled terrain under each feature plus its tagged or estimated height. This is a visual placement convention, not a verified roof or foundation height; wall bases are buried 0.02 m to avoid seams. Tagged OSM heights are unverified; remaining values are estimates.</p>
+          <p class="building-attribution" data-testid="building-attribution">© OpenStreetMap contributors · extract provided by Geofabrik GmbH · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL 1.0 attribution and licence</a></p>
+          <p class="building-completeness">Mapped counts do not establish completeness. Road and remaining feature checks are outstanding; the candidate AOI remains pending.</p>
+        </section>
         <aside id="controls-help" class="controls-help" aria-labelledby="controls-title" data-testid="controls-help" hidden>
           <h2 id="controls-title">IN-FLIGHT CONTROLS</h2>
           <p><kbd>Mouse</kbd><span>Look around</span></p>
           <p><kbd>W</kbd><kbd>S</kbd><span>Fly along the camera direction</span></p>
           <p><kbd>A</kbd><kbd>D</kbd><span>Strafe left / right</span></p>
           <p><kbd>Space</kbd><kbd>Ctrl</kbd><span>Rise / descend</span></p>
-          <p><kbd>Shift</kbd><span>Move faster</span><kbd>R</kbd><span>Reset view</span><kbd>Esc</kbd><span>Release pointer</span></p>
+          <p><kbd>Shift</kbd><span>Move faster</span><kbd>R</kbd><span>Reset view</span><kbd>H</kbd><span>Toggle help</span><kbd>Esc</kbd><span>Release pointer</span></p>
           <p class="terrain-key-hint"${m0Mode ? ' hidden' : ''}><kbd>G</kbd><span>Toggle terrain grid and north cues</span></p>
         </aside>
         <section class="start-card" aria-labelledby="page-title">
@@ -171,6 +204,27 @@ export function createApp(container: HTMLElement): AppHandle {
   );
   const terrainActions = container.querySelector<HTMLElement>(
     '[data-testid="terrain-actions"]',
+  );
+  const buildingControls = container.querySelector<HTMLElement>(
+    '[data-testid="building-controls"]',
+  );
+  const buildingsToggle = container.querySelector<HTMLButtonElement>(
+    '[data-testid="buildings-toggle"]',
+  );
+  const buildingsRetry = container.querySelector<HTMLButtonElement>(
+    '[data-testid="buildings-retry"]',
+  );
+  const buildingsTerrainOnly = container.querySelector<HTMLButtonElement>(
+    '[data-testid="buildings-terrain-only"]',
+  );
+  const buildingStatus = container.querySelector<HTMLElement>(
+    '[data-testid="building-status"]',
+  );
+  const buildingError = container.querySelector<HTMLElement>(
+    '[data-testid="building-error"]',
+  );
+  const buildingErrorMessage = container.querySelector<HTMLElement>(
+    '[data-testid="building-error-message"]',
   );
   const fpsOutput = container.querySelector<HTMLOutputElement>(
     '[data-testid="frames-per-second"]',
@@ -240,6 +294,13 @@ export function createApp(container: HTMLElement): AppHandle {
     !gridToggle ||
     !wireframeToggle ||
     !terrainActions ||
+    !buildingControls ||
+    !buildingsToggle ||
+    !buildingsRetry ||
+    !buildingsTerrainOnly ||
+    !buildingStatus ||
+    !buildingError ||
+    !buildingErrorMessage ||
     !fpsOutput ||
     !worldType ||
     !sourceMode ||
@@ -289,6 +350,12 @@ export function createApp(container: HTMLElement): AppHandle {
   let currentOriginElevationM = 0;
   let currentTerrain: HeightfieldWorld['terrain'] | undefined;
   let currentGridAndCompass: HeightfieldWorld['gridAndCompass'] | undefined;
+  let currentTerrainGrid: TerrainGrid | undefined;
+  let currentTerrainManifest: RealTerrainSceneManifest | undefined;
+  let currentBuildingGroup: Group | undefined;
+  let buildingsRequested = initialBuildingsMode;
+  let buildingLoad: AbortController | undefined;
+  let buildingAttempt = 0;
   let pointerLocked = false;
   let disposed = false;
   let hasLoadedWorld = false;
@@ -311,6 +378,7 @@ export function createApp(container: HTMLElement): AppHandle {
   };
 
   const clearCurrentWorld = (): void => {
+    clearBuildingLayer();
     controller?.dispose();
     controller = undefined;
     if (currentWorldGroup) {
@@ -322,7 +390,36 @@ export function createApp(container: HTMLElement): AppHandle {
     currentOriginElevationM = 0;
     currentTerrain = undefined;
     currentGridAndCompass = undefined;
+    currentTerrainGrid = undefined;
+    currentTerrainManifest = undefined;
+    buildingControls.hidden = true;
     hasLoadedWorld = false;
+  };
+
+  const clearBuildingLayer = (): void => {
+    buildingAttempt += 1;
+    buildingLoad?.abort();
+    buildingLoad = undefined;
+    if (currentBuildingGroup) {
+      scene.remove(currentBuildingGroup);
+      disposeSceneResources(currentBuildingGroup);
+      currentBuildingGroup = undefined;
+    }
+    shell.dataset.buildingState = 'off';
+    shell.dataset.buildingCount = '0';
+    shell.dataset.buildingComponents = '0';
+    shell.dataset.buildingMeshCount = '0';
+    shell.dataset.buildingVisible = 'false';
+    buildingStatus.dataset.state = 'off';
+    buildingStatus.dataset.buildingCount = '0';
+    buildingStatus.dataset.componentCount = '0';
+    buildingStatus.textContent = 'Optional local OSM layer is off.';
+    buildingsToggle.disabled = false;
+    buildingsToggle.setAttribute('aria-pressed', 'false');
+    buildingsToggle.textContent = 'Load OSM buildings';
+    buildingsRetry.hidden = true;
+    buildingsTerrainOnly.hidden = true;
+    buildingError.hidden = true;
   };
 
   const setControlsHelpVisible = (visible: boolean): void => {
@@ -346,6 +443,144 @@ export function createApp(container: HTMLElement): AppHandle {
     shell.dataset.wireframeVisible = String(currentTerrain.material.wireframe);
     wireframeToggle.setAttribute('aria-pressed', String(visible));
     wireframeToggle.textContent = `Wireframe: ${visible ? 'on' : 'off'}`;
+  };
+
+  const setBuildingRoute = (enabled: boolean): void => {
+    const url = new URL(window.location.href);
+    if (enabled) {
+      url.searchParams.set('world', 'torquay-poc-001');
+      url.searchParams.set('buildings', '1');
+    } else {
+      url.searchParams.delete('buildings');
+    }
+    window.history.pushState({}, '', url);
+  };
+
+  const startBuildingLoad = async (): Promise<void> => {
+    if (!currentTerrainManifest || !currentTerrainGrid || !hasLoadedWorld) {
+      return;
+    }
+    clearBuildingLayer();
+    buildingsRequested = true;
+    const attempt = buildingAttempt;
+    const abortController = new AbortController();
+    buildingLoad = abortController;
+    shell.dataset.buildingState = 'loading';
+    buildingStatus.dataset.state = 'loading';
+    buildingStatus.textContent =
+      'Loading and validating the local OSM package…';
+    buildingsToggle.disabled = true;
+    buildingsToggle.textContent = 'Loading OSM buildings…';
+    buildingsRetry.hidden = true;
+    buildingsTerrainOnly.hidden = true;
+    buildingError.hidden = true;
+    try {
+      const packageData = await loadBuildingPackage(
+        REAL_BUILDINGS_MANIFEST_URL,
+        currentTerrainManifest,
+        undefined,
+        abortController.signal,
+      );
+      if (
+        disposed ||
+        attempt !== buildingAttempt ||
+        abortController.signal.aborted ||
+        !currentTerrainGrid
+      ) {
+        return;
+      }
+      const group = createBuildings(packageData, currentTerrainGrid);
+      if (
+        disposed ||
+        attempt !== buildingAttempt ||
+        abortController.signal.aborted
+      ) {
+        disposeSceneResources(group);
+        return;
+      }
+      currentBuildingGroup = group;
+      scene.add(group);
+      shell.dataset.buildingState = 'loaded';
+      shell.dataset.buildingCount = String(packageData.features.length);
+      shell.dataset.buildingComponents = String(packageData.componentCount);
+      shell.dataset.buildingMeshCount = String(group.children.length);
+      shell.dataset.buildingVisible = 'true';
+      buildingStatus.dataset.state = 'loaded';
+      buildingStatus.dataset.buildingCount = String(
+        packageData.features.length,
+      );
+      buildingStatus.dataset.componentCount = String(
+        packageData.componentCount,
+      );
+      const methods = packageData.heightMethodCounts;
+      buildingStatus.textContent =
+        `Loaded ${packageData.features.length.toLocaleString()} footprints / ` +
+        `${packageData.componentCount.toLocaleString()} components · ` +
+        `${methods.osm_height} tagged-but-unverified heights, ` +
+        `${methods.estimated_levels} level estimates, ` +
+        `${methods.estimated_default} default estimates.`;
+      buildingsToggle.disabled = false;
+      buildingsToggle.setAttribute('aria-pressed', 'true');
+      buildingsToggle.textContent = 'Hide OSM buildings';
+      buildingsRetry.hidden = true;
+      buildingsTerrainOnly.hidden = true;
+      buildingError.hidden = true;
+      status.textContent =
+        'Terrain and local OSM footprints ready. Heights are unverified or estimated.';
+    } catch (error) {
+      if (
+        disposed ||
+        attempt !== buildingAttempt ||
+        abortController.signal.aborted
+      ) {
+        return;
+      }
+      const detail = error instanceof Error ? error.message : String(error);
+      const publishCommand =
+        'From the pipeline folder run .\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-buildings.';
+      buildingErrorMessage.textContent = `${detail} ${publishCommand} The terrain remains available; no buildings are shown.`;
+      buildingError.hidden = false;
+      shell.dataset.buildingState = 'error';
+      buildingStatus.dataset.state = 'error';
+      buildingStatus.textContent =
+        'Building layer failed to load; terrain is still usable.';
+      buildingsToggle.disabled = false;
+      buildingsToggle.setAttribute('aria-pressed', 'false');
+      buildingsToggle.textContent = 'Load OSM buildings';
+      buildingsRetry.hidden = false;
+      buildingsTerrainOnly.hidden = false;
+      status.textContent =
+        'Building package unavailable. Retry or continue with terrain only.';
+    }
+  };
+
+  const toggleBuildings = (): void => {
+    if (currentBuildingGroup) {
+      const visible = !currentBuildingGroup.visible;
+      currentBuildingGroup.visible = visible;
+      buildingsRequested = visible;
+      setBuildingRoute(visible);
+      shell.dataset.buildingVisible = String(visible);
+      buildingsToggle.setAttribute('aria-pressed', String(visible));
+      buildingsToggle.textContent = visible
+        ? 'Hide OSM buildings'
+        : 'Show OSM buildings';
+      buildingStatus.dataset.state = visible ? 'loaded' : 'hidden';
+      buildingStatus.textContent = visible
+        ? `Local OSM layer visible · ${buildingStatus.dataset.buildingCount} footprints / ${buildingStatus.dataset.componentCount} components. Heights are estimates or tagged-but-unverified.`
+        : `Local OSM layer loaded but hidden · ${buildingStatus.dataset.buildingCount} footprints / ${buildingStatus.dataset.componentCount} components.`;
+      return;
+    }
+    setBuildingRoute(true);
+    void startBuildingLoad();
+  };
+
+  const continueTerrainOnly = (): void => {
+    buildingsRequested = false;
+    clearBuildingLayer();
+    setBuildingRoute(false);
+    shell.dataset.buildingVisible = 'false';
+    status.textContent = 'EA terrain only. The pending AOI remains unapproved.';
   };
 
   const setBoundaryFeedback = (atBoundary: boolean): void => {
@@ -414,6 +649,16 @@ export function createApp(container: HTMLElement): AppHandle {
     currentOriginElevationM = world.originElevationM ?? 0;
     currentTerrain = world.terrain;
     currentGridAndCompass = world.gridAndCompass;
+    currentTerrainGrid = world.terrainGrid;
+    currentTerrainManifest = world.realManifest;
+    buildingControls.hidden = !world.isReal;
+    shell.dataset.buildingVisible = 'false';
+    shell.dataset.buildingState = 'off';
+    if (world.isReal) {
+      buildingStatus.textContent = 'Optional local OSM layer is off.';
+      buildingStatus.dataset.state = 'off';
+      buildingsToggle.disabled = false;
+    }
     setGridVisible(true);
     setWireframeVisible(false);
     controller = new FreeFlyController(
@@ -482,6 +727,9 @@ export function createApp(container: HTMLElement): AppHandle {
     status.textContent =
       'World ready. Click Start to capture the pointer; Esc releases it.';
     updateTelemetry();
+    if (world.isReal && buildingsRequested) {
+      void startBuildingLoad();
+    }
   };
 
   const showLoadError = (error: unknown): void => {
@@ -579,6 +827,10 @@ export function createApp(container: HTMLElement): AppHandle {
         rows: world.grid.rows,
         terrain: world.terrain,
         gridAndCompass: world.gridAndCompass,
+        terrainGrid: world.grid,
+        ...(loaded.manifest.worldType === 'real'
+          ? { realManifest: loaded.manifest }
+          : {}),
       });
     } catch (error) {
       if (
@@ -617,6 +869,7 @@ export function createApp(container: HTMLElement): AppHandle {
 
   const updateBrowserRoute = (mode: 'synthetic' | 'real' | 'm0'): void => {
     const url = new URL(window.location.href);
+    url.searchParams.delete('buildings');
     if (mode === 'm0') {
       url.searchParams.set('world', 'm0');
     } else if (mode === 'real') {
@@ -630,6 +883,7 @@ export function createApp(container: HTMLElement): AppHandle {
     mode: 'synthetic' | 'real' | 'm0',
     updateRoute = true,
   ): void => {
+    buildingsRequested = false;
     if (updateRoute) updateBrowserRoute(mode);
     if (mode === 'm0') {
       selectedWorldMode = 'synthetic';
@@ -654,7 +908,16 @@ export function createApp(container: HTMLElement): AppHandle {
     setWireframeVisible(
       currentTerrain ? !currentTerrain.material.wireframe : false,
     );
-  const toggleGridFromKeyboard = (event: KeyboardEvent): void => {
+  const retryBuildingLoad = (): void => {
+    setBuildingRoute(true);
+    void startBuildingLoad();
+  };
+  const handleViewerShortcut = (event: KeyboardEvent): void => {
+    if (event.code === 'KeyH' && !event.repeat) {
+      event.preventDefault();
+      setControlsHelpVisible(controlsHelp.hidden === true);
+      return;
+    }
     if (event.code === 'KeyG' && !event.repeat && currentGridAndCompass) {
       event.preventDefault();
       setGridVisible(!currentGridAndCompass.visible);
@@ -671,12 +934,18 @@ export function createApp(container: HTMLElement): AppHandle {
   helpToggle.addEventListener('click', toggleControlsHelp);
   gridToggle.addEventListener('click', toggleGridFromButton);
   wireframeToggle.addEventListener('click', toggleWireframeFromButton);
+  buildingsToggle.addEventListener('click', toggleBuildings);
+  buildingsRetry.addEventListener('click', retryBuildingLoad);
+  buildingsTerrainOnly.addEventListener('click', continueTerrainOnly);
   const retryWorldLoad = (): void => void startWorldLoad(selectedWorldMode);
   retryButton.addEventListener('click', retryWorldLoad);
   canvas.addEventListener('click', requestLockFromCanvas);
-  window.addEventListener('keydown', toggleGridFromKeyboard);
+  window.addEventListener('keydown', handleViewerShortcut);
   const handlePopState = (): void => {
-    const routeWorld = new URLSearchParams(window.location.search).get('world');
+    const route = new URLSearchParams(window.location.search);
+    const routeWorld = route.get('world');
+    buildingsRequested =
+      routeWorld === 'torquay-poc-001' && route.get('buildings') === '1';
     if (routeWorld === 'm0') {
       selectedWorldMode = 'synthetic';
       startM0World();
@@ -802,6 +1071,8 @@ export function createApp(container: HTMLElement): AppHandle {
       updateTelemetry();
     }
     renderer.render(scene, camera);
+    shell.dataset.drawCalls = String(renderer.info.render.calls);
+    shell.dataset.triangles = String(renderer.info.render.triangles);
     if (hasLoadedWorld && shell.dataset.rendererReady !== 'true') {
       shell.dataset.rendererReady = 'true';
     }
@@ -820,12 +1091,14 @@ export function createApp(container: HTMLElement): AppHandle {
       if (disposed) return;
       disposed = true;
       activeLoad?.abort();
+      buildingAttempt += 1;
+      buildingLoad?.abort();
       controller?.dispose();
       renderer.setAnimationLoop(null);
       timer.dispose();
       resizeObserver.disconnect();
       window.removeEventListener('resize', resizeRenderer);
-      window.removeEventListener('keydown', toggleGridFromKeyboard);
+      window.removeEventListener('keydown', handleViewerShortcut);
       window.removeEventListener('popstate', handlePopState);
       syntheticWorldButton.removeEventListener('click', selectSyntheticWorld);
       realWorldButton.removeEventListener('click', selectRealWorld);
@@ -835,6 +1108,9 @@ export function createApp(container: HTMLElement): AppHandle {
       helpToggle.removeEventListener('click', toggleControlsHelp);
       gridToggle.removeEventListener('click', toggleGridFromButton);
       wireframeToggle.removeEventListener('click', toggleWireframeFromButton);
+      buildingsToggle.removeEventListener('click', toggleBuildings);
+      buildingsRetry.removeEventListener('click', retryBuildingLoad);
+      buildingsTerrainOnly.removeEventListener('click', continueTerrainOnly);
       retryButton.removeEventListener('click', retryWorldLoad);
       canvas.removeEventListener('click', requestLockFromCanvas);
       disposeSceneResources(scene);

@@ -1,0 +1,42 @@
+{
+  "checkedAt": "2026-10-18",
+  "environment": "headed installed Google Chrome on Windows production preview",
+  "url": "http://127.0.0.1:4174/?world=torquay-poc-001&buildings=1",
+  "browserVersion": "155.0.8059.80",
+  "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 SUPER (0x00002783) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "devicePixelRatio": 1.5,
+  "canvas": {
+    "cssWidth": 1440,
+    "cssHeight": 900,
+    "width": 1440,
+    "height": 900
+  },
+  "pose": {
+    "x": 0,
+    "y": 170.55,
+    "z": 360,
+    "bearingDegrees": 0,
+    "pitchDegrees": -25.3
+  },
+  "drawCalls": 11,
+  "triangles": 627303,
+  "buildingFeatures": 1000,
+  "buildingComponents": 1002,
+  "fpsSamples": [
+    60,
+    60,
+    60,
+    60,
+    60,
+    60,
+    60
+  ],
+  "medianFps": 60,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": []
+}

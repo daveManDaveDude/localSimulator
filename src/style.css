@@ -366,6 +366,99 @@ body {
   display: none;
 }
 
+.building-controls {
+  position: absolute;
+  bottom: 22px;
+  left: 26px;
+  z-index: 1;
+  width: min(470px, calc(100vw - 52px));
+  max-height: min(42vh, 330px);
+  overflow: auto;
+  padding: 12px 15px;
+  border: 1px solid rgb(205 239 226 / 14%);
+  border-radius: 12px;
+  color: #b8c8c3;
+  background: rgb(12 20 24 / 88%);
+  box-shadow: 0 18px 55px rgb(0 0 0 / 24%);
+  backdrop-filter: blur(12px);
+  font-size: 9px;
+  line-height: 1.5;
+  pointer-events: auto;
+}
+
+.building-controls[hidden] {
+  display: none;
+}
+
+.building-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.building-actions button {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid rgb(165 223 206 / 36%);
+  border-radius: 6px;
+  color: #c9e7dc;
+  background: rgb(255 255 255 / 5%);
+  font: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.building-actions button:hover:not(:disabled) {
+  color: #10201c;
+  background: #a5dfce;
+}
+
+.building-actions button:focus-visible {
+  outline: 2px solid #e2b17f;
+  outline-offset: 2px;
+}
+
+.building-actions button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.building-controls p {
+  margin: 6px 0 0;
+}
+
+.building-controls [data-testid='building-status'][data-state='error'] {
+  color: #ffc8b7;
+}
+
+.building-error {
+  margin-top: 7px;
+  padding: 7px 8px;
+  border: 1px solid rgb(230 158 133 / 46%);
+  border-radius: 6px;
+  color: #ffe0ce;
+  overflow-wrap: anywhere;
+}
+
+.building-error[hidden] {
+  display: none;
+}
+
+.building-error p {
+  margin: 0;
+}
+
+.building-policy,
+.building-completeness {
+  color: #94a8a2;
+}
+
+.building-attribution a {
+  color: #a9d8c8;
+  text-underline-offset: 2px;
+}
+
 .controls-help {
   position: absolute;
   right: 26px;
