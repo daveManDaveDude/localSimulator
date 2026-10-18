@@ -127,6 +127,7 @@ export function createApp(container: HTMLElement): AppHandle {
             <button type="button" data-testid="buildings-terrain-only" hidden>Continue with terrain only</button>
           </div>
           <p data-testid="building-status" role="status" aria-live="polite" data-state="off" data-building-count="0" data-component-count="0">Optional local OSM layer is off.</p>
+          <p data-testid="building-extract-vintage">OSM extract vintage: not loaded.</p>
           <div class="building-error" data-testid="building-error" role="alert" hidden>
             <p data-testid="building-error-message"></p>
           </div>
@@ -220,6 +221,9 @@ export function createApp(container: HTMLElement): AppHandle {
   const buildingStatus = container.querySelector<HTMLElement>(
     '[data-testid="building-status"]',
   );
+  const buildingVintage = container.querySelector<HTMLElement>(
+    '[data-testid="building-extract-vintage"]',
+  );
   const buildingError = container.querySelector<HTMLElement>(
     '[data-testid="building-error"]',
   );
@@ -299,6 +303,7 @@ export function createApp(container: HTMLElement): AppHandle {
     !buildingsRetry ||
     !buildingsTerrainOnly ||
     !buildingStatus ||
+    !buildingVintage ||
     !buildingError ||
     !buildingErrorMessage ||
     !fpsOutput ||
@@ -356,6 +361,7 @@ export function createApp(container: HTMLElement): AppHandle {
   let buildingsRequested = initialBuildingsMode;
   let buildingLoad: AbortController | undefined;
   let buildingAttempt = 0;
+  let buildingMethodSummary = '';
   let pointerLocked = false;
   let disposed = false;
   let hasLoadedWorld = false;
@@ -414,6 +420,8 @@ export function createApp(container: HTMLElement): AppHandle {
     buildingStatus.dataset.buildingCount = '0';
     buildingStatus.dataset.componentCount = '0';
     buildingStatus.textContent = 'Optional local OSM layer is off.';
+    buildingVintage.textContent = 'OSM extract vintage: not loaded.';
+    buildingMethodSummary = '';
     buildingsToggle.disabled = false;
     buildingsToggle.setAttribute('aria-pressed', 'false');
     buildingsToggle.textContent = 'Load OSM buildings';
@@ -513,12 +521,16 @@ export function createApp(container: HTMLElement): AppHandle {
         packageData.componentCount,
       );
       const methods = packageData.heightMethodCounts;
+      buildingMethodSummary =
+        `${methods.osm_height.toLocaleString()} tagged-but-unverified heights, ` +
+        `${methods.estimated_levels.toLocaleString()} level estimates, ` +
+        `${methods.estimated_default.toLocaleString()} default estimates`;
+      buildingStatus.dataset.heightMethodSummary = buildingMethodSummary;
       buildingStatus.textContent =
         `Loaded ${packageData.features.length.toLocaleString()} footprints / ` +
         `${packageData.componentCount.toLocaleString()} components · ` +
-        `${methods.osm_height} tagged-but-unverified heights, ` +
-        `${methods.estimated_levels} level estimates, ` +
-        `${methods.estimated_default} default estimates.`;
+        `${buildingMethodSummary}.`;
+      buildingVintage.textContent = `OSM extract vintage: ${packageData.manifest.provenance.extractTimestamp}.`;
       buildingsToggle.disabled = false;
       buildingsToggle.setAttribute('aria-pressed', 'true');
       buildingsToggle.textContent = 'Hide OSM buildings';
@@ -566,9 +578,11 @@ export function createApp(container: HTMLElement): AppHandle {
         ? 'Hide OSM buildings'
         : 'Show OSM buildings';
       buildingStatus.dataset.state = visible ? 'loaded' : 'hidden';
-      buildingStatus.textContent = visible
-        ? `Local OSM layer visible · ${buildingStatus.dataset.buildingCount} footprints / ${buildingStatus.dataset.componentCount} components. Heights are estimates or tagged-but-unverified.`
-        : `Local OSM layer loaded but hidden · ${buildingStatus.dataset.buildingCount} footprints / ${buildingStatus.dataset.componentCount} components.`;
+      buildingStatus.textContent =
+        `Local OSM layer ${visible ? 'visible' : 'loaded but hidden'} · ` +
+        `${Number(buildingStatus.dataset.buildingCount).toLocaleString()} footprints / ` +
+        `${Number(buildingStatus.dataset.componentCount).toLocaleString()} components · ` +
+        `${buildingMethodSummary}.`;
       return;
     }
     setBuildingRoute(true);

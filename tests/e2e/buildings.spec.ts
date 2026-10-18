@@ -107,7 +107,10 @@ test('loads the opt-in OSM layer, keeps terrain navigation, and captures both vi
     '1,000 footprints / 1,002 components',
   );
   await expect(page.getByTestId('building-status')).toContainText(
-    '998 default estimates',
+    '0 tagged-but-unverified heights, 2 level estimates, 998 default estimates',
+  );
+  await expect(page.getByTestId('building-extract-vintage')).toHaveText(
+    'OSM extract vintage: 2026-10-16T20:21:21Z.',
   );
   await expect(page.getByTestId('building-policy')).toBeVisible();
   await expect(page.getByTestId('building-attribution')).toContainText(
@@ -144,6 +147,9 @@ test('loads the opt-in OSM layer, keeps terrain navigation, and captures both vi
   await visibilityButton.click();
   await expect(shell).toHaveAttribute('data-building-visible', 'false');
   await expect(visibilityButton).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByTestId('building-status')).toContainText(
+    '0 tagged-but-unverified heights, 2 level estimates, 998 default estimates',
+  );
   await expect(shell).toHaveAttribute(
     'data-building-mesh-count',
     String(initialMeshCount),
@@ -151,6 +157,9 @@ test('loads the opt-in OSM layer, keeps terrain navigation, and captures both vi
   await visibilityButton.click();
   await expect(shell).toHaveAttribute('data-building-visible', 'true');
   await expect(visibilityButton).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('building-status')).toContainText(
+    '0 tagged-but-unverified heights, 2 level estimates, 998 default estimates',
+  );
 
   const screenshotDirectory = resolve(
     process.cwd(),

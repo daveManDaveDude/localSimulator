@@ -3,6 +3,7 @@ import {
   loadBuildingPackage,
   type BuildingFetch,
 } from '../../src/app/buildingLoader';
+import { MAX_BUILDING_MANIFEST_BYTES } from '../../src/geo/buildingSchema';
 import { createRealManifest } from './fixtures';
 import {
   createBuildingPayload,
@@ -141,6 +142,77 @@ describe('loadBuildingPackage', () => {
     ).rejects.toMatchObject({ stage: 'QA request' });
   });
 
+  it.each([['missing'], ['understated']])(
+    'stops reading a headerless or understated oversized manifest stream (%s)',
+    async (headerVariant) => {
+      const prepared = await prepare();
+      let pulls = 0;
+      let cancelled = false;
+      const responseStream = new ReadableStream<Uint8Array>(
+        {
+          pull(controller) {
+            if (pulls === 8) {
+              controller.close();
+              return;
+            }
+            pulls += 1;
+            controller.enqueue(new Uint8Array(64 * 1024));
+          },
+          cancel() {
+            cancelled = true;
+          },
+        },
+        { highWaterMark: 0 },
+      );
+      const headers = new Headers();
+      if (headerVariant === 'understated') headers.set('content-length', '1');
+      const fetcher: BuildingFetch = async (url) =>
+        url.pathname.endsWith('/manifest.json')
+          ? new Response(responseStream, { headers })
+          : new Response('{}');
+
+      await expect(
+        loadBuildingPackage(manifestUrl, prepared.terrain, fetcher),
+      ).rejects.toMatchObject({
+        stage: 'manifest response',
+        message: expect.stringContaining(
+          `${MAX_BUILDING_MANIFEST_BYTES}-byte package limit`,
+        ),
+      });
+      expect(pulls).toBeLessThan(8);
+      expect(cancelled).toBe(true);
+    },
+  );
+
+  it('rejects an oversized declared manifest before consuming the body', async () => {
+    const prepared = await prepare();
+    let pulls = 0;
+    let cancelled = false;
+    const responseStream = new ReadableStream<Uint8Array>(
+      {
+        pull(controller) {
+          pulls += 1;
+          controller.enqueue(new Uint8Array(1));
+        },
+        cancel() {
+          cancelled = true;
+        },
+      },
+      { highWaterMark: 0 },
+    );
+    const fetcher: BuildingFetch = async () =>
+      new Response(responseStream, {
+        headers: {
+          'content-length': String(MAX_BUILDING_MANIFEST_BYTES + 1),
+        },
+      });
+    await expect(
+      loadBuildingPackage(manifestUrl, prepared.terrain, fetcher),
+    ).rejects.toMatchObject({ stage: 'manifest response' });
+    expect(pulls).toBe(0);
+    expect(cancelled).toBe(true);
+  });
+
   it('rejects corrupt but rehashed nested data through payload validation', async () => {
     const terrain = createRealManifest();
     const badFeature = createFeature({ heightM: 12 });
@@ -163,5 +235,259 @@ describe('loadBuildingPackage', () => {
       loadBuildingPackage(manifestUrl, terrain, fetcher),
     ).rejects.toMatchObject({ stage: 'payload validation' });
     expect(await sha256Hex(payloadBytes)).toBe(manifest.buildings.sha256);
+  });
+
+  it.each([
+    'crossing-hole',
+    'overlapping-components',
+    'outside-aoi',
+    'canonical-duplicate',
+  ] as const)(
+    'rejects fully rehashed %s package geometry in the loader',
+    async (kind) => {
+      const terrain = createRealManifest();
+      const outer: [number, number][] = [
+        [-10, -10],
+        [10, -10],
+        [10, 10],
+        [-10, 10],
+        [-10, -10],
+      ];
+      let features;
+      if (kind === 'crossing-hole') {
+        features = [
+          createFeature({
+            geometry: {
+              type: 'MultiPolygon',
+              polygons: [
+                {
+                  exteriorXZ: outer,
+                  interiorRingsXZ: [
+                    [
+                      [-2, -2],
+                      [-2, 12],
+                      [2, 12],
+                      [2, -2],
+                      [-2, -2],
+                    ],
+                  ],
+                },
+              ],
+            },
+            footprintAreaM2: 344,
+          }),
+        ];
+      } else if (kind === 'overlapping-components') {
+        features = [
+          createFeature({
+            geometry: {
+              type: 'MultiPolygon',
+              polygons: [
+                {
+                  exteriorXZ: [
+                    [-5, -5],
+                    [0, -5],
+                    [0, 0],
+                    [-5, 0],
+                    [-5, -5],
+                  ],
+                  interiorRingsXZ: [],
+                },
+                {
+                  exteriorXZ: [
+                    [-1, -1],
+                    [4, -1],
+                    [4, 4],
+                    [-1, 4],
+                    [-1, -1],
+                  ],
+                  interiorRingsXZ: [],
+                },
+              ],
+            },
+            footprintAreaM2: 50,
+          }),
+        ];
+      } else if (kind === 'outside-aoi') {
+        features = [
+          createFeature({
+            geometry: {
+              type: 'MultiPolygon',
+              polygons: [
+                {
+                  exteriorXZ: [
+                    [499, -1],
+                    [501, -1],
+                    [501, 1],
+                    [499, 1],
+                    [499, -1],
+                  ],
+                  interiorRingsXZ: [],
+                },
+              ],
+            },
+            footprintAreaM2: 4,
+          }),
+        ];
+      } else {
+        const first = createFeature({ id: 'osm:way:1' });
+        const baseRing = first.geometry.polygons[0]!.exteriorXZ;
+        const reverseOpen = baseRing.slice(0, -1).reverse();
+        const rotatedOpen = [...reverseOpen.slice(1), reverseOpen[0]!];
+        const rotatedReversed = [...rotatedOpen, rotatedOpen[0]!];
+        features = [
+          first,
+          createFeature({
+            id: 'osm:way:2',
+            source: {
+              dataset: 'Geofabrik Devon OpenStreetMap extract',
+              objectType: 'way',
+              osmId: 2,
+              version: 1,
+              timestamp: '2026-10-17 12:00:00+00:00',
+            },
+            geometry: {
+              type: 'MultiPolygon',
+              polygons: [
+                {
+                  exteriorXZ: rotatedReversed,
+                  interiorRingsXZ: [],
+                },
+              ],
+            },
+          }),
+        ];
+      }
+      const payload = createBuildingPayload(features);
+      const qa = createBuildingQa(features);
+      const payloadBytes = new TextEncoder().encode(
+        JSON.stringify(payload),
+      ).buffer;
+      const qaBytes = new TextEncoder().encode(JSON.stringify(qa)).buffer;
+      const manifest = await createPackageManifest(
+        terrain,
+        payloadBytes,
+        qaBytes,
+        features.length,
+      );
+      const manifestBytes = new TextEncoder().encode(
+        JSON.stringify(manifest),
+      ).buffer;
+      const { fetcher } = createFetcher({
+        manifestBytes,
+        payloadBytes,
+        qaBytes,
+      });
+      await expect(
+        loadBuildingPackage(manifestUrl, terrain, fetcher),
+      ).rejects.toMatchObject({ stage: 'payload validation' });
+    },
+  );
+
+  it.each([
+    ['worldId', 'OTHER-WORLD'],
+    ['buildingsSha256', '0'.repeat(64)],
+    ['buildingsByteLength', 1],
+  ] as const)(
+    'rejects a fully rehashed QA package identity mismatch for %s',
+    async (field, value) => {
+      const prepared = await prepare();
+      const changedQa = JSON.parse(
+        new TextDecoder().decode(prepared.qaBytes),
+      ) as Record<string, unknown>;
+      (changedQa.package as Record<string, unknown>)[field] = value;
+      const qaBytes = new TextEncoder().encode(
+        JSON.stringify(changedQa),
+      ).buffer;
+      const manifest = structuredClone(prepared.manifest);
+      manifest.qaReport.byteLength = qaBytes.byteLength;
+      manifest.qaReport.sha256 = await sha256Hex(qaBytes);
+      const manifestBytes = new TextEncoder().encode(
+        JSON.stringify(manifest),
+      ).buffer;
+      const { fetcher } = createFetcher({
+        manifestBytes,
+        payloadBytes: prepared.payloadBytes,
+        qaBytes,
+      });
+      await expect(
+        loadBuildingPackage(manifestUrl, prepared.terrain, fetcher),
+      ).rejects.toMatchObject({ stage: 'payload validation' });
+    },
+  );
+
+  it('accepts Python-rounded QA mean heights for a rehashed three-feature fixture', async () => {
+    const terrain = createRealManifest();
+    const makeDefault = (id: number, offset: number) =>
+      createFeature({
+        id: `osm:way:${id}`,
+        source: {
+          dataset: 'Geofabrik Devon OpenStreetMap extract',
+          objectType: 'way',
+          osmId: id,
+          version: 1,
+          timestamp: '2026-10-17 12:00:00+00:00',
+        },
+        geometry: {
+          type: 'MultiPolygon',
+          polygons: [
+            {
+              exteriorXZ: [
+                [offset, -1],
+                [offset + 2, -1],
+                [offset + 2, 1],
+                [offset, 1],
+                [offset, -1],
+              ],
+              interiorRingsXZ: [],
+            },
+          ],
+        },
+      });
+    const base = makeDefault(11, 10);
+    const tagged = {
+      ...base,
+      heightM: 3.048,
+      heightMethod: 'osm_height' as const,
+      heightConfidence: 'tagged_but_unverified' as const,
+      heightProvenance: {
+        heightM: 3.048,
+        method: 'osm_height' as const,
+        confidence: 'tagged_but_unverified' as const,
+        rawHeight: '10 ft',
+        parsedHeightM: 3.048,
+        parsedUnit: 'feet',
+        rawLevels: null,
+        clamp: null,
+        fallbackReason: null,
+      },
+      tags: { building: 'yes', height: '10 ft' },
+    };
+    const features = [tagged, makeDefault(12, 20), makeDefault(13, 30)];
+    const payload = createBuildingPayload(features);
+    const qa = createBuildingQa(features);
+    (qa.summary as Record<string, unknown>).meanHeightM = 6.349;
+    const payloadBytes = new TextEncoder().encode(
+      JSON.stringify(payload),
+    ).buffer;
+    const qaBytes = new TextEncoder().encode(JSON.stringify(qa)).buffer;
+    const manifest = await createPackageManifest(
+      terrain,
+      payloadBytes,
+      qaBytes,
+      features.length,
+    );
+    const manifestBytes = new TextEncoder().encode(
+      JSON.stringify(manifest),
+    ).buffer;
+    const { fetcher } = createFetcher({
+      manifestBytes,
+      payloadBytes,
+      qaBytes,
+    });
+    const result = await loadBuildingPackage(manifestUrl, terrain, fetcher);
+    expect(result.features.map((feature) => feature.heightM)).toEqual([
+      3.048, 8, 8,
+    ]);
   });
 });

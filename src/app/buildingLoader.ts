@@ -130,25 +130,60 @@ async function fetchJsonBytes(
       declaredLength < 0 ||
       declaredLength > maximumBytes
     ) {
+      try {
+        await response.body?.cancel(
+          'declared package response exceeds its byte limit',
+        );
+      } catch {
+        // Keep the size error as the primary diagnostic.
+      }
       throw new BuildingLoadError(
         stage.replace('request', 'response') as BuildingLoadStage,
         `response exceeds the ${maximumBytes}-byte package limit`,
       );
     }
   }
+  const responseStage = stage.replace(
+    'request',
+    'response',
+  ) as BuildingLoadStage;
+  if (!response.body) return new ArrayBuffer(0);
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
   try {
-    const bytes = await response.arrayBuffer();
-    if (bytes.byteLength > maximumBytes) {
-      throw new Error(
-        `response exceeds the ${maximumBytes}-byte package limit`,
-      );
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value.byteLength > maximumBytes - totalBytes) {
+        try {
+          await reader.cancel('package response exceeded its byte limit');
+        } catch {
+          // The size error remains the actionable failure if cancel also fails.
+        }
+        throw new BuildingLoadError(
+          responseStage,
+          `response exceeds the ${maximumBytes}-byte package limit`,
+        );
+      }
+      totalBytes += value.byteLength;
+      chunks.push(value);
     }
-    return bytes;
+    const bytes = new Uint8Array(totalBytes);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return bytes.buffer;
   } catch (error) {
+    if (error instanceof BuildingLoadError) throw error;
     throw new BuildingLoadError(
-      stage.replace('request', 'response') as BuildingLoadStage,
+      responseStage,
       `could not read ${url.href}: ${errorMessage(error)}`,
     );
+  } finally {
+    reader.releaseLock();
   }
 }
 

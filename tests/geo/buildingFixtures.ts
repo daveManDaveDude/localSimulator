@@ -3,6 +3,7 @@ import type {
   BuildingPackageManifest,
 } from '../../src/geo/buildingSchema';
 import type { RealTerrainSceneManifest } from '../../src/geo/sceneSchema';
+import { createHash } from 'node:crypto';
 
 export type JsonRecord = Record<string, unknown>;
 
@@ -92,6 +93,9 @@ export function createBuildingQa(
     0,
   );
   const heights = features.map((feature) => feature.heightM);
+  const buildingsBytes = new TextEncoder().encode(
+    JSON.stringify(createBuildingPayload(features)),
+  );
   return {
     formatVersion: 1,
     aoiId: 'torquay-poc-001',
@@ -126,6 +130,15 @@ export function createBuildingQa(
         heights.reduce((sum, height) => sum + height, 0) / heights.length,
       densityInterpretation:
         'Mapped OSM coverage only; this is not a completeness estimate.',
+    },
+    package: {
+      worldId: 'torquay-poc-001',
+      manifestPath: 'manifest.json',
+      buildingsPath: 'buildings.json',
+      buildingsByteLength: buildingsBytes.byteLength,
+      buildingsSha256: createHash('sha256')
+        .update(buildingsBytes)
+        .digest('hex'),
     },
   };
 }
@@ -226,6 +239,7 @@ export async function createPackageManifest(
       fileUrl:
         'https://download.geofabrik.de/europe/united-kingdom/england/devon-261016.osm.pbf',
       downloadDate: '2026-10-17',
+      extractTimestamp: '2026-10-16T20:21:21Z',
       filename: 'devon-261016.osm.pbf',
       sizeBytes: 58_254_938,
       sha256: '5'.repeat(64),

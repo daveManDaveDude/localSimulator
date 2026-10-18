@@ -29,6 +29,28 @@ describe('validateBuildingPackageManifest', () => {
     expect(result.ok).toBe(true);
   });
 
+  it.each([undefined, 'not-a-timestamp'])(
+    'requires a valid source extract timestamp (%s)',
+    async (timestamp) => {
+      const { terrain, manifest } = await createValidInputs();
+      const changed = structuredClone(manifest) as unknown as Record<
+        string,
+        unknown
+      >;
+      const provenance = changed.provenance as Record<string, unknown>;
+      if (timestamp === undefined) delete provenance.extractTimestamp;
+      else provenance.extractTimestamp = timestamp;
+      const result = validateBuildingPackageManifest(changed, terrain);
+      expect(result.ok).toBe(false);
+      if (!result.ok)
+        expect(
+          result.issues.some(
+            (issue) => issue.path === 'provenance.extractTimestamp',
+          ),
+        ).toBe(true);
+    },
+  );
+
   it.each([
     ['terrainIdentity.origin.eastingM', 'origin'],
     ['terrainIdentity.heightfieldSha256', 'heightfield'],
@@ -277,5 +299,437 @@ describe('validateBuildingPayload', () => {
     const result = validateBuildingPayload(payload, qa, validManifest.value);
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value.holeCount).toBe(1);
+  });
+
+  it('rejects holes that cross exteriors, cross each other, or nest', async () => {
+    const { terrain } = await createValidInputs();
+    const exterior: [number, number][] = [
+      [-10, -10],
+      [10, -10],
+      [10, 10],
+      [-10, 10],
+      [-10, -10],
+    ];
+    const crossExterior = createFeature({
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: exterior,
+            interiorRingsXZ: [
+              [
+                [-2, -2],
+                [-2, 12],
+                [2, 12],
+                [2, -2],
+                [-2, -2],
+              ],
+            ],
+          },
+        ],
+      },
+      footprintAreaM2: 344,
+    });
+    const crossingHoles = createFeature({
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: exterior,
+            interiorRingsXZ: [
+              [
+                [-6, -6],
+                [-6, 0],
+                [0, 0],
+                [0, -6],
+                [-6, -6],
+              ],
+              [
+                [-2, -2],
+                [-2, 4],
+                [4, 4],
+                [4, -2],
+                [-2, -2],
+              ],
+            ],
+          },
+        ],
+      },
+      footprintAreaM2: 328,
+    });
+    const nestedHoles = createFeature({
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: exterior,
+            interiorRingsXZ: [
+              [
+                [-6, -6],
+                [-6, 6],
+                [6, 6],
+                [6, -6],
+                [-6, -6],
+              ],
+              [
+                [-1, -1],
+                [-1, 1],
+                [1, 1],
+                [1, -1],
+                [-1, -1],
+              ],
+            ],
+          },
+        ],
+      },
+      footprintAreaM2: 252,
+    });
+    for (const feature of [crossExterior, crossingHoles, nestedHoles]) {
+      const payload = createBuildingPayload([feature]);
+      const qa = createBuildingQa([feature]);
+      const manifest = await createPackageManifest(
+        terrain,
+        new TextEncoder().encode(JSON.stringify(payload)).buffer,
+        new TextEncoder().encode(JSON.stringify(qa)).buffer,
+      );
+      const validatedManifest = validateBuildingPackageManifest(
+        manifest,
+        terrain,
+      );
+      if (!validatedManifest.ok)
+        throw new Error('expected the topology fixture manifest to validate');
+      const result = validateBuildingPayload(
+        payload,
+        qa,
+        validatedManifest.value,
+      );
+      expect(result.ok).toBe(false);
+    }
+  });
+
+  it('rejects overlapping components and geometry outside the local AOI', async () => {
+    const { terrain } = await createValidInputs();
+    const overlapping = createFeature({
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: [
+              [-5, -5],
+              [0, -5],
+              [0, 0],
+              [-5, 0],
+              [-5, -5],
+            ],
+            interiorRingsXZ: [],
+          },
+          {
+            exteriorXZ: [
+              [-1, -1],
+              [4, -1],
+              [4, 4],
+              [-1, 4],
+              [-1, -1],
+            ],
+            interiorRingsXZ: [],
+          },
+        ],
+      },
+      footprintAreaM2: 50,
+    });
+    const outside = createFeature({
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: [
+              [499, -1],
+              [501, -1],
+              [501, 1],
+              [499, 1],
+              [499, -1],
+            ],
+            interiorRingsXZ: [],
+          },
+        ],
+      },
+      footprintAreaM2: 4,
+    });
+    for (const feature of [overlapping, outside]) {
+      const payload = createBuildingPayload([feature]);
+      const qa = createBuildingQa([feature]);
+      const payloadBytes = new TextEncoder().encode(
+        JSON.stringify(payload),
+      ).buffer;
+      const qaBytes = new TextEncoder().encode(JSON.stringify(qa)).buffer;
+      const manifest = await createPackageManifest(
+        terrain,
+        payloadBytes,
+        qaBytes,
+      );
+      const validatedManifest = validateBuildingPackageManifest(
+        manifest,
+        terrain,
+      );
+      if (!validatedManifest.ok)
+        throw new Error('expected the topology fixture manifest to validate');
+      expect(
+        validateBuildingPayload(payload, qa, validatedManifest.value).ok,
+      ).toBe(false);
+    }
+  });
+
+  it('allows point-contact components and islands inside holes', async () => {
+    const feature = createFeature({
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: [
+              [-10, -10],
+              [10, -10],
+              [10, 10],
+              [-10, 10],
+              [-10, -10],
+            ],
+            interiorRingsXZ: [
+              [
+                [-5, -5],
+                [-5, 5],
+                [5, 5],
+                [5, -5],
+                [-5, -5],
+              ],
+            ],
+          },
+          {
+            exteriorXZ: [
+              [-2, -2],
+              [2, -2],
+              [2, 2],
+              [-2, 2],
+              [-2, -2],
+            ],
+            interiorRingsXZ: [],
+          },
+          {
+            exteriorXZ: [
+              [10, 10],
+              [12, 10],
+              [12, 12],
+              [10, 12],
+              [10, 10],
+            ],
+            interiorRingsXZ: [],
+          },
+        ],
+      },
+      footprintAreaM2: 320,
+    });
+    const { terrain } = await createValidInputs();
+    const payload = createBuildingPayload([feature]);
+    const qa = createBuildingQa([feature]);
+    const payloadBytes = new TextEncoder().encode(
+      JSON.stringify(payload),
+    ).buffer;
+    const qaBytes = new TextEncoder().encode(JSON.stringify(qa)).buffer;
+    const manifest = await createPackageManifest(
+      terrain,
+      payloadBytes,
+      qaBytes,
+    );
+    const validatedManifest = validateBuildingPackageManifest(
+      manifest,
+      terrain,
+    );
+    if (!validatedManifest.ok)
+      throw new Error(
+        'expected the point-contact fixture manifest to validate',
+      );
+    const result = validateBuildingPayload(
+      payload,
+      qa,
+      validatedManifest.value,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.componentCount).toBe(3);
+  });
+
+  it('canonicalizes ring start, winding, component order, and hole order', async () => {
+    const polygon = {
+      exteriorXZ: [
+        [-20, -20],
+        [20, -20],
+        [20, 20],
+        [-20, 20],
+        [-20, -20],
+      ] as [number, number][],
+      interiorRingsXZ: [
+        [
+          [-12, -12],
+          [-12, -8],
+          [-8, -8],
+          [-8, -12],
+          [-12, -12],
+        ] as [number, number][],
+        [
+          [8, 8],
+          [8, 12],
+          [12, 12],
+          [12, 8],
+          [8, 8],
+        ] as [number, number][],
+      ],
+    };
+    const other = {
+      exteriorXZ: [
+        [30, 30],
+        [34, 30],
+        [34, 34],
+        [30, 34],
+        [30, 30],
+      ] as [number, number][],
+      interiorRingsXZ: [],
+    };
+    const alternateRing = (ring: [number, number][]) => {
+      const open = ring.slice(0, -1).reverse();
+      const rotated = [...open.slice(1), ...open.slice(0, 1)];
+      return [...rotated, rotated[0]!];
+    };
+    const first = createFeature({
+      id: 'osm:way:1',
+      geometry: { type: 'MultiPolygon', polygons: [polygon, other] },
+      footprintAreaM2: 1584,
+    });
+    const second = createFeature({
+      id: 'osm:way:2',
+      source: {
+        dataset: 'Geofabrik Devon OpenStreetMap extract',
+        objectType: 'way',
+        osmId: 2,
+        version: 1,
+        timestamp: '2026-10-17 12:00:00+00:00',
+      },
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: alternateRing(other.exteriorXZ),
+            interiorRingsXZ: [],
+          },
+          {
+            exteriorXZ: alternateRing(polygon.exteriorXZ),
+            interiorRingsXZ: polygon.interiorRingsXZ
+              .slice()
+              .reverse()
+              .map(alternateRing),
+          },
+        ],
+      },
+      footprintAreaM2: 1584,
+    });
+    const { terrain } = await createValidInputs();
+    const payload = createBuildingPayload([first, second]);
+    const qa = createBuildingQa([first, second]);
+    const payloadBytes = new TextEncoder().encode(
+      JSON.stringify(payload),
+    ).buffer;
+    const qaBytes = new TextEncoder().encode(JSON.stringify(qa)).buffer;
+    const manifest = await createPackageManifest(
+      terrain,
+      payloadBytes,
+      qaBytes,
+      2,
+    );
+    const validatedManifest = validateBuildingPackageManifest(
+      manifest,
+      terrain,
+    );
+    if (!validatedManifest.ok)
+      throw new Error('expected the duplicate fixture manifest to validate');
+    const result = validateBuildingPayload(
+      payload,
+      qa,
+      validatedManifest.value,
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok)
+      expect(
+        result.issues.some((issue) =>
+          issue.message.includes('duplicate canonical geometry'),
+        ),
+      ).toBe(true);
+  });
+
+  it('accepts the exporter precision for the mean of rounded feature heights', async () => {
+    const { terrain } = await createValidInputs();
+    const defaultFeature = (id: number, offset: number) =>
+      createFeature({
+        id: `osm:way:${id}`,
+        source: {
+          dataset: 'Geofabrik Devon OpenStreetMap extract',
+          objectType: 'way',
+          osmId: id,
+          version: 1,
+          timestamp: '2026-10-17 12:00:00+00:00',
+        },
+        geometry: {
+          type: 'MultiPolygon',
+          polygons: [
+            {
+              exteriorXZ: [
+                [offset, -1],
+                [offset + 2, -1],
+                [offset + 2, 1],
+                [offset, 1],
+                [offset, -1],
+              ],
+              interiorRingsXZ: [],
+            },
+          ],
+        },
+      });
+    const feet = defaultFeature(10, 10);
+    const tagged = {
+      ...feet,
+      heightM: 3.048,
+      heightMethod: 'osm_height' as const,
+      heightConfidence: 'tagged_but_unverified' as const,
+      heightProvenance: {
+        heightM: 3.048,
+        method: 'osm_height' as const,
+        confidence: 'tagged_but_unverified' as const,
+        rawHeight: '10 ft',
+        parsedHeightM: 3.048,
+        parsedUnit: 'feet',
+        rawLevels: null,
+        clamp: null,
+        fallbackReason: null,
+      },
+      tags: { building: 'yes', height: '10 ft' },
+    };
+    const features = [tagged, defaultFeature(11, 20), defaultFeature(12, 30)];
+    const payload = createBuildingPayload(features);
+    const qa = createBuildingQa(features);
+    (qa.summary as Record<string, unknown>).meanHeightM = 6.349;
+    const payloadBytes = new TextEncoder().encode(
+      JSON.stringify(payload),
+    ).buffer;
+    const qaBytes = new TextEncoder().encode(JSON.stringify(qa)).buffer;
+    const manifest = await createPackageManifest(
+      terrain,
+      payloadBytes,
+      qaBytes,
+      features.length,
+    );
+    const validatedManifest = validateBuildingPackageManifest(
+      manifest,
+      terrain,
+    );
+    if (!validatedManifest.ok)
+      throw new Error('expected rounded mean fixture manifest to validate');
+    expect(
+      validateBuildingPayload(payload, qa, validatedManifest.value).ok,
+    ).toBe(true);
   });
 });

@@ -131,6 +131,7 @@ export interface BuildingPackageManifest {
     downloadUrl: string;
     fileUrl: string;
     downloadDate: string;
+    extractTimestamp: string;
     filename: string;
     sizeBytes: number;
     sha256: string;
@@ -176,6 +177,13 @@ export interface BuildingQaSummary {
     maximumHeightM: number;
     meanHeightM: number;
     densityInterpretation: string;
+  };
+  package: {
+    worldId: string;
+    manifestPath: 'manifest.json';
+    buildingsPath: 'buildings.json';
+    buildingsByteLength: number;
+    buildingsSha256: string;
   };
 }
 
@@ -453,6 +461,122 @@ function pointInRing(point: XzPosition, ring: XzPosition[]): boolean {
   return inside;
 }
 
+function pointInRingInterior(point: XzPosition, ring: XzPosition[]): boolean {
+  if (!pointInRing(point, ring)) return false;
+  for (let index = 0; index < ring.length - 1; index += 1) {
+    if (onSegment(ring[index]!, ring[index + 1]!, point)) return false;
+  }
+  return true;
+}
+
+function ringEdges(ring: XzPosition[]): Array<[XzPosition, XzPosition]> {
+  return Array.from({ length: ring.length - 1 }, (_, index) => [
+    ring[index]!,
+    ring[index + 1]!,
+  ]);
+}
+
+function hasPositiveLengthCollinearOverlap(
+  a: XzPosition,
+  b: XzPosition,
+  c: XzPosition,
+  d: XzPosition,
+): boolean {
+  if (
+    Math.abs(orientation(a, b, c)) > 1e-10 ||
+    Math.abs(orientation(a, b, d)) > 1e-10
+  ) {
+    return false;
+  }
+  const axis = Math.abs(b[0] - a[0]) >= Math.abs(b[1] - a[1]) ? 0 : 1;
+  const overlap =
+    Math.min(Math.max(a[axis], b[axis]), Math.max(c[axis], d[axis])) -
+    Math.max(Math.min(a[axis], b[axis]), Math.min(c[axis], d[axis]));
+  return overlap > 1e-10;
+}
+
+function hasForbiddenRingIntersection(
+  first: XzPosition[],
+  second: XzPosition[],
+  allowPointContacts: boolean,
+): boolean {
+  for (const [a, b] of ringEdges(first)) {
+    for (const [c, d] of ringEdges(second)) {
+      if (!segmentsIntersect(a, b, c, d)) continue;
+      const abC = orientation(a, b, c);
+      const abD = orientation(a, b, d);
+      const cdA = orientation(c, d, a);
+      const cdB = orientation(c, d, b);
+      const properCrossing =
+        ((abC > 1e-10 && abD < -1e-10) || (abC < -1e-10 && abD > 1e-10)) &&
+        ((cdA > 1e-10 && cdB < -1e-10) || (cdA < -1e-10 && cdB > 1e-10));
+      if (
+        !allowPointContacts ||
+        properCrossing ||
+        hasPositiveLengthCollinearOverlap(a, b, c, d)
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function pointInPolygonInterior(
+  point: XzPosition,
+  polygon: BuildingPolygon,
+): boolean {
+  return (
+    pointInRingInterior(point, polygon.exteriorXZ) &&
+    !polygon.interiorRingsXZ.some((hole) => pointInRing(point, hole))
+  );
+}
+
+function polygonsOverlap(
+  first: BuildingPolygon,
+  second: BuildingPolygon,
+): boolean {
+  const firstRings = [first.exteriorXZ, ...first.interiorRingsXZ];
+  const secondRings = [second.exteriorXZ, ...second.interiorRingsXZ];
+  for (const firstRing of firstRings) {
+    for (const secondRing of secondRings) {
+      if (hasForbiddenRingIntersection(firstRing, secondRing, true)) {
+        return true;
+      }
+    }
+  }
+  return (
+    first.exteriorXZ
+      .slice(0, -1)
+      .some((point) => pointInPolygonInterior(point, second)) ||
+    second.exteriorXZ
+      .slice(0, -1)
+      .some((point) => pointInPolygonInterior(point, first))
+  );
+}
+
+function canonicalizeRing(ring: XzPosition[]): XzPosition[] {
+  const open = ring.slice(0, -1);
+  let start = 0;
+  for (let index = 1; index < open.length; index += 1) {
+    const current = open[index]!;
+    const candidate = open[start]!;
+    if (
+      current[0] < candidate[0] ||
+      (current[0] === candidate[0] && current[1] < candidate[1])
+    ) {
+      start = index;
+    }
+  }
+  const ordered = [...open.slice(start), ...open.slice(0, start)];
+  ordered.push([...ordered[0]!] as XzPosition);
+  return ordered;
+}
+
+function canonicalRingKey(ring: XzPosition[]): string {
+  return JSON.stringify(ring);
+}
+
 function parseRing(
   value: unknown,
   path: string,
@@ -509,15 +633,6 @@ function parseRing(
     );
     return undefined;
   }
-  if ((exterior && area <= 0) || (!exterior && area >= 0)) {
-    addIssue(
-      issues,
-      path,
-      exterior
-        ? 'exterior winding must be counter-clockwise in local XZ coordinates'
-        : 'hole winding must be clockwise in local XZ coordinates',
-    );
-  }
   if (!isSimpleRing(ring)) {
     addIssue(
       issues,
@@ -535,7 +650,14 @@ function parseRing(
       return undefined;
     }
   }
-  return ring;
+  const wantsPositive = exterior;
+  const correctlyWound = wantsPositive ? area > 0 : area < 0;
+  const open = ring.slice(0, -1);
+  const normalizedOpen = correctlyWound ? open : open.reverse();
+  return canonicalizeRing([
+    ...normalizedOpen,
+    [...normalizedOpen[0]!] as XzPosition,
+  ]);
 }
 
 function validateManifest(
@@ -1000,6 +1122,7 @@ function validateManifest(
       'downloadUrl',
       'fileUrl',
       'downloadDate',
+      'extractTimestamp',
       'filename',
       'sha256',
       'licence',
@@ -1027,6 +1150,17 @@ function validateManifest(
         'provenance.notes',
         'must retain the source and ODbL limitations',
       );
+    const extractTimestamp = provenance.extractTimestamp;
+    if (
+      !nonempty(extractTimestamp) ||
+      !Number.isFinite(Date.parse(extractTimestamp))
+    ) {
+      addIssue(
+        issues,
+        'provenance.extractTimestamp',
+        'must be a valid extract timestamp from the source manifest',
+      );
+    }
     if (!isString(provenance.licence) || !provenance.licence.includes('ODbL')) {
       addIssue(
         issues,
@@ -1262,14 +1396,54 @@ function parseFeature(
         featureValid = false;
         return;
       }
-      for (const hole of holes) {
-        if (!pointInRing(hole[0]!, exterior)) {
+      const minX = -manifest.aoi.widthM / 2 - 1e-6;
+      const maxX = manifest.aoi.widthM / 2 + 1e-6;
+      const minZ = -manifest.aoi.heightM / 2 - 1e-6;
+      const maxZ = manifest.aoi.heightM / 2 + 1e-6;
+      for (const [ringIndex, ring] of [exterior, ...holes].entries()) {
+        if (
+          ring.some(([x, z]) => x < minX || x > maxX || z < minZ || z > maxZ)
+        ) {
           addIssue(
             issues,
-            `${polygonPath}.interiorRingsXZ`,
-            'hole must be contained by its exterior ring',
+            ringIndex === 0
+              ? `${polygonPath}.exteriorXZ`
+              : `${polygonPath}.interiorRingsXZ[${ringIndex - 1}]`,
+            'coordinates must remain within the local AOI bounds',
           );
           featureValid = false;
+        }
+      }
+      for (let holeIndex = 0; holeIndex < holes.length; holeIndex += 1) {
+        const hole = holes[holeIndex]!;
+        if (
+          !hole
+            .slice(0, -1)
+            .every((point) => pointInRingInterior(point, exterior)) ||
+          hasForbiddenRingIntersection(hole, exterior, false)
+        ) {
+          addIssue(
+            issues,
+            `${polygonPath}.interiorRingsXZ[${holeIndex}]`,
+            'hole must be wholly contained by its exterior and cannot cross or touch its boundary',
+          );
+          featureValid = false;
+        }
+        for (let otherIndex = 0; otherIndex < holeIndex; otherIndex += 1) {
+          const other = holes[otherIndex]!;
+          if (
+            hasForbiddenRingIntersection(hole, other, false) ||
+            pointInRing(hole[0]!, other) ||
+            pointInRing(other[0]!, hole)
+          ) {
+            addIssue(
+              issues,
+              `${polygonPath}.interiorRingsXZ`,
+              'holes cannot cross, touch, overlap, or contain one another',
+            );
+            featureValid = false;
+            break;
+          }
         }
       }
       const polygonArea =
@@ -1284,9 +1458,34 @@ function parseFeature(
         featureValid = false;
       }
       area += polygonArea;
+      holes.sort((left, right) =>
+        canonicalRingKey(left).localeCompare(canonicalRingKey(right)),
+      );
       polygons.push({ exteriorXZ: exterior, interiorRingsXZ: holes });
     });
   }
+  for (
+    let polygonIndex = 0;
+    polygonIndex < polygons.length;
+    polygonIndex += 1
+  ) {
+    for (let otherIndex = 0; otherIndex < polygonIndex; otherIndex += 1) {
+      if (polygonsOverlap(polygons[polygonIndex]!, polygons[otherIndex]!)) {
+        addIssue(
+          issues,
+          `${path}.geometry.polygons[${polygonIndex}]`,
+          'MultiPolygon component interiors cannot overlap; isolated point contacts and islands inside holes are allowed',
+        );
+        featureValid = false;
+        break;
+      }
+    }
+  }
+  polygons.sort((left, right) =>
+    canonicalRingKey(left.exteriorXZ).localeCompare(
+      canonicalRingKey(right.exteriorXZ),
+    ),
+  );
   if (
     !isNumber(input.footprintAreaM2) ||
     input.footprintAreaM2 <= 0 ||
@@ -1346,7 +1545,10 @@ function parseFeature(
     );
   }
   if (!featureValid) return undefined;
-  return input as unknown as BuildingFeature;
+  return {
+    ...(input as unknown as BuildingFeature),
+    geometry: { type: 'MultiPolygon', polygons },
+  };
 }
 
 function validatePayloadAndQa(
@@ -1455,6 +1657,51 @@ function validatePayloadAndQa(
       );
     if (qaInput.coverageStatus !== 'not_checked')
       addIssue(issues, 'qa.json.coverageStatus', 'must remain not_checked');
+    const packageIdentity = qaInput.package;
+    if (!isRecord(packageIdentity)) {
+      addIssue(
+        issues,
+        'qa.json.package',
+        'must bind the QA report to the validated building payload',
+      );
+    } else {
+      if (packageIdentity.worldId !== manifest.worldId)
+        addIssue(
+          issues,
+          'qa.json.package.worldId',
+          'must match the validated package world ID',
+        );
+      if (packageIdentity.manifestPath !== 'manifest.json')
+        addIssue(
+          issues,
+          'qa.json.package.manifestPath',
+          'must identify the package-local manifest',
+        );
+      if (packageIdentity.buildingsPath !== manifest.buildings.path)
+        addIssue(
+          issues,
+          'qa.json.package.buildingsPath',
+          'must match manifest.buildings.path',
+        );
+      if (
+        !isPositiveInteger(packageIdentity.buildingsByteLength) ||
+        packageIdentity.buildingsByteLength !== manifest.buildings.byteLength
+      )
+        addIssue(
+          issues,
+          'qa.json.package.buildingsByteLength',
+          'must match manifest.buildings.byteLength',
+        );
+      if (
+        !isHash(packageIdentity.buildingsSha256) ||
+        packageIdentity.buildingsSha256 !== manifest.buildings.sha256
+      )
+        addIssue(
+          issues,
+          'qa.json.package.buildingsSha256',
+          'must match manifest.buildings.sha256',
+        );
+    }
   }
   const counts =
     isRecord(qaInput) && isRecord(qaInput.counts) ? qaInput.counts : undefined;
@@ -1585,7 +1832,8 @@ function validatePayloadAndQa(
         'must match validated feature heights',
       );
     const mean = features.length > 0 ? totalHeightM / features.length : 0;
-    if (!sameNumber(qaSummary.meanHeightM, mean, 1e-5))
+    // The Python exporter stores this summary at millimetre precision.
+    if (!sameNumber(qaSummary.meanHeightM, mean, 0.0005001))
       addIssue(
         issues,
         'qa.json.summary.meanHeightM',

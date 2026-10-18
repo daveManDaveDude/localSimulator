@@ -44,8 +44,11 @@ def publish_building_package(
     terrain_root = terrain_package_path.resolve()
     source_root = source_package_path.resolve()
     output_root = terrain_root / "buildings"
-    if source_root == output_root or source_root == terrain_root:
-        raise BuildingPublishError("source package must be separate from the terrain output")
+    if source_root.is_relative_to(terrain_root) or terrain_root.is_relative_to(source_root):
+        raise BuildingPublishError(
+            "source and terrain packages must be separate, non-nested directories; "
+            "publishing inside or over the source could delete or corrupt its input"
+        )
     if not terrain_root.is_dir():
         raise BuildingPublishError(f"terrain package does not exist: {terrain_root}")
     if output_root.exists() and output_root.is_symlink():

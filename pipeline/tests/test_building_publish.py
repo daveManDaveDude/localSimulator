@@ -132,3 +132,46 @@ def test_failed_directory_swap_rolls_back_previous_output(
     assert {name: (output / name).read_bytes() for name in FILES} == old_bytes
     assert not list(terrain.glob(".buildings-stage-*"))
     assert not list(terrain.glob(".buildings-backup-*"))
+
+
+@pytest.mark.parametrize("source_is_nested", [True, False])
+def test_publish_rejects_nested_source_and_preserves_all_input_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source_is_nested: bool
+) -> None:
+    terrain = tmp_path / "terrain"
+    terrain.mkdir()
+    (terrain / "manifest.json").write_bytes(b"terrain manifest")
+    (terrain / "heightfield.f32").write_bytes(b"terrain data")
+    if source_is_nested:
+        source = terrain / "buildings" / "source"
+        _package(source)
+    else:
+        source = tmp_path / "source"
+        _package(source)
+        nested_terrain = source / "terrain"
+        nested_terrain.mkdir()
+        terrain = nested_terrain
+        (terrain / "manifest.json").write_bytes(b"terrain manifest")
+        (terrain / "heightfield.f32").write_bytes(b"terrain data")
+    monkeypatch.setattr(publisher, "validate_building_package", _validate)
+    source_before = {
+        path.relative_to(source): path.read_bytes() for path in source.rglob("*") if path.is_file()
+    }
+    terrain_before = {
+        path.relative_to(terrain): path.read_bytes()
+        for path in terrain.rglob("*")
+        if path.is_file()
+    }
+
+    with pytest.raises(publisher.BuildingPublishError, match="non-nested"):
+        _publish(source, terrain)
+
+    assert {
+        path.relative_to(source): path.read_bytes() for path in source.rglob("*") if path.is_file()
+    } == source_before
+    assert {
+        path.relative_to(terrain): path.read_bytes()
+        for path in terrain.rglob("*")
+        if path.is_file()
+    } == terrain_before
+    assert not list(terrain.glob(".buildings-stage-*"))
