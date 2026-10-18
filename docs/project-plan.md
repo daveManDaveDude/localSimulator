@@ -525,7 +525,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **TVW-009 status:** Passed independent review after Luna fix 2 (`42bafd6`). The completed issue covers building import, height policy, asset validation and QA only. Preserve the current 1,000 m AOI and pending overall coverage status; mapped building counts do not establish completeness. Roads and remaining feature checks are not included. The combined M4 renderer/terrain-footing gate remains open for TVW-010.
 
-**TVW-010 status:** User-authorized on 2026-10-18; Sol specification is starting. Scope is browser loading and rendering of validated OSM building footprints on the local EA terrain with terrain-following bases. Preserve the synthetic default and pending AOI status. No roads or later issue.
+**TVW-010 status:** User-authorized on 2026-10-18; Sol specification accepted on 2026-10-18 and implementation is starting. Scope is browser loading/rendering of the validated local OSM package on EA terrain with terrain-following wall bases. The documented flat-roof convention is highest terrain beneath each complete footprint plus its validated estimated height. Preserve the synthetic default and pending AOI status. No roads or later issue. See [TVW-010 specification](milestones/TVW-010-spec.md).
 
 **User-visible result:** **real buildings** stand on the slopes at approximately correct plan positions and shapes.
 
