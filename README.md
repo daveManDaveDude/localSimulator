@@ -53,7 +53,7 @@ The generator writes the original 3 × 3 loader fixture plus a separate 25 × 19
 
 ## AOI and EA DTM inspection
 
-The Python pipeline is separate from the browser and uses no online transformation-grid downloads. The 2026-10-17 user-approved revision derives a 1,000 m × 1,000 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. It keeps the previously verified WGS84 and BNG centre unchanged. The anchor is a postcode centroid, not a property or survey point. The candidate remains `selected_pending_coverage`; OSM/OS building and road counts have not been checked, so the AOI is not frozen.
+The Python pipeline is separate from the browser and uses no online transformation-grid downloads. The 2026-10-17 user-approved revision derives a 1,000 m × 1,000 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. It keeps the previously verified WGS84 and BNG centre unchanged. The anchor is a postcode centroid, not a property or survey point. The candidate remains `selected_pending_coverage`; OSM building footprints have been imported and QA-checked, but their mapped count does not prove completeness. OS building and OSM/OS road checks remain outstanding, so the AOI is not frozen.
 
 Create the isolated Python environment in PowerShell:
 
