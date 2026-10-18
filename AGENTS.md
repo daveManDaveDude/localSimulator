@@ -1,10 +1,10 @@
 # Project instructions
 
-TVW-004 through TVW-009 are complete and independently reviewed; M0, M1 and the M3 terrain-only issue are complete. TVW-009 imported and QA-checked OSM building footprints, but mapped feature counts do not prove completeness and road/remaining feature checks are outstanding. The user has not authorized TVW-010 or later. Keep the AOI pending and do not call it approved or frozen. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` / `not_checked` status.
+TVW-004 through TVW-009 are complete and independently reviewed; M0, M1 and the M3 terrain-only issue are complete. On 2026-10-18 the user separately authorized TVW-010 for browser rendering of the local building package on terrain. Road rendering, TVW-011 and later remain unauthorized. Mapped feature counts do not prove completeness and road/remaining feature checks are outstanding. Keep the AOI pending and do not call it approved or frozen. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` / `not_checked` status.
 
 ## Working protocol
 
-1. Work on **one milestone and one focused issue** at a time. M0, M1 and TVW-008/M3 are complete and independently reviewed. TVW-008 preserved the pending overall AOI status and synthetic worlds. TVW-009/M4 import, height policy and QA passed independent review; the combined M4 renderer/terrain-footing gate and TVW-010 remain unauthorized until separate user instruction.
+1. Work on **one milestone and one focused issue** at a time. M0, M1 and TVW-008/M3 are complete and independently reviewed. TVW-008 preserved the pending overall AOI status and synthetic worlds. TVW-009/M4 import, height policy and QA passed independent review. The user separately authorized TVW-010 browser building rendering; do not begin TVW-011 or later without separate instruction.
 2. Start with an implementation plan, concrete files touched, tests and proof of completion.
 3. Keep geographic calculations in tested Python modules and typed, documented asset contracts. No ad-hoc coordinate transforms scattered across React/Three.js render logic.
 4. Maintain a **fully functioning synthetic world** at all times.
