@@ -237,9 +237,64 @@ describe('loadBuildingPackage', () => {
     expect(await sha256Hex(payloadBytes)).toBe(manifest.buildings.sha256);
   });
 
+  it('loads fully rehashed components that share only a boundary edge', async () => {
+    const terrain = createRealManifest();
+    const feature = createFeature({
+      geometry: {
+        type: 'MultiPolygon',
+        polygons: [
+          {
+            exteriorXZ: [
+              [-2, -2],
+              [0, -2],
+              [0, 0],
+              [-2, 0],
+              [-2, -2],
+            ],
+            interiorRingsXZ: [],
+          },
+          {
+            exteriorXZ: [
+              [0, -2],
+              [2, -2],
+              [2, 0],
+              [0, 0],
+              [0, -2],
+            ],
+            interiorRingsXZ: [],
+          },
+        ],
+      },
+      footprintAreaM2: 8,
+    });
+    const payloadBytes = new TextEncoder().encode(
+      JSON.stringify(createBuildingPayload([feature])),
+    ).buffer;
+    const qaBytes = new TextEncoder().encode(
+      JSON.stringify(createBuildingQa([feature])),
+    ).buffer;
+    const manifest = await createPackageManifest(
+      terrain,
+      payloadBytes,
+      qaBytes,
+    );
+    const manifestBytes = new TextEncoder().encode(
+      JSON.stringify(manifest),
+    ).buffer;
+    const { fetcher } = createFetcher({
+      manifestBytes,
+      payloadBytes,
+      qaBytes,
+    });
+
+    const result = await loadBuildingPackage(manifestUrl, terrain, fetcher);
+    expect(result.componentCount).toBe(2);
+  });
+
   it.each([
     'crossing-hole',
     'overlapping-components',
+    'boundary-contained-overlap',
     'outside-aoi',
     'canonical-duplicate',
   ] as const)(
@@ -306,6 +361,37 @@ describe('loadBuildingPackage', () => {
               ],
             },
             footprintAreaM2: 50,
+          }),
+        ];
+      } else if (kind === 'boundary-contained-overlap') {
+        features = [
+          createFeature({
+            geometry: {
+              type: 'MultiPolygon',
+              polygons: [
+                {
+                  exteriorXZ: [
+                    [-2, -2],
+                    [2, -2],
+                    [2, 2],
+                    [-2, 2],
+                    [-2, -2],
+                  ],
+                  interiorRingsXZ: [],
+                },
+                {
+                  exteriorXZ: [
+                    [0, -2],
+                    [2, 0],
+                    [0, 2],
+                    [-2, 0],
+                    [0, -2],
+                  ],
+                  interiorRingsXZ: [],
+                },
+              ],
+            },
+            footprintAreaM2: 24,
           }),
         ];
       } else if (kind === 'outside-aoi') {

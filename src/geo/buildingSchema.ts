@@ -476,25 +476,6 @@ function ringEdges(ring: XzPosition[]): Array<[XzPosition, XzPosition]> {
   ]);
 }
 
-function hasPositiveLengthCollinearOverlap(
-  a: XzPosition,
-  b: XzPosition,
-  c: XzPosition,
-  d: XzPosition,
-): boolean {
-  if (
-    Math.abs(orientation(a, b, c)) > 1e-10 ||
-    Math.abs(orientation(a, b, d)) > 1e-10
-  ) {
-    return false;
-  }
-  const axis = Math.abs(b[0] - a[0]) >= Math.abs(b[1] - a[1]) ? 0 : 1;
-  const overlap =
-    Math.min(Math.max(a[axis], b[axis]), Math.max(c[axis], d[axis])) -
-    Math.max(Math.min(a[axis], b[axis]), Math.min(c[axis], d[axis]));
-  return overlap > 1e-10;
-}
-
 function hasForbiddenRingIntersection(
   first: XzPosition[],
   second: XzPosition[],
@@ -510,11 +491,7 @@ function hasForbiddenRingIntersection(
       const properCrossing =
         ((abC > 1e-10 && abD < -1e-10) || (abC < -1e-10 && abD > 1e-10)) &&
         ((cdA > 1e-10 && cdB < -1e-10) || (cdA < -1e-10 && cdB > 1e-10));
-      if (
-        !allowPointContacts ||
-        properCrossing ||
-        hasPositiveLengthCollinearOverlap(a, b, c, d)
-      ) {
+      if (!allowPointContacts || properCrossing) {
         return true;
       }
     }
@@ -532,6 +509,72 @@ function pointInPolygonInterior(
   );
 }
 
+function segmentIntersectionParameters(
+  a: XzPosition,
+  b: XzPosition,
+  c: XzPosition,
+  d: XzPosition,
+): number[] {
+  const abX = b[0] - a[0];
+  const abZ = b[1] - a[1];
+  const cdX = d[0] - c[0];
+  const cdZ = d[1] - c[1];
+  const denominator = abX * cdZ - abZ * cdX;
+  const acX = c[0] - a[0];
+  const acZ = c[1] - a[1];
+  if (Math.abs(denominator) <= 1e-12) {
+    if (Math.abs(acX * abZ - acZ * abX) > 1e-10) return [];
+    const lengthSquared = abX * abX + abZ * abZ;
+    if (lengthSquared <= 1e-20) return [];
+    const cParameter = (acX * abX + acZ * abZ) / lengthSquared;
+    const dParameter =
+      ((d[0] - a[0]) * abX + (d[1] - a[1]) * abZ) / lengthSquared;
+    const start = Math.max(0, Math.min(cParameter, dParameter));
+    const end = Math.min(1, Math.max(cParameter, dParameter));
+    if (start > end + 1e-10) return [];
+    return [Math.min(1, Math.max(0, start)), Math.min(1, Math.max(0, end))];
+  }
+
+  const t = (acX * cdZ - acZ * cdX) / denominator;
+  const u = (acX * abZ - acZ * abX) / denominator;
+  if (t < -1e-10 || t > 1 + 1e-10 || u < -1e-10 || u > 1 + 1e-10) {
+    return [];
+  }
+  return [Math.min(1, Math.max(0, t))];
+}
+
+function hasBoundaryIntervalInsidePolygon(
+  ring: XzPosition[],
+  polygon: BuildingPolygon,
+): boolean {
+  const boundaryRings = [polygon.exteriorXZ, ...polygon.interiorRingsXZ];
+  for (const [a, b] of ringEdges(ring)) {
+    const cuts = [0, 1];
+    for (const boundaryRing of boundaryRings) {
+      for (const [c, d] of ringEdges(boundaryRing)) {
+        cuts.push(...segmentIntersectionParameters(a, b, c, d));
+      }
+    }
+    cuts.sort((first, second) => first - second);
+    const uniqueCuts = cuts.filter(
+      (value, index) =>
+        index === 0 || Math.abs(value - cuts[index - 1]!) > 1e-10,
+    );
+    for (let index = 0; index < uniqueCuts.length - 1; index += 1) {
+      const start = uniqueCuts[index]!;
+      const end = uniqueCuts[index + 1]!;
+      if (end - start <= 1e-10) continue;
+      const parameter = (start + end) / 2;
+      const point: XzPosition = [
+        a[0] + (b[0] - a[0]) * parameter,
+        a[1] + (b[1] - a[1]) * parameter,
+      ];
+      if (pointInPolygonInterior(point, polygon)) return true;
+    }
+  }
+  return false;
+}
+
 function polygonsOverlap(
   first: BuildingPolygon,
   second: BuildingPolygon,
@@ -546,6 +589,8 @@ function polygonsOverlap(
     }
   }
   return (
+    firstRings.some((ring) => hasBoundaryIntervalInsidePolygon(ring, second)) ||
+    secondRings.some((ring) => hasBoundaryIntervalInsidePolygon(ring, first)) ||
     first.exteriorXZ
       .slice(0, -1)
       .some((point) => pointInPolygonInterior(point, second)) ||
