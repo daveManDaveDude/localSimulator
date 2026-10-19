@@ -12,12 +12,13 @@ from torquay_pipeline.alignment_report import (
     AOI_BOUNDS_M,
     AXIS_MAPPING,
     OS_ATTRIBUTION,
-    OS_LICENCE_URL,
     RASTER_REGISTRATION,
     AlignmentReportError,
+    _expected_comparison_window,
     _load_config,
     _markdown_report,
     _package_summary,
+    _source_report_metadata,
     _validated_control,
     _write_validated_alignment_report,
     load_local_packages,
@@ -45,21 +46,10 @@ def _report_fixture(root: Path) -> dict:
     config_bytes = json.dumps(config, sort_keys=True).encode()
     config_path.write_bytes(config_bytes)
 
-    manifest = {
-        "sources": [
-            {
-                "sourceId": "os-openmap-local-apr-2026-sx",
-                "product": "OS OpenMap–Local GeoTIFF Full Colour",
-                "edition": "April 2026",
-                "licence": {
-                    "name": "Open Government Licence v3.0",
-                    "url": OS_LICENCE_URL,
-                    "requiredAttribution": OS_ATTRIBUTION,
-                },
-            }
-        ]
-    }
-    manifest_bytes = json.dumps(manifest, sort_keys=True).encode()
+    source_manifest_path = project / "data" / "comparison-source-manifest.json"
+    manifest_bytes = source_manifest_path.read_bytes()
+    manifest = json.loads(manifest_bytes)
+    source_record = manifest["sources"][0]
     manifest_path = root / "data" / "comparison-source-manifest.json"
     manifest_path.parent.mkdir(parents=True)
     manifest_path.write_bytes(manifest_bytes)
@@ -173,7 +163,7 @@ def _report_fixture(root: Path) -> dict:
         evidence = []
         scene_path = None
         for kind in ("reference", "overlay", "package", "scene"):
-            relative = f"docs/milestones/screenshots/{spot_id}-{kind}.png"
+            relative = f"docs/milestones/screenshots/TVW-012-{spot_id}-{kind}.png"
             image = (spot_id + kind).encode()
             path = root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -184,6 +174,9 @@ def _report_fixture(root: Path) -> dict:
             if kind == "scene":
                 scene_path = path
         control = source_spot["control"]
+        comparison_window, pixel_reference = _expected_comparison_window(
+            source_spot, source_record, f"spots[{len(spots)}]"
+        )
         target = control["local_xz_m"]
         sampled_ground = 40.0
         camera = {
@@ -241,14 +234,9 @@ def _report_fixture(root: Path) -> dict:
                     "localXZMetres": control["local_xz_m"],
                     "bngENMetres": control["bng_e_n_m"],
                     "wgs84LonLat": control["wgs84_lon_lat"],
+                    "pixelReference": pixel_reference,
                 },
-                "comparisonWindow": {
-                    "bngBoundsM": source_spot["window_bounds_bng_m"],
-                    "actualRasterPixelEdgeBoundsM": source_spot["window_bounds_bng_m"],
-                    "widthPixels": 200,
-                    "heightPixels": 200,
-                    "tileNames": ["SX96NW.tif"],
-                },
+                "comparisonWindow": comparison_window,
                 "browserSession": {
                     "expectedContextId": spot_id,
                     "cameraPoseLocalMetres": camera,
@@ -304,20 +292,7 @@ def _report_fixture(root: Path) -> dict:
         "formatVersion": 1,
         "reportId": config["report_id"],
         "sourceIndependence": "independent_publisher_os_openmap_local",
-        "source": {
-            "sourceId": "os-openmap-local-apr-2026-sx",
-            "publisher": "Ordnance Survey",
-            "product": "OS OpenMap–Local GeoTIFF Full Colour",
-            "edition": "April 2026",
-            "archiveFilename": "fixture.zip",
-            "archiveBytes": 1,
-            "archiveSha256": "a" * 64,
-            "licence": {
-                "name": "Open Government Licence v3.0",
-                "url": OS_LICENCE_URL,
-                "requiredAttribution": OS_ATTRIBUTION,
-            },
-        },
+        "source": _source_report_metadata(source_record),
         "sourceManifest": {
             "path": "data/comparison-source-manifest.json",
             "sha256": _sha(manifest_bytes),
@@ -423,6 +398,20 @@ def test_report_rejects_stale_evidence_integrity(tmp_path: Path) -> None:
         validate_alignment_report(report, tmp_path)
 
 
+def test_report_rejects_panel_evidence_from_a_different_registered_spot(tmp_path: Path) -> None:
+    report = _report_fixture(tmp_path)
+    evidence = report["spots"][0]["evidence"][0]
+    other_panel = report["spots"][1]["evidence"][0]
+    evidence.update(
+        path=other_panel["path"],
+        byteLength=other_panel["byteLength"],
+        sha256=other_panel["sha256"],
+    )
+
+    with pytest.raises(AlignmentReportError, match="registered reference panel"):
+        validate_alignment_report(report, tmp_path)
+
+
 def test_report_rejects_stale_source_manifest_integrity(tmp_path: Path) -> None:
     report = _report_fixture(tmp_path)
     manifest_path = tmp_path / report["sourceManifest"]["path"]
@@ -493,6 +482,39 @@ def test_report_rejects_unbound_control_package_and_pose_mutations(
         validate_alignment_report(report, tmp_path)
 
 
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        (
+            lambda report: (
+                report["spots"][0]["comparisonWindow"].update(
+                    actualRasterPixelEdgeBoundsM=[0, 0, 200, 200]
+                ),
+                report["spots"][0]["control"]["pixelReference"].update(
+                    actualPixelEdgeWindowBNGMetres=[0, 0, 200, 200]
+                ),
+            ),
+            "comparisonWindow",
+        ),
+        (lambda report: report["source"].update(archiveSha256="0" * 64), "source archive/tile"),
+        (
+            lambda report: report["source"]["selectedTiles"][0].update(
+                transform=[1, 0, 0, 0, -1, 0]
+            ),
+            "source archive/tile",
+        ),
+    ],
+)
+def test_report_rejects_unbound_source_raster_and_window_metadata(
+    tmp_path: Path, mutate, message: str
+) -> None:
+    report = _report_fixture(tmp_path)
+    mutate(report)
+
+    with pytest.raises(AlignmentReportError, match=message):
+        validate_alignment_report(report, tmp_path)
+
+
 def test_validated_control_rejects_wgs84_zero_zero(tmp_path: Path) -> None:
     _report_fixture(tmp_path)
     config, _ = _load_config(tmp_path / "config/alignment.torquay.json")
@@ -528,7 +550,7 @@ def test_report_markdown_links_are_relative_to_milestone_directory(tmp_path: Pat
 
     markdown = _markdown_report(report)
 
-    assert "(screenshots/ne-second-main-reference.png)" in markdown
+    assert "(screenshots/TVW-012-ne-second-main-reference.png)" in markdown
     assert "(artifacts/TVW-012-prior-sw-inconclusive.json)" in markdown
     assert "(docs/milestones/screenshots/" not in markdown
 

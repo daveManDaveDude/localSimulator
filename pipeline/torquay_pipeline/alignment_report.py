@@ -47,6 +47,7 @@ RASTER_REGISTRATION = (
     "AREA_OR_POINT=Area; pixel centers are left+column+0.5 m and top-row-0.5 m. "
     "Source imagery is read as-is without warp/resampling."
 )
+PIXEL_EDGE_REGISTRATION = "AREA_OR_POINT=Area; source raster is not warped or resampled"
 
 
 class AlignmentReportError(ValueError):
@@ -451,6 +452,223 @@ def _load_report_config(report: dict[str, Any], project_root: Path) -> dict[str,
         raise AlignmentReportError("alignmentConfig file is missing or its SHA-256 differs")
     config, _ = _load_config(path)
     return config
+
+
+def _json_values_equal(actual: Any, expected: Any) -> bool:
+    """Compare JSON values without Python's bool-as-int equality shortcut."""
+    try:
+        return json.dumps(
+            actual, sort_keys=True, ensure_ascii=False, allow_nan=False
+        ) == json.dumps(expected, sort_keys=True, ensure_ascii=False, allow_nan=False)
+    except (TypeError, ValueError):
+        return False
+
+
+def _source_report_metadata(source_record: dict[str, Any]) -> dict[str, Any]:
+    """Map the accepted source manifest record to the report's verified source view."""
+    archive = source_record.get("archive")
+    tiles = source_record.get("selectedTiles")
+    if not isinstance(archive, dict) or not isinstance(tiles, list) or len(tiles) != 2:
+        raise AlignmentReportError("comparison source manifest archive/tiles are malformed")
+    archive_path = archive.get("relativePath")
+    if (
+        not isinstance(archive_path, str)
+        or not archive_path
+        or "\\" in archive_path
+        or ":" in archive_path
+        or Path(archive_path).is_absolute()
+        or any(part in {"", ".", ".."} for part in Path(archive_path).parts)
+    ):
+        raise AlignmentReportError("comparison source manifest archive path is unsafe")
+    if (
+        isinstance(archive.get("sizeBytes"), bool)
+        or not isinstance(archive.get("sizeBytes"), int)
+        or archive["sizeBytes"] <= 0
+        or not isinstance(archive.get("sha256"), str)
+        or len(archive["sha256"]) != 64
+        or any(character not in "0123456789abcdef" for character in archive["sha256"])
+    ):
+        raise AlignmentReportError("comparison source manifest archive identity is malformed")
+    report_tiles: list[dict[str, Any]] = []
+    for index, tile in enumerate(tiles):
+        if not isinstance(tile, dict):
+            raise AlignmentReportError(f"comparison source selectedTiles[{index}] is malformed")
+        member = tile.get("archiveMember")
+        relative_path = tile.get("relativePath")
+        raster = tile.get("raster")
+        if (
+            not isinstance(member, str)
+            or not member
+            or not isinstance(relative_path, str)
+            or not relative_path
+            or "\\" in relative_path
+            or ":" in relative_path
+            or Path(relative_path).is_absolute()
+            or any(part in {"", ".", ".."} for part in Path(relative_path).parts)
+            or not isinstance(raster, dict)
+        ):
+            raise AlignmentReportError(
+                f"comparison source selectedTiles[{index}] identity/raster is malformed"
+            )
+        report_tiles.append(
+            {
+                "member": member,
+                "filename": Path(relative_path).name,
+                "sizeBytes": tile.get("sizeBytes"),
+                "sha256": tile.get("sha256"),
+                "crc32": tile.get("crc32"),
+                "crs": raster.get("crs"),
+                "width": raster.get("width"),
+                "height": raster.get("height"),
+                "bandCount": raster.get("bandCount"),
+                "dtype": raster.get("dtype"),
+                "transform": raster.get("transform"),
+                "boundsM": raster.get("boundsM"),
+                "resolutionM": raster.get("resolutionM"),
+                "colorInterpretation": raster.get("colorInterpretation"),
+                "pixelInterpretation": raster.get("pixelInterpretation"),
+                "nodata": raster.get("nodata"),
+                "paletteEntries": raster.get("paletteEntries"),
+                "tags": raster.get("tags"),
+            }
+        )
+    licence = source_record.get("licence")
+    acquisition = source_record.get("acquisition")
+    if not isinstance(licence, dict) or not isinstance(acquisition, dict):
+        raise AlignmentReportError("comparison source manifest licence/acquisition is malformed")
+    return {
+        "sourceId": source_record.get("sourceId"),
+        "publisher": source_record.get("publisher"),
+        "product": source_record.get("product"),
+        "edition": source_record.get("edition"),
+        "archiveFilename": Path(archive_path).name,
+        "archiveBytes": archive["sizeBytes"],
+        "archiveSha256": archive["sha256"],
+        "selectedTiles": report_tiles,
+        "licence": licence,
+        "acquisition": acquisition,
+    }
+
+
+def _expected_comparison_window(
+    config_spot: dict[str, Any], source_record: dict[str, Any], label: str
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Derive exact pixel-edge and tile registration from config and source metadata."""
+    requested_values = config_spot.get("window_bounds_bng_m")
+    if (
+        not isinstance(requested_values, list)
+        or len(requested_values) != 4
+        or any(
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+            for value in requested_values
+        )
+    ):
+        raise AlignmentReportError(f"{label}.comparisonWindow config bounds are malformed")
+    requested = [float(value) for value in requested_values]
+    left, bottom, right, top = requested
+    if left >= right or bottom >= top:
+        raise AlignmentReportError(f"{label}.comparisonWindow config bounds are unordered")
+    pixel_edges = [
+        float(math.floor(left)),
+        float(math.floor(bottom)),
+        float(math.ceil(right)),
+        float(math.ceil(top)),
+    ]
+    pixel_left, pixel_bottom, pixel_right, pixel_top = pixel_edges
+    width, height = pixel_right - pixel_left, pixel_top - pixel_bottom
+    if width <= 0 or height <= 0 or width * height > 25_000_000:
+        raise AlignmentReportError(f"{label}.comparisonWindow has unsafe pixel dimensions")
+
+    records = source_record.get("selectedTiles")
+    if not isinstance(records, list):
+        raise AlignmentReportError("comparison source selectedTiles are malformed")
+    tile_bounds: list[tuple[str, tuple[float, float, float, float]]] = []
+    for index, record in enumerate(records):
+        raster = record.get("raster") if isinstance(record, dict) else None
+        bounds = raster.get("boundsM") if isinstance(raster, dict) else None
+        relative_path = record.get("relativePath") if isinstance(record, dict) else None
+        if (
+            not isinstance(bounds, list)
+            or len(bounds) != 4
+            or any(
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                for value in bounds
+            )
+            or not isinstance(relative_path, str)
+        ):
+            raise AlignmentReportError(
+                f"comparison source selectedTiles[{index}] raster bounds are malformed"
+            )
+        tile_bounds.append((Path(relative_path).name, tuple(float(v) for v in bounds)))
+
+    used_tiles = sorted(
+        name
+        for name, (tile_left, tile_bottom, tile_right, tile_top) in tile_bounds
+        if max(pixel_left, tile_left) < min(pixel_right, tile_right)
+        and max(pixel_bottom, tile_bottom) < min(pixel_top, tile_top)
+    )
+    if not used_tiles:
+        raise AlignmentReportError(f"{label}.comparisonWindow is outside selected raster tiles")
+    x_edges = sorted(
+        {float(pixel_left), float(pixel_right)}
+        | {
+            max(float(pixel_left), bounds[0])
+            for _, bounds in tile_bounds
+            if pixel_left < bounds[2] and pixel_right > bounds[0]
+        }
+        | {
+            min(float(pixel_right), bounds[2])
+            for _, bounds in tile_bounds
+            if pixel_left < bounds[2] and pixel_right > bounds[0]
+        }
+    )
+    y_edges = sorted(
+        {float(pixel_bottom), float(pixel_top)}
+        | {
+            max(float(pixel_bottom), bounds[1])
+            for _, bounds in tile_bounds
+            if pixel_bottom < bounds[3] and pixel_top > bounds[1]
+        }
+        | {
+            min(float(pixel_top), bounds[3])
+            for _, bounds in tile_bounds
+            if pixel_bottom < bounds[3] and pixel_top > bounds[1]
+        }
+    )
+    for y0, y1 in zip(y_edges, y_edges[1:], strict=False):
+        for x0, x1 in zip(x_edges, x_edges[1:], strict=False):
+            if x1 <= x0 or y1 <= y0:
+                continue
+            if not any(
+                bounds[0] <= x0 and x1 <= bounds[2] and bounds[1] <= y0 and y1 <= bounds[3]
+                for _, bounds in tile_bounds
+            ):
+                raise AlignmentReportError(
+                    f"{label}.comparisonWindow has an uncovered raster pixel gap"
+                )
+    comparison = {
+        "bngBoundsM": requested,
+        "actualRasterPixelEdgeBoundsM": pixel_edges,
+        "widthPixels": int(width),
+        "heightPixels": int(height),
+        "pixelSizeM": 1.0,
+        "tileNames": used_tiles,
+    }
+    observation = config_spot.get("manual_observation")
+    pixel_reference = {
+        "registration": PIXEL_EDGE_REGISTRATION,
+        "pixelSizeM": 1.0,
+        "requestedWindowBNGMetres": requested,
+        "actualPixelEdgeWindowBNGMetres": pixel_edges,
+        "manualReferencePointBNGMetres": (
+            observation.get("reference_point_bng_m") if isinstance(observation, dict) else None
+        ),
+    }
+    return comparison, pixel_reference
 
 
 def _validate_report_coordinate_reference(report: dict[str, Any], packages: LocalPackages) -> None:
@@ -1181,6 +1399,10 @@ def validate_alignment_report(
         or ":" in source_manifest_path_text
     ):
         raise AlignmentReportError("sourceManifest.path must be a safe project-relative path")
+    if source_manifest_path_text != "data/comparison-source-manifest.json":
+        raise AlignmentReportError(
+            "sourceManifest.path must bind data/comparison-source-manifest.json"
+        )
     source_manifest_path = Path(source_manifest_path_text)
     if source_manifest_path.is_absolute() or any(
         part in {"", ".", ".."} for part in source_manifest_path.parts
@@ -1206,15 +1428,21 @@ def validate_alignment_report(
     source_records = (
         source_manifest_value.get("sources") if isinstance(source_manifest_value, dict) else None
     )
-    if not isinstance(source_records, list) or not any(
-        isinstance(item, dict)
-        and item.get("sourceId") == source.get("sourceId")
-        and item.get("product") == source.get("product")
-        and item.get("edition") == source.get("edition")
-        and item.get("licence") == licence
-        for item in source_records
+    if (
+        not isinstance(source_manifest_value, dict)
+        or source_manifest_value.get("formatVersion") != 1
+        or source_manifest_value.get("scope") != "comparison-only"
+        or not isinstance(source_records, list)
+        or len(source_records) != 1
+        or not isinstance(source_records[0], dict)
     ):
-        raise AlignmentReportError("source metadata does not match the bound comparison manifest")
+        raise AlignmentReportError("bound comparison source manifest has an invalid structure")
+    source_record = source_records[0]
+    expected_source = _source_report_metadata(source_record)
+    if not _json_values_equal(source, expected_source):
+        raise AlignmentReportError(
+            "source archive/tile/raster metadata does not match the bound comparison manifest"
+        )
     browser_descriptor = report.get("browserSessionEvidence")
     if not isinstance(browser_descriptor, dict):
         raise AlignmentReportError("alignment report browserSessionEvidence is missing")
@@ -1301,6 +1529,21 @@ def validate_alignment_report(
         if config_spot is None:
             raise AlignmentReportError(f"{label}.id is not in the bound accepted configuration")
         _validate_report_controls(spot, config_spot)
+        expected_window, expected_pixel_reference = _expected_comparison_window(
+            config_spot, source_record, label
+        )
+        if not _json_values_equal(spot.get("comparisonWindow"), expected_window):
+            raise AlignmentReportError(
+                f"{label}.comparisonWindow pixel edges/tiles do not match the accepted "
+                "config and source raster metadata"
+            )
+        control_record = spot.get("control")
+        if not isinstance(control_record, dict) or not _json_values_equal(
+            control_record.get("pixelReference"), expected_pixel_reference
+        ):
+            raise AlignmentReportError(
+                f"{label}.control.pixelReference does not match the registered raster window"
+            )
         status = spot.get("alignmentStatus")
         if not isinstance(status, str) or status not in {
             "pass",
@@ -1339,6 +1582,13 @@ def validate_alignment_report(
             path = Path(path_text)
             if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
                 raise AlignmentReportError(f"{label}.evidence path is unsafe")
+            expected_evidence_path = (
+                Path("docs/milestones/screenshots") / f"TVW-012-{spot['id']}-{kind}.png"
+            ).as_posix()
+            if path_text != expected_evidence_path:
+                raise AlignmentReportError(
+                    f"{label}.evidence path does not identify the registered {kind} panel"
+                )
             candidate = (project_root / Path(*path.parts)).resolve()
             try:
                 candidate.relative_to(project_root.resolve())
@@ -1937,16 +2187,7 @@ def build_alignment_artifacts(
         "combinedM5Status": "pending",
         "sourceIndependence": "independent_publisher_os_openmap_local",
         "source": {
-            "sourceId": source.record["sourceId"],
-            "publisher": source.record["publisher"],
-            "product": source.record["product"],
-            "edition": source.record["edition"],
-            "archiveFilename": source.archive_path.name,
-            "archiveBytes": source.archive_path.stat().st_size,
-            "archiveSha256": source.record["archive"]["sha256"],
-            "selectedTiles": [tile.to_dict() for tile in source.tiles],
-            "licence": source.record["licence"],
-            "acquisition": source.record["acquisition"],
+            **_source_report_metadata(source.record),
         },
         "sourceManifest": {
             "path": source.manifest_path.relative_to(project_root).as_posix(),
