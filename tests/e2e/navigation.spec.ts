@@ -361,6 +361,44 @@ test('walk mode follows the synthetic heightfield and preserves flight semantics
   );
   await expect(page.getByTestId('walk-acquisition')).toBeVisible();
   await page.waitForTimeout(180);
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-navigation-suspended',
+    'true',
+  );
+  const beforeBlur = await position(page);
+  await page.waitForTimeout(350);
+  const afterBlur = await position(page);
+  expect(Math.abs(afterBlur.y - beforeBlur.y)).toBeLessThan(0.03);
+  await expect(page.getByTestId('flight-state')).toHaveAttribute(
+    'data-locked',
+    'true',
+  );
+
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-navigation-suspended',
+    'false',
+  );
+  await page.waitForTimeout(180);
+  const afterFocus = await position(page);
+  expect(afterFocus.y).toBeLessThan(afterBlur.y - 0.5);
+  await expect(page.getByTestId('navigation-mode')).toHaveAttribute(
+    'data-mode',
+    'walk',
+  );
+  expect(await clearance(page)).toBeCloseTo(1.7, 1);
+
+  // Keep the separate acquisition-cancellation regression after the lifecycle
+  // resume has completed successfully.
+  await page.keyboard.press('f');
+  await holdKey(page, 'Space', 1_000);
+  await page.keyboard.press('f');
+  await expect(page.getByTestId('navigation-mode')).toHaveAttribute(
+    'data-mode',
+    'entering-walk',
+  );
+  await page.waitForTimeout(180);
   const beforeCancel = await position(page);
   await page.keyboard.press('f');
   await expect(page.getByTestId('navigation-mode')).toHaveAttribute(

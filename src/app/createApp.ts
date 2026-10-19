@@ -1452,6 +1452,9 @@ export function createApp(container: HTMLElement): AppHandle {
       `Pitch ${pitchDegrees.toFixed(1)}°`;
 
     flightState.dataset.locked = String(controller?.isLocked ?? false);
+    shell.dataset.navigationSuspended = String(
+      controller?.isNavigationSuspended ?? false,
+    );
     const navigationMode = controller?.mode ?? 'fly';
     flightState.dataset.mode = navigationMode;
     flightState.textContent =

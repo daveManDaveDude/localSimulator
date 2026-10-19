@@ -1,3 +1,4 @@
+import { Euler, type Camera } from 'three';
 import type { FlightBounds, Vec3Like } from './movement';
 
 export type TerrainSampler = (x: number, z: number) => number | null;
@@ -33,6 +34,42 @@ export const DEFAULT_WALK_CONFIG: WalkConfig = {
   boostMultiplier: 2.75,
   eyeClearanceMeters: 1.7,
 };
+
+/**
+ * Returns the yaw maintained by PointerLockControls' YXZ camera orientation.
+ * The camera's projected look vector loses horizontal direction at vertical
+ * pitch, while the Euler yaw remains stable across the full pitch range.
+ */
+export function walkYawRadiansFromCamera(
+  camera: Pick<Camera, 'quaternion'>,
+): number {
+  const pointerLockOrientation = new Euler(0, 0, 0, 'YXZ').setFromQuaternion(
+    camera.quaternion,
+    'YXZ',
+  );
+  return -pointerLockOrientation.y;
+}
+
+/** The exact camera-to-ground-movement path used by FreeFlyController. */
+export function advanceCameraWalkPosition(
+  camera: Pick<Camera, 'quaternion'>,
+  position: Readonly<Vec3Like>,
+  input: Readonly<WalkInput>,
+  elapsedSeconds: number,
+  bounds: Readonly<FlightBounds>,
+  sampleHeight: TerrainSampler,
+  config: Readonly<WalkConfig> = DEFAULT_WALK_CONFIG,
+): WalkStep {
+  return advanceWalkPosition(
+    position,
+    walkYawRadiansFromCamera(camera),
+    input,
+    elapsedSeconds,
+    bounds,
+    sampleHeight,
+    config,
+  );
+}
 
 const EPSILON = 1e-9;
 

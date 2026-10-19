@@ -7,6 +7,8 @@ import {
 } from './walkMovement';
 import { boundedFrameSteps } from './movement';
 import type { FlightBounds, Vec3Like } from './movement';
+import { Euler, PerspectiveCamera } from 'three';
+import { advanceCameraWalkPosition } from './walkMovement';
 
 const bounds: FlightBounds = {
   minX: -5,
@@ -164,6 +166,38 @@ describe('advanceWalkPosition', () => {
     expect(tooHigh.accepted).toBe(false);
     expect(tooHigh.reason).toBe('outside-y-bounds');
   });
+});
+
+describe('walking heading from camera orientation', () => {
+  it.each([
+    [-Math.PI / 2 + 1e-10, 30],
+    [-Math.PI / 2, 30],
+    [Math.PI / 2 - 1e-10, 30],
+    [Math.PI / 2, 30],
+    [-Math.PI / 2 + 1e-10, 45],
+    [-Math.PI / 2, 45],
+    [Math.PI / 2 - 1e-10, 45],
+    [Math.PI / 2, 45],
+  ] as const)(
+    'keeps yaw at vertical pitch %s and heading %i degrees',
+    (pitch, headingDegrees) => {
+      const camera = new PerspectiveCamera();
+      const heading = (headingDegrees * Math.PI) / 180;
+      camera.quaternion.setFromEuler(new Euler(pitch, -heading, 0, 'YXZ'));
+
+      const step = advanceCameraWalkPosition(
+        camera,
+        position,
+        { forward: 1, strafe: 0, boost: false },
+        0.05,
+        bounds,
+        () => -2,
+      );
+
+      expect(step.position.x).toBeCloseTo(0.75 * Math.sin(heading), 10);
+      expect(step.position.z).toBeCloseTo(-0.75 * Math.cos(heading), 10);
+    },
+  );
 });
 
 describe('walk-mode acquisition and frame partitioning', () => {

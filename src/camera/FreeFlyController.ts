@@ -9,12 +9,13 @@ import {
   type Vec3Like,
 } from './movement';
 import {
+  advanceCameraWalkPosition,
   advanceWalkAcquisition,
-  advanceWalkPosition,
   DEFAULT_WALK_CONFIG,
   prepareWalkAcquisition,
   type TerrainSampler,
 } from './walkMovement';
+import { NavigationLifecycle } from './navigationLifecycle';
 
 export type NavigationMode = 'fly' | 'entering-walk' | 'walk';
 
@@ -53,6 +54,10 @@ export class FreeFlyController {
   private readonly sampleHeight: TerrainSampler;
   private readonly lookDirection = new Vector3();
   private readonly keys = new Set<string>();
+  private readonly lifecycle = new NavigationLifecycle(
+    window.document.hasFocus(),
+    !document.hidden,
+  );
   private lockErrorTimer: number | undefined;
   private atBoundary = false;
   private navigationMode: NavigationMode = 'fly';
@@ -81,13 +86,18 @@ export class FreeFlyController {
 
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
-    window.addEventListener('blur', this.clearKeys);
+    window.addEventListener('blur', this.handleWindowBlur);
+    window.addEventListener('focus', this.handleWindowFocus);
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
     document.addEventListener('pointerlockerror', this.handlePointerLockError);
   }
 
   get isLocked(): boolean {
     return this.controls.isLocked;
+  }
+
+  get isNavigationSuspended(): boolean {
+    return this.lifecycle.isSuspended;
   }
 
   get mode(): NavigationMode {
@@ -235,7 +245,11 @@ export class FreeFlyController {
   }
 
   update(elapsedSeconds: number): void {
-    if (!this.controls.isLocked || this.disposed) {
+    if (
+      !this.controls.isLocked ||
+      this.disposed ||
+      this.lifecycle.shouldSkipUpdate()
+    ) {
       return;
     }
 
@@ -312,7 +326,8 @@ export class FreeFlyController {
     this.controls.dispose();
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('keyup', this.handleKeyUp);
-    window.removeEventListener('blur', this.clearKeys);
+    window.removeEventListener('blur', this.handleWindowBlur);
+    window.removeEventListener('focus', this.handleWindowFocus);
     document.removeEventListener(
       'visibilitychange',
       this.handleVisibilityChange,
@@ -343,11 +358,9 @@ export class FreeFlyController {
   }
 
   private updateWalk(elapsedSeconds: number): void {
-    this.controls.getDirection(this.lookDirection);
-    const yawRadians = Math.atan2(this.lookDirection.x, -this.lookDirection.z);
-    const result = advanceWalkPosition(
+    const result = advanceCameraWalkPosition(
+      this.camera,
       this.camera.position,
-      yawRadians,
       {
         forward: Number(this.keys.has('KeyW')) - Number(this.keys.has('KeyS')),
         strafe: Number(this.keys.has('KeyD')) - Number(this.keys.has('KeyA')),
@@ -462,6 +475,17 @@ export class FreeFlyController {
   };
 
   private readonly handleVisibilityChange = (): void => {
+    this.lifecycle.setDocumentVisible(!document.hidden);
+    this.clearKeys();
+  };
+
+  private readonly handleWindowBlur = (): void => {
+    this.lifecycle.setWindowFocused(false);
+    this.clearKeys();
+  };
+
+  private readonly handleWindowFocus = (): void => {
+    this.lifecycle.setWindowFocused(true);
     this.clearKeys();
   };
 
