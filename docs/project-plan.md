@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0, M1 and TVW-001 through TVW-010 passed independent review. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, and TVW-010 completed optional browser building rendering. Mapped building counts do not establish completeness; road and remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-011 and later are not authorized.
+**Status:** M0, M1 and TVW-001 through TVW-010 passed independent review. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, and TVW-010 completed optional browser building rendering. Mapped building counts do not establish completeness; road and remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-011 was separately authorized on 2026-10-19 and is in implementation; TVW-012 and later are not authorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -551,6 +551,8 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 **TVW-009 issue gate:** PASS after Luna fix 2 (`42bafd6`) and independent Sol review. The local OSM footprint package, height policy, provenance/validation and QA report/map are complete and reproducible. TVW-010 separately completed and passed the browser building/terrain-footing gate. The overall mapped-area feature gate remains incomplete because roads and remaining feature checks are outstanding.
 
 ### M5 — Roads and navigation cues
+
+**TVW-011 status:** Authorized on 2026-10-19; the accepted specification is [TVW-011-spec.md](milestones/TVW-011-spec.md), and implementation is in progress. This status does not pass TVW-011 or the combined M5 exit gate. TVW-012 remains separately unauthorized. The AOI stays `selected_pending_coverage` / `not_checked`.
 
 **User-visible result:** road alignments and major junctions become recognisable; named roads can optionally appear in a selected-road debug label.
 
