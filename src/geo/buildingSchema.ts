@@ -509,6 +509,37 @@ function pointInPolygonInterior(
   );
 }
 
+function findPolygonInteriorPoint(polygon: BuildingPolygon): XzPosition | null {
+  const rings = [polygon.exteriorXZ, ...polygon.interiorRingsXZ];
+  const ordinates = [
+    ...new Set(
+      rings.flatMap((ring) => ring.slice(0, -1).map((point) => point[1])),
+    ),
+  ].sort((first, second) => first - second);
+  for (let index = 0; index < ordinates.length - 1; index += 1) {
+    const south = ordinates[index]!;
+    const north = ordinates[index + 1]!;
+    if (north - south <= 1e-10) continue;
+    const z = (south + north) / 2;
+    const crossings = rings
+      .flatMap((ring) =>
+        ringEdges(ring).flatMap(([a, b]) => {
+          if (a[1] > z === b[1] > z) return [];
+          return [a[0] + ((z - a[1]) * (b[0] - a[0])) / (b[1] - a[1])];
+        }),
+      )
+      .sort((first, second) => first - second);
+    for (let crossing = 0; crossing < crossings.length - 1; crossing += 1) {
+      const west = crossings[crossing]!;
+      const east = crossings[crossing + 1]!;
+      if (east - west <= 1e-10) continue;
+      const candidate: XzPosition = [(west + east) / 2, z];
+      if (pointInPolygonInterior(candidate, polygon)) return candidate;
+    }
+  }
+  return null;
+}
+
 function segmentIntersectionParameters(
   a: XzPosition,
   b: XzPosition,
@@ -588,7 +619,12 @@ function polygonsOverlap(
       }
     }
   }
+  const firstInterior = findPolygonInteriorPoint(first);
+  const secondInterior = findPolygonInteriorPoint(second);
   return (
+    (firstInterior !== null && pointInPolygonInterior(firstInterior, second)) ||
+    (secondInterior !== null &&
+      pointInPolygonInterior(secondInterior, first)) ||
     firstRings.some((ring) => hasBoundaryIntervalInsidePolygon(ring, second)) ||
     secondRings.some((ring) => hasBoundaryIntervalInsidePolygon(ring, first)) ||
     first.exteriorXZ

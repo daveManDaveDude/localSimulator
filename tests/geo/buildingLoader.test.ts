@@ -295,6 +295,8 @@ describe('loadBuildingPackage', () => {
     'crossing-hole',
     'overlapping-components',
     'boundary-contained-overlap',
+    'identical-components',
+    'collinear-equivalent-components',
     'outside-aoi',
     'canonical-duplicate',
   ] as const)(
@@ -392,6 +394,40 @@ describe('loadBuildingPackage', () => {
               ],
             },
             footprintAreaM2: 24,
+          }),
+        ];
+      } else if (
+        kind === 'identical-components' ||
+        kind === 'collinear-equivalent-components'
+      ) {
+        const square: [number, number][] = [
+          [-1, -1],
+          [1, -1],
+          [1, 1],
+          [-1, 1],
+          [-1, -1],
+        ];
+        const second: [number, number][] =
+          kind === 'identical-components'
+            ? square
+            : [
+                [-1, -1],
+                [0, -1],
+                [1, -1],
+                [1, 1],
+                [-1, 1],
+                [-1, -1],
+              ];
+        features = [
+          createFeature({
+            geometry: {
+              type: 'MultiPolygon',
+              polygons: [
+                { exteriorXZ: square, interiorRingsXZ: [] },
+                { exteriorXZ: second, interiorRingsXZ: [] },
+              ],
+            },
+            footprintAreaM2: 8,
           }),
         ];
       } else if (kind === 'outside-aoi') {
