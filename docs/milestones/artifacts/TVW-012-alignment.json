@@ -1,4 +1,8 @@
 {
+  "alignmentConfig": {
+    "path": "config/alignment.torquay.json",
+    "sha256": "ea0e08ab16a7a91a0a721badb3390f47a2448f7f0460b88a300645666717472d"
+  },
   "alignmentGateStatus": "pass",
   "aoi": {
     "boundsM": [
@@ -71,6 +75,11 @@
       "mappedFootprints": 1000,
       "payloadSha256": "7ffe824db1f0bafadf48c14f610a357f2a001791658078b12442a71e13ea8f48",
       "qaSha256": "b28ed40f0daf7ee521b016a231b01cdd754738bad6626e061e7e502409c5debd"
+    },
+    "packagePaths": {
+      "buildings": "data/generated/buildings/torquay-poc-001",
+      "roads": "data/generated/roads/torquay-poc-001",
+      "terrain": "public/worlds/torquay-poc-001"
     },
     "roads": {
       "manifestSha256": "b9896cb1d88f0bfdf1010a2a5001443b270c7162defff210bbd7cf93313bc8af",

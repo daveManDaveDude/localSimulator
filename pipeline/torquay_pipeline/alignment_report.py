@@ -29,6 +29,7 @@ from .comparison_sources import (
     VerifiedComparisonSource,
     verify_comparison_source,
 )
+from .coordinates import pinned_transformer, transform_bng_to_wgs84
 
 AOI_BOUNDS_M = (
     290608.9018176432,
@@ -41,6 +42,11 @@ OS_ATTRIBUTION = "Contains Ordnance Survey data © Crown copyright and database 
 OS_LICENCE_URL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
 OSM_ATTRIBUTION = "© OpenStreetMap contributors; extract provided by Geofabrik GmbH"
 OSM_LICENCE_URL = "https://www.openstreetmap.org/copyright"
+AXIS_MAPPING = "E=originE+x; N=originN-z; north is up-screen and -Z in the world."
+RASTER_REGISTRATION = (
+    "AREA_OR_POINT=Area; pixel centers are left+column+0.5 m and top-row-0.5 m. "
+    "Source imagery is read as-is without warp/resampling."
+)
 
 
 class AlignmentReportError(ValueError):
@@ -233,6 +239,78 @@ def load_local_packages(
     )
 
 
+def _package_summary(packages: LocalPackages) -> dict[str, Any]:
+    return {
+        "terrain": {
+            "manifestSha256": packages.terrain_manifest_sha256,
+            "heightfieldSha256": packages.terrain_manifest["heightfield"]["sha256"],
+        },
+        "roads": {
+            "manifestSha256": packages.road_manifest_sha256,
+            "payloadSha256": packages.road_payload_sha256,
+            "qaSha256": packages.road_qa_sha256,
+            "mappedWays": len(packages.road_payload["features"]),
+        },
+        "buildings": {
+            "manifestSha256": packages.building_manifest_sha256,
+            "payloadSha256": packages.building_payload_sha256,
+            "qaSha256": packages.building_qa_sha256,
+            "mappedFootprints": len(packages.building_payload["buildings"]),
+        },
+    }
+
+
+def _project_relative_file(project_root: Path, relative: object, field: str) -> Path:
+    if not isinstance(relative, str) or not relative or "\\" in relative or ":" in relative:
+        raise AlignmentReportError(f"{field} must be a safe project-relative POSIX path")
+    path = Path(relative)
+    if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+        raise AlignmentReportError(f"{field} is unsafe")
+    candidate = (project_root / Path(*path.parts)).resolve()
+    try:
+        candidate.relative_to(project_root.resolve())
+    except ValueError as exc:
+        raise AlignmentReportError(f"{field} escapes the project") from exc
+    return candidate
+
+
+def _candidate_bytes(path: Path, pending_outputs: dict[Path, bytes] | None) -> bytes | None:
+    if pending_outputs:
+        resolved = path.resolve()
+        for candidate, content in pending_outputs.items():
+            if candidate.resolve() == resolved:
+                return content
+    try:
+        return path.read_bytes()
+    except OSError:
+        return None
+
+
+def _load_report_packages(report: dict[str, Any], project_root: Path) -> LocalPackages:
+    record = report.get("localPackages")
+    paths = record.get("packagePaths") if isinstance(record, dict) else None
+    if not isinstance(paths, dict) or set(paths) != {"terrain", "roads", "buildings"}:
+        raise AlignmentReportError(
+            "localPackages.packagePaths must identify the three local packages"
+        )
+    resolved = {
+        key: _project_relative_file(project_root, value, f"localPackages.packagePaths.{key}")
+        for key, value in paths.items()
+    }
+    for key, path in resolved.items():
+        if not path.is_dir():
+            raise AlignmentReportError(f"localPackages.{key} package directory is missing")
+    packages = load_local_packages(resolved["terrain"], resolved["roads"], resolved["buildings"])
+    if record != {
+        **_package_summary(packages),
+        "packagePaths": paths,
+    }:
+        raise AlignmentReportError(
+            "localPackages hashes/counts do not match the validated local package assets"
+        )
+    return packages
+
+
 def read_palette_window(
     source: VerifiedComparisonSource, requested_bounds_m: tuple[float, float, float, float]
 ) -> RasterWindow:
@@ -359,6 +437,115 @@ def _load_config(path: Path) -> tuple[dict[str, Any], bytes]:
     return raw, content
 
 
+def _load_report_config(report: dict[str, Any], project_root: Path) -> dict[str, Any]:
+    descriptor = report.get("alignmentConfig")
+    if (
+        not isinstance(descriptor, dict)
+        or descriptor.get("path") != "config/alignment.torquay.json"
+    ):
+        raise AlignmentReportError(
+            "alignmentConfig must bind the accepted config/alignment.torquay.json"
+        )
+    path = _project_relative_file(project_root, descriptor.get("path"), "alignmentConfig.path")
+    if not path.is_file() or descriptor.get("sha256") != _hash_path(path):
+        raise AlignmentReportError("alignmentConfig file is missing or its SHA-256 differs")
+    config, _ = _load_config(path)
+    return config
+
+
+def _validate_report_coordinate_reference(report: dict[str, Any], packages: LocalPackages) -> None:
+    reference = report.get("coordinateReference")
+    if not isinstance(reference, dict):
+        raise AlignmentReportError("coordinateReference is missing or malformed")
+    if (
+        reference.get("crs") != "EPSG:27700"
+        or reference.get("aoi") != report.get("aoi")
+        or reference.get("axisMapping") != AXIS_MAPPING
+        or reference.get("rasterRegistration") != RASTER_REGISTRATION
+    ):
+        raise AlignmentReportError(
+            "coordinateReference does not match the registered AOI/axis contract"
+        )
+    road_operation = packages.road_manifest.get("coordinateOperation", {}).get("wgs84ToBng")
+    if not isinstance(road_operation, dict):
+        raise AlignmentReportError("local road package has no WGS84-to-BNG coordinate operation")
+    try:
+        _transformer, expected_operation = pinned_transformer(4326, 27700)
+    except ValueError as exc:
+        raise AlignmentReportError(f"cannot verify the pinned coordinate operation: {exc}") from exc
+    if road_operation != expected_operation.as_dict():
+        raise AlignmentReportError(
+            "local road package does not use the pinned EPSG:1314 + EPSG:19916 operation"
+        )
+    if reference.get("localCoordinateOperation") != road_operation:
+        raise AlignmentReportError(
+            "coordinateReference operation differs from the validated road package operation"
+        )
+    uncertainty = reference.get("uncertaintyComponents")
+    if (
+        not isinstance(uncertainty, list)
+        or not uncertainty
+        or any(not isinstance(item, str) or not item.strip() for item in uncertainty)
+    ):
+        raise AlignmentReportError("coordinateReference uncertaintyComponents are required")
+
+
+def _validate_report_controls(report_spot: dict[str, Any], config_spot: dict[str, Any]) -> None:
+    label = f"spots[{report_spot.get('id', '?')}]"
+    control = config_spot["control"]
+    actual = report_spot.get("control")
+    if not isinstance(actual, dict):
+        raise AlignmentReportError(f"{label}.control is missing or malformed")
+    expected = {
+        "featureRole": control["feature_role"],
+        "osmNodeId": control["osm_node_id"],
+        "osmWayIds": control["osm_way_ids"],
+        "roadNames": control["road_names"],
+        "localXZMetres": control["local_xz_m"],
+        "bngENMetres": control["bng_e_n_m"],
+        "wgs84LonLat": control["wgs84_lon_lat"],
+    }
+    if any(actual.get(key) != value for key, value in expected.items()):
+        raise AlignmentReportError(
+            f"{label}.control does not match the bound accepted configuration"
+        )
+    if report_spot.get("selectionStatus") != config_spot.get("selection_status"):
+        raise AlignmentReportError(f"{label}.selectionStatus differs from the bound configuration")
+    if report_spot.get("selectionRationale") != config_spot.get("selection_rationale"):
+        raise AlignmentReportError(
+            f"{label}.selectionRationale differs from the bound configuration"
+        )
+    if report_spot.get("alignmentStatus") != config_spot.get("alignment_status"):
+        raise AlignmentReportError(f"{label}.alignmentStatus differs from the bound configuration")
+    if report_spot.get("debugContextId") != config_spot.get("debug_context_id"):
+        raise AlignmentReportError(f"{label}.debugContextId differs from the bound configuration")
+    comparison = report_spot.get("comparisonWindow")
+    if not isinstance(comparison, dict) or comparison.get("bngBoundsM") != config_spot.get(
+        "window_bounds_bng_m"
+    ):
+        raise AlignmentReportError(
+            f"{label}.comparisonWindow does not match the registered context"
+        )
+    expected_observation = config_spot.get("manual_observation")
+    actual_observation = report_spot.get("manualObservation")
+    expected_observation = (
+        {
+            "summary": expected_observation.get("summary"),
+            "reviewedBy": expected_observation.get("reviewed_by"),
+            "method": expected_observation.get("method"),
+            "confidence": expected_observation.get("confidence"),
+            "referencePointBngM": expected_observation.get("reference_point_bng_m"),
+            "screeningAssessment": expected_observation.get("screening_assessment"),
+        }
+        if isinstance(expected_observation, dict)
+        else None
+    )
+    if actual_observation != expected_observation:
+        raise AlignmentReportError(
+            f"{label}.manualObservation differs from the bound configuration"
+        )
+
+
 def _validated_control(config: dict[str, Any], packages: LocalPackages) -> list[dict[str, Any]]:
     roads = packages.road_payload.get("features")
     buildings = packages.building_payload.get("buildings")
@@ -404,6 +591,9 @@ def _validated_control(config: dict[str, Any], packages: LocalPackages) -> list[
             for value in (*local, *bng, *lonlat)
         ):
             raise AlignmentReportError(f"{field}.control coordinates must be finite numbers")
+        longitude, latitude = (float(value) for value in lonlat)
+        if not (-180.0 <= longitude <= 180.0 and -90.0 <= latitude <= 90.0):
+            raise AlignmentReportError(f"{field}.control WGS84 coordinates are out of range")
         expected_e, expected_n = origin_e + float(local[0]), origin_n - float(local[1])
         if math.dist((expected_e, expected_n), tuple(float(value) for value in bng)) > 0.002:
             raise AlignmentReportError(
@@ -414,6 +604,16 @@ def _validated_control(config: dict[str, Any], packages: LocalPackages) -> list[
             and AOI_BOUNDS_M[1] <= expected_n <= AOI_BOUNDS_M[3]
         ):
             raise AlignmentReportError(f"{field}.control lies outside the reviewed AOI")
+        try:
+            expected_lon, expected_lat, _operation = transform_bng_to_wgs84(
+                [expected_e], [expected_n]
+            )
+        except ValueError as exc:
+            raise AlignmentReportError(f"{field}.control WGS84 transform failed: {exc}") from exc
+        if abs(expected_lon[0] - longitude) > 1e-7 or abs(expected_lat[0] - latitude) > 1e-7:
+            raise AlignmentReportError(
+                f"{field}.control WGS84 coordinates do not match the pinned BNG operation"
+            )
         source_features: list[dict[str, Any]] = []
         for way_id in way_ids:
             feature = roads_by_id.get(f"way/{way_id}")
@@ -940,7 +1140,12 @@ def _validate_prior_candidate(value: Any, active_ids: set[str], project_root: Pa
         )
 
 
-def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]:
+def validate_alignment_report(
+    report: Any,
+    project_root: Path,
+    *,
+    pending_outputs: dict[Path, bytes] | None = None,
+) -> dict[str, Any]:
     """Validate result states and integrity-bound local evidence without inferring visual PASS."""
     if (
         not isinstance(report, dict)
@@ -981,7 +1186,9 @@ def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]
         part in {"", ".", ".."} for part in source_manifest_path.parts
     ):
         raise AlignmentReportError("sourceManifest.path is unsafe")
-    source_manifest_file = (project_root / Path(*source_manifest_path.parts)).resolve()
+    source_manifest_file = _project_relative_file(
+        project_root, source_manifest_path_text, "sourceManifest.path"
+    )
     try:
         source_manifest_file.relative_to(project_root.resolve())
     except ValueError as exc:
@@ -1021,14 +1228,9 @@ def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]
         raise AlignmentReportError(
             "browserSessionEvidence.path must be a safe project-relative path"
         )
-    browser_path = Path(browser_path_text)
-    if browser_path.is_absolute() or any(part in {"", ".", ".."} for part in browser_path.parts):
-        raise AlignmentReportError("browserSessionEvidence.path is unsafe")
-    browser_file = (project_root / Path(*browser_path.parts)).resolve()
-    try:
-        browser_file.relative_to(project_root.resolve())
-    except ValueError as exc:
-        raise AlignmentReportError("browserSessionEvidence.path escapes the project") from exc
+    browser_file = _project_relative_file(
+        project_root, browser_path_text, "browserSessionEvidence.path"
+    )
     if (
         not browser_file.is_file()
         or browser_descriptor.get("byteLength") != browser_file.stat().st_size
@@ -1038,6 +1240,15 @@ def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]
         )
     if browser_descriptor.get("sha256") != _hash_path(browser_file):
         raise AlignmentReportError("browser session evidence SHA-256 mismatch")
+    try:
+        browser_evidence = json.loads(browser_file.read_bytes())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise AlignmentReportError(f"browser session evidence is invalid JSON: {exc}") from exc
+    if not isinstance(browser_evidence, dict):
+        raise AlignmentReportError("browser session evidence must be a JSON object")
+    for error_field in ("consoleErrors", "pageErrors", "failedRequests"):
+        if browser_evidence.get(error_field) != []:
+            raise AlignmentReportError(f"browser session evidence contains {error_field}")
     aoi = report.get("aoi")
     if not isinstance(aoi, dict):
         raise AlignmentReportError("alignment report AOI metadata must be an object")
@@ -1047,9 +1258,35 @@ def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]
         or aoi.get("coverageStatus") != "not_checked"
     ):
         raise AlignmentReportError("alignment report must preserve the pending AOI status")
+    config = _load_report_config(report, project_root)
+    if report.get("reportId") != config.get("report_id"):
+        raise AlignmentReportError("reportId differs from the bound accepted configuration")
+    if report.get("source", {}).get("sourceId") != config.get("source_id"):
+        raise AlignmentReportError("report sourceId differs from the bound accepted configuration")
+    packages = _load_report_packages(report, project_root)
+    _validate_report_coordinate_reference(report, packages)
+    config_spots = _validated_control(config, packages)
+    config_by_id = {spot["id"]: spot for spot in config_spots}
+    browser_records_value = browser_evidence.get("evidence")
+    if not isinstance(browser_records_value, list):
+        raise AlignmentReportError("browser session evidence has no evidence array")
+    browser_records: dict[str, dict[str, Any]] = {}
+    for index, record in enumerate(browser_records_value):
+        if not isinstance(record, dict):
+            raise AlignmentReportError(f"browser evidence[{index}] must be an object")
+        context_id = record.get("expectedContextId")
+        if not isinstance(context_id, str) or not context_id or context_id in browser_records:
+            raise AlignmentReportError(
+                f"browser evidence[{index}].expectedContextId must be unique nonempty text"
+            )
+        browser_records[context_id] = record
     spots = report.get("spots")
     if not isinstance(spots, list) or len(spots) != 3:
         raise AlignmentReportError("alignment report must contain exactly three registered spots")
+    if set(browser_records) != set(config_by_id):
+        raise AlignmentReportError(
+            "browser evidence contexts differ from the accepted configuration"
+        )
     statuses: set[str] = set()
     evidence_paths: set[str] = set()
     spot_ids: set[str] = set()
@@ -1060,6 +1297,10 @@ def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]
         if not spot["id"] or spot["id"] in spot_ids:
             raise AlignmentReportError(f"{label}.id must be nonempty and unique")
         spot_ids.add(spot["id"])
+        config_spot = config_by_id.get(spot["id"])
+        if config_spot is None:
+            raise AlignmentReportError(f"{label}.id is not in the bound accepted configuration")
+        _validate_report_controls(spot, config_spot)
         status = spot.get("alignmentStatus")
         if not isinstance(status, str) or status not in {
             "pass",
@@ -1103,10 +1344,11 @@ def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]
                 candidate.relative_to(project_root.resolve())
             except ValueError as exc:
                 raise AlignmentReportError(f"{label}.evidence path escapes the project") from exc
-            if not candidate.is_file():
+            asset_bytes = _candidate_bytes(candidate, pending_outputs)
+            if asset_bytes is None:
                 raise AlignmentReportError(f"{label}.evidence file is missing: '{path_text}'")
-            size = candidate.stat().st_size
-            digest = _hash_path(candidate)
+            size = len(asset_bytes)
+            digest = _hash_bytes(asset_bytes)
             if item.get("byteLength") != size or item.get("sha256") != digest:
                 raise AlignmentReportError(
                     f"{label}.evidence file hash/length mismatch for '{path_text}'"
@@ -1159,6 +1401,90 @@ def validate_alignment_report(report: Any, project_root: Path) -> dict[str, Any]
             or not required_credits.issubset(set(credits))
         ):
             raise AlignmentReportError(f"{label}.browserSession is missing source attribution")
+        raw_browser = browser_records[spot["id"]]
+        camera = raw_browser.get("camera")
+        raw_runtime = raw_browser.get("runtime")
+        target = raw_browser.get("targetLocalXZMetres")
+        if (
+            not isinstance(camera, dict)
+            or not isinstance(raw_runtime, dict)
+            or not isinstance(target, list)
+            or len(target) != 2
+        ):
+            raise AlignmentReportError(f"{label}.browserSession raw camera evidence is malformed")
+        reported_camera = browser_session.get("cameraPoseLocalMetres")
+        configured_target = config_spot["control"]["local_xz_m"]
+        camera_offset = raw_browser.get("cameraOffsetM")
+        values = [
+            camera.get("x"),
+            camera.get("y"),
+            camera.get("z"),
+            camera.get("bearing"),
+            camera.get("pitch"),
+            *target,
+            camera_offset,
+            raw_browser.get("sampledGroundHeightM"),
+            raw_browser.get("eyeHeightAboveTerrainM"),
+        ]
+        if any(
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+            for value in values
+        ):
+            raise AlignmentReportError(f"{label}.browserSession has invalid camera values")
+        target_matches = (
+            math.dist(
+                tuple(float(value) for value in target),
+                tuple(float(value) for value in configured_target),
+            )
+            <= 0.001
+        )
+        camera_distance = math.hypot(
+            float(camera["x"]) - float(target[0]),
+            float(camera["z"]) - float(target[1]),
+        )
+        if (
+            not target_matches
+            or not isinstance(reported_camera, dict)
+            or reported_camera != camera
+            or not 29.99 <= float(camera_offset) <= 60.01
+            or abs(camera_distance - float(camera_offset)) > 0.03
+            or abs(
+                float(camera["y"])
+                - float(raw_browser["sampledGroundHeightM"])
+                - float(raw_browser["eyeHeightAboveTerrainM"])
+            )
+            > 0.01
+            or browser_session.get("targetLocalXZMetres") != target
+            or browser_session.get("cameraOffsetM") != camera_offset
+            or browser_session.get("sampledGroundHeightM")
+            != raw_browser.get("sampledGroundHeightM")
+            or browser_session.get("eyeHeightAboveTerrainM")
+            != raw_browser.get("eyeHeightAboveTerrainM")
+            or browser_session.get("expectedContextId") != raw_browser.get("expectedContextId")
+            or browser_session.get("poseMethod") != raw_browser.get("poseMethod")
+            or browser_session.get("viewport") != raw_browser.get("viewport")
+            or browser_session.get("renderer") != raw_runtime.get("renderer")
+            or browser_session.get("canvas") != raw_runtime.get("canvas")
+        ):
+            raise AlignmentReportError(
+                f"{label}.browserSession pose/target does not match the accepted "
+                "control and raw browser evidence"
+            )
+        scene_item = next(item for item in evidence if item.get("kind") == "scene")
+        screenshot_path = raw_browser.get("screenshotPath")
+        try:
+            screenshot_file = Path(screenshot_path).resolve()
+        except (TypeError, OSError) as exc:
+            raise AlignmentReportError(f"{label} raw screenshot path is invalid") from exc
+        expected_scene = _project_relative_file(
+            project_root, scene_item.get("path"), f"{label}.sceneEvidence.path"
+        )
+        if screenshot_file != expected_scene.resolve():
+            raise AlignmentReportError(
+                f"{label} raw browser screenshot does not match scene evidence"
+            )
     if len(evidence_paths) != 12:
         raise AlignmentReportError(
             "each comparison spot requires distinct reference, overlay, OSM-only and 3D scene images"  # noqa: E501
@@ -1224,7 +1550,7 @@ def _prepare_alignment_inputs(
     return config, source, packages, spots
 
 
-def render_alignment_panels(
+def _render_alignment_panel_outputs(
     config_path: Path,
     source_manifest_path: Path,
     source_root: Path,
@@ -1232,8 +1558,8 @@ def render_alignment_panels(
     road_package_dir: Path,
     building_package_dir: Path,
     project_root: Path,
-) -> dict[str, Any]:
-    """Generate the source, registered overlay, and OSM-only panels for all contexts."""
+) -> tuple[dict[Path, bytes], dict[str, Any]]:
+    """Render all static panels into memory without changing existing evidence."""
     _config, source, packages, spots = _prepare_alignment_inputs(
         config_path,
         source_manifest_path,
@@ -1256,14 +1582,55 @@ def render_alignment_panels(
             )
             output_files[project_root / relative] = image
             panel_count += 1
-    _atomic_write_outputs(output_files)
-    return {
+    return output_files, {
         "panelCount": panel_count,
         "spotCount": len(spots),
         "tiles": sorted({tile.path.name for tile in source.tiles}),
         "sourceArchiveSha256": source.record["archive"]["sha256"],
         "terrainOrigin": origin,
     }
+
+
+def render_alignment_panels(
+    config_path: Path,
+    source_manifest_path: Path,
+    source_root: Path,
+    terrain_package_dir: Path,
+    road_package_dir: Path,
+    building_package_dir: Path,
+    project_root: Path,
+) -> dict[str, Any]:
+    """Generate and atomically publish the source, overlay, and OSM-only panels."""
+    output_files, result = _render_alignment_panel_outputs(
+        config_path,
+        source_manifest_path,
+        source_root,
+        terrain_package_dir,
+        road_package_dir,
+        building_package_dir,
+        project_root,
+    )
+    _atomic_write_outputs(output_files)
+    return result
+
+
+def _write_validated_alignment_report(
+    report: dict[str, Any],
+    panel_outputs: dict[Path, bytes],
+    project_root: Path,
+) -> Path:
+    """Validate the complete candidate output set before one rollback-safe publication."""
+    validate_alignment_report(report, project_root, pending_outputs=panel_outputs)
+    report_bytes = (json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode(
+        "utf-8"
+    )
+    report_path = project_root / "docs/milestones/artifacts/TVW-012-alignment.json"
+    markdown_path = project_root / "docs/milestones/TVW-012.md"
+    outputs = dict(panel_outputs)
+    outputs[report_path] = report_bytes
+    outputs[markdown_path] = _markdown_report(report).encode("utf-8")
+    _atomic_write_outputs(outputs)
+    return report_path
 
 
 def build_alignment_artifacts(
@@ -1276,7 +1643,7 @@ def build_alignment_artifacts(
     project_root: Path,
 ) -> dict[str, Any]:
     """Refresh static panels and write an integrity-bound report after browser evidence exists."""
-    render_alignment_panels(
+    panel_outputs, _panel_metadata = _render_alignment_panel_outputs(
         config_path,
         source_manifest_path,
         source_root,
@@ -1413,11 +1780,11 @@ def build_alignment_artifacts(
                 Path("docs/milestones/screenshots") / f"TVW-012-{spot['id']}-{panel_kind}.png"
             )
             image_path = project_root / relative
-            if not image_path.is_file():
+            image_bytes = panel_outputs.get(image_path)
+            if image_bytes is None:
                 raise AlignmentReportError(
                     f"registered {panel_kind} panel is missing for {spot['id']}: '{relative.as_posix()}'"  # noqa: E501
                 )
-            image_bytes = image_path.read_bytes()
             panels.append(
                 {
                     "kind": panel_kind,
@@ -1540,10 +1907,31 @@ def build_alignment_artifacts(
         if spot_statuses.issubset({"pass", "fail"}) and len(spot_statuses) > 0
         else "in_progress"
     )
-    output_files: dict[Path, bytes] = {}
+    try:
+        config_relative = config_path.resolve().relative_to(project_root.resolve()).as_posix()
+    except ValueError as exc:
+        raise AlignmentReportError("alignment config must reside within the project") from exc
+    if config_relative != "config/alignment.torquay.json":
+        raise AlignmentReportError("alignment report requires config/alignment.torquay.json")
+    package_paths: dict[str, str] = {}
+    for key, package_dir in (
+        ("terrain", terrain_package_dir),
+        ("roads", road_package_dir),
+        ("buildings", building_package_dir),
+    ):
+        try:
+            package_paths[key] = (
+                package_dir.resolve().relative_to(project_root.resolve()).as_posix()
+            )
+        except ValueError as exc:
+            raise AlignmentReportError(f"{key} package must reside within the project") from exc
     report = {
         "formatVersion": 1,
         "reportId": config["report_id"],
+        "alignmentConfig": {
+            "path": config_relative,
+            "sha256": _hash_path(config_path.resolve()),
+        },
         "issueStatus": issue_status,
         "alignmentGateStatus": alignment_gate,
         "combinedM5Status": "pending",
@@ -1581,8 +1969,8 @@ def build_alignment_artifacts(
                 "selectionStatus": "selected_pending_coverage",
                 "coverageStatus": "not_checked",
             },
-            "axisMapping": "E=originE+x; N=originN-z; north is up-screen and -Z in the world.",
-            "rasterRegistration": "AREA_OR_POINT=Area; pixel centers are left+column+0.5 m and top-row-0.5 m. Source imagery is read as-is without warp/resampling.",  # noqa: E501
+            "axisMapping": AXIS_MAPPING,
+            "rasterRegistration": RASTER_REGISTRATION,
             "localCoordinateOperation": packages.road_manifest.get("coordinateOperation", {}).get(
                 "wgs84ToBng"
             ),
@@ -1597,24 +1985,7 @@ def build_alignment_artifacts(
             "triggerMetres": SCREENING_THRESHOLD_M,
             "meaning": "Predeclared investigation trigger after scale, symbol thickness and uncertainty review; not a survey tolerance or accuracy guarantee.",  # noqa: E501
         },
-        "localPackages": {
-            "terrain": {
-                "manifestSha256": packages.terrain_manifest_sha256,
-                "heightfieldSha256": packages.terrain_manifest["heightfield"]["sha256"],
-            },
-            "roads": {
-                "manifestSha256": packages.road_manifest_sha256,
-                "payloadSha256": packages.road_payload_sha256,
-                "qaSha256": packages.road_qa_sha256,
-                "mappedWays": len(packages.road_payload["features"]),
-            },
-            "buildings": {
-                "manifestSha256": packages.building_manifest_sha256,
-                "payloadSha256": packages.building_payload_sha256,
-                "qaSha256": packages.building_qa_sha256,
-                "mappedFootprints": len(packages.building_payload["buildings"]),
-            },
-        },
+        "localPackages": {**_package_summary(packages), "packagePaths": package_paths},
         "manualReview": {
             "reviewedBy": config["manual_review"]["reviewed_by"],
             "reviewedAtUtc": config["manual_review"]["reviewed_at_utc"],
@@ -1639,16 +2010,7 @@ def build_alignment_artifacts(
             "Combined M5 remains pending coordinator review and cannot pass from image generation alone.",  # noqa: E501
         ],
     }
-    validate_alignment_report(report, project_root)
-    report_bytes = (json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode(
-        "utf-8"
-    )
-    report_path = project_root / "docs/milestones/artifacts/TVW-012-alignment.json"
-    output_files[report_path] = report_bytes
-    markdown = _markdown_report(report).encode("utf-8")
-    markdown_path = project_root / "docs/milestones/TVW-012.md"
-    output_files[markdown_path] = markdown
-    _atomic_write_outputs(output_files)
+    report_path = _write_validated_alignment_report(report, panel_outputs, project_root)
     return {
         "report": report_path,
         "spotCount": len(reports),
@@ -1721,7 +2083,8 @@ def _markdown_report(report: dict[str, Any]) -> str:
     for spot in report["spots"]:
         lines.extend([f"### {spot['label']}", ""])
         for evidence in spot["evidence"]:
-            lines.append(f"- [{spot['id']} {evidence['kind']} panel]({evidence['path']})")
+            evidence_link = Path(evidence["path"]).relative_to("docs/milestones").as_posix()
+            lines.append(f"- [{spot['id']} {evidence['kind']} panel]({evidence_link})")
             if evidence["kind"] == "scene":
                 lines.append(
                     "  - Source credit: Environment Agency copyright/database right 2022 (DTM); "
@@ -1740,7 +2103,8 @@ def _markdown_report(report: dict[str, Any]) -> str:
         ]
     )
     for evidence in prior["evidence"]:
-        lines.append(f"- [Prior candidate {evidence['kind']} panel]({evidence['path']})")
+        evidence_link = Path(evidence["path"]).relative_to("docs/milestones").as_posix()
+        lines.append(f"- [Prior candidate {evidence['kind']} panel]({evidence_link})")
     lines.append(
         "- [Integrity-bound prior candidate record](artifacts/TVW-012-prior-sw-inconclusive.json)"
     )
