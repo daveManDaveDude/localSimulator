@@ -27,6 +27,7 @@ import { createRoads, createRoadLandmarkMarker } from '../scene/createRoads';
 import { disposeSceneResources } from '../scene/disposeSceneResources';
 import type { HeightfieldWorld } from '../scene/createHeightfieldWorld';
 import { installAlignmentQaCamera } from './alignmentQaCamera';
+import { createRoadLabelOverlay } from './createRoadLabels';
 
 const TERRAIN_MANIFEST_URL = '/worlds/synthetic-terrain-demo/manifest.json';
 const REAL_TERRAIN_MANIFEST_URL = '/worlds/torquay-poc-001/manifest.json';
@@ -156,12 +157,14 @@ export function createApp(container: HTMLElement): AppHandle {
             <button type="button" data-testid="roads-toggle" aria-pressed="false">Load OSM road ribbons</button>
             <button type="button" data-testid="roads-retry" hidden>Retry road load</button>
             <button type="button" data-testid="roads-wireframe-toggle" aria-pressed="false">Road wireframe: off</button>
+            <button type="button" data-testid="street-names-toggle" aria-label="Street names" aria-pressed="false" disabled>Street names: off</button>
             <label for="road-landmark-select">Debug context</label>
             <select id="road-landmark-select" data-testid="road-landmark-select" disabled>
               <option value="">Load road package to select a context</option>
             </select>
           </div>
           <p data-testid="road-status" role="status" aria-live="polite" data-state="off" data-way-count="0" data-part-count="0" data-triangle-count="0">Optional local OSM road ribbons are off.</p>
+          <output class="street-label-status" data-testid="street-label-status" data-eligible-count="0" data-visible-count="0">Street-name annotations are off.</output>
           <p data-testid="road-extract-vintage">OSM extract vintage: not loaded.</p>
           <p data-testid="road-error" role="alert" hidden></p>
           <div class="road-recovery" data-testid="road-recovery" hidden>
@@ -282,6 +285,12 @@ export function createApp(container: HTMLElement): AppHandle {
   const roadsWireframeToggle = container.querySelector<HTMLButtonElement>(
     '[data-testid="roads-wireframe-toggle"]',
   );
+  const streetNamesToggle = container.querySelector<HTMLButtonElement>(
+    '[data-testid="street-names-toggle"]',
+  );
+  const streetLabelStatus = container.querySelector<HTMLOutputElement>(
+    '[data-testid="street-label-status"]',
+  );
   const roadLandmarkSelect = container.querySelector<HTMLSelectElement>(
     '[data-testid="road-landmark-select"]',
   );
@@ -390,6 +399,8 @@ export function createApp(container: HTMLElement): AppHandle {
     !roadsToggle ||
     !roadsRetry ||
     !roadsWireframeToggle ||
+    !streetNamesToggle ||
+    !streetLabelStatus ||
     !roadLandmarkSelect ||
     !roadStatus ||
     !roadError ||
@@ -443,6 +454,12 @@ export function createApp(container: HTMLElement): AppHandle {
   const scene = createScene();
   const camera = new PerspectiveCamera(54, 1, 0.1, 180);
   camera.up.set(0, 1, 0);
+  const roadLabels = createRoadLabelOverlay({
+    shell,
+    camera,
+    toggle: streetNamesToggle,
+    status: streetLabelStatus,
+  });
   let controller: FreeFlyController | undefined;
   let currentSampleHeight: GroundSampler | undefined;
   let currentOriginElevationM = 0;
@@ -517,6 +534,7 @@ export function createApp(container: HTMLElement): AppHandle {
     }
     currentRoadMarker = undefined;
     loadedRoadPackage = undefined;
+    roadLabels.clear();
     shell.dataset.roadState = 'off';
     shell.dataset.roadWayCount = '0';
     shell.dataset.roadPartCount = '0';
@@ -619,6 +637,7 @@ export function createApp(container: HTMLElement): AppHandle {
     packageData: LoadedRoadPackage,
     visible: boolean,
   ): void => {
+    roadLabels.setRoadVisible(visible);
     const counts = packageData.qa.counts;
     roadMetadataSummary =
       `${packageData.features.length.toLocaleString()} mapped ways · ` +
@@ -725,6 +744,11 @@ export function createApp(container: HTMLElement): AppHandle {
       currentRoadGroup = group;
       loadedRoadPackage = packageData;
       scene.add(group);
+      roadLabels.setPackage(
+        packageData,
+        (x, z) => currentTerrainGrid?.sampleHeight(x, z) ?? null,
+      );
+      roadLabels.setRoadVisible(true);
       roadVintage.textContent =
         `OSM extract vintage: ${packageData.manifest.source.extractTimestamp} ` +
         `(replication sequence ${packageData.manifest.source.replicationSequence}).`;
@@ -763,6 +787,7 @@ export function createApp(container: HTMLElement): AppHandle {
       roadError.textContent = `${detail} From the pipeline folder run .\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-roads. Terrain and any loaded buildings remain available.`;
       roadError.hidden = false;
       roadStatus.dataset.state = 'error';
+      roadLabels.clear();
       roadStatus.textContent =
         'Road package failed to load; the terrain remains usable.';
       shell.dataset.roadState = 'error';
@@ -798,6 +823,7 @@ export function createApp(container: HTMLElement): AppHandle {
   };
 
   const updateRoadStatusFromPackage = (visible: boolean): void => {
+    roadLabels.setRoadVisible(visible);
     const counts = roadStatus.dataset;
     const wayCount = Number(counts.wayCount ?? 0);
     const partCount = Number(counts.partCount ?? 0);
@@ -1579,6 +1605,7 @@ export function createApp(container: HTMLElement): AppHandle {
       updateTelemetry();
     }
     renderer.render(scene, camera);
+    roadLabels.update();
     shell.dataset.drawCalls = String(renderer.info.render.calls);
     shell.dataset.triangles = String(renderer.info.render.triangles);
     // Keep renderer counters observable to the local benchmark without
@@ -1608,6 +1635,7 @@ export function createApp(container: HTMLElement): AppHandle {
       buildingLoad?.abort();
       roadAttempt += 1;
       roadLoad?.abort();
+      roadLabels.dispose();
       controller?.dispose();
       renderer.setAnimationLoop(null);
       timer.dispose();
@@ -1626,6 +1654,7 @@ export function createApp(container: HTMLElement): AppHandle {
       wireframeToggle.removeEventListener('click', toggleWireframeFromButton);
       buildingsToggle.removeEventListener('click', toggleBuildings);
       roadsToggle.removeEventListener('click', toggleRoads);
+      streetNamesToggle.removeEventListener('click', roadLabels.toggle);
       roadsRetry.removeEventListener('click', retryRoadLoad);
       roadsTerrainOnly.removeEventListener('click', continueWithoutRoads);
       roadsWireframeToggle.removeEventListener('click', toggleRoadWireframe);

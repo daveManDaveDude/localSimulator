@@ -157,6 +157,12 @@ Roads are opt-in at `/?world=torquay-poc-001&roads=1`; combined layers use `/?wo
 
 The optional road package and source-derived outputs are ignored by Git. Share builds preserve tracked synthetic assets and exclude the whole real terrain parent, including buildings and roads. See [TVW-011 handback](docs/milestones/TVW-011.md), [road data provenance](docs/data-sources.md#osm-highway-roads-tvw-011), and [the road package contract](docs/asset-contract.md#optional-osm-road-package-tvw-011).
 
+### TVW-015 optional street-name annotations
+
+On the explicit real-terrain roads route, `/?world=torquay-poc-001&roads=1`, wait for the local road package to load, then use **Street names: off** in the road controls. The opt-in DOM overlay derives names only from each validated road feature's `sourceTags.name`, trims outer whitespace, and places one label at each eligible clipped centerline-part midpoint, sampled 0.25 m above terrain. It shows at most 20 labels within 500 m, avoids the visible interface panels and screen-space collisions, and follows the camera and viewport. Turning the road layer off also turns labels off; labels remain disabled by default.
+
+These are screen annotations rather than physical signs: they are not depth-occluded by terrain or buildings and their counts describe only current display candidates, not road coverage. OSM contributor and Geofabrik attribution stays visible with the road layer. `npm run test:e2e:tvw015:real` builds and checks the production local-data route on an isolated preview port; `npm run test:e2e:tvw015:share` builds the clean share variant and checks that synthetic startup has no road assets or names. Both use local packages only.
+
 Playwright's install command downloads a local Chromium build and requires internet access. After installation, the browser tests use local files. The persistent Chromium suite covers both the retained M0 viewer and loaded terrain, pointer lock and movement, terrain grid and wireframe controls, optional building publication/load/render/toggle and recovery, ground-height telemetry, resize, Escape release, and held-key cleanup. Vitest covers movement, manifest validation, binary decoding/loading, terrain grid/sampling, and Three.js mesh geometry.
 
 ## M7 clean demo, local real-data rebuild, and benchmark
@@ -201,6 +207,7 @@ The viewer credits the Environment Agency and links its catalogue and Open Gover
 - `docs/milestones/TVW-009.md` records the dated OSM source, local building-footprint QA, placement checks and implementation handback.
 - `docs/milestones/TVW-010.md` records optional building rendering, local package publication and browser evidence.
 - `docs/milestones/TVW-011.md` records the local OSM highway pipeline, terrain-draped ribbons, QA and browser evidence.
+- `docs/milestones/TVW-015.md` records optional street-name labels, the production browser evidence and the labels-off/on observation.
 - `docs/milestones/TVW-014.md` records the clean-clone smoke, restored-source regeneration, production checks, benchmark, screenshots and limitations.
 - `docs/data-sources.md` documents publisher provenance, local source-file restoration and the current inspection result.
 - `docs/building-asset-contract.md` documents the local OSM footprint package, coordinates, height provenance and QA meaning.

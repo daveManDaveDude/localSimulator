@@ -458,14 +458,34 @@ test('walk mode follows the synthetic heightfield and preserves flight semantics
     .toBe(true);
   await holdKey(page, 'Control', 900);
   const belowTerrain = await position(page);
+  const navigationFeedback = page.getByTestId('flight-status-message');
+  await navigationFeedback.evaluate((node) => {
+    const status = node as HTMLElement;
+    const observer = new MutationObserver(() => {
+      const text = status.textContent ?? '';
+      if (text.includes('below the sampled terrain')) {
+        status.dataset.testCapturedNavigationFeedback = text;
+        observer.disconnect();
+      }
+    });
+    observer.observe(status, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+  });
   await page.keyboard.press('f');
   await expect(page.getByTestId('navigation-mode')).toHaveAttribute(
     'data-mode',
     'fly',
   );
-  await expect(page.getByTestId('flight-status-message')).toContainText(
-    'below the sampled terrain',
+  await expect(navigationFeedback).toHaveAttribute(
+    'data-test-captured-navigation-feedback',
+    /below the sampled terrain/,
   );
+  await navigationFeedback.evaluate((node) => {
+    delete (node as HTMLElement).dataset.testCapturedNavigationFeedback;
+  });
   expect(planarDistance(belowTerrain, await position(page))).toBeLessThan(0.03);
   await page.keyboard.press('Escape');
 });
