@@ -99,6 +99,47 @@ TVW-011 reuses the exact dated Devon extract described above; it does not downlo
 
 The pipeline reads complete ordered way locations from the verified PBF, applies its 50 m source filter, and clips exported centerlines and buffered display surfaces to the exact candidate square. It applies a documented class/visual-width policy and skips non-ground or ambiguous bridge, tunnel, layer and covered tags. These assumptions do not establish physical road width, elevation, connectivity or completeness. Geometries are projected with the same pinned EPSG:1314 + EPSG:19916 operation (reported accuracy 2 m); the preferred 1 m OSTN15 grid is unavailable and PROJ network access stays disabled. Roads are stored as local XZ vertices with references to the exact fixed triangles of the verified EA terrain grid, so the browser can drape their surfaces using the terrain sampler.
 
-The measured run exported 198 unique highway ways and 198 clipped centerline parts: 171 vehicular streets, 0 cycleways and 27 paths. Those features form 200 separate clipped ribbon components after width buffering. The published mesh has 72,098 vertices and 98,238 terrain-conforming triangles. Two triangles whose vertices collapse under Float32 conversion are omitted; their combined area is 4.35e-10 m², within the explicit 1e-6 m² limit in QA. The run also counted 193,139 ways outside the acquisition buffer, 5,589 excluded class/surface cases, 6,996 bridge/tunnel/ambiguous-ground exclusions, and 2,909 area surfaces; 49 filtered ways had no clipped line part. No duplicate IDs, missing locations, incomplete way IDs or invalid transformed geometries were recorded. Mapped counts describe this extract only and do not prove coverage. The AOI remains `selected_pending_coverage` / `not_checked`; broader M2 feature checks and TVW-012's independent map comparison/report remain pending.
+The measured run exported 198 unique highway ways and 198 clipped centerline parts: 171 vehicular streets, 0 cycleways and 27 paths. Those features form 200 separate clipped ribbon components after width buffering. The published mesh has 72,098 vertices and 98,238 terrain-conforming triangles. Two triangles whose vertices collapse under Float32 conversion are omitted; their combined area is 4.35e-10 m², within the explicit 1e-6 m² limit in QA. The run also counted 193,139 ways outside the acquisition buffer, 5,589 excluded class/surface cases, 6,996 bridge/tunnel/ambiguous-ground exclusions, and 2,909 area surfaces; 49 filtered ways had no clipped line part. No duplicate IDs, missing locations, incomplete way IDs or invalid transformed geometries were recorded. Mapped counts describe this extract only and do not prove coverage. The AOI remains `selected_pending_coverage` / `not_checked`; broader M2 feature checks remain pending. TVW-012's bounded independent map comparison is recorded in [the TVW-012 report](milestones/TVW-012.md).
 
 The generated package `data/generated/roads/torquay-poc-001/` and intermediate raw node/tag records are ignored by Git. To restore the exact source, follow the OSM source restoration steps above, then run the `inspect-road-source`, `import-roads`, `validate-roads`, `preview-roads` and `publish-roads` commands in the README. The publisher writes only the `roads/` child inside the ignored Vite public package; it verifies the dated source and writes a staged package only after validation. Browser credit is `© OpenStreetMap contributors`, with Geofabrik GmbH identified as extract provider and a link to the ODbL. The standalone actual-source preview is `milestones/screenshots/TVW-011-roads-preview.png`.
+
+## OS OpenMap–Local comparison raster (TVW-012)
+
+The TVW-012 comparison uses an independent April 2026 Ordnance Survey OS OpenMap–Local GeoTIFF Full Colour source. The archive was selected from the public OS Data Hub portal on 2026-10-19 at 11:39:33 UTC for the 100 km National Grid square SX. The portal advertised 349.41 MB; the HTTP response was 200 with 349,405,146 bytes, matching the archive and a range-probe total. The source archive SHA-256 is `d9a01900c4dd5c26af50d6aed79f419a1957acf4167aedef97bb905ffcdff853`; ZIP CRC verification passed across 227 members. The selection was comparison-only and not copied into the production world.
+
+The exact archive member paths, CRCs, byte lengths, SHA-256 values, Rasterio properties, OS portal request/redirect, Azure timestamps, licence text, and full attribution record are in [data/comparison-source-manifest.json](../data/comparison-source-manifest.json). The two needed raster members are `OS OpenMap Local (Full Colour Raster) SX/data/SX96NW.tif` (2,620,996 bytes; SHA-256 `fec960fdb94a2e2cc3cdcfa201c35c6070871ae7c86b6c80617bad550799ae1a`) and `OS OpenMap Local (Full Colour Raster) SX/data/SX96SW.tif` (2,248,452 bytes; SHA-256 `546c7a7c60b8c372c35dfd7ad21ddbbd71437ba45966235f6a09264352181838`). Both are palette GeoTIFFs in EPSG:27700, 1 m pixels, 5000 × 5000, AREA_OR_POINT=Area. The source tiles straddle northing 65000; both were required to cover the 1 km AOI and comparison windows. Their source bounds are respectively E290000–295000/N65000–70000 and E290000–295000/N60000–65000.
+
+The source is supplied under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/). Its archive `doc/licence.txt` explicitly requests `Contains Ordnance Survey data © Crown copyright and database right 2026`. That exact year-specific credit appears in the report panels and browser evidence alongside separate Environment Agency and OpenStreetMap/Geofabrik credits. Raw archive and selected members belong under ignored `data/raw/comparison/os_openmap_local/`; only the attributed comparison evidence and metadata are tracked. Do not redistribute the source raster as a viewer asset.
+
+To restore the comparison source, download the exact archived file from the recorded `requestUrl` in the comparison source manifest into `data/raw/comparison/os_openmap_local/openmaplocal-2026-04-sx-geotiff.zip` and verify its recorded size and SHA-256. Extract only the four bound raster/licence/readme members to the manifest's relative paths; the source verifier then checks the extracted bytes against the exact ZIP members:
+
+```powershell
+New-Item -ItemType Directory -Force data\raw\comparison\os_openmap_local | Out-Null
+Invoke-WebRequest -Uri 'https://api.os.uk/downloads/v1/products/OpenMapLocal/downloads?area=SX&format=GeoTIFF&subformat=Full+Colour&redirect' -OutFile 'data/raw/comparison/os_openmap_local/openmaplocal-2026-04-sx-geotiff.zip'
+Get-FileHash -Algorithm SHA256 'data/raw/comparison/os_openmap_local/openmaplocal-2026-04-sx-geotiff.zip'
+@'
+from pathlib import Path
+from zipfile import ZipFile
+
+root = Path("data/raw/comparison/os_openmap_local")
+archive_path = root / "openmaplocal-2026-04-sx-geotiff.zip"
+members = {
+    "OS OpenMap Local (Full Colour Raster) SX/data/SX96NW.tif": "selected-members/SX96NW.tif",
+    "OS OpenMap Local (Full Colour Raster) SX/data/SX96SW.tif": "selected-members/SX96SW.tif",
+    "OS OpenMap Local (Full Colour Raster) SX/doc/licence.txt": "selected-members/licence.txt",
+    "OS OpenMap Local (Full Colour Raster) SX/readme.txt": "selected-members/readme.txt",
+}
+with ZipFile(archive_path) as archive:
+    for member, relative in members.items():
+        destination = root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(archive.read(member))
+'@ | pipeline\.venv\Scripts\python.exe -
+Push-Location pipeline
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-comparison-source
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli compare-alignment
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-alignment-report
+Pop-Location
+```
+
+The verified report is [TVW-012](milestones/TVW-012.md), with per-spot OS reference, registered overlay, OSM-only panel, and actual 3D viewer screenshots. Second Avenue / Main Avenue, Pencorse Road / Audley Avenue, and Teignmouth Road / Snowberry Close are qualitative placement passes; no numeric offset was measured. St Vincent’s Road / Chapel Court is retained as a prior inconclusive candidate and is not counted. The overall AOI is still `selected_pending_coverage` / `not_checked`; three checks do not establish coverage or approval.

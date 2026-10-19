@@ -1,0 +1,132 @@
+{
+  "formatVersion": 1,
+  "scope": "comparison-only",
+  "sources": [
+    {
+      "sourceId": "os-openmap-local-apr-2026-sx",
+      "publisher": "Ordnance Survey",
+      "product": "OS OpenMap–Local GeoTIFF Full Colour",
+      "edition": "April 2026",
+      "selection": {
+        "selectionType": "100 km National Grid square",
+        "square": "SX",
+        "portalAdvertisedSizeText": "349.41 MB",
+        "selectedOnlyForComparison": true,
+        "selectionRationale": "The reviewed 1 km AOI and all three comparison windows lie within the OS 100 km SX square. The archive contains its 5 km palette GeoTIFF tiles; only SX96SW and SX96NW, whose measured bounds cover the AOI and its northing seam, were extracted."
+      },
+      "acquisition": {
+        "portalProductUrl": "https://osdatahub.os.uk/downloads/open/OpenMapLocal",
+        "portalProductDocumentationUrl": "https://docs.os.uk/os-downloads/products/maps-and-imagery-portfolio/os-openmap-local/os-openmap-local-downloads",
+        "requestUrl": "https://api.os.uk/downloads/v1/products/OpenMapLocal/downloads?area=SX&format=GeoTIFF&subformat=Full+Colour&redirect",
+        "resolvedResourceUrlWithoutTemporaryQuery": "https://omseprd1stdstordownload.blob.core.windows.net/downloads/OpenMapLocal/2026-04/100kmSquares/GeoTIFF%20Full%20Colour/omlras_gtfc_sx.zip",
+        "acquiredAtUtc": "2026-10-19T11:39:33Z",
+        "response": {
+          "rangeProbeStatus": 206,
+          "rangeProbeContentRange": "bytes 0-0/349405146",
+          "downloadStatus": 200,
+          "contentLengthBytes": 349405146,
+          "contentType": "application/octet-stream",
+          "azureLastModified": "2026-07-07T09:09:25Z",
+          "azureCreationTime": "2026-04-20T14:06:37Z",
+          "azureBlobContentMd5Base64": "76EcQADumfuvFppUek0n8A=="
+        }
+      },
+      "archive": {
+        "relativePath": "openmaplocal-2026-04-sx-geotiff.zip",
+        "sizeBytes": 349405146,
+        "sha256": "d9a01900c4dd5c26af50d6aed79f419a1957acf4167aedef97bb905ffcdff853",
+        "httpStatus": 200,
+        "contentLengthBytes": 349405146,
+        "advertisedSizeText": "349.41 MB",
+        "archiveMemberCount": 227,
+        "zipCrcVerified": true
+      },
+      "licence": {
+        "name": "Open Government Licence v3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "archiveText": "Your use of OS OpenData is subject to the terms at http://os.uk/opendata/licence",
+        "requiredAttribution": "Contains Ordnance Survey data © Crown copyright and database right 2026",
+        "attributionYearSource": "The archive's doc/licence.txt member explicitly states 2026.",
+        "productReference": "https://docs.os.uk/os-downloads/products/maps-and-imagery-portfolio/os-openmap-local/os-openmap-local-overview"
+      },
+      "supportFiles": [
+        {
+          "archiveMember": "OS OpenMap Local (Full Colour Raster) SX/doc/licence.txt",
+          "relativePath": "selected-members/licence.txt",
+          "sizeBytes": 190,
+          "sha256": "65f3f555aa3e42e93b4db24a29ad277beefd12bc4871076d558c1cc41a6b216d",
+          "crc32": "77914946",
+          "description": "Archive licence text with the year-specific OS attribution."
+        },
+        {
+          "archiveMember": "OS OpenMap Local (Full Colour Raster) SX/readme.txt",
+          "relativePath": "selected-members/readme.txt",
+          "sizeBytes": 1488,
+          "sha256": "d32d1cd25d883ec2321c5af824d93b10fa4e4feda7ebf9177d2e10bbd181a17c",
+          "crc32": "d91fc22f",
+          "description": "Archive readme confirming the data/doc directory structure and licence file."
+        }
+      ],
+      "selectedTiles": [
+        {
+          "tileName": "SX96SW",
+          "archiveMember": "OS OpenMap Local (Full Colour Raster) SX/data/SX96SW.tif",
+          "relativePath": "selected-members/SX96SW.tif",
+          "sizeBytes": 2248452,
+          "sha256": "546c7a7c60b8c372c35dfd7ad21ddbbd71437ba45966235f6a09264352181838",
+          "crc32": "ec0c7f60",
+          "raster": {
+            "width": 5000,
+            "height": 5000,
+            "bandCount": 1,
+            "dtype": "uint8",
+            "crs": "EPSG:27700",
+            "transform": [1.0, 0.0, 290000.0, 0.0, -1.0, 65000.0],
+            "boundsM": [290000.0, 60000.0, 295000.0, 65000.0],
+            "resolutionM": [1.0, 1.0],
+            "colorInterpretation": ["palette"],
+            "pixelInterpretation": "Area",
+            "nodata": null,
+            "paletteEntries": 256,
+            "tags": {
+              "AREA_OR_POINT": "Area",
+              "TIFFTAG_IMAGEDESCRIPTION": "OS Open Map - Local - Full colour raster - TILE SX96SW",
+              "TIFFTAG_RESOLUTIONUNIT": "2 (pixels/inch)",
+              "TIFFTAG_XRESOLUTION": "254",
+              "TIFFTAG_YRESOLUTION": "254"
+            }
+          }
+        },
+        {
+          "tileName": "SX96NW",
+          "archiveMember": "OS OpenMap Local (Full Colour Raster) SX/data/SX96NW.tif",
+          "relativePath": "selected-members/SX96NW.tif",
+          "sizeBytes": 2620996,
+          "sha256": "fec960fdb94a2e2cc3cdcfa201c35c6070871ae7c86b6c80617bad550799ae1a",
+          "crc32": "aecd0469",
+          "raster": {
+            "width": 5000,
+            "height": 5000,
+            "bandCount": 1,
+            "dtype": "uint8",
+            "crs": "EPSG:27700",
+            "transform": [1.0, 0.0, 290000.0, 0.0, -1.0, 70000.0],
+            "boundsM": [290000.0, 65000.0, 295000.0, 70000.0],
+            "resolutionM": [1.0, 1.0],
+            "colorInterpretation": ["palette"],
+            "pixelInterpretation": "Area",
+            "nodata": null,
+            "paletteEntries": 256,
+            "tags": {
+              "AREA_OR_POINT": "Area",
+              "TIFFTAG_IMAGEDESCRIPTION": "OS Open Map - Local - Full colour raster - TILE SX96NW",
+              "TIFFTAG_RESOLUTIONUNIT": "2 (pixels/inch)",
+              "TIFFTAG_XRESOLUTION": "254",
+              "TIFFTAG_YRESOLUTION": "254"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

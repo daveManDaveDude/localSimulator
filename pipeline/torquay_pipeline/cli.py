@@ -16,6 +16,12 @@ from pyproj.network import is_network_enabled
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 
+from .alignment_report import (
+    AlignmentReportError,
+    build_alignment_artifacts,
+    render_alignment_panels,
+    validate_alignment_report,
+)
 from .aoi import generate_selection, write_selection
 from .building_export import (
     BuildingExportError,
@@ -32,6 +38,7 @@ from .building_sources import (
     verify_building_source,
 )
 from .buildings import BuildingConfig, BuildingImportError, import_osm_buildings
+from .comparison_sources import ComparisonSourceError, verify_comparison_source
 from .config import AoiConfig, AoiConfigError, load_aoi_config, validate_stored_selection
 from .road_config import RoadConfigError, load_road_config
 from .road_export import RoadExportError, build_road_package, validate_road_package
@@ -196,7 +203,100 @@ def _parser() -> argparse.ArgumentParser:
                 type=Path,
                 default=Path("../docs/milestones/screenshots/TVW-011-roads-preview.png"),
             )
+    command = commands.add_parser(
+        "inspect-comparison-source",
+        help="verify the comparison-only OS archive, extracted members, and raster metadata",
+    )
+    command.add_argument(
+        "--manifest", type=Path, default=Path("../data/comparison-source-manifest.json")
+    )
+    command.add_argument(
+        "--source-root", type=Path, default=Path("../data/raw/comparison/os_openmap_local")
+    )
+    command = commands.add_parser(
+        "compare-alignment",
+        help="render registered comparison panels and, when browser evidence exists, report them",
+    )
+    command.add_argument("--config", type=Path, default=Path("../config/alignment.torquay.json"))
+    command.add_argument(
+        "--manifest", type=Path, default=Path("../data/comparison-source-manifest.json")
+    )
+    command.add_argument(
+        "--source-root", type=Path, default=Path("../data/raw/comparison/os_openmap_local")
+    )
+    command.add_argument(
+        "--terrain-package", type=Path, default=Path("../public/worlds/torquay-poc-001")
+    )
+    command.add_argument(
+        "--road-package", type=Path, default=Path("../data/generated/roads/torquay-poc-001")
+    )
+    command.add_argument(
+        "--building-package",
+        type=Path,
+        default=Path("../data/generated/buildings/torquay-poc-001"),
+    )
+    command.add_argument("--project-root", type=Path, default=Path(".."))
+    command.add_argument(
+        "--render-panels-only",
+        action="store_true",
+        help="generate the three static map panels without requiring browser screenshots",
+    )
+    command = commands.add_parser(
+        "validate-alignment-report", help="validate report status and integrity-bound evidence"
+    )
+    command.add_argument(
+        "--report", type=Path, default=Path("../docs/milestones/artifacts/TVW-012-alignment.json")
+    )
+    command.add_argument("--project-root", type=Path, default=Path(".."))
     return parser
+
+
+def _alignment_command(args: argparse.Namespace) -> int:
+    if args.command == "inspect-comparison-source":
+        source = verify_comparison_source(args.manifest.resolve(), args.source_root.resolve())
+        result = {
+            "sourceId": source.record["sourceId"],
+            "archive": {
+                "path": str(source.archive_path),
+                "byteLength": source.archive_path.stat().st_size,
+                "sha256": source.record["archive"]["sha256"],
+                "memberCount": source.record["archive"]["archiveMemberCount"],
+            },
+            "verifiedTiles": [tile.to_dict() for tile in source.tiles],
+            "coversReviewedAoi": source.cover(
+                (290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931)
+            ),
+            "supportFiles": list(source.support_files),
+        }
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "compare-alignment":
+        common = (
+            args.config.resolve(),
+            args.manifest.resolve(),
+            args.source_root.resolve(),
+            args.terrain_package.resolve(),
+            args.road_package.resolve(),
+            args.building_package.resolve(),
+            args.project_root.resolve(),
+        )
+        result = (
+            render_alignment_panels(*common)
+            if args.render_panels_only
+            else build_alignment_artifacts(*common)
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
+        return 0
+    try:
+        report = json.loads(args.report.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise AlignmentReportError(f"cannot read alignment report '{args.report}': {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise AlignmentReportError(
+            f"alignment report '{args.report}' is invalid JSON: {exc}"
+        ) from exc
+    print(json.dumps(validate_alignment_report(report, args.project_root.resolve()), indent=2))
+    return 0
 
 
 def _road_command(args: argparse.Namespace) -> int:
@@ -622,6 +722,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             "publish-roads",
         }:
             return _road_command(args)
+        if args.command in {
+            "inspect-comparison-source",
+            "compare-alignment",
+            "validate-alignment-report",
+        }:
+            return _alignment_command(args)
         config = load_aoi_config(args.config)
         selection, geojson, markdown = generate_selection(config)
         if args.command == "validate-aoi":
@@ -691,10 +797,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0 if result.report["analysis"]["ea_dtm_threshold_result"] == "pass" else 2
     except (
         AoiConfigError,
+        AlignmentReportError,
         BuildingExportError,
         BuildingPublishError,
         BuildingImportError,
         BuildingSourceError,
+        ComparisonSourceError,
         RoadConfigError,
         RoadImportError,
         RoadExportError,

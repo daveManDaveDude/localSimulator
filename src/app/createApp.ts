@@ -26,6 +26,7 @@ import { createBuildings } from '../scene/createBuildings';
 import { createRoads, createRoadLandmarkMarker } from '../scene/createRoads';
 import { disposeSceneResources } from '../scene/disposeSceneResources';
 import type { HeightfieldWorld } from '../scene/createHeightfieldWorld';
+import { installAlignmentQaCamera } from './alignmentQaCamera';
 
 const TERRAIN_MANIFEST_URL = '/worlds/synthetic-terrain-demo/manifest.json';
 const REAL_TERRAIN_MANIFEST_URL = '/worlds/torquay-poc-001/manifest.json';
@@ -1432,6 +1433,9 @@ export function createApp(container: HTMLElement): AppHandle {
     }
   };
   updateTelemetry();
+  const disposeAlignmentQaCamera = import.meta.env.DEV
+    ? installAlignmentQaCamera(window, camera, true)
+    : () => undefined;
 
   resizeRenderer = (): void => {
     const width = Math.max(1, shell.clientWidth);
@@ -1492,6 +1496,7 @@ export function createApp(container: HTMLElement): AppHandle {
       if (disposed) return;
       disposed = true;
       activeLoad?.abort();
+      disposeAlignmentQaCamera();
       buildingAttempt += 1;
       buildingLoad?.abort();
       roadAttempt += 1;

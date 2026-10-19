@@ -1,0 +1,157 @@
+{
+  "candidateRole": "inconclusive prior candidate; not counted among active comparison spots",
+  "formatVersion": 1,
+  "record": {
+    "alignmentStatus": "inconclusive",
+    "browserSession": {
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "cameraOffsetM": 50,
+      "cameraPoseLocalMetres": {
+        "bearing": 25,
+        "pitch": -35,
+        "x": -351.96,
+        "y": 53.18,
+        "z": 366.25
+      },
+      "canvas": {
+        "cssHeight": 900,
+        "cssWidth": 1440,
+        "height": 900,
+        "width": 1440
+      },
+      "expectedContextId": "sw-st-vincent-chapel",
+      "eyeHeightAboveTerrainM": 35.0005,
+      "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "sampledGroundHeightM": 18.1795,
+      "sourceCredits": [
+        "Contains Environment Agency copyright and/or database right 2022 (DTM)",
+        "Contains Ordnance Survey data © Crown copyright and database right 2026 (OS OpenMap Local)",
+        "© OpenStreetMap contributors; extract provided by Geofabrik GmbH"
+      ],
+      "targetLocalXZMetres": [
+        -330.827,
+        320.939
+      ],
+      "viewport": {
+        "devicePixelRatio": 1.5,
+        "height": 900,
+        "width": 1440
+      }
+    },
+    "comparisonWindow": {
+      "actualRasterPixelEdgeBoundsM": [
+        290678.0,
+        64930.0,
+        290878.0,
+        65130.0
+      ],
+      "bngBoundsM": [
+        290678.0,
+        64930.0,
+        290878.0,
+        65130.0
+      ],
+      "heightPixels": 200,
+      "pixelSizeM": 1.0,
+      "tileNames": [
+        "SX96NW.tif",
+        "SX96SW.tif"
+      ],
+      "widthPixels": 200
+    },
+    "control": {
+      "bngENMetres": [
+        290778.0748176432,
+        65032.54450844931
+      ],
+      "featureRole": "junction",
+      "localXZMetres": [
+        -330.827,
+        320.939
+      ],
+      "osmNodeId": 336350820,
+      "osmWayIds": [
+        30482106,
+        30482107
+      ],
+      "pixelReference": {
+        "actualPixelEdgeWindowBNGMetres": [
+          290678.0,
+          64930.0,
+          290878.0,
+          65130.0
+        ],
+        "manualReferencePointBNGMetres": null,
+        "pixelSizeM": 1.0,
+        "registration": "AREA_OR_POINT=Area; source raster is not warped or resampled",
+        "requestedWindowBNGMetres": [
+          290678.0,
+          64930.0,
+          290878.0,
+          65130.0
+        ]
+      },
+      "roadNames": [
+        "St. Vincent’s Road",
+        "Chapel Court"
+      ],
+      "wgs84LonLat": [
+        -3.540579895069462,
+        50.474906198500086
+      ]
+    },
+    "debugContextId": "sw-st-vincent-chapel",
+    "evidence": [
+      {
+        "byteLength": 118098,
+        "kind": "reference",
+        "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-reference.png",
+        "sha256": "07e3f74f1de8faf64b253b39873c6d83e69c16e8d581485e65292bfdae4bb773"
+      },
+      {
+        "byteLength": 274552,
+        "kind": "overlay",
+        "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-overlay.png",
+        "sha256": "c99e1c8fcc5aa2c7a2e6f88b76bdd6fb66296e916e3c5c478f94a4487a6b38f1"
+      },
+      {
+        "byteLength": 227506,
+        "kind": "package",
+        "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-package.png",
+        "sha256": "c86a819ff2cc4166b89cd7c62f00d52daec7d0f1ba941903b22c35709a298dc1"
+      },
+      {
+        "byteLength": 524283,
+        "kind": "scene",
+        "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-scene.png",
+        "sha256": "f27fa39de4302b488da69cf0301414961a7fc142727d851b884e4631d43f2e53"
+      }
+    ],
+    "id": "sw-st-vincent-chapel",
+    "label": "SW · St. Vincent’s Road / Chapel Court candidate (inconclusive)",
+    "manualObservation": {
+      "confidence": "low",
+      "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+      "referencePointBngM": null,
+      "reviewedBy": "Codex visual inspection",
+      "screeningAssessment": "Street-name/context discrepancy is unresolved; no numeric offset was measured.",
+      "summary": "The OS reference around the selected OSM point labels Bel Court and Snowberry Road, while this OSM context is named St. Vincent’s Road / Chapel Court. The overlay and 3D scene show nearby connected road geometry, but the available OS labels do not support a confident correspondence between those named contexts. This spot is inconclusive and is not counted as a match."
+    },
+    "originalContext": {
+      "building_way_id": 181620525,
+      "context_id": "sw-mount-stuart",
+      "local_xz_m": [
+        -414.6965762343025,
+        294.5276208946598
+      ],
+      "representative_lon_lat": [
+        -3.5417691183482414,
+        50.475127986993755
+      ]
+    },
+    "selectionRationale": "Retained the existing OSM context for independent comparison. The OS raster shows nearby named streets, but its labels do not establish that the selected OSM St. Vincent’s Road / Chapel Court junction is the same named context.",
+    "selectionStatus": "accepted_existing_context"
+  }
+}

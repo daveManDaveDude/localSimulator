@@ -1,0 +1,844 @@
+{
+  "alignmentGateStatus": "pass",
+  "aoi": {
+    "boundsM": [
+      290608.9018176432,
+      64853.48350844931,
+      291608.9018176432,
+      65853.48350844931
+    ],
+    "coverageStatus": "not_checked",
+    "selectionStatus": "selected_pending_coverage"
+  },
+  "browserSessionEvidence": {
+    "byteLength": 3243,
+    "path": "docs/milestones/artifacts/TVW-012-browser-evidence.json",
+    "sha256": "11fbfcc7459eb969a07d09f4c8173ef94c72f6f3b9686f32ba7ddd71bf2b1653"
+  },
+  "combinedM5Status": "pending",
+  "coordinateReference": {
+    "aoi": {
+      "boundsM": [
+        290608.9018176432,
+        64853.48350844931,
+        291608.9018176432,
+        65853.48350844931
+      ],
+      "coverageStatus": "not_checked",
+      "selectionStatus": "selected_pending_coverage"
+    },
+    "axisMapping": "E=originE+x; N=originN-z; north is up-screen and -Z in the world.",
+    "crs": "EPSG:27700",
+    "localCoordinateOperation": {
+      "accuracy_m": 2.0,
+      "best_available": false,
+      "definition": "proj=pipeline step proj=unitconvert xy_in=deg xy_out=rad step proj=push v_3 step proj=cart ellps=WGS84 step inv proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=airy step proj=pop v_3 step proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy",
+      "description": "Inverse of OSGB36 to WGS 84 (6) + British National Grid (with axis order normalized for visualization)",
+      "grid_status": "selected EPSG:1314 + EPSG:19916 operation uses no grid files",
+      "grids": [],
+      "name": "EPSG:1314 + EPSG:19916",
+      "preferred_missing_operations": [
+        {
+          "grids": [
+            {
+              "available": false,
+              "full_name": "",
+              "short_name": "uk_os_OSTN15_NTv2_OSGBtoETRS.tif",
+              "url": "https://cdn.proj.org/uk_os_OSTN15_NTv2_OSGBtoETRS.tif"
+            }
+          ],
+          "name": "Inverse of OSGB36 to WGS 84 (9) + British National Grid",
+          "reported_accuracy_m": 1.0
+        }
+      ],
+      "reported_accuracy_m": 2.0,
+      "uses_grids": false
+    },
+    "rasterRegistration": "AREA_OR_POINT=Area; pixel centers are left+column+0.5 m and top-row-0.5 m. Source imagery is read as-is without warp/resampling.",
+    "uncertaintyComponents": [
+      "Pinned OSM-to-BNG operation reports 2 m accuracy; preferred OSTN15 grid is unavailable and PROJ best_available is false.",
+      "OS OpenMap–Local is a generalized cartographic raster with nominal 1:10,000 map scale, not a survey control source.",
+      "Raster pixel resolution is 1 m; symbol line widths and manual pixel selection limit centerline precision.",
+      "OS edition and OSM extract have different update/survey vintages; OSM coordinates have mapping uncertainty."
+    ]
+  },
+  "formatVersion": 1,
+  "issueStatus": "complete",
+  "issues": [],
+  "localPackages": {
+    "buildings": {
+      "manifestSha256": "25af81f6211aa137b80bf496172d2789815e08650c69c0c6630ad4282b750541",
+      "mappedFootprints": 1000,
+      "payloadSha256": "7ffe824db1f0bafadf48c14f610a357f2a001791658078b12442a71e13ea8f48",
+      "qaSha256": "b28ed40f0daf7ee521b016a231b01cdd754738bad6626e061e7e502409c5debd"
+    },
+    "roads": {
+      "manifestSha256": "b9896cb1d88f0bfdf1010a2a5001443b270c7162defff210bbd7cf93313bc8af",
+      "mappedWays": 198,
+      "payloadSha256": "56d017df60cfb4c655cf484c58e17cc858d0959da211c225501ca56676fd1ec3",
+      "qaSha256": "2c164fec3822f56030d22bfb7f48acb5c16b462e8e9829f1886a4120595d5f94"
+    },
+    "terrain": {
+      "heightfieldSha256": "1d0a9f27d9e150a422541b3ba2bd175f05d18c5ef58f8d8f4a4f586694c48183",
+      "manifestSha256": "a398e519ee8537af3bcdcdb781a1501a3e0f45e58e47a4bdd2a986e15a06788f"
+    }
+  },
+  "manualReview": {
+    "method": "Side-by-side qualitative review of the April 2026 OS raster, registered OSM overlay, OSM-only panel, and actual WebGL scene capture. No survey-grade offset was measured.",
+    "observationsAreExplicitConfigInputs": true,
+    "reviewedAtUtc": "2026-10-19T12:26:13Z",
+    "reviewedBy": "Codex visual inspection"
+  },
+  "notes": [
+    "Feature counts do not prove OSM or AOI completeness.",
+    "The NW Baron Road / Lindfield Close context remains recorded as unavailable/ambiguous and is not counted; Pencorse Road / Audley Avenue is the accepted replacement selection.",
+    "The former SW St Vincent’s Road / Chapel Court candidate remains separately preserved as inconclusive and is not counted; Teignmouth Road / Snowberry Close is the accepted replacement selection.",
+    "Three bounded map comparisons do not approve/freeze the AOI or complete M2.",
+    "Combined M5 remains pending coordinator review and cannot pass from image generation alone."
+  ],
+  "priorCandidates": [
+    {
+      "byteLength": 5418,
+      "path": "docs/milestones/artifacts/TVW-012-prior-sw-inconclusive.json",
+      "record": {
+        "alignmentStatus": "inconclusive",
+        "browserSession": {
+          "browserName": "chromium",
+          "browserVersion": "156.0.8078.4",
+          "cameraOffsetM": 50,
+          "cameraPoseLocalMetres": {
+            "bearing": 25,
+            "pitch": -35,
+            "x": -351.96,
+            "y": 53.18,
+            "z": 366.25
+          },
+          "canvas": {
+            "cssHeight": 900,
+            "cssWidth": 1440,
+            "height": 900,
+            "width": 1440
+          },
+          "expectedContextId": "sw-st-vincent-chapel",
+          "eyeHeightAboveTerrainM": 35.0005,
+          "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+          "sampledGroundHeightM": 18.1795,
+          "sourceCredits": [
+            "Contains Environment Agency copyright and/or database right 2022 (DTM)",
+            "Contains Ordnance Survey data © Crown copyright and database right 2026 (OS OpenMap Local)",
+            "© OpenStreetMap contributors; extract provided by Geofabrik GmbH"
+          ],
+          "targetLocalXZMetres": [
+            -330.827,
+            320.939
+          ],
+          "viewport": {
+            "devicePixelRatio": 1.5,
+            "height": 900,
+            "width": 1440
+          }
+        },
+        "comparisonWindow": {
+          "actualRasterPixelEdgeBoundsM": [
+            290678.0,
+            64930.0,
+            290878.0,
+            65130.0
+          ],
+          "bngBoundsM": [
+            290678.0,
+            64930.0,
+            290878.0,
+            65130.0
+          ],
+          "heightPixels": 200,
+          "pixelSizeM": 1.0,
+          "tileNames": [
+            "SX96NW.tif",
+            "SX96SW.tif"
+          ],
+          "widthPixels": 200
+        },
+        "control": {
+          "bngENMetres": [
+            290778.0748176432,
+            65032.54450844931
+          ],
+          "featureRole": "junction",
+          "localXZMetres": [
+            -330.827,
+            320.939
+          ],
+          "osmNodeId": 336350820,
+          "osmWayIds": [
+            30482106,
+            30482107
+          ],
+          "pixelReference": {
+            "actualPixelEdgeWindowBNGMetres": [
+              290678.0,
+              64930.0,
+              290878.0,
+              65130.0
+            ],
+            "manualReferencePointBNGMetres": null,
+            "pixelSizeM": 1.0,
+            "registration": "AREA_OR_POINT=Area; source raster is not warped or resampled",
+            "requestedWindowBNGMetres": [
+              290678.0,
+              64930.0,
+              290878.0,
+              65130.0
+            ]
+          },
+          "roadNames": [
+            "St. Vincent’s Road",
+            "Chapel Court"
+          ],
+          "wgs84LonLat": [
+            -3.540579895069462,
+            50.474906198500086
+          ]
+        },
+        "debugContextId": "sw-st-vincent-chapel",
+        "evidence": [
+          {
+            "byteLength": 118098,
+            "kind": "reference",
+            "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-reference.png",
+            "sha256": "07e3f74f1de8faf64b253b39873c6d83e69c16e8d581485e65292bfdae4bb773"
+          },
+          {
+            "byteLength": 274552,
+            "kind": "overlay",
+            "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-overlay.png",
+            "sha256": "c99e1c8fcc5aa2c7a2e6f88b76bdd6fb66296e916e3c5c478f94a4487a6b38f1"
+          },
+          {
+            "byteLength": 227506,
+            "kind": "package",
+            "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-package.png",
+            "sha256": "c86a819ff2cc4166b89cd7c62f00d52daec7d0f1ba941903b22c35709a298dc1"
+          },
+          {
+            "byteLength": 524283,
+            "kind": "scene",
+            "path": "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-scene.png",
+            "sha256": "f27fa39de4302b488da69cf0301414961a7fc142727d851b884e4631d43f2e53"
+          }
+        ],
+        "id": "sw-st-vincent-chapel",
+        "label": "SW · St. Vincent’s Road / Chapel Court candidate (inconclusive)",
+        "manualObservation": {
+          "confidence": "low",
+          "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+          "referencePointBngM": null,
+          "reviewedBy": "Codex visual inspection",
+          "screeningAssessment": "Street-name/context discrepancy is unresolved; no numeric offset was measured.",
+          "summary": "The OS reference around the selected OSM point labels Bel Court and Snowberry Road, while this OSM context is named St. Vincent’s Road / Chapel Court. The overlay and 3D scene show nearby connected road geometry, but the available OS labels do not support a confident correspondence between those named contexts. This spot is inconclusive and is not counted as a match."
+        },
+        "originalContext": {
+          "building_way_id": 181620525,
+          "context_id": "sw-mount-stuart",
+          "local_xz_m": [
+            -414.6965762343025,
+            294.5276208946598
+          ],
+          "representative_lon_lat": [
+            -3.5417691183482414,
+            50.475127986993755
+          ]
+        },
+        "selectionRationale": "Retained the existing OSM context for independent comparison. The OS raster shows nearby named streets, but its labels do not establish that the selected OSM St. Vincent’s Road / Chapel Court junction is the same named context.",
+        "selectionStatus": "accepted_existing_context"
+      },
+      "sha256": "3db68c240bf0f77138ea5aaaf174d7a983f0cefd2f963644743aa5e769963b24"
+    }
+  ],
+  "reportId": "tvw-012-torquay-alignment",
+  "screeningRule": {
+    "meaning": "Predeclared investigation trigger after scale, symbol thickness and uncertainty review; not a survey tolerance or accuracy guarantee.",
+    "triggerMetres": 10.0
+  },
+  "source": {
+    "acquisition": {
+      "acquiredAtUtc": "2026-10-19T11:39:33Z",
+      "portalProductDocumentationUrl": "https://docs.os.uk/os-downloads/products/maps-and-imagery-portfolio/os-openmap-local/os-openmap-local-downloads",
+      "portalProductUrl": "https://osdatahub.os.uk/downloads/open/OpenMapLocal",
+      "requestUrl": "https://api.os.uk/downloads/v1/products/OpenMapLocal/downloads?area=SX&format=GeoTIFF&subformat=Full+Colour&redirect",
+      "resolvedResourceUrlWithoutTemporaryQuery": "https://omseprd1stdstordownload.blob.core.windows.net/downloads/OpenMapLocal/2026-04/100kmSquares/GeoTIFF%20Full%20Colour/omlras_gtfc_sx.zip",
+      "response": {
+        "azureBlobContentMd5Base64": "76EcQADumfuvFppUek0n8A==",
+        "azureCreationTime": "2026-04-20T14:06:37Z",
+        "azureLastModified": "2026-07-07T09:09:25Z",
+        "contentLengthBytes": 349405146,
+        "contentType": "application/octet-stream",
+        "downloadStatus": 200,
+        "rangeProbeContentRange": "bytes 0-0/349405146",
+        "rangeProbeStatus": 206
+      }
+    },
+    "archiveBytes": 349405146,
+    "archiveFilename": "openmaplocal-2026-04-sx-geotiff.zip",
+    "archiveSha256": "d9a01900c4dd5c26af50d6aed79f419a1957acf4167aedef97bb905ffcdff853",
+    "edition": "April 2026",
+    "licence": {
+      "archiveText": "Your use of OS OpenData is subject to the terms at http://os.uk/opendata/licence",
+      "attributionYearSource": "The archive's doc/licence.txt member explicitly states 2026.",
+      "name": "Open Government Licence v3.0",
+      "productReference": "https://docs.os.uk/os-downloads/products/maps-and-imagery-portfolio/os-openmap-local/os-openmap-local-overview",
+      "requiredAttribution": "Contains Ordnance Survey data © Crown copyright and database right 2026",
+      "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+    },
+    "product": "OS OpenMap–Local GeoTIFF Full Colour",
+    "publisher": "Ordnance Survey",
+    "selectedTiles": [
+      {
+        "bandCount": 1,
+        "boundsM": [
+          290000.0,
+          60000.0,
+          295000.0,
+          65000.0
+        ],
+        "colorInterpretation": [
+          "palette"
+        ],
+        "crc32": "ec0c7f60",
+        "crs": "EPSG:27700",
+        "dtype": "uint8",
+        "filename": "SX96SW.tif",
+        "height": 5000,
+        "member": "OS OpenMap Local (Full Colour Raster) SX/data/SX96SW.tif",
+        "nodata": null,
+        "paletteEntries": 256,
+        "pixelInterpretation": "Area",
+        "resolutionM": [
+          1.0,
+          1.0
+        ],
+        "sha256": "546c7a7c60b8c372c35dfd7ad21ddbbd71437ba45966235f6a09264352181838",
+        "sizeBytes": 2248452,
+        "tags": {
+          "AREA_OR_POINT": "Area",
+          "TIFFTAG_IMAGEDESCRIPTION": "OS Open Map - Local - Full colour raster - TILE SX96SW",
+          "TIFFTAG_RESOLUTIONUNIT": "2 (pixels/inch)",
+          "TIFFTAG_XRESOLUTION": "254",
+          "TIFFTAG_YRESOLUTION": "254"
+        },
+        "transform": [
+          1.0,
+          0.0,
+          290000.0,
+          0.0,
+          -1.0,
+          65000.0
+        ],
+        "width": 5000
+      },
+      {
+        "bandCount": 1,
+        "boundsM": [
+          290000.0,
+          65000.0,
+          295000.0,
+          70000.0
+        ],
+        "colorInterpretation": [
+          "palette"
+        ],
+        "crc32": "aecd0469",
+        "crs": "EPSG:27700",
+        "dtype": "uint8",
+        "filename": "SX96NW.tif",
+        "height": 5000,
+        "member": "OS OpenMap Local (Full Colour Raster) SX/data/SX96NW.tif",
+        "nodata": null,
+        "paletteEntries": 256,
+        "pixelInterpretation": "Area",
+        "resolutionM": [
+          1.0,
+          1.0
+        ],
+        "sha256": "fec960fdb94a2e2cc3cdcfa201c35c6070871ae7c86b6c80617bad550799ae1a",
+        "sizeBytes": 2620996,
+        "tags": {
+          "AREA_OR_POINT": "Area",
+          "TIFFTAG_IMAGEDESCRIPTION": "OS Open Map - Local - Full colour raster - TILE SX96NW",
+          "TIFFTAG_RESOLUTIONUNIT": "2 (pixels/inch)",
+          "TIFFTAG_XRESOLUTION": "254",
+          "TIFFTAG_YRESOLUTION": "254"
+        },
+        "transform": [
+          1.0,
+          0.0,
+          290000.0,
+          0.0,
+          -1.0,
+          70000.0
+        ],
+        "width": 5000
+      }
+    ],
+    "sourceId": "os-openmap-local-apr-2026-sx"
+  },
+  "sourceIndependence": "independent_publisher_os_openmap_local",
+  "sourceManifest": {
+    "path": "data/comparison-source-manifest.json",
+    "sha256": "79a42273d0182546002d782cbf99a3a877ccad4920f95c69f430aa674d40c660"
+  },
+  "spots": [
+    {
+      "alignmentStatus": "pass",
+      "browserSession": {
+        "browserName": "chromium",
+        "browserVersion": "156.0.8078.4",
+        "cameraOffsetM": 60,
+        "cameraPoseLocalMetres": {
+          "bearing": 48,
+          "pitch": -35,
+          "x": 146.54,
+          "y": 75.55,
+          "z": -197.24
+        },
+        "canvas": {
+          "cssHeight": 900,
+          "cssWidth": 1440,
+          "height": 900,
+          "width": 1440
+        },
+        "expectedContextId": "ne-second-main",
+        "eyeHeightAboveTerrainM": 35.0032,
+        "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "sampledGroundHeightM": 40.5468,
+        "sourceCredits": [
+          "Contains Environment Agency copyright and/or database right 2022 (DTM)",
+          "Contains Ordnance Survey data © Crown copyright and database right 2026 (OS OpenMap Local)",
+          "© OpenStreetMap contributors; extract provided by Geofabrik GmbH"
+        ],
+        "targetLocalXZMetres": [
+          191.131,
+          -237.389
+        ],
+        "viewport": {
+          "devicePixelRatio": 1.5,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "comparisonWindow": {
+        "actualRasterPixelEdgeBoundsM": [
+          291200.0,
+          65490.0,
+          291400.0,
+          65690.0
+        ],
+        "bngBoundsM": [
+          291200.0,
+          65490.0,
+          291400.0,
+          65690.0
+        ],
+        "heightPixels": 200,
+        "pixelSizeM": 1.0,
+        "tileNames": [
+          "SX96NW.tif"
+        ],
+        "widthPixels": 200
+      },
+      "control": {
+        "bngENMetres": [
+          291300.0328176432,
+          65590.8725084493
+        ],
+        "featureRole": "junction",
+        "localXZMetres": [
+          191.131,
+          -237.389
+        ],
+        "osmNodeId": 344511179,
+        "osmWayIds": [
+          30982866,
+          30982869
+        ],
+        "pixelReference": {
+          "actualPixelEdgeWindowBNGMetres": [
+            291200.0,
+            65490.0,
+            291400.0,
+            65690.0
+          ],
+          "manualReferencePointBNGMetres": null,
+          "pixelSizeM": 1.0,
+          "registration": "AREA_OR_POINT=Area; source raster is not warped or resampled",
+          "requestedWindowBNGMetres": [
+            291200.0,
+            65490.0,
+            291400.0,
+            65690.0
+          ]
+        },
+        "roadNames": [
+          "Main Avenue",
+          "Second Avenue"
+        ],
+        "wgs84LonLat": [
+          -3.533389382988352,
+          50.48002259454095
+        ]
+      },
+      "debugContextId": "ne-second-main",
+      "evidence": [
+        {
+          "byteLength": 102707,
+          "kind": "reference",
+          "path": "docs/milestones/screenshots/TVW-012-ne-second-main-reference.png",
+          "sha256": "49dc728503c395b2ac0ceda65a732fee20edf8f355a3f65fdf7d8ffe4d09a6a5"
+        },
+        {
+          "byteLength": 269551,
+          "kind": "overlay",
+          "path": "docs/milestones/screenshots/TVW-012-ne-second-main-overlay.png",
+          "sha256": "2664cf099f221ec62ca90031396e60e56c8f8bd5d7a2ea6dc718d479fd0c000b"
+        },
+        {
+          "byteLength": 230582,
+          "kind": "package",
+          "path": "docs/milestones/screenshots/TVW-012-ne-second-main-package.png",
+          "sha256": "ae13e5edf099bcdcb3894b0fba46595a4d12c3c66484ef90a443253765c6b9be"
+        },
+        {
+          "byteLength": 451963,
+          "kind": "scene",
+          "path": "docs/milestones/screenshots/TVW-012-ne-second-main-scene.png",
+          "sha256": "b3d3e2a6cb70ffd37b2ec72990a93e6ccbf0d36d64b4a4881ae356c25edded56"
+        }
+      ],
+      "id": "ne-second-main",
+      "label": "NE · Second Avenue / Main Avenue",
+      "manualObservation": {
+        "confidence": "medium",
+        "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+        "referencePointBngM": null,
+        "reviewedBy": "Codex visual inspection",
+        "screeningAssessment": "No visible discrepancy exceeding the 10 m investigation trigger was apparent at this map scale; this is not a measured accuracy result.",
+        "summary": "The OS window labels Main Avenue and Second Avenue at the marked T-junction. The registered OSM centerlines meet at the same source node and lie within the broad mapped road corridor; the actual 3D capture shows the connected junction among the same building rows. This is a qualitative placement match only; no numeric offset was measured."
+      },
+      "originalContext": {
+        "building_way_id": 208552436,
+        "context_id": "ne-second-avenue",
+        "local_xz_m": [
+          203.32051374798175,
+          -340.4368796944909
+        ],
+        "representative_lon_lat": [
+          -3.5332476398607215,
+          50.480951244856804
+        ]
+      },
+      "selectionRationale": "A clear junction labelled Second Avenue and Main Avenue in the independent raster; both road centerlines meet at the same source node in the existing OSM package.",
+      "selectionStatus": "accepted_existing_context"
+    },
+    {
+      "alignmentStatus": "pass",
+      "browserSession": {
+        "browserName": "chromium",
+        "browserVersion": "156.0.8078.4",
+        "cameraOffsetM": 40,
+        "cameraPoseLocalMetres": {
+          "bearing": 125,
+          "pitch": -35,
+          "x": -412.77,
+          "y": 63.4,
+          "z": -359.77
+        },
+        "canvas": {
+          "cssHeight": 900,
+          "cssWidth": 1440,
+          "height": 900,
+          "width": 1440
+        },
+        "expectedContextId": "nw-audley-pencorse",
+        "eyeHeightAboveTerrainM": 35.0045,
+        "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "sampledGroundHeightM": 28.3955,
+        "sourceCredits": [
+          "Contains Environment Agency copyright and/or database right 2022 (DTM)",
+          "Contains Ordnance Survey data © Crown copyright and database right 2026 (OS OpenMap Local)",
+          "© OpenStreetMap contributors; extract provided by Geofabrik GmbH"
+        ],
+        "targetLocalXZMetres": [
+          -380.008,
+          -336.826
+        ],
+        "viewport": {
+          "devicePixelRatio": 1.5,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "comparisonWindow": {
+        "actualRasterPixelEdgeBoundsM": [
+          290628.0,
+          65590.0,
+          290828.0,
+          65790.0
+        ],
+        "bngBoundsM": [
+          290628.0,
+          65590.0,
+          290828.0,
+          65790.0
+        ],
+        "heightPixels": 200,
+        "pixelSizeM": 1.0,
+        "tileNames": [
+          "SX96NW.tif"
+        ],
+        "widthPixels": 200
+      },
+      "control": {
+        "bngENMetres": [
+          290728.8938176432,
+          65690.30950844931
+        ],
+        "featureRole": "junction",
+        "localXZMetres": [
+          -380.008,
+          -336.826
+        ],
+        "osmNodeId": 390449423,
+        "osmWayIds": [
+          34074000,
+          34074006
+        ],
+        "pixelReference": {
+          "actualPixelEdgeWindowBNGMetres": [
+            290628.0,
+            65590.0,
+            290828.0,
+            65790.0
+          ],
+          "manualReferencePointBNGMetres": null,
+          "pixelSizeM": 1.0,
+          "registration": "AREA_OR_POINT=Area; source raster is not warped or resampled",
+          "requestedWindowBNGMetres": [
+            290628.0,
+            65590.0,
+            290828.0,
+            65790.0
+          ]
+        },
+        "roadNames": [
+          "Audley Avenue",
+          "Pencorse Road"
+        ],
+        "wgs84LonLat": [
+          -3.5414650933735334,
+          50.48081019142953
+        ]
+      },
+      "debugContextId": "nw-audley-pencorse",
+      "evidence": [
+        {
+          "byteLength": 114975,
+          "kind": "reference",
+          "path": "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-reference.png",
+          "sha256": "411f7dea20e4f5f71585d58df893c73f23e399e33f77f96dd1251a8885820e54"
+        },
+        {
+          "byteLength": 243496,
+          "kind": "overlay",
+          "path": "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-overlay.png",
+          "sha256": "38e97955925c5cb4c29d023ed94ebc280ca3d69018c4201e034c57455d86f139"
+        },
+        {
+          "byteLength": 198844,
+          "kind": "package",
+          "path": "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-package.png",
+          "sha256": "5f005956d9c4ef50aaae459d8b879e29ce612a137385cd87fcaad696f89d0aa8"
+        },
+        {
+          "byteLength": 410971,
+          "kind": "scene",
+          "path": "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-scene.png",
+          "sha256": "e27b9fa452f7bc8a406738cd389a5fbf8e7287702ebce3237df65de1ec7c3d6f"
+        }
+      ],
+      "id": "nw-audley-pencorse",
+      "label": "NW · Pencorse Road / Audley Avenue",
+      "manualObservation": {
+        "confidence": "medium",
+        "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+        "referencePointBngM": null,
+        "reviewedBy": "Codex visual inspection",
+        "screeningAssessment": "No visible discrepancy exceeding the 10 m investigation trigger was apparent at this map scale; this is not a measured accuracy result.",
+        "summary": "The OS window labels Pencorse Road and Audley Avenue at the registered T-junction. Their OSM ways meet at the selected node and the overlay follows the visible mapped road corridors; the actual 3D capture shows the junction and surrounding building arrangement. This is a qualitative placement match only; no numeric offset was measured."
+      },
+      "originalContext": {
+        "building_way_id": 193285347,
+        "context_id": "nw-baron-lindfield",
+        "initial_outcome": "unavailable_ambiguous",
+        "local_xz_m": [
+          -483.60802391561447,
+          -301.78087954761577
+        ],
+        "reason": "Named Baron Road and Lindfield Close target ways are absent; nearest eligible exported feature is an unnamed footway, which is not relabelled.",
+        "representative_lon_lat": [
+          -3.54291445782617,
+          50.48047580317829
+        ]
+      },
+      "selectionRationale": "The initial Baron Road / Lindfield Close target is absent from the clipped OSM export and remains ambiguous. The replacement is an in-AOI junction whose two street labels are visible in the independent raster and whose two centerlines share an exported OSM source node.",
+      "selectionStatus": "accepted_replacement_selection"
+    },
+    {
+      "alignmentStatus": "pass",
+      "browserSession": {
+        "browserName": "chromium",
+        "browserVersion": "156.0.8078.4",
+        "cameraOffsetM": 45,
+        "cameraPoseLocalMetres": {
+          "bearing": 45,
+          "pitch": -35,
+          "x": -329.11,
+          "y": 47.66,
+          "z": 271.54
+        },
+        "canvas": {
+          "cssHeight": 900,
+          "cssWidth": 1440,
+          "height": 900,
+          "width": 1440
+        },
+        "expectedContextId": "sw-teignmouth-snowberry",
+        "eyeHeightAboveTerrainM": 34.997899999999994,
+        "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "sampledGroundHeightM": 12.6621,
+        "sourceCredits": [
+          "Contains Environment Agency copyright and/or database right 2022 (DTM)",
+          "Contains Ordnance Survey data © Crown copyright and database right 2026 (OS OpenMap Local)",
+          "© OpenStreetMap contributors; extract provided by Geofabrik GmbH"
+        ],
+        "targetLocalXZMetres": [
+          -297.29,
+          239.72
+        ],
+        "viewport": {
+          "devicePixelRatio": 1.5,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "comparisonWindow": {
+        "actualRasterPixelEdgeBoundsM": [
+          290711.0,
+          65013.0,
+          290912.0,
+          65214.0
+        ],
+        "bngBoundsM": [
+          290711.612,
+          65013.764,
+          290911.612,
+          65213.764
+        ],
+        "heightPixels": 201,
+        "pixelSizeM": 1.0,
+        "tileNames": [
+          "SX96NW.tif"
+        ],
+        "widthPixels": 201
+      },
+      "control": {
+        "bngENMetres": [
+          290811.612,
+          65113.764
+        ],
+        "featureRole": "junction",
+        "localXZMetres": [
+          -297.29,
+          239.72
+        ],
+        "osmNodeId": 336334681,
+        "osmWayIds": [
+          30480035,
+          30480999
+        ],
+        "pixelReference": {
+          "actualPixelEdgeWindowBNGMetres": [
+            290711.0,
+            65013.0,
+            290912.0,
+            65214.0
+          ],
+          "manualReferencePointBNGMetres": null,
+          "pixelSizeM": 1.0,
+          "registration": "AREA_OR_POINT=Area; source raster is not warped or resampled",
+          "requestedWindowBNGMetres": [
+            290711.612,
+            65013.764,
+            290911.612,
+            65213.764
+          ]
+        },
+        "roadNames": [
+          "Teignmouth Road",
+          "Snowberry Close"
+        ],
+        "wgs84LonLat": [
+          -3.540131184957885,
+          50.475642595439
+        ]
+      },
+      "debugContextId": "sw-teignmouth-snowberry",
+      "evidence": [
+        {
+          "byteLength": 127195,
+          "kind": "reference",
+          "path": "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-reference.png",
+          "sha256": "7298370a5cccc318e066d2fdfe807bc3bae1d8e06e07a8757fca822ddb5cc402"
+        },
+        {
+          "byteLength": 304758,
+          "kind": "overlay",
+          "path": "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-overlay.png",
+          "sha256": "9e7e4ddd471a5091e26001232bcb2fbabccda950cde676ec69da4c5a0fc80ce4"
+        },
+        {
+          "byteLength": 247113,
+          "kind": "package",
+          "path": "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-package.png",
+          "sha256": "40770dd75c766f59d488278bb0d25add4d8ae6d10a2be0bd6986ac54390d5374"
+        },
+        {
+          "byteLength": 425063,
+          "kind": "scene",
+          "path": "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-scene.png",
+          "sha256": "52f224bb57c4bb6d8a84d0d9fdbd988f4edbdab7f69a2000869a5e14186183ee"
+        }
+      ],
+      "id": "sw-teignmouth-snowberry",
+      "label": "SW · Teignmouth Road / Snowberry Close",
+      "manualObservation": {
+        "confidence": "medium",
+        "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+        "referencePointBngM": null,
+        "reviewedBy": "Codex visual inspection",
+        "screeningAssessment": "No visible discrepancy exceeding the 10 m investigation trigger was apparent at this map scale; this is not a measured accuracy result.",
+        "summary": "The independent OS reference labels Teignmouth Road and Snowberry Close at the marked junction. The registered OSM ways meet at node/336334681, and the overlay follows both named road corridors. The actual WebGL scene shows the connected road junction and surrounding buildings from an offset camera pose. This is a qualitative placement match only; no numeric offset was measured."
+      },
+      "originalContext": {
+        "context_id": "sw-teignmouth-snowberry",
+        "initial_outcome": "accepted_replacement_selection",
+        "reason": "In-AOI street-label and source-node replacement for the inconclusive St Vincent’s Road / Chapel Court candidate, which remains preserved separately."
+      },
+      "selectionRationale": "The OS raster labels Teignmouth Road and Snowberry Close at the in-AOI junction. The existing OSM ways meet at node/336334681 and their centerlines follow those two visible road corridors. The coordinator accepted this replacement selection on 2026-10-19; its bounded alignment review is recorded separately from the preserved inconclusive prior candidate.",
+      "selectionStatus": "accepted_replacement_selection"
+    }
+  ]
+}

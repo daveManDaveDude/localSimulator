@@ -1,0 +1,134 @@
+{
+  "format_version": 1,
+  "report_id": "tvw-012-torquay-alignment",
+  "world_id": "torquay-poc-001",
+  "source_id": "os-openmap-local-apr-2026-sx",
+  "coordinate_reference": {
+    "crs": "EPSG:27700",
+    "axis_order": "easting-northing",
+    "local_mapping": "E=originE+x; N=originN-z",
+    "screen_north": "up",
+    "pixel_registration": "area",
+    "pixel_center_rule": "pixel centers are at left+column+0.5 m, top-row-0.5 m"
+  },
+  "aoi": {
+    "bounds_m": [
+      290608.9018176432,
+      64853.48350844931,
+      291608.9018176432,
+      65853.48350844931
+    ],
+    "selection_status": "selected_pending_coverage",
+    "coverage_status": "not_checked"
+  },
+  "screening": {
+    "discrepancy_trigger_m": 10.0,
+    "interpretation": "Predeclared investigation trigger after considering scale, symbol thickness and uncertainty; not a survey tolerance or OS accuracy guarantee."
+  },
+  "manual_review": {
+    "reviewed_by": "Codex visual inspection",
+    "reviewed_at_utc": "2026-10-19T12:26:13Z",
+    "method": "Side-by-side qualitative review of the April 2026 OS raster, registered OSM overlay, OSM-only panel, and actual WebGL scene capture. No survey-grade offset was measured."
+  },
+  "comparison_status": "in_progress",
+  "combined_m5_status": "pending",
+  "spots": [
+    {
+      "id": "ne-second-main",
+      "label": "NE · Second Avenue / Main Avenue",
+      "selection_status": "accepted_existing_context",
+      "selection_rationale": "A clear junction labelled Second Avenue and Main Avenue in the independent raster; both road centerlines meet at the same source node in the existing OSM package.",
+      "original_context": {
+        "context_id": "ne-second-avenue",
+        "building_way_id": 208552436,
+        "representative_lon_lat": [-3.5332476398607215, 50.480951244856804],
+        "local_xz_m": [203.32051374798175, -340.4368796944909]
+      },
+      "control": {
+        "feature_role": "junction",
+        "osm_node_id": 344511179,
+        "osm_way_ids": [30982866, 30982869],
+        "road_names": ["Main Avenue", "Second Avenue"],
+        "local_xz_m": [191.131, -237.389],
+        "bng_e_n_m": [291300.0328176432, 65590.8725084493],
+        "wgs84_lon_lat": [-3.533389382988352, 50.48002259454095]
+      },
+      "debug_context_id": "ne-second-main",
+      "window_bounds_bng_m": [291200.0, 65490.0, 291400.0, 65690.0],
+      "alignment_status": "pass",
+      "manual_observation": {
+        "summary": "The OS window labels Main Avenue and Second Avenue at the marked T-junction. The registered OSM centerlines meet at the same source node and lie within the broad mapped road corridor; the actual 3D capture shows the connected junction among the same building rows. This is a qualitative placement match only; no numeric offset was measured.",
+        "reviewed_by": "Codex visual inspection",
+        "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+        "confidence": "medium",
+        "reference_point_bng_m": null,
+        "screening_assessment": "No visible discrepancy exceeding the 10 m investigation trigger was apparent at this map scale; this is not a measured accuracy result."
+      }
+    },
+    {
+      "id": "nw-audley-pencorse",
+      "label": "NW · Pencorse Road / Audley Avenue",
+      "selection_status": "accepted_replacement_selection",
+      "selection_rationale": "The initial Baron Road / Lindfield Close target is absent from the clipped OSM export and remains ambiguous. The replacement is an in-AOI junction whose two street labels are visible in the independent raster and whose two centerlines share an exported OSM source node.",
+      "original_context": {
+        "context_id": "nw-baron-lindfield",
+        "building_way_id": 193285347,
+        "representative_lon_lat": [-3.54291445782617, 50.48047580317829],
+        "local_xz_m": [-483.60802391561447, -301.78087954761577],
+        "initial_outcome": "unavailable_ambiguous",
+        "reason": "Named Baron Road and Lindfield Close target ways are absent; nearest eligible exported feature is an unnamed footway, which is not relabelled."
+      },
+      "control": {
+        "feature_role": "junction",
+        "osm_node_id": 390449423,
+        "osm_way_ids": [34074000, 34074006],
+        "road_names": ["Audley Avenue", "Pencorse Road"],
+        "local_xz_m": [-380.008, -336.826],
+        "bng_e_n_m": [290728.8938176432, 65690.30950844931],
+        "wgs84_lon_lat": [-3.5414650933735334, 50.48081019142953]
+      },
+      "debug_context_id": "nw-audley-pencorse",
+      "window_bounds_bng_m": [290628.0, 65590.0, 290828.0, 65790.0],
+      "alignment_status": "pass",
+      "manual_observation": {
+        "summary": "The OS window labels Pencorse Road and Audley Avenue at the registered T-junction. Their OSM ways meet at the selected node and the overlay follows the visible mapped road corridors; the actual 3D capture shows the junction and surrounding building arrangement. This is a qualitative placement match only; no numeric offset was measured.",
+        "reviewed_by": "Codex visual inspection",
+        "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+        "confidence": "medium",
+        "reference_point_bng_m": null,
+        "screening_assessment": "No visible discrepancy exceeding the 10 m investigation trigger was apparent at this map scale; this is not a measured accuracy result."
+      }
+    },
+    {
+      "id": "sw-teignmouth-snowberry",
+      "label": "SW · Teignmouth Road / Snowberry Close",
+      "selection_status": "accepted_replacement_selection",
+      "selection_rationale": "The OS raster labels Teignmouth Road and Snowberry Close at the in-AOI junction. The existing OSM ways meet at node/336334681 and their centerlines follow those two visible road corridors. The coordinator accepted this replacement selection on 2026-10-19; its bounded alignment review is recorded separately from the preserved inconclusive prior candidate.",
+      "original_context": {
+        "context_id": "sw-teignmouth-snowberry",
+        "initial_outcome": "accepted_replacement_selection",
+        "reason": "In-AOI street-label and source-node replacement for the inconclusive St Vincent’s Road / Chapel Court candidate, which remains preserved separately."
+      },
+      "control": {
+        "feature_role": "junction",
+        "osm_node_id": 336334681,
+        "osm_way_ids": [30480035, 30480999],
+        "road_names": ["Teignmouth Road", "Snowberry Close"],
+        "local_xz_m": [-297.290, 239.720],
+        "bng_e_n_m": [290811.612, 65113.764],
+        "wgs84_lon_lat": [-3.540131184957885, 50.475642595439]
+      },
+      "debug_context_id": "sw-teignmouth-snowberry",
+      "window_bounds_bng_m": [290711.612, 65013.764, 290911.612, 65213.764],
+      "alignment_status": "pass",
+      "manual_observation": {
+        "summary": "The independent OS reference labels Teignmouth Road and Snowberry Close at the marked junction. The registered OSM ways meet at node/336334681, and the overlay follows both named road corridors. The actual WebGL scene shows the connected road junction and surrounding buildings from an offset camera pose. This is a qualitative placement match only; no numeric offset was measured.",
+        "reviewed_by": "Codex visual inspection",
+        "method": "Side-by-side OS reference, registered overlay, OSM-only package map, and actual WebGL scene review.",
+        "confidence": "medium",
+        "reference_point_bng_m": null,
+        "screening_assessment": "No visible discrepancy exceeding the 10 m investigation trigger was apparent at this map scale; this is not a measured accuracy result."
+      }
+    }
+  ]
+}

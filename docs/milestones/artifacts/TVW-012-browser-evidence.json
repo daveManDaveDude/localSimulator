@@ -1,0 +1,112 @@
+{
+  "evidence": [
+    {
+      "screenshotPath": "C:\\vibe\\localSimulator\\docs\\milestones\\screenshots\\TVW-012-ne-second-main-scene.png",
+      "camera": {
+        "x": 146.54,
+        "y": 75.55,
+        "z": -197.24,
+        "bearing": 48,
+        "pitch": -35
+      },
+      "sampledGroundHeightM": 40.5468,
+      "eyeHeightAboveTerrainM": 35.0032,
+      "targetLocalXZMetres": [
+        191.131,
+        -237.389
+      ],
+      "cameraOffsetM": 60,
+      "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+      "expectedContextId": "ne-second-main",
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 900,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1.5
+      }
+    },
+    {
+      "screenshotPath": "C:\\vibe\\localSimulator\\docs\\milestones\\screenshots\\TVW-012-nw-audley-pencorse-scene.png",
+      "camera": {
+        "x": -412.77,
+        "y": 63.4,
+        "z": -359.77,
+        "bearing": 125,
+        "pitch": -35
+      },
+      "sampledGroundHeightM": 28.3955,
+      "eyeHeightAboveTerrainM": 35.0045,
+      "targetLocalXZMetres": [
+        -380.008,
+        -336.826
+      ],
+      "cameraOffsetM": 40,
+      "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+      "expectedContextId": "nw-audley-pencorse",
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 900,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1.5
+      }
+    },
+    {
+      "screenshotPath": "C:\\vibe\\localSimulator\\docs\\milestones\\screenshots\\TVW-012-sw-teignmouth-snowberry-scene.png",
+      "camera": {
+        "x": -329.11,
+        "y": 47.66,
+        "z": 271.54,
+        "bearing": 45,
+        "pitch": -35
+      },
+      "sampledGroundHeightM": 12.6621,
+      "eyeHeightAboveTerrainM": 34.997899999999994,
+      "targetLocalXZMetres": [
+        -297.29,
+        239.72
+      ],
+      "cameraOffsetM": 45,
+      "poseMethod": "development-only QA camera pose setter; no camera travel is implied",
+      "expectedContextId": "sw-teignmouth-snowberry",
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 900,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1.5
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": []
+}
