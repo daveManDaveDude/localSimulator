@@ -371,6 +371,19 @@ def test_publish_rejects_protected_outputs_before_validation_or_writing(
                 package,
                 output_dir=output,
             )
+    for unsafe_terrain in (
+        overview_export.ROOT / "docs" / "milestones",
+        overview_export.ROOT / "data" / "raw" / "ea_dtm",
+    ):
+        output = unsafe_terrain / "overview"
+        assert not output.exists()
+        with pytest.raises(overview_publish.OverviewPublishError, match="overlap"):
+            overview_publish.publish_overview_package(
+                package,
+                output_dir=output,
+                terrain_dir=unsafe_terrain,
+            )
+        assert not output.exists()
     shared_source_parent = tmp_path / "shared-source-parent"
     shared_source_parent.mkdir()
     with pytest.raises(overview_publish.OverviewPublishError, match="overlap"):

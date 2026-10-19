@@ -80,6 +80,10 @@ The focused `tests/test_overview_export.py` suite covers attempts to write to or
 
 From `pipeline`, ran `.\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-overview --package-dir public/worlds/torquay-poc-001/overview`. The CLI resolved the package to `C:\vibe\localSimulator\public\worlds\torquay-poc-001\overview` and validation passed after publication with the package hashes above.
 
+#### Fix round 2
+
+The second review found that the publication exception could also hide an ancestor overlap when a custom terrain directory sat under ROOT/docs or data/raw. The exception is now bound to the exact (terrain_dir / "overview", terrain_dir) pair. Regression cases set terrain to ROOT/docs/milestones and ROOT/data/raw/ea_dtm; both are rejected before package validation and create no output. The focused suite passed 20 tests and the full suite passed 219. Default publication succeeded byte-identically, followed by successful validation of the published package using the corrected command above. Node typecheck, lint, format, unit, and both production builds passed in the isolated validation copy.
+
 The M8-specific browser profiles and unit/format gates were rerun after the compact synthetic-panel change. The full TVW-014 profile subsequently passed with 19 passed, 8 expected profile skips, and no failures. The dedicated TVW-014/015 real/share profiles passed before that final UI-only adjustment; the full profile and M8 profiles exercised the adjusted code.
 
 ## Failed attempts and environment notes

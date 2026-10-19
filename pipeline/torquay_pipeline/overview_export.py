@@ -153,19 +153,21 @@ def _assert_disjoint_paths(
 ) -> None:
     """Reject output overlap with all input locations before staging or writing."""
     output = _path_key(output)
-    allowed = {_path_key(path) for path in allowed_output_paths}
+    allowed_parent_pairs = {
+        (_path_key(path), _path_key(path.parent)) for path in allowed_output_paths
+    }
     for source in input_directories:
         resolved = _path_key(source)
         overlaps = _is_within_path(output, resolved) or _is_within_path(resolved, output)
         # The published overview occupies one reserved sibling namespace inside
-        # the terrain package. It may be below that directory, but it never
-        # replaces or contains any terrain input files and no other nested
-        # output is permitted there.
+        # the explicitly selected terrain directory. This exception applies
+        # only to that exact parent; other protected ancestors (such as docs or
+        # raw data) remain protected.
         matching_directory_count = sum(
             _path_key(directory) == resolved for directory in input_directories
         )
         if (
-            output in allowed
+            (output, resolved) in allowed_parent_pairs
             and _is_within_path(output, resolved)
             and output != resolved
             and matching_directory_count == 1
