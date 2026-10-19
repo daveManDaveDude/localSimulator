@@ -30,7 +30,7 @@ Open the local address printed by Vite. `npm ci` restores the exact dependencies
 
 The refreshable project dashboard is at `/progress.html` on the same local server. It reads `public/project-progress.json`; update that snapshot as milestone handbacks change, then use **Refresh status** to load the latest project position and forecast. See [docs/project-dashboard.md](docs/project-dashboard.md) for the update fields and status rules.
 
-Click **Start exploring** to enter pointer lock. Move the mouse to look; use **W/S** to fly along the full camera direction, **A/D** to strafe, **Space/Ctrl** to rise and descend, **Shift** to move faster, **R** to restore the spawn position and view, and **Esc** to release the pointer. The camera stays inside the finite synthetic terrain bounds; the status pill signals when you reach an edge. Click the scene or **Resume flying** to relock after pressing Esc. Use **G** or the terrain-grid button to toggle grid and north cues; the wireframe button changes the terrain mesh display.
+Click **Start exploring** to enter pointer lock. Move the mouse to look. **W/S** and **A/D** move in the current navigation mode; **Shift** boosts speed. Both modes use 15 m/s normal speed and 41.25 m/s boosted speed. In **fly mode**, movement follows the full camera look direction and **Space/Ctrl** rise or descend. In **walk mode**, movement follows camera yaw, ignores vertical keys, and keeps the eye 1.7 m above the active terrain sample. Use the **Enter walk mode** button or **F** while pointer-locked; if you are flying above the terrain, the camera smoothly acquires walk height. Use **F** again to cancel acquisition. **R** restores the fly spawn, or resets to the sampled walk spawn while remaining in walk mode. **Esc** releases the pointer and pauses movement/acquisition; click the scene or the mode-appropriate **Resume** button to relock. The camera stays inside finite world bounds; the status pill signals when you reach an edge. Use **G** or the terrain-grid button to toggle grid and north cues; the wireframe button changes the terrain mesh display.
 
 The live HUD reports the loaded world, source mode, grid dimensions, sampled ground height, camera position and bearing/pitch, lock state, speed, FPS and boundary state. A load error identifies the failing stage and offers retry and a link to the M0 analytic demo.
 
@@ -43,10 +43,10 @@ npm run preview      # Serve the production build locally
 npm run typecheck    # Run strict TypeScript validation
 npm run lint         # Run ESLint
 npm run format:check # Check formatting with Prettier
-npm run test         # Run movement, asset, terrain-grid, and mesh unit tests
+npm run test         # Run movement, navigation, asset, terrain-grid, and mesh unit tests
 npm run generate:synthetic-heightfield # Rebuild both deterministic synthetic fixture packages
 npm run test:e2e:install # Download Playwright's Chromium browser (first time only)
-npm run test:e2e     # Run real-browser synthetic and local EA terrain regressions
+npm run test:e2e     # Run real-browser synthetic, local GIS, and walk-mode regressions
 ```
 
 The generator writes the original 3 × 3 loader fixture plus a separate 25 × 19, 2 m-spaced terrain demo. The latter contains a fictional base slope, Gaussian hill and narrow ridge, with little-endian Float32 samples and a SHA-256 in its manifest. `docs/asset-contract.md` documents both manifest variants, local-path and sampling contracts. The synthetic viewer loads the checked-in fixture; the EA mode loads only the generated local package and does not fetch geographic data from a service.

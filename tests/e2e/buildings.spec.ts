@@ -209,8 +209,9 @@ test('loads the opt-in OSM layer, keeps terrain navigation, and captures both vi
   ) as FootprintPackage;
   expect(isInsideBuilding(positionAtFrontage, footprintPackage)).toBe(false);
 
+  // Use cruise-speed descent so a slow browser frame cannot overshoot the
+  // ground-eye capture after the project speed was doubled.
   await page.keyboard.down('Control');
-  await page.keyboard.down('Shift');
   await page.waitForFunction(
     () => {
       const position = document.querySelector<HTMLOutputElement>(
@@ -221,24 +222,7 @@ test('loads the opt-in OSM layer, keeps terrain navigation, and captures both vi
       );
       if (!position || !ground) return false;
       return (
-        Number(position.dataset.y) - Number(ground.dataset.heightMeters) <= 20
-      );
-    },
-    { polling: 20, timeout: 60_000 },
-  );
-  await page.keyboard.up('Shift');
-  // Finish at cruise speed for a small, controlled step near the ground.
-  await page.waitForFunction(
-    () => {
-      const position = document.querySelector<HTMLOutputElement>(
-        '[data-testid="camera-position"]',
-      );
-      const ground = document.querySelector<HTMLOutputElement>(
-        '[data-testid="ground-height"]',
-      );
-      if (!position || !ground) return false;
-      return (
-        Number(position.dataset.y) - Number(ground.dataset.heightMeters) <= 3.2
+        Number(position.dataset.y) - Number(ground.dataset.heightMeters) <= 5
       );
     },
     { polling: 20, timeout: 30_000 },

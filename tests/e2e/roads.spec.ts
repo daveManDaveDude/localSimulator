@@ -143,7 +143,7 @@ test('loads actual local OSM road ribbons on terrain, toggles layers and capture
       return Boolean(
         position &&
         ground &&
-        Number(position.dataset.y) - Number(ground.dataset.heightMeters) < 3.2,
+        Number(position.dataset.y) - Number(ground.dataset.heightMeters) < 5.5,
       );
     },
     { polling: 25, timeout: 30_000 },

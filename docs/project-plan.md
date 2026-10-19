@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0, M1 and TVW-001 through TVW-012 passed their issue reviews. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, and TVW-012 completed the independent three-spot map comparison and issue report. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-013 and later remain unauthorized.
+**Status:** M0, M1 and TVW-001 through TVW-012 passed their issue reviews. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, and TVW-012 completed the independent three-spot map comparison and issue report. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-013 implementation has been submitted for independent review; TVW-014 and later remain unauthorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -579,7 +579,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M6 — Ground-following walk mode
 
-**TVW-013 status:** The user separately authorized TVW-013 on 2026-10-19 after M5 acceptance. The accepted specification adds normal/Shift movement speeds of 15 / 41.25 m/s in fly and walk modes, preserving the current 2.75× Shift ratio. TVW-014 and later remain unauthorized.
+**TVW-013 status:** The user separately authorized TVW-013 on 2026-10-19 after M5 acceptance. The implementation is submitted for independent review. The accepted specification adds normal/Shift movement speeds of 15 / 41.25 m/s in fly and walk modes, preserving the current 2.75× Shift ratio. TVW-014 and later remain unauthorized.
 
 **User-visible result:** a user can walk along slopes at **~1.7 m eye height**, look around, and switch freely back to flying.
 

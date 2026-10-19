@@ -80,7 +80,7 @@ export function createApp(container: HTMLElement): AppHandle {
     new URLSearchParams(window.location.search).get('roads') === '1';
   container.innerHTML = `
     <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-load-state="loading" data-renderer-ready="false">
-      <canvas class="viewer-canvas" aria-label="Terrain free-fly world"></canvas>
+      <canvas class="viewer-canvas" aria-label="Terrain navigation world"></canvas>
       <div class="viewer-ui">
         <div class="viewer-topline">
           <p class="synthetic-badge" data-testid="provenance-badge"><span aria-hidden="true"></span>${initialRealMode ? 'REAL DATA · EA DTM 2022 composite' : 'SYNTHETIC · FICTIONAL LOCAL DATA'}</p>
@@ -104,10 +104,11 @@ export function createApp(container: HTMLElement): AppHandle {
             <a href="?world=m0" data-testid="return-m0">Open M0 analytic demo</a>
           </div>
         </section>
-        <section class="debug-hud" aria-label="Flight telemetry" data-testid="debug-hud">
+        <section class="debug-hud" aria-label="Navigation telemetry" data-testid="debug-hud">
           <div class="debug-hud-heading">
             <h2>LIVE TELEMETRY</h2>
             <div class="debug-actions" aria-label="Viewer actions">
+              <button type="button" data-testid="navigation-mode-toggle" aria-pressed="false">Enter walk mode <kbd>F</kbd></button>
               <button type="button" data-testid="reset-button">Reset view</button>
               <button type="button" data-testid="help-toggle" aria-controls="controls-help" aria-expanded="false">Show controls</button>
             </div>
@@ -121,10 +122,12 @@ export function createApp(container: HTMLElement): AppHandle {
             <div class="provenance-links" data-testid="provenance-links" hidden><dt>Source and licence</dt><dd><a data-testid="source-details-link" target="_blank" rel="noopener noreferrer" hidden>Publisher catalogue</a><a data-testid="licence-details-link" target="_blank" rel="noopener noreferrer" hidden>Open Government Licence v3.0</a></dd></div>
             <div><dt>Grid</dt><dd data-testid="terrain-details" data-columns="" data-rows="">Loading…</dd></div>
             <div><dt>Ground height</dt><dd><output data-testid="ground-height" data-outside="false" data-height-meters="">Waiting for terrain</output></dd></div>
-            <div><dt>Flight</dt><dd><output data-testid="flight-state" aria-live="off" data-locked="false">POINTER UNLOCKED · FREE FLY</output></dd></div>
+            <div><dt>Navigation</dt><dd><output data-testid="flight-state" aria-live="off" data-locked="false">POINTER UNLOCKED · FLY</output></dd></div>
+            <div><dt>Mode</dt><dd><output data-testid="navigation-mode" data-mode="fly">FLY</output></dd></div>
             <div><dt>Camera position</dt><dd><output data-testid="camera-position" aria-live="off" aria-label="Camera position in metres" data-x="0" data-y="0" data-z="0">X 0.0 · Y 0.0 · Z 0.0 m</output></dd></div>
             <div><dt>Bearing / pitch</dt><dd><output data-testid="camera-orientation" aria-live="off" aria-label="Camera bearing and pitch" data-bearing-degrees="0" data-pitch-degrees="0">Bearing 000.0° · Pitch 0.0°</output></dd></div>
-            <div><dt>Speed</dt><dd><output data-testid="flight-speed" aria-live="off" aria-label="Flight speed in metres per second" data-meters-per-second="0" data-boosting="false">0.0 m/s</output></dd></div>
+            <div><dt>Speed</dt><dd><output data-testid="flight-speed" aria-live="off" aria-label="Configured movement speed in metres per second" data-meters-per-second="15" data-boosting="false">15.0 m/s · CRUISE</output></dd></div>
+            <div><dt>Eye clearance</dt><dd><output data-testid="eye-clearance" data-clearance-meters="" data-valid="false">Outside sampled terrain</output><output data-testid="walk-acquisition" data-remaining-meters="" hidden></output></dd></div>
             <div><dt>FPS</dt><dd><output data-testid="frames-per-second" aria-live="off" data-fps="0">Waiting for first frame</output></dd></div>
             <div><dt>Bounds</dt><dd><output data-testid="boundary-state" aria-live="off" data-at-boundary="false">WITHIN DEMO BOUNDS</output></dd></div>
           </dl>
@@ -169,12 +172,13 @@ export function createApp(container: HTMLElement): AppHandle {
           <p class="road-attribution" data-testid="road-attribution">© OpenStreetMap contributors · extract by Geofabrik GmbH · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL attribution and licence</a></p>
         </section>
         <aside id="controls-help" class="controls-help" aria-labelledby="controls-title" data-testid="controls-help" hidden>
-          <h2 id="controls-title">IN-FLIGHT CONTROLS</h2>
+          <h2 id="controls-title">NAVIGATION CONTROLS</h2>
           <p><kbd>Mouse</kbd><span>Look around</span></p>
-          <p><kbd>W</kbd><kbd>S</kbd><span>Fly along the camera direction</span></p>
+          <p><kbd>W</kbd><kbd>S</kbd><span>Move forward / back</span></p>
           <p><kbd>A</kbd><kbd>D</kbd><span>Strafe left / right</span></p>
-          <p><kbd>Space</kbd><kbd>Ctrl</kbd><span>Rise / descend</span></p>
-          <p><kbd>Shift</kbd><span>Move faster</span><kbd>R</kbd><span>Reset view</span><kbd>H</kbd><span>Toggle help</span><kbd>Esc</kbd><span>Release pointer</span></p>
+          <p><kbd>Space</kbd><kbd>Ctrl</kbd><span>Rise / descend in fly mode</span></p>
+          <p><kbd>F</kbd><span>Toggle fly / walk</span><kbd>Shift</kbd><span>Move faster</span></p>
+          <p><kbd>R</kbd><span>Reset view</span><kbd>H</kbd><span>Toggle help</span><kbd>Esc</kbd><span>Release pointer</span></p>
           <p class="terrain-key-hint"${m0Mode ? ' hidden' : ''}><kbd>G</kbd><span>Toggle terrain grid and north cues</span></p>
         </aside>
         <section class="start-card" aria-labelledby="page-title">
@@ -183,9 +187,9 @@ export function createApp(container: HTMLElement): AppHandle {
           <p class="welcome-copy" data-testid="welcome-copy">${m0Mode ? 'M0 ANALYTIC DEMO · fictional slope and blocks; no Torquay measurements or map data are used.' : initialRealMode ? 'REAL EA LIDAR · local, verified 2 m heightfield for the pending candidate AOI. OSM/OS feature coverage remains unchecked.' : 'SYNTHETIC HEIGHTFIELD · fictional slope, hill, and ridge loaded from a local Float32 fixture; no Torquay measurements or map data are used.'}</p>
           <button class="start-button" type="button" data-testid="start-button"${m0Mode ? '' : ' disabled'}>Start exploring</button>
           <div class="control-hints" aria-label="Free-flight controls">
-            <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Fly in the camera direction</span></p>
-            <p><kbd>Space</kbd><kbd>Ctrl</kbd><span>Rise / descend</span></p>
-            <p><kbd>Shift</kbd><span>Move faster</span><kbd>R</kbd><span>Reset view</span></p>
+            <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Move forward / back and strafe</span></p>
+            <p><kbd>Space</kbd><kbd>Ctrl</kbd><span>Rise / descend in fly mode</span></p>
+            <p><kbd>F</kbd><span>Toggle fly / walk</span><kbd>Shift</kbd><span>Move faster</span><kbd>R</kbd><span>Reset</span></p>
           </div>
           <p class="unlock-hint">Mouse looks around · press <kbd>Esc</kbd> to release the pointer</p>
         </section>
@@ -226,6 +230,9 @@ export function createApp(container: HTMLElement): AppHandle {
   const controlsHelp = container.querySelector<HTMLElement>('.controls-help');
   const helpToggle = container.querySelector<HTMLButtonElement>(
     '[data-testid="help-toggle"]',
+  );
+  const navigationModeToggle = container.querySelector<HTMLButtonElement>(
+    '[data-testid="navigation-mode-toggle"]',
   );
   const resetButton = container.querySelector<HTMLButtonElement>(
     '[data-testid="reset-button"]',
@@ -329,6 +336,15 @@ export function createApp(container: HTMLElement): AppHandle {
   const flightState = container.querySelector<HTMLOutputElement>(
     '[data-testid="flight-state"]',
   );
+  const navigationModeOutput = container.querySelector<HTMLOutputElement>(
+    '[data-testid="navigation-mode"]',
+  );
+  const eyeClearance = container.querySelector<HTMLOutputElement>(
+    '[data-testid="eye-clearance"]',
+  );
+  const walkAcquisition = container.querySelector<HTMLOutputElement>(
+    '[data-testid="walk-acquisition"]',
+  );
   const cameraPosition = container.querySelector<HTMLOutputElement>(
     '[data-testid="camera-position"]',
   );
@@ -357,6 +373,7 @@ export function createApp(container: HTMLElement): AppHandle {
     !retryButton ||
     !controlsHelp ||
     !helpToggle ||
+    !navigationModeToggle ||
     !resetButton ||
     !gridToggle ||
     !wireframeToggle ||
@@ -391,6 +408,9 @@ export function createApp(container: HTMLElement): AppHandle {
     !terrainDetails ||
     !groundHeight ||
     !flightState ||
+    !navigationModeOutput ||
+    !eyeClearance ||
+    !walkAcquisition ||
     !cameraPosition ||
     !cameraOrientation ||
     !flightSpeed ||
@@ -959,8 +979,37 @@ export function createApp(container: HTMLElement): AppHandle {
           ? 'Candidate AOI edge reached. Turn back to remain inside the local terrain.'
           : 'Demo edge reached. Turn back to stay within the synthetic terrain.';
     } else if (pointerLocked) {
-      status.textContent = 'FREE FLY · WASD moves · Esc releases the pointer';
+      status.textContent =
+        controller?.mode === 'walk'
+          ? 'WALK · WASD moves · F toggles fly mode · Esc releases the pointer'
+          : 'FLY · WASD moves · F toggles walk mode · Esc releases the pointer';
     }
+  };
+
+  const setNavigationModeFeedback = (
+    mode: 'fly' | 'entering-walk' | 'walk',
+  ): void => {
+    shell.dataset.navigationMode = mode;
+    navigationModeOutput.dataset.mode = mode;
+    navigationModeOutput.textContent =
+      mode === 'entering-walk'
+        ? 'ENTERING WALK'
+        : mode === 'walk'
+          ? 'WALK'
+          : 'FLY';
+    walkAcquisition.hidden = mode !== 'entering-walk';
+    const walking = mode !== 'fly';
+    if (
+      !pointerLocked &&
+      startButton.textContent.startsWith('Resume ') &&
+      !shell.classList.contains('lock-error')
+    ) {
+      startButton.textContent = walking ? 'Resume walking' : 'Resume flying';
+    }
+    navigationModeToggle.setAttribute('aria-pressed', String(walking));
+    navigationModeToggle.innerHTML = walking
+      ? 'Return to fly mode <kbd>F</kbd>'
+      : 'Enter walk mode <kbd>F</kbd>';
   };
 
   const controllerCallbacks = {
@@ -970,10 +1019,17 @@ export function createApp(container: HTMLElement): AppHandle {
       if (locked) setControlsHelpVisible(true);
       if (locked) {
         startButton.textContent = 'Start exploring';
-        status.textContent = 'FREE FLY · WASD moves · Esc releases the pointer';
+        status.textContent =
+          controller?.mode === 'walk'
+            ? 'WALK · WASD moves · F toggles fly mode · Esc releases the pointer'
+            : 'FLY · WASD moves · F toggles walk mode · Esc releases the pointer';
       } else {
-        startButton.textContent = 'Resume flying';
-        status.textContent = 'Mouse unlocked. Click Resume flying to continue.';
+        startButton.textContent =
+          controller?.mode === 'walk' ? 'Resume walking' : 'Resume flying';
+        status.textContent =
+          controller?.mode === 'walk'
+            ? 'Mouse unlocked. Click Resume walking to continue.'
+            : 'Mouse unlocked. Click Resume flying to continue.';
       }
     },
     onBoundaryChange: setBoundaryFeedback,
@@ -987,9 +1043,16 @@ export function createApp(container: HTMLElement): AppHandle {
       status.textContent = 'Requesting mouse look…';
     },
     onReset: (): void => {
-      status.textContent = pointerLocked
-        ? 'Spawn position and view reset · Esc releases the pointer'
-        : 'Spawn position and view reset. Click Start to fly.';
+      status.textContent =
+        controller?.mode === 'walk'
+          ? 'Walk reset to spawn at 1.70 m eye clearance.'
+          : pointerLocked
+            ? 'Spawn position and view reset · Esc releases the pointer'
+            : 'Spawn position and view reset. Click Start to fly.';
+    },
+    onNavigationModeChange: setNavigationModeFeedback,
+    onNavigationFeedback: (message: string): void => {
+      status.textContent = message;
     },
   };
 
@@ -1036,8 +1099,10 @@ export function createApp(container: HTMLElement): AppHandle {
       canvas,
       world.spawnPosition,
       world.bounds,
+      world.sampleHeight,
       controllerCallbacks,
     );
+    setNavigationModeFeedback('fly');
 
     worldType.dataset.worldId = world.worldId;
     worldType.textContent = world.name;
@@ -1077,10 +1142,10 @@ export function createApp(container: HTMLElement): AppHandle {
     canvas.setAttribute(
       'aria-label',
       world.isReal
-        ? 'Environment Agency local terrain free-fly world'
+        ? 'Environment Agency local terrain navigation world'
         : world.sourceMode === 'heightfield'
-          ? 'Synthetic hill and ridge terrain free-fly world'
-          : 'M0 synthetic free-fly world',
+          ? 'Synthetic hill and ridge terrain navigation world'
+          : 'M0 synthetic navigation world',
     );
     setWorldSelection(
       world.isReal
@@ -1318,6 +1383,9 @@ export function createApp(container: HTMLElement): AppHandle {
       setGridVisible(!currentGridAndCompass.visible);
     }
   };
+  const toggleNavigationMode = (): void => {
+    controller?.toggleNavigationMode();
+  };
 
   startButton.addEventListener('click', requestLockFromButton);
   const selectSyntheticWorld = (): void => chooseWorld('synthetic');
@@ -1326,6 +1394,7 @@ export function createApp(container: HTMLElement): AppHandle {
   realWorldButton.addEventListener('click', selectRealWorld);
   recoverSyntheticButton.addEventListener('click', selectSyntheticWorld);
   resetButton.addEventListener('click', resetFromButton);
+  navigationModeToggle.addEventListener('click', toggleNavigationMode);
   helpToggle.addEventListener('click', toggleControlsHelp);
   gridToggle.addEventListener('click', toggleGridFromButton);
   wireframeToggle.addEventListener('click', toggleWireframeFromButton);
@@ -1383,9 +1452,15 @@ export function createApp(container: HTMLElement): AppHandle {
       `Pitch ${pitchDegrees.toFixed(1)}°`;
 
     flightState.dataset.locked = String(controller?.isLocked ?? false);
-    flightState.textContent = controller?.isLocked
-      ? 'POINTER LOCKED · FREE FLY'
-      : 'POINTER UNLOCKED · FREE FLY';
+    const navigationMode = controller?.mode ?? 'fly';
+    flightState.dataset.mode = navigationMode;
+    flightState.textContent =
+      `${controller?.isLocked ? 'POINTER LOCKED' : 'POINTER UNLOCKED'} · ` +
+      (navigationMode === 'entering-walk'
+        ? 'ENTERING WALK'
+        : navigationMode === 'walk'
+          ? 'WALK'
+          : 'FLY');
     flightSpeed.dataset.metersPerSecond = (
       controller?.speedMetersPerSecond ?? 0
     ).toFixed(2);
@@ -1431,6 +1506,31 @@ export function createApp(container: HTMLElement): AppHandle {
         `${height.toFixed(2)} m local · ` +
         `${(height + currentOriginElevationM).toFixed(2)} m Newlyn`;
     }
+    const clearance =
+      controller?.eyeClearanceMeters ??
+      (height !== null && height !== undefined
+        ? camera.position.y - height
+        : null);
+    eyeClearance.dataset.valid = String(
+      clearance !== null && Number.isFinite(clearance),
+    );
+    eyeClearance.dataset.clearanceMeters =
+      clearance !== null && Number.isFinite(clearance)
+        ? clearance.toFixed(4)
+        : '';
+    eyeClearance.textContent =
+      clearance !== null && Number.isFinite(clearance)
+        ? `${clearance.toFixed(2)} m above sampled ground`
+        : 'Outside sampled terrain';
+    const remaining = controller?.acquisitionRemainingMeters ?? null;
+    walkAcquisition.dataset.remainingMeters =
+      remaining !== null && Number.isFinite(remaining)
+        ? remaining.toFixed(4)
+        : '';
+    walkAcquisition.textContent =
+      remaining !== null && Number.isFinite(remaining)
+        ? `Walk acquisition · ${remaining.toFixed(2)} m to eye-height target`
+        : '';
   };
   updateTelemetry();
   const disposeAlignmentQaCamera = import.meta.env.DEV
@@ -1513,6 +1613,7 @@ export function createApp(container: HTMLElement): AppHandle {
       recoverSyntheticButton.removeEventListener('click', selectSyntheticWorld);
       startButton.removeEventListener('click', requestLockFromButton);
       resetButton.removeEventListener('click', resetFromButton);
+      navigationModeToggle.removeEventListener('click', toggleNavigationMode);
       helpToggle.removeEventListener('click', toggleControlsHelp);
       gridToggle.removeEventListener('click', toggleGridFromButton);
       wireframeToggle.removeEventListener('click', toggleWireframeFromButton);

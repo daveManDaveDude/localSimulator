@@ -24,6 +24,7 @@ export interface FlightConfig {
   speedMetersPerSecond: number;
   boostMultiplier: number;
   maxFrameStepSeconds: number;
+  maxSubstepSeconds: number;
 }
 
 export interface FlightStep {
@@ -33,9 +34,10 @@ export interface FlightStep {
 }
 
 export const DEFAULT_FLIGHT_CONFIG: FlightConfig = {
-  speedMetersPerSecond: 7.5,
+  speedMetersPerSecond: 15,
   boostMultiplier: 2.75,
-  maxFrameStepSeconds: 0.1,
+  maxFrameStepSeconds: 0.25,
+  maxSubstepSeconds: 0.05,
 };
 
 const EPSILON = 1e-9;
@@ -123,4 +125,36 @@ export function advanceFreeFlyPosition(
 /** Returns a fresh copy for a controller's exact spawn-position reset. */
 export function copySpawnPosition(spawnPosition: Readonly<Vec3Like>): Vec3Like {
   return { x: spawnPosition.x, y: spawnPosition.y, z: spawnPosition.z };
+}
+
+/**
+ * Splits visible frame time into bounded updates and discards suspension gaps.
+ * Keeping the returned steps at or below 50 ms avoids large movement jumps.
+ */
+export function boundedFrameSteps(
+  elapsedSeconds: number,
+  config: Pick<
+    FlightConfig,
+    'maxFrameStepSeconds' | 'maxSubstepSeconds'
+  > = DEFAULT_FLIGHT_CONFIG,
+): number[] {
+  if (
+    !Number.isFinite(elapsedSeconds) ||
+    elapsedSeconds <= 0 ||
+    !Number.isFinite(config.maxFrameStepSeconds) ||
+    config.maxFrameStepSeconds <= 0 ||
+    !Number.isFinite(config.maxSubstepSeconds) ||
+    config.maxSubstepSeconds <= 0
+  ) {
+    return [];
+  }
+
+  let remaining = Math.min(elapsedSeconds, config.maxFrameStepSeconds);
+  const steps: number[] = [];
+  while (remaining > 1e-9) {
+    const step = Math.min(remaining, config.maxSubstepSeconds);
+    steps.push(step);
+    remaining -= step;
+  }
+  return steps;
 }

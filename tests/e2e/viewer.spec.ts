@@ -154,6 +154,10 @@ test('shows live synthetic flight state and supports browser navigation', async 
     'data-locked',
     'true',
   );
+  await expect(page.getByTestId('flight-speed')).toHaveAttribute(
+    'data-meters-per-second',
+    '15.00',
+  );
   await expect(page.getByTestId('controls-help')).toBeVisible();
   await expect(page.getByTestId('frames-per-second')).toHaveAttribute(
     'data-fps',
@@ -214,6 +218,7 @@ test('shows live synthetic flight state and supports browser navigation', async 
     'true',
   );
   const boostedSpeed = await readSpeed(page);
+  expect(boostedSpeed).toBeCloseTo(41.25, 2);
   expect(boostedSpeed).toBeGreaterThan(baseSpeed * 2);
   await page.keyboard.down('w');
   await page.waitForTimeout(220);
@@ -820,7 +825,7 @@ test('loads and navigates the local EA terrain package', async ({ page }) => {
   );
   const speed = await readSpeed(page);
   await page.keyboard.up('Shift');
-  expect(speed).toBeGreaterThan(0);
+  expect(speed).toBeCloseTo(41.25, 2);
 
   const beforeLook = await readOrientation(page);
   await page.mouse.move(600, 420);

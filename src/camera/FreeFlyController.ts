@@ -2,11 +2,21 @@ import { Vector3, type Camera } from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import {
   advanceFreeFlyPosition,
+  boundedFrameSteps,
   copySpawnPosition,
   DEFAULT_FLIGHT_CONFIG,
   type FlightBounds,
   type Vec3Like,
 } from './movement';
+import {
+  advanceWalkAcquisition,
+  advanceWalkPosition,
+  DEFAULT_WALK_CONFIG,
+  prepareWalkAcquisition,
+  type TerrainSampler,
+} from './walkMovement';
+
+export type NavigationMode = 'fly' | 'entering-walk' | 'walk';
 
 export interface FreeFlyControllerCallbacks {
   onPointerLockChange: (locked: boolean) => void;
@@ -14,6 +24,8 @@ export interface FreeFlyControllerCallbacks {
   onLockError: (message: string) => void;
   onLockRequest: () => void;
   onReset: () => void;
+  onNavigationModeChange: (mode: NavigationMode) => void;
+  onNavigationFeedback: (message: string) => void;
 }
 
 const MOVEMENT_KEYS = new Set([
@@ -28,6 +40,9 @@ const MOVEMENT_KEYS = new Set([
   'ShiftRight',
 ]);
 
+const ACQUISITION_SPEED_METERS_PER_SECOND = 20;
+const ACQUISITION_EPSILON_METERS = 0.001;
+
 export class FreeFlyController {
   private readonly controls: PointerLockControls;
   private readonly camera: Camera;
@@ -35,10 +50,14 @@ export class FreeFlyController {
   private readonly callbacks: FreeFlyControllerCallbacks;
   private readonly spawnPosition: Vec3Like;
   private readonly spawnOrientation: Camera['quaternion'];
+  private readonly sampleHeight: TerrainSampler;
   private readonly lookDirection = new Vector3();
   private readonly keys = new Set<string>();
   private lockErrorTimer: number | undefined;
   private atBoundary = false;
+  private navigationMode: NavigationMode = 'fly';
+  private acquisitionTargetY: number | null = null;
+  private lastInvalidSampleFeedback = false;
   private disposed = false;
 
   constructor(
@@ -46,10 +65,12 @@ export class FreeFlyController {
     domElement: HTMLCanvasElement,
     spawnPosition: Readonly<Vec3Like>,
     bounds: FlightBounds,
+    sampleHeight: TerrainSampler,
     callbacks: FreeFlyControllerCallbacks,
   ) {
     this.camera = camera;
     this.bounds = bounds;
+    this.sampleHeight = sampleHeight;
     this.callbacks = callbacks;
     this.spawnPosition = copySpawnPosition(spawnPosition);
     this.spawnOrientation = camera.quaternion.clone();
@@ -69,6 +90,10 @@ export class FreeFlyController {
     return this.controls.isLocked;
   }
 
+  get mode(): NavigationMode {
+    return this.navigationMode;
+  }
+
   get isAtBoundary(): boolean {
     return this.atBoundary;
   }
@@ -81,10 +106,34 @@ export class FreeFlyController {
   }
 
   get speedMetersPerSecond(): number {
-    return (
-      DEFAULT_FLIGHT_CONFIG.speedMetersPerSecond *
-      (this.isBoosting ? DEFAULT_FLIGHT_CONFIG.boostMultiplier : 1)
+    const speed =
+      this.navigationMode === 'fly'
+        ? DEFAULT_FLIGHT_CONFIG.speedMetersPerSecond
+        : DEFAULT_WALK_CONFIG.speedMetersPerSecond;
+    return speed * (this.isBoosting ? DEFAULT_WALK_CONFIG.boostMultiplier : 1);
+  }
+
+  get groundHeight(): number | null {
+    const height = this.sampleHeight(
+      this.camera.position.x,
+      this.camera.position.z,
     );
+    return height !== null && Number.isFinite(height) ? height : null;
+  }
+
+  get eyeClearanceMeters(): number | null {
+    const ground = this.groundHeight;
+    return ground === null ? null : this.camera.position.y - ground;
+  }
+
+  get acquisitionRemainingMeters(): number | null {
+    if (
+      this.navigationMode !== 'entering-walk' ||
+      this.acquisitionTargetY === null
+    ) {
+      return null;
+    }
+    return this.acquisitionTargetY - this.camera.position.y;
   }
 
   requestLock(): void {
@@ -125,49 +174,125 @@ export class FreeFlyController {
     }
   }
 
-  update(elapsedSeconds: number): void {
-    if (!this.controls.isLocked) {
+  toggleNavigationMode(): void {
+    if (this.disposed) return;
+    this.clearKeys();
+
+    if (this.navigationMode === 'walk') {
+      this.acquisitionTargetY = null;
+      this.setNavigationMode('fly');
+      this.callbacks.onNavigationFeedback(
+        'Fly mode enabled. Position and view were preserved.',
+      );
       return;
     }
 
-    this.controls.getDirection(this.lookDirection);
-    const result = advanceFreeFlyPosition(
+    if (this.navigationMode === 'entering-walk') {
+      this.acquisitionTargetY = null;
+      this.setNavigationMode('fly');
+      this.callbacks.onNavigationFeedback(
+        'Walk acquisition cancelled. Current position and view were preserved.',
+      );
+      return;
+    }
+
+    const acquisition = prepareWalkAcquisition(
       this.camera.position,
-      this.lookDirection,
-      {
-        forward: Number(this.keys.has('KeyW')) - Number(this.keys.has('KeyS')),
-        strafe: Number(this.keys.has('KeyD')) - Number(this.keys.has('KeyA')),
-        vertical:
-          Number(this.keys.has('Space')) -
-          Number(this.keys.has('ControlLeft') || this.keys.has('ControlRight')),
-        boost: this.keys.has('ShiftLeft') || this.keys.has('ShiftRight'),
-      },
-      elapsedSeconds,
       this.bounds,
-      DEFAULT_FLIGHT_CONFIG,
+      this.sampleHeight,
+      DEFAULT_WALK_CONFIG.eyeClearanceMeters,
     );
+    if (!acquisition.accepted || acquisition.targetY === null) {
+      const message =
+        acquisition.reason === 'below-terrain'
+          ? 'Cannot enter walk mode below the sampled terrain. Fly above the ground first.'
+          : acquisition.reason === 'outside-y-bounds'
+            ? 'Cannot enter walk mode because the eye-height target is outside the world bounds.'
+            : 'Cannot enter walk mode because this position has no valid terrain sample.';
+      this.callbacks.onNavigationFeedback(message);
+      return;
+    }
 
-    this.camera.position.set(
-      result.position.x,
-      result.position.y,
-      result.position.z,
+    this.acquisitionTargetY = acquisition.targetY;
+    this.lastInvalidSampleFeedback = false;
+    if (
+      Math.abs(this.camera.position.y - acquisition.targetY) <=
+      ACQUISITION_EPSILON_METERS
+    ) {
+      this.camera.position.y = acquisition.targetY;
+      this.acquisitionTargetY = null;
+      this.setNavigationMode('walk');
+      this.callbacks.onNavigationFeedback(
+        'Walk mode enabled · 1.70 m eye clearance.',
+      );
+      return;
+    }
+
+    this.setNavigationMode('entering-walk');
+    this.callbacks.onNavigationFeedback(
+      'Entering walk mode. Moving vertically to 1.70 m above the sampled terrain.',
     );
+  }
 
-    if (result.hitBoundary !== this.atBoundary) {
-      this.atBoundary = result.hitBoundary;
-      this.callbacks.onBoundaryChange(this.atBoundary);
+  update(elapsedSeconds: number): void {
+    if (!this.controls.isLocked || this.disposed) {
+      return;
+    }
+
+    const steps = boundedFrameSteps(elapsedSeconds, DEFAULT_FLIGHT_CONFIG);
+    for (const step of steps) {
+      if (this.navigationMode === 'entering-walk') {
+        this.updateWalkAcquisition(step);
+      } else if (this.navigationMode === 'walk') {
+        this.updateWalk(step);
+      } else {
+        this.updateFly(step);
+      }
     }
   }
 
   reset(): void {
     this.clearKeys();
-    this.camera.position.set(
-      this.spawnPosition.x,
-      this.spawnPosition.y,
-      this.spawnPosition.z,
-    );
+    if (this.navigationMode === 'walk') {
+      const groundHeight = this.sampleHeight(
+        this.spawnPosition.x,
+        this.spawnPosition.z,
+      );
+      const targetY =
+        groundHeight === null
+          ? Number.NaN
+          : groundHeight + DEFAULT_WALK_CONFIG.eyeClearanceMeters;
+      if (
+        groundHeight === null ||
+        !Number.isFinite(groundHeight) ||
+        !Number.isFinite(targetY) ||
+        targetY < this.bounds.minY ||
+        targetY > this.bounds.maxY
+      ) {
+        this.callbacks.onNavigationFeedback(
+          'Walk reset was not applied because the spawn has no valid terrain eye-height sample.',
+        );
+        return;
+      }
+      this.camera.position.set(
+        this.spawnPosition.x,
+        targetY,
+        this.spawnPosition.z,
+      );
+    } else {
+      this.camera.position.set(
+        this.spawnPosition.x,
+        this.spawnPosition.y,
+        this.spawnPosition.z,
+      );
+      if (this.navigationMode === 'entering-walk') {
+        this.acquisitionTargetY = null;
+        this.setNavigationMode('fly');
+      }
+    }
     this.camera.quaternion.copy(this.spawnOrientation);
     this.setAtBoundary(false);
+    this.lastInvalidSampleFeedback = false;
     this.callbacks.onReset();
   }
 
@@ -199,6 +324,98 @@ export class FreeFlyController {
     this.clearKeys();
   }
 
+  private updateFly(elapsedSeconds: number): void {
+    this.controls.getDirection(this.lookDirection);
+    const result = advanceFreeFlyPosition(
+      this.camera.position,
+      this.lookDirection,
+      this.readFlightInput(),
+      elapsedSeconds,
+      this.bounds,
+      DEFAULT_FLIGHT_CONFIG,
+    );
+    this.camera.position.set(
+      result.position.x,
+      result.position.y,
+      result.position.z,
+    );
+    this.setAtBoundary(result.hitBoundary);
+  }
+
+  private updateWalk(elapsedSeconds: number): void {
+    this.controls.getDirection(this.lookDirection);
+    const yawRadians = Math.atan2(this.lookDirection.x, -this.lookDirection.z);
+    const result = advanceWalkPosition(
+      this.camera.position,
+      yawRadians,
+      {
+        forward: Number(this.keys.has('KeyW')) - Number(this.keys.has('KeyS')),
+        strafe: Number(this.keys.has('KeyD')) - Number(this.keys.has('KeyA')),
+        boost: this.keys.has('ShiftLeft') || this.keys.has('ShiftRight'),
+      },
+      elapsedSeconds,
+      this.bounds,
+      this.sampleHeight,
+      DEFAULT_WALK_CONFIG,
+    );
+
+    if (!result.validSample) {
+      this.reportInvalidWalkSample();
+      return;
+    }
+    this.lastInvalidSampleFeedback = false;
+    this.camera.position.set(
+      result.position.x,
+      result.position.y,
+      result.position.z,
+    );
+    this.setAtBoundary(result.hitBoundary);
+  }
+
+  private updateWalkAcquisition(elapsedSeconds: number): void {
+    const targetY = this.acquisitionTargetY;
+    if (targetY === null) {
+      this.setNavigationMode('fly');
+      return;
+    }
+    const next = advanceWalkAcquisition(
+      this.camera.position,
+      targetY,
+      elapsedSeconds,
+      ACQUISITION_SPEED_METERS_PER_SECOND,
+    );
+    if (
+      !Number.isFinite(next.y) ||
+      next.y < this.bounds.minY ||
+      next.y > this.bounds.maxY
+    ) {
+      this.reportInvalidWalkSample();
+      this.acquisitionTargetY = null;
+      this.setNavigationMode('fly');
+      return;
+    }
+    this.camera.position.y = next.y;
+    if (Math.abs(targetY - next.y) <= ACQUISITION_EPSILON_METERS) {
+      this.camera.position.y = targetY;
+      this.acquisitionTargetY = null;
+      this.setNavigationMode('walk');
+      this.callbacks.onNavigationFeedback(
+        'Walk mode enabled · 1.70 m eye clearance.',
+      );
+    }
+  }
+
+  private readFlightInput() {
+    return {
+      forward: Number(this.keys.has('KeyW')) - Number(this.keys.has('KeyS')),
+      strafe: Number(this.keys.has('KeyD')) - Number(this.keys.has('KeyA')),
+      vertical:
+        Number(this.keys.has('Space')) -
+        Number(this.keys.has('ControlLeft') || this.keys.has('ControlRight')),
+      boost: this.keys.has('ShiftLeft') || this.keys.has('ShiftRight'),
+    };
+  }
+
   private readonly handleLock = (): void => {
     this.clearLockErrorTimer();
     this.clearKeys();
@@ -214,9 +431,6 @@ export class FreeFlyController {
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
     if (event.code === 'Escape' && this.controls.isLocked) {
-      // Make Escape explicit app behavior as well as the browser's native
-      // pointer-lock release gesture. This keeps the advertised control
-      // reliable in browsers that deliver Escape to the page first.
       this.controls.unlock();
       return;
     }
@@ -224,6 +438,12 @@ export class FreeFlyController {
     if (event.code === 'KeyR' && !event.repeat) {
       event.preventDefault();
       this.reset();
+      return;
+    }
+
+    if (event.code === 'KeyF' && this.controls.isLocked && !event.repeat) {
+      event.preventDefault();
+      this.toggleNavigationMode();
       return;
     }
 
@@ -242,9 +462,7 @@ export class FreeFlyController {
   };
 
   private readonly handleVisibilityChange = (): void => {
-    if (document.hidden) {
-      this.clearKeys();
-    }
+    this.clearKeys();
   };
 
   private readonly handlePointerLockError = (): void => {
@@ -259,13 +477,24 @@ export class FreeFlyController {
     this.keys.clear();
   };
 
-  private setAtBoundary(atBoundary: boolean): void {
-    if (atBoundary === this.atBoundary) {
-      return;
-    }
+  private setNavigationMode(mode: NavigationMode): void {
+    if (this.navigationMode === mode) return;
+    this.navigationMode = mode;
+    this.callbacks.onNavigationModeChange(mode);
+  }
 
+  private setAtBoundary(atBoundary: boolean): void {
+    if (atBoundary === this.atBoundary) return;
     this.atBoundary = atBoundary;
     this.callbacks.onBoundaryChange(atBoundary);
+  }
+
+  private reportInvalidWalkSample(): void {
+    if (this.lastInvalidSampleFeedback) return;
+    this.lastInvalidSampleFeedback = true;
+    this.callbacks.onNavigationFeedback(
+      'Walking paused: the current bounds do not have a finite terrain sample. The last valid pose was kept.',
+    );
   }
 
   private clearLockErrorTimer(): void {

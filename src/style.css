@@ -245,6 +245,8 @@ body {
   top: 88px;
   right: 26px;
   width: min(350px, 38vw);
+  max-height: min(54vh, 485px);
+  overflow-y: auto;
   padding: 16px 18px;
   pointer-events: auto;
 }
@@ -799,6 +801,7 @@ kbd {
     top: 164px;
     right: 14px;
     width: min(350px, calc(100vw - 28px));
+    max-height: 42vh;
     padding: 13px 14px;
   }
 

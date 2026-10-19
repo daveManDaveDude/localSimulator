@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   advanceFreeFlyPosition,
+  boundedFrameSteps,
   copySpawnPosition,
+  DEFAULT_FLIGHT_CONFIG,
   type FlightBounds,
   type FlightConfig,
   type FlightInput,
@@ -21,6 +23,7 @@ const config: FlightConfig = {
   speedMetersPerSecond: 10,
   boostMultiplier: 3,
   maxFrameStepSeconds: 0.1,
+  maxSubstepSeconds: 0.05,
 };
 
 const start: Vec3Like = { x: 0, y: 5, z: 0 };
@@ -172,5 +175,21 @@ describe('advanceFreeFlyPosition', () => {
 
     expect(resetPosition).toEqual(spawn);
     expect(resetPosition).not.toBe(spawn);
+  });
+
+  it('uses the accepted fly and boost speeds', () => {
+    expect(DEFAULT_FLIGHT_CONFIG.speedMetersPerSecond).toBe(15);
+    expect(
+      DEFAULT_FLIGHT_CONFIG.speedMetersPerSecond *
+        DEFAULT_FLIGHT_CONFIG.boostMultiplier,
+    ).toBeCloseTo(41.25, 10);
+  });
+
+  it('bounds updates to 0.25 seconds in substeps no larger than 0.05 seconds', () => {
+    const steps = boundedFrameSteps(1);
+    expect(steps.reduce((sum, step) => sum + step, 0)).toBeCloseTo(0.25, 10);
+    expect(steps.every((step) => step <= 0.05 + 1e-12)).toBe(true);
+    expect(boundedFrameSteps(Number.NaN)).toEqual([]);
+    expect(boundedFrameSteps(-1)).toEqual([]);
   });
 });
