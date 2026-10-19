@@ -8,6 +8,7 @@ import math
 import os
 import shutil
 import tempfile
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -99,15 +100,116 @@ def _repo_path(path: Path) -> Path:
     return (path if path.is_absolute() else ROOT / path).resolve()
 
 
-def _assert_disjoint_paths(output: Path, inputs: list[Path]) -> None:
-    output = output.resolve()
-    for source in inputs:
-        resolved = source.resolve()
-        if output == resolved or output.is_relative_to(resolved) or resolved.is_relative_to(output):
+def _path_key(path: Path) -> Path:
+    """Resolve existing symlinks and normalize case for safe path comparisons."""
+    try:
+        return Path(os.path.normcase(str(path.resolve(strict=False))))
+    except (OSError, RuntimeError) as exc:
+        raise OverviewExportError(f"cannot canonicalize protected path '{path}': {exc}") from exc
+
+
+def _is_symlink_or_junction(path: Path) -> bool:
+    is_junction = getattr(path, "is_junction", lambda: False)()
+    return path.is_symlink() or is_junction
+
+
+def _safe_output_path(path: Path) -> Path:
+    """Resolve an output path only after rejecting symlink/junction components."""
+    candidate = path if path.is_absolute() else ROOT / path
+    try:
+        absolute = Path(os.path.abspath(candidate))
+    except (OSError, RuntimeError) as exc:
+        raise OverviewExportError(f"cannot resolve output path '{candidate}': {exc}") from exc
+    cursor = absolute
+    while True:
+        try:
+            if _is_symlink_or_junction(cursor):
+                raise OverviewExportError(
+                    f"refusing output path with symbolic-link/junction component: '{cursor}'"
+                )
+        except OSError as exc:
+            raise OverviewExportError(
+                f"cannot inspect output path component '{cursor}': {exc}"
+            ) from exc
+        if cursor.parent == cursor:
+            break
+        cursor = cursor.parent
+    return _path_key(absolute)
+
+
+def _is_within_path(path: Path, parent: Path) -> bool:
+    try:
+        return os.path.commonpath((str(path), str(parent))) == str(parent)
+    except ValueError:
+        return False
+
+
+def _assert_disjoint_paths(
+    output: Path,
+    *,
+    input_directories: list[Path],
+    input_files: list[Path],
+    allowed_output_paths: tuple[Path, ...] = (),
+) -> None:
+    """Reject output overlap with all input locations before staging or writing."""
+    output = _path_key(output)
+    allowed = {_path_key(path) for path in allowed_output_paths}
+    for source in input_directories:
+        resolved = _path_key(source)
+        overlaps = _is_within_path(output, resolved) or _is_within_path(resolved, output)
+        # The published overview occupies one reserved sibling namespace inside
+        # the terrain package. It may be below that directory, but it never
+        # replaces or contains any terrain input files and no other nested
+        # output is permitted there.
+        matching_directory_count = sum(
+            _path_key(directory) == resolved for directory in input_directories
+        )
+        if (
+            output in allowed
+            and _is_within_path(output, resolved)
+            and output != resolved
+            and matching_directory_count == 1
+        ):
+            overlaps = False
+        if overlaps:
             raise OverviewExportError(
                 f"refusing unsafe nested input/output paths: output '{output}' "
-                f"overlaps '{resolved}'"
+                f"overlaps protected directory '{resolved}'"
             )
+    for source in input_files:
+        resolved = _path_key(source)
+        if _is_within_path(output, resolved) or _is_within_path(resolved, output):
+            raise OverviewExportError(
+                f"refusing unsafe input/output paths: output '{output}' "
+                f"overlaps protected file '{resolved}'"
+            )
+
+
+def _overview_input_directories(
+    terrain_dir: Path, roads_dir: Path, buildings_dir: Path
+) -> list[Path]:
+    return [
+        ROOT / "docs",
+        ROOT / "config",
+        ROOT / "data/raw",
+        terrain_dir,
+        roads_dir,
+        buildings_dir,
+    ]
+
+
+def _overview_input_files(
+    aoi_config_path: Path,
+    aoi_geojson_path: Path,
+    source_manifest_path: Path,
+) -> list[Path]:
+    return [
+        aoi_config_path,
+        aoi_geojson_path,
+        source_manifest_path,
+        DEFAULT_BUILDING_CONFIG,
+        DEFAULT_ROAD_CONFIG,
+    ]
 
 
 def _validate_aoi(config_path: Path, geojson_path: Path) -> tuple[AoiConfig, list[list[float]]]:
@@ -895,8 +997,10 @@ def _derive_package(
 def _write_package(output_dir: Path, artifacts: dict[str, bytes]) -> None:
     parent = output_dir.parent
     parent.mkdir(parents=True, exist_ok=True)
+    backup = parent / f".{output_dir.name}-backup-{uuid.uuid4().hex}"
+    if backup.exists() or backup.is_symlink():
+        raise OverviewExportError(f"refusing to use pre-existing overview backup path '{backup}'")
     stage = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}-stage-", dir=parent))
-    backup = parent / f".{output_dir.name}-backup"
     moved = False
     try:
         for name in ("features.geojson", "manifest.json"):
@@ -913,8 +1017,6 @@ def _write_package(output_dir: Path, artifacts: dict[str, bytes]) -> None:
                 raise OverviewExportError(
                     f"refusing to replace non-directory output '{output_dir}'"
                 )
-            if backup.exists():
-                shutil.rmtree(backup)
             os.replace(output_dir, backup)
             moved = True
         os.replace(stage, output_dir)
@@ -944,19 +1046,16 @@ def build_overview_package(
     aoi_geojson_path: Path = DEFAULT_AOI_GEOJSON,
     source_manifest_path: Path = DEFAULT_SOURCE_MANIFEST,
 ) -> dict[str, Any]:
-    terrain_dir, roads_dir, buildings_dir, output_dir = map(
-        _repo_path, (terrain_dir, roads_dir, buildings_dir, output_dir)
-    )
+    terrain_dir, roads_dir, buildings_dir = map(_repo_path, (terrain_dir, roads_dir, buildings_dir))
+    output_dir = _safe_output_path(output_dir)
     aoi_config_path, aoi_geojson_path, source_manifest_path = map(
         _repo_path, (aoi_config_path, aoi_geojson_path, source_manifest_path)
     )
-    inputs = [terrain_dir]
-    if "roads" in layers:
-        inputs.append(roads_dir)
-    if "buildings" in layers:
-        inputs.append(buildings_dir)
-    inputs.append(ROOT / "data/raw")
-    _assert_disjoint_paths(output_dir, inputs)
+    _assert_disjoint_paths(
+        output_dir,
+        input_directories=_overview_input_directories(terrain_dir, roads_dir, buildings_dir),
+        input_files=_overview_input_files(aoi_config_path, aoi_geojson_path, source_manifest_path),
+    )
     artifacts = _derive_package(
         terrain_dir=terrain_dir,
         roads_dir=roads_dir,

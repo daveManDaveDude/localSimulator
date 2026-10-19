@@ -40,17 +40,18 @@ The share build retained the synthetic M0 scene. It made zero MapLibre resource 
 
 Python checks ran against the repository's isolated `pipeline/.venv`:
 
-| Command                                                                                                                                     | Result                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `cd pipeline; .\.venv\Scripts\python.exe -m pytest -q`                                                                                      | 213 passed                                                     |
-| `cd pipeline; .\.venv\Scripts\ruff.exe check torquay_pipeline tests`                                                                        | Passed                                                         |
-| `cd pipeline; .\.venv\Scripts\ruff.exe format --check torquay_pipeline tests`                                                               | 41 files already formatted                                     |
-| `cd pipeline; .\.venv\Scripts\python.exe -m pip check`                                                                                      | No broken requirements                                         |
-| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli build-overview`                                                            | Passed; 1 AOI, 196 roads, 1,000 buildings                      |
-| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-overview`                                                         | Passed; generated package valid                                |
-| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-overview`                                                          | Passed; published package byte-identical                       |
-| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-overview --package-dir ..\public\worlds\torquay-poc-001\overview` | Passed; published package valid                                |
-| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli build-overview --output-dir ..\data\generated\overview-m8-repeat-final`    | Passed; second deterministic package matched both hashes above |
+| Command                                                                                                                                  | Result                                                         |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `cd pipeline; .\.venv\Scripts\python.exe -m pytest -q`                                                                                   | 219 passed                                                     |
+| `cd pipeline; .\.venv\Scripts\python.exe -m pytest tests/test_overview_export.py -q`                                                     | 20 passed                                                      |
+| `cd pipeline; .\.venv\Scripts\ruff.exe check torquay_pipeline tests`                                                                     | Passed                                                         |
+| `cd pipeline; .\.venv\Scripts\ruff.exe format --check torquay_pipeline tests`                                                            | 41 files already formatted                                     |
+| `cd pipeline; .\.venv\Scripts\python.exe -m pip check`                                                                                   | No broken requirements                                         |
+| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli build-overview`                                                         | Passed; 1 AOI, 196 roads, 1,000 buildings                      |
+| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-overview`                                                      | Passed; generated package valid                                |
+| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-overview`                                                       | Passed; published package byte-identical                       |
+| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-overview --package-dir public/worlds/torquay-poc-001/overview` | Passed; published package valid                                |
+| `cd pipeline; .\.venv\Scripts\python.exe -m torquay_pipeline.cli build-overview --output-dir ..\data\generated\overview-m8-repeat-final` | Passed; second deterministic package matched both hashes above |
 
 Node gates ran in an isolated validation copy (`C:\vibe\localSimulator-m8-check-20261019`) after `npm.cmd ci` there succeeded with 0 vulnerabilities. The user's port-5173 server was not stopped or reused.
 
@@ -71,6 +72,14 @@ Node gates ran in an isolated validation copy (`C:\vibe\localSimulator-m8-check-
 | `npm.cmd run test:e2e:tvw015:real`    | Passed, 1 test                                                                      |
 | `npm.cmd run test:e2e:tvw015:share`   | Passed, 1 test                                                                      |
 
+### Fix round 1 after independent review
+
+The review found output-path protection gaps in overview build/publish and an invalid published-package command. The output guards now canonicalize Windows paths, account for symlink/junction parents, reject equal/ancestor/descendant overlaps with all protected inputs regardless of selected layers, and permit only the exact reserved `terrain/overview` publish destination. Output checks happen before derivation or replacement. Backup directories use unique owned names; a pre-existing fixed-name backup is preserved, and a collision with a generated backup name fails without replacing the package.
+
+The focused `tests/test_overview_export.py` suite covers attempts to write to or over `ROOT/docs`, the AOI config/GeoJSON, source manifest, raw data, terrain paths/files, road/building packages, and package paths; it also verifies input bytes and pre-existing backups remain unchanged on rejection/collision, and verifies rollback. It passed 20 tests. The symlink/junction guard is tested by injecting a linked-path component because Windows denied creating a real symlink in this environment.
+
+From `pipeline`, ran `.\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-overview --package-dir public/worlds/torquay-poc-001/overview`. The CLI resolved the package to `C:\vibe\localSimulator\public\worlds\torquay-poc-001\overview` and validation passed after publication with the package hashes above.
+
 The M8-specific browser profiles and unit/format gates were rerun after the compact synthetic-panel change. The full TVW-014 profile subsequently passed with 19 passed, 8 expected profile skips, and no failures. The dedicated TVW-014/015 real/share profiles passed before that final UI-only adjustment; the full profile and M8 profiles exercised the adjusted code.
 
 ## Failed attempts and environment notes
@@ -79,6 +88,8 @@ The M8-specific browser profiles and unit/format gates were rerun after the comp
 - `npm.cmd ls --depth=0` in the live checkout then failed because the unsuccessful install had partially pruned that dependency tree. `npm.cmd ls --depth=0` passed in the isolated validation copy after its clean install.
 - An initial `npm.cmd run test:e2e:tvw014:real` ran after a share build, so its real package was absent and all three tests failed. Rebuilding with `npm.cmd run build` before the real profile resolved the profile setup; the corrected run passed 3/3.
 - An initial Python command used an incorrectly formed venv path and did not execute; the corrected commands above ran and passed.
+- The first `npm.cmd run build:share` in the isolated validation copy was started concurrently with `npm.cmd run build`; both manipulated the same `dist` directory, producing a transient Windows `ENOTEMPTY` cleanup error. Running `npm.cmd run build:share` serially passed, and the overview share E2E profile passed afterward.
+- An initial Prettier check of this handback detected the corrected validation-table row's formatting; Prettier was applied and the final formatting check passed.
 
 ## Preservation and limits
 

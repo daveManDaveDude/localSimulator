@@ -151,9 +151,66 @@ def test_output_cannot_overlap_any_source_or_raw_data(tmp_path: Path) -> None:
     source = tmp_path / "roads"
     source.mkdir()
     with pytest.raises(OverviewExportError, match="overlaps"):
-        _assert_disjoint_paths(source / "overview", [source])
+        _assert_disjoint_paths(source / "overview", input_directories=[source], input_files=[])
     with pytest.raises(OverviewExportError, match="overlaps"):
-        _assert_disjoint_paths(source, [source / "roads.json"])
+        _assert_disjoint_paths(source, input_directories=[], input_files=[source / "roads.json"])
+
+
+def test_build_rejects_all_protected_locations_before_deriving_or_writing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    aoi_json = overview_export.DEFAULT_AOI_GEOJSON.read_bytes()
+    source_manifest = overview_export.DEFAULT_SOURCE_MANIFEST.read_bytes()
+    terrain_manifest = (overview_export.DEFAULT_TERRAIN_DIR / "manifest.json").read_bytes()
+    terrain_heightfield = (overview_export.DEFAULT_TERRAIN_DIR / "heightfield.f32").read_bytes()
+    dangerous_outputs = [
+        overview_export.ROOT / "docs",
+        overview_export.ROOT / "docs" / "m8-must-not-exist",
+        overview_export.DEFAULT_AOI_CONFIG,
+        overview_export.DEFAULT_AOI_GEOJSON,
+        overview_export.DEFAULT_ROAD_CONFIG,
+        overview_export.DEFAULT_BUILDING_CONFIG,
+        overview_export.ROOT / "config",
+        overview_export.ROOT / "data" / "source-manifest.json",
+        overview_export.ROOT / "data" / "raw",
+        overview_export.ROOT / "data" / "raw" / "m8-must-not-exist",
+        overview_export.DEFAULT_TERRAIN_DIR,
+        overview_export.DEFAULT_TERRAIN_DIR / "manifest.json",
+        overview_export.DEFAULT_TERRAIN_DIR / "heightfield.f32",
+        overview_export.DEFAULT_ROADS_DIR,
+        overview_export.DEFAULT_BUILDINGS_DIR,
+    ]
+
+    def unexpected_derive(**_kwargs: object) -> dict[str, bytes]:
+        pytest.fail("path safety must reject before reading or deriving package inputs")
+
+    monkeypatch.setattr(overview_export, "_derive_package", unexpected_derive)
+    for output in dangerous_outputs:
+        with pytest.raises(OverviewExportError, match="overlap"):
+            overview_export.build_overview_package(layers=("aoi",), output_dir=output)
+    assert overview_export.DEFAULT_AOI_GEOJSON.read_bytes() == aoi_json
+    assert overview_export.DEFAULT_SOURCE_MANIFEST.read_bytes() == source_manifest
+    assert (overview_export.DEFAULT_TERRAIN_DIR / "manifest.json").read_bytes() == terrain_manifest
+    assert (
+        overview_export.DEFAULT_TERRAIN_DIR / "heightfield.f32"
+    ).read_bytes() == terrain_heightfield
+    assert not (overview_export.ROOT / "docs" / "m8-must-not-exist").exists()
+    assert not (overview_export.ROOT / "data" / "raw" / "m8-must-not-exist").exists()
+    assert not (overview_export.DEFAULT_ROADS_DIR / "m8-must-not-exist").exists()
+
+
+def test_output_symlink_or_junction_component_is_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    linked_parent = tmp_path / "linked-parent"
+    real_check = overview_export._is_symlink_or_junction
+    monkeypatch.setattr(
+        overview_export,
+        "_is_symlink_or_junction",
+        lambda path: path == linked_parent or real_check(path),
+    )
+    with pytest.raises(OverviewExportError, match="symbolic-link/junction"):
+        overview_export._safe_output_path(linked_parent / "new-output")
 
 
 def test_atomic_package_write_restores_previous_bytes_if_install_fails(
@@ -164,6 +221,9 @@ def test_atomic_package_write_restores_previous_bytes_if_install_fails(
     (output / "manifest.json").write_bytes(b"previous manifest\n")
     (output / "features.geojson").write_bytes(b"previous features\n")
     before = {path.name: path.read_bytes() for path in output.iterdir()}
+    unowned_backup = tmp_path / ".overview-backup"
+    unowned_backup.mkdir()
+    (unowned_backup / "keep.txt").write_bytes(b"unowned backup")
     real_replace = overview_export.os.replace
     replace_count = 0
 
@@ -181,6 +241,44 @@ def test_atomic_package_write_restores_previous_bytes_if_install_fails(
             {"features.geojson": b"new feature", "manifest.json": b"new manifest"},
         )
     assert {path.name: path.read_bytes() for path in output.iterdir()} == before
+    assert (unowned_backup / "keep.txt").read_bytes() == b"unowned backup"
+
+
+def test_fixed_name_unowned_backup_is_preserved_during_successful_build(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "overview"
+    output.mkdir()
+    (output / "old.txt").write_bytes(b"old output")
+    unowned_backup = tmp_path / ".overview-backup"
+    unowned_backup.mkdir()
+    (unowned_backup / "keep.txt").write_bytes(b"unowned backup")
+
+    _write_package(output, {"features.geojson": b"features", "manifest.json": b"manifest"})
+
+    assert (output / "manifest.json").read_bytes() == b"manifest"
+    assert (unowned_backup / "keep.txt").read_bytes() == b"unowned backup"
+
+
+def test_build_fails_safely_when_unique_backup_name_is_already_owned_elsewhere(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output = tmp_path / "overview"
+    output.mkdir()
+    (output / "old.txt").write_bytes(b"old output")
+    existing_backup = tmp_path / ".overview-backup-reserved"
+    existing_backup.mkdir()
+    (existing_backup / "keep.txt").write_bytes(b"unowned")
+
+    class FixedUuid:
+        hex = "reserved"
+
+    monkeypatch.setattr(overview_export.uuid, "uuid4", lambda: FixedUuid())
+    with pytest.raises(OverviewExportError, match="pre-existing overview backup path"):
+        _write_package(output, {"features.geojson": b"features", "manifest.json": b"manifest"})
+
+    assert (output / "old.txt").read_bytes() == b"old output"
+    assert (existing_backup / "keep.txt").read_bytes() == b"unowned"
 
 
 def test_publication_rollback_keeps_previous_package(
@@ -198,6 +296,9 @@ def test_publication_rollback_keeps_previous_package(
     output.mkdir()
     (output / "sentinel").write_bytes(b"old data")
     before = {path.name: path.read_bytes() for path in output.iterdir()}
+    unowned_backup = output.parent / ".overview-backup"
+    unowned_backup.mkdir()
+    (unowned_backup / "keep.txt").write_bytes(b"unowned backup")
 
     monkeypatch.setattr(
         overview_publish,
@@ -226,6 +327,113 @@ def test_publication_rollback_keeps_previous_package(
             buildings_dir=buildings,
         )
     assert {path.name: path.read_bytes() for path in output.iterdir()} == before
+    assert (unowned_backup / "keep.txt").read_bytes() == b"unowned backup"
+
+
+def test_publish_rejects_protected_outputs_before_validation_or_writing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package = tmp_path / "source-overview"
+    package.mkdir()
+    (package / "manifest.json").write_bytes(b"source manifest")
+    (package / "features.geojson").write_bytes(b"source features")
+    aoi_json = DEFAULT_AOI_GEOJSON.read_bytes()
+    source_manifest = overview_export.DEFAULT_SOURCE_MANIFEST.read_bytes()
+    terrain_manifest = (overview_export.DEFAULT_TERRAIN_DIR / "manifest.json").read_bytes()
+    terrain_heightfield = (overview_export.DEFAULT_TERRAIN_DIR / "heightfield.f32").read_bytes()
+    dangerous_outputs = [
+        overview_export.ROOT / "docs",
+        overview_export.DEFAULT_AOI_CONFIG,
+        overview_export.DEFAULT_AOI_GEOJSON,
+        overview_export.DEFAULT_ROAD_CONFIG,
+        overview_export.DEFAULT_BUILDING_CONFIG,
+        overview_export.ROOT / "config",
+        overview_export.ROOT / "data" / "source-manifest.json",
+        overview_export.ROOT / "data" / "raw",
+        overview_export.ROOT / "data" / "raw" / "m8-publish-must-not-exist",
+        overview_export.DEFAULT_TERRAIN_DIR,
+        overview_export.DEFAULT_TERRAIN_DIR / "manifest.json",
+        overview_export.DEFAULT_TERRAIN_DIR / "heightfield.f32",
+        overview_export.DEFAULT_ROADS_DIR,
+        overview_export.DEFAULT_BUILDINGS_DIR,
+        overview_export.DEFAULT_TERRAIN_DIR / "overview" / "nested",
+        package,
+        tmp_path,
+    ]
+
+    def unexpected_validation(*_args: object, **_kwargs: object) -> dict[str, str]:
+        pytest.fail("path safety must reject before package validation")
+
+    monkeypatch.setattr(overview_publish, "validate_overview_package", unexpected_validation)
+    for output in dangerous_outputs:
+        with pytest.raises(overview_publish.OverviewPublishError, match="overlap"):
+            overview_publish.publish_overview_package(
+                package,
+                output_dir=output,
+            )
+    shared_source_parent = tmp_path / "shared-source-parent"
+    shared_source_parent.mkdir()
+    with pytest.raises(overview_publish.OverviewPublishError, match="overlap"):
+        overview_publish.publish_overview_package(
+            package,
+            output_dir=shared_source_parent / "overview",
+            terrain_dir=shared_source_parent,
+            roads_dir=shared_source_parent,
+            buildings_dir=tmp_path / "buildings",
+        )
+    assert (package / "manifest.json").read_bytes() == b"source manifest"
+    assert (package / "features.geojson").read_bytes() == b"source features"
+    assert DEFAULT_AOI_GEOJSON.read_bytes() == aoi_json
+    assert overview_export.DEFAULT_SOURCE_MANIFEST.read_bytes() == source_manifest
+    assert (overview_export.DEFAULT_TERRAIN_DIR / "manifest.json").read_bytes() == terrain_manifest
+    assert (
+        overview_export.DEFAULT_TERRAIN_DIR / "heightfield.f32"
+    ).read_bytes() == terrain_heightfield
+    assert not (overview_export.ROOT / "data" / "raw" / "m8-publish-must-not-exist").exists()
+    assert not (shared_source_parent / "overview").exists()
+
+
+def test_publish_fails_safely_on_unowned_backup_collision(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package = tmp_path / "source"
+    package.mkdir()
+    (package / "manifest.json").write_bytes(b"manifest")
+    (package / "features.geojson").write_bytes(b"features")
+    terrain = tmp_path / "terrain"
+    terrain.mkdir()
+    output = terrain / "overview"
+    output.mkdir()
+    (output / "old.txt").write_bytes(b"old output")
+    existing_backup = terrain / ".overview-backup-reserved"
+    existing_backup.mkdir()
+    (existing_backup / "keep.txt").write_bytes(b"unowned")
+    monkeypatch.setattr(
+        overview_publish,
+        "validate_overview_package",
+        lambda *_args, **_kwargs: {"status": "valid"},
+    )
+
+    class FixedUuid:
+        hex = "reserved"
+
+    monkeypatch.setattr(overview_publish.uuid, "uuid4", lambda: FixedUuid())
+    with pytest.raises(
+        overview_publish.OverviewPublishError, match="pre-existing overview backup path"
+    ):
+        overview_publish.publish_overview_package(
+            package,
+            output_dir=output,
+            terrain_dir=terrain,
+            roads_dir=terrain / "roads",
+            buildings_dir=terrain / "buildings",
+            aoi_config_path=overview_export.DEFAULT_AOI_CONFIG,
+            aoi_geojson_path=overview_export.DEFAULT_AOI_GEOJSON,
+            source_manifest_path=overview_export.DEFAULT_SOURCE_MANIFEST,
+        )
+
+    assert (output / "old.txt").read_bytes() == b"old output"
+    assert (existing_backup / "keep.txt").read_bytes() == b"unowned"
 
 
 def test_cli_output_json_is_deterministic_without_runtime_timestamp() -> None:

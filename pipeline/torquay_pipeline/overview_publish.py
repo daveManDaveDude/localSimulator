@@ -17,9 +17,12 @@ from .overview_export import (
     DEFAULT_SOURCE_MANIFEST,
     DEFAULT_TERRAIN_DIR,
     OVERVIEW_ASSETS,
-    ROOT,
     OverviewExportError,
+    _assert_disjoint_paths,
+    _overview_input_directories,
+    _overview_input_files,
     _repo_path,
+    _safe_output_path,
     validate_overview_package,
 )
 
@@ -39,40 +42,29 @@ def publish_overview_package(
     aoi_geojson_path: Path = DEFAULT_AOI_GEOJSON,
     source_manifest_path: Path = DEFAULT_SOURCE_MANIFEST,
 ) -> dict[str, Any]:
-    package_dir, output_dir, terrain_dir, roads_dir, buildings_dir = map(
-        _repo_path, (package_dir, output_dir, terrain_dir, roads_dir, buildings_dir)
+    package_dir, terrain_dir, roads_dir, buildings_dir = map(
+        _repo_path, (package_dir, terrain_dir, roads_dir, buildings_dir)
     )
+    output_dir = _safe_output_path(output_dir)
     aoi_config_path, aoi_geojson_path, source_manifest_path = map(
         _repo_path, (aoi_config_path, aoi_geojson_path, source_manifest_path)
     )
+    try:
+        _assert_disjoint_paths(
+            output_dir,
+            input_directories=[
+                *_overview_input_directories(terrain_dir, roads_dir, buildings_dir),
+                package_dir,
+            ],
+            input_files=_overview_input_files(
+                aoi_config_path, aoi_geojson_path, source_manifest_path
+            ),
+            allowed_output_paths=(terrain_dir / "overview",),
+        )
+    except OverviewExportError as exc:
+        raise OverviewPublishError(str(exc)) from exc
     if not terrain_dir.is_dir():
         raise OverviewPublishError(f"terrain package does not exist: {terrain_dir}")
-    if output_dir == terrain_dir or terrain_dir.is_relative_to(output_dir):
-        raise OverviewPublishError(
-            "overview output must not replace or contain the terrain package"
-        )
-    if output_dir.is_relative_to(terrain_dir) and output_dir != terrain_dir / "overview":
-        raise OverviewPublishError(
-            "only the dedicated terrain/overview child may be published inside terrain"
-        )
-    for source in (package_dir, roads_dir, buildings_dir):
-        if (
-            output_dir == source
-            or output_dir.is_relative_to(source)
-            or source.is_relative_to(output_dir)
-        ):
-            raise OverviewPublishError(
-                f"overview output '{output_dir}' overlaps protected source package '{source}'"
-            )
-    raw_root = (ROOT / "data/raw").resolve()
-    if (
-        output_dir == raw_root
-        or output_dir.is_relative_to(raw_root)
-        or raw_root.is_relative_to(output_dir)
-    ):
-        raise OverviewPublishError("overview output must not overlap raw source data")
-    if output_dir.is_symlink():
-        raise OverviewPublishError(f"refusing to replace symbolic-link output: {output_dir}")
     try:
         validation = validate_overview_package(
             package_dir,
@@ -93,6 +85,9 @@ def publish_overview_package(
     except OSError as exc:
         raise OverviewPublishError(f"cannot create overview staging directory: {exc}") from exc
     backup = output_dir.parent / f".overview-backup-{uuid.uuid4().hex}"
+    if backup.exists() or backup.is_symlink():
+        shutil.rmtree(stage, ignore_errors=True)
+        raise OverviewPublishError(f"refusing to use pre-existing overview backup path '{backup}'")
     moved_old = False
     try:
         # The checked manifest is staged last so a partially written pair is never published.
