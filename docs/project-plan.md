@@ -525,7 +525,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **TVW-009 status:** Passed independent review after Luna fix 2 (`42bafd6`). The completed issue covers building import, height policy, asset validation and QA only. Preserve the current 1,000 m AOI and pending overall coverage status; mapped building counts do not establish completeness. Roads and remaining feature checks are not included. TVW-010 completed and passed independent review for browser rendering and terrain footing; roads remain outside this issue.
 
-**TVW-010 status:** PASS after Luna fix 3 (`fb287fe`) and independent Sol review on 2026-10-19. The optional browser layer loads and renders the validated local OSM package on EA terrain with terrain-following wall bases. Rehashed topology cases, publisher safety, QA identity, mean rounding, bounded streaming and UI provenance/count persistence passed review. The flat-roof convention is highest terrain beneath each complete footprint plus its validated tagged or estimated height. The synthetic default and pending AOI status are preserved. Roads and TVW-011 remain unauthorized. See [TVW-010 specification](milestones/TVW-010-spec.md) and [TVW-010 handback](milestones/TVW-010.md).
+**TVW-010 status:** PASS after Luna fix 3 (`fb287fe`) and independent Sol review on 2026-10-19. The optional browser layer loads and renders the validated local OSM package on EA terrain with terrain-following wall bases. Rehashed topology cases, publisher safety, QA identity, mean rounding, bounded streaming and UI provenance/count persistence passed review. The flat-roof convention is highest terrain beneath each complete footprint plus its validated tagged or estimated height. The synthetic default and pending AOI status are preserved; roads were outside TVW-010 and were authorized separately under TVW-011. See [TVW-010 specification](milestones/TVW-010-spec.md) and [TVW-010 handback](milestones/TVW-010.md).
 
 **User-visible result:** **real buildings** stand on the slopes at approximately correct plan positions and shapes.
 
@@ -552,7 +552,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M5 — Roads and navigation cues
 
-**TVW-011 status:** Authorized on 2026-10-19; the accepted specification is [TVW-011-spec.md](milestones/TVW-011-spec.md), and Luna 6 xhigh implementation has resumed. The dated-PBF import/validation reports 198 ways and 200 clipped parts (72,099 render vertices; 98,240 triangles); two separate package reproductions byte-match. The QA preview has been inspected with a 100 m scale bar. Browser integration, full gates and independent review remain pending. This status does not pass TVW-011 or the combined M5 exit gate. TVW-012 remains separately unauthorized. The AOI stays `selected_pending_coverage` / `not_checked`.
+**TVW-011 status:** PASS after Luna fix rounds 1 (`ed29006`) and 2 (`3ae4e3a`) and independent Sol review on 2026-10-19. The local optional road layer is source-bound, reproducible, terrain-draped and browser-verified; the dated extract produced 198 ways, 198 clipped centerline parts, 200 ribbon components, 72,098 render vertices and 98,238 triangles. Rehashed adversarial schema cases, synthetic fallback, provenance and QA checks passed review. See the [TVW-011 handback](milestones/TVW-011.md) for commands, hashes, screenshots and limitations. TVW-011 completes its issue scope only; the combined M5 exit gate remains pending TVW-012's formal three-spot independent comparison. The AOI remains `selected_pending_coverage` / `not_checked`, and mapped counts do not establish completeness. TVW-012 remains separately unauthorized.
 
 **User-visible result:** road alignments and major junctions become recognisable; named roads can optionally appear in a selected-road debug label.
 
@@ -567,11 +567,13 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 **Acceptance:**
 
 - Roads demonstrably follow the terrain rather than render as one flat plane.
-- Roads and buildings align horizontally on three manually selected junctions/landmarks.
+- Three source-backed landmark contexts and bounded placement observations are recorded. The formal independent three-spot map comparison is TVW-012 work.
 - No giant ribbons/triangles caused by NaN, malformed paths or broken polyline segments.
 - Road class fallback widths are documented as visual estimates, not survey widths.
 
-**Exit gate:** compare with an independent map at three spots; record results and screenshots.
+**TVW-011 issue gate:** local road ribbons load on terrain; extraction, provenance, schema/geometry QA and synthetic fallback pass; bounded placement observations and screenshots are recorded.
+
+**Combined M5 exit gate:** remains pending the formal independent three-spot comparison and issue report in TVW-012. Do not treat TVW-011's mapped counts or bounded placement observations as a completeness check or AOI approval.
 
 ### M6 — Ground-following walk mode
 

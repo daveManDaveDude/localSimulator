@@ -1,10 +1,10 @@
 # Project instructions
 
-TVW-004 through TVW-010 are complete and independently reviewed; M0, M1 and the M3 terrain-only issue are complete. TVW-010 browser rendering of the local building package on terrain passed independent review on 2026-10-19. The user authorized TVW-011 on 2026-10-19; TVW-012 and later remain unauthorized. Mapped feature counts do not prove completeness and road/remaining feature checks are outstanding. Keep the AOI pending and do not call it approved or frozen. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` / `not_checked` status.
+TVW-004 through TVW-011 are complete and independently reviewed; M0, M1 and the M3 terrain-only issue are complete. TVW-011 optional road rendering passed independent review on 2026-10-19. TVW-012 and later remain unauthorized, and the combined M5 exit gate remains pending. Mapped feature counts do not prove completeness; formal three-spot comparison and remaining-feature coverage checks are outstanding. Keep the AOI pending and do not call it approved or frozen. Preserve the TQ1 4HN centroid and the `selected_pending_coverage` / `not_checked` status.
 
 ## Working protocol
 
-1. Work on **one milestone and one focused issue** at a time. M0, M1 and TVW-008/M3 are complete and independently reviewed. TVW-008 preserved the pending overall AOI status and synthetic worlds. TVW-009/M4 import, height policy and QA, and TVW-010 browser building rendering passed independent review. TVW-011 is separately authorized; do not begin TVW-012 or later without separate instruction.
+1. Work on **one milestone and one focused issue** at a time. M0, M1 and TVW-008/M3 are complete and independently reviewed. TVW-008 preserved the pending overall AOI status and synthetic worlds. TVW-009/M4 import, height policy and QA, TVW-010 browser building rendering, and TVW-011 optional road rendering passed independent review. Do not begin TVW-012 or later without separate instruction.
 2. Start with an implementation plan, concrete files touched, tests and proof of completion.
 3. Keep geographic calculations in tested Python modules and typed, documented asset contracts. No ad-hoc coordinate transforms scattered across React/Three.js render logic.
 4. Maintain a **fully functioning synthetic world** at all times.
