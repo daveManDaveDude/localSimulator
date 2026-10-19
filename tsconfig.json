@@ -23,6 +23,9 @@
     "tests",
     "vite.config.ts",
     "playwright.config.ts",
+    "playwright.tvw014-share.config.ts",
+    "playwright.tvw014-real.config.ts",
+    "playwright.tvw014-full.config.ts",
     "vitest.config.ts"
   ]
 }

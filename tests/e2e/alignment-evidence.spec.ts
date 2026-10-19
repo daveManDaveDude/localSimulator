@@ -232,10 +232,9 @@ test('TVW-012 captures actual 3D scenes at the three registered comparison spots
     });
   }
 
+  const localOrigin = new URL(page.url()).origin;
   expect(
-    requestedUrls.every(
-      (url) => new URL(url).origin === 'http://127.0.0.1:4173',
-    ),
+    requestedUrls.every((url) => new URL(url).origin === localOrigin),
   ).toBe(true);
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);

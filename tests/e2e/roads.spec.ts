@@ -51,22 +51,21 @@ test('loads actual local OSM road ribbons on terrain, toggles layers and capture
   await expect(
     page.getByRole('link', { name: 'ODbL attribution and licence' }),
   ).toHaveAttribute('href', 'https://www.openstreetmap.org/copyright');
+  const localOrigin = new URL(page.url()).origin;
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/roads/manifest.json',
+    `${localOrigin}/worlds/torquay-poc-001/roads/manifest.json`,
   );
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/roads/roads.json',
+    `${localOrigin}/worlds/torquay-poc-001/roads/roads.json`,
   );
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/roads/qa.json',
+    `${localOrigin}/worlds/torquay-poc-001/roads/qa.json`,
   );
   expect(requestedUrls).not.toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/roads/',
+    `${localOrigin}/worlds/torquay-poc-001/roads/`,
   );
   expect(
-    requestedUrls.every(
-      (url) => new URL(url).origin === 'http://127.0.0.1:4173',
-    ),
+    requestedUrls.every((url) => new URL(url).origin === localOrigin),
   ).toBe(true);
 
   const status = page.getByTestId('road-status');

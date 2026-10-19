@@ -1437,9 +1437,9 @@ export function createApp(container: HTMLElement): AppHandle {
     const pitchDegrees =
       Math.asin(Math.max(-1, Math.min(1, lookDirection.y))) * (180 / Math.PI);
 
-    cameraPosition.dataset.x = camera.position.x.toFixed(2);
-    cameraPosition.dataset.y = camera.position.y.toFixed(2);
-    cameraPosition.dataset.z = camera.position.z.toFixed(2);
+    cameraPosition.dataset.x = camera.position.x.toFixed(6);
+    cameraPosition.dataset.y = camera.position.y.toFixed(6);
+    cameraPosition.dataset.z = camera.position.z.toFixed(6);
     cameraPosition.textContent =
       `X ${camera.position.x.toFixed(1)} · ` +
       `Y ${camera.position.y.toFixed(1)} · ` +
@@ -1581,6 +1581,10 @@ export function createApp(container: HTMLElement): AppHandle {
     renderer.render(scene, camera);
     shell.dataset.drawCalls = String(renderer.info.render.calls);
     shell.dataset.triangles = String(renderer.info.render.triangles);
+    // Keep renderer counters observable to the local benchmark without
+    // exposing a mutable production hook or relying on test-only camera state.
+    shell.dataset.geometryCount = String(renderer.info.memory.geometries);
+    shell.dataset.textureCount = String(renderer.info.memory.textures);
     if (hasLoadedWorld && shell.dataset.rendererReady !== 'true') {
       shell.dataset.rendererReady = 'true';
     }

@@ -13,9 +13,9 @@ Implement only M6 ground-following navigation. Preserve the working synthetic de
 
 The existing `DEFAULT_FLIGHT_CONFIG` is 7.5 m/s with a 2.75× Shift multiplier (20.625 m/s boosted). Double both absolute speeds and retain that multiplier:
 
-| Mode | Normal movement | Shift movement |
-|---|---:|---:|
-| Fly | 15 m/s | 41.25 m/s |
+| Mode |   Normal movement |       Shift movement |
+| ---- | ----------------: | -------------------: |
+| Fly  |            15 m/s |            41.25 m/s |
 | Walk | 15 m/s horizontal | 41.25 m/s horizontal |
 
 These are fast navigation speeds, not a realistic pedestrian simulation. Walking speed measures horizontal displacement; terrain following changes Y independently. Normalize diagonal input in both modes. Flight retains full look-direction movement and Space/Control vertical movement. In walking mode, horizontal movement follows camera yaw, pitch does not change horizontal speed, and Space/Control do not cause vertical movement.

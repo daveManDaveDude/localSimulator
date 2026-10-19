@@ -159,6 +159,34 @@ The optional road package and source-derived outputs are ignored by Git. Share b
 
 Playwright's install command downloads a local Chromium build and requires internet access. After installation, the browser tests use local files. The persistent Chromium suite covers both the retained M0 viewer and loaded terrain, pointer lock and movement, terrain grid and wireframe controls, optional building publication/load/render/toggle and recovery, ground-height telemetry, resize, Escape release, and held-key cleanup. Vitest covers movement, manifest validation, binary decoding/loading, terrain grid/sampling, and Three.js mesh geometry.
 
+## M7 clean demo, local real-data rebuild, and benchmark
+
+The synthetic default and `/?world=m0` need only the tracked repository and Node.js; neither requires the ignored EA/OSM sources or generated real-world packages. On a clean clone, run `npm ci`, `npm run build:share`, then `npm run test:e2e:tvw014:share`. The share build intentionally omits `public/worlds/torquay-poc-001/`; the smoke test checks synthetic startup, pointer-lock navigation, movement, boost, reset, Escape, resize, and recovery when the optional EA package is absent. This verifies the share build and missing-data path, not a real-world source build.
+
+To regenerate the existing local real-data packages, restore only the exact ignored source files documented in [docs/data-sources.md](docs/data-sources.md) and hash-checked in [data/source-manifest.json](data/source-manifest.json). This project does not download data at runtime. From PowerShell, run the current inspection, terrain build, building import/publication, and road import/publication commands from `pipeline`:
+
+```powershell
+Push-Location pipeline
+\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-sources
+\.venv\Scripts\python.exe -m torquay_pipeline.cli build-terrain
+\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-building-source
+\.venv\Scripts\python.exe -m torquay_pipeline.cli import-buildings
+\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-buildings
+\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-buildings
+\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-road-source
+\.venv\Scripts\python.exe -m torquay_pipeline.cli import-roads
+\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-roads
+\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-roads
+Pop-Location
+npm ci
+npm run build
+npm run test:e2e:tvw014:real
+```
+
+The six benchmark workloads cover synthetic M0, EA terrain, terrain plus either optional layer, and the combined scene in fly and walk modes. The command `npm run benchmark` starts its own production preview on a newly allocated local port and refuses to attach to a pre-existing server. It writes raw frame intervals and a summary to `docs/milestones/artifacts/TVW-014-benchmark.{json,md}` and actual-browser captures to `docs/milestones/screenshots/TVW-014-*.png`. It uses a 1920 × 1080 CSS viewport at DPR 1 when the browser permits, a 3-second warm-up, and three 10-second runs per workload. The report records fresh-context and warm-context load time plus Chromium's observed disk/service-worker/prefetch cache-hit counts, frame interval mean/median/p95/p99/maximum, draw calls, triangles, geometry/texture object counts, package manifest/payload/QA bytes, browser/OS/renderer, and sampled JS heap where Chromium exposes it. Renderer memory geometry/texture values are object counts, not byte counts; JS heap is not total process or GPU memory; FPS is not GPU execution time. Measurements describe only the recorded machine and renderer and have no pass/fail threshold.
+
+The viewer credits the Environment Agency and links its catalogue and Open Government Licence v3.0 for the EA terrain. OSM layers credit © OpenStreetMap contributors, name Geofabrik GmbH as the extract provider, and link the ODbL. The OS OpenMap–Local raster appears only as a separate comparison source in [TVW-012](docs/milestones/TVW-012.md), not as rendered terrain, buildings, or roads. The exact source, product, vintage, attribution, and package identities are documented in the source manifest and the [TVW-014 handback](docs/milestones/TVW-014.md). The 1,000 m candidate remains `selected_pending_coverage` / `not_checked`; EA raster coverage, mapped feature counts, and three qualitative alignment observations do not prove complete feature coverage or approve/freeze the AOI.
+
 ## Project documents
 
 - `docs/project-plan.md` is the canonical working copy of the plan.
@@ -173,6 +201,7 @@ Playwright's install command downloads a local Chromium build and requires inter
 - `docs/milestones/TVW-009.md` records the dated OSM source, local building-footprint QA, placement checks and implementation handback.
 - `docs/milestones/TVW-010.md` records optional building rendering, local package publication and browser evidence.
 - `docs/milestones/TVW-011.md` records the local OSM highway pipeline, terrain-draped ribbons, QA and browser evidence.
+- `docs/milestones/TVW-014.md` records the clean-clone smoke, restored-source regeneration, production checks, benchmark, screenshots and limitations.
 - `docs/data-sources.md` documents publisher provenance, local source-file restoration and the current inspection result.
 - `docs/building-asset-contract.md` documents the local OSM footprint package, coordinates, height provenance and QA meaning.
 - `data/source-manifest.json` records actual source URLs, archive checksums, raster metadata, licence and attribution.

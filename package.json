@@ -17,7 +17,11 @@
     "test": "vitest run",
     "generate:synthetic-heightfield": "node scripts/generate-synthetic-heightfield.mjs",
     "test:e2e:install": "playwright install chromium",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:tvw014:share": "playwright test --config=playwright.tvw014-share.config.ts",
+    "test:e2e:tvw014:real": "playwright test --config=playwright.tvw014-real.config.ts",
+    "test:e2e:tvw014:full": "playwright test --config=playwright.tvw014-full.config.ts",
+    "benchmark": "node scripts/benchmark.mjs"
   },
   "dependencies": {
     "three": "0.186.1"

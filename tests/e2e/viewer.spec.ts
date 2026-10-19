@@ -475,11 +475,12 @@ test('loads and navigates the local synthetic heightfield terrain', async ({
     'data-height-meters',
     /^-?\d+\.\d{4}$/,
   );
+  const localOrigin = new URL(page.url()).origin;
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/synthetic-terrain-demo/manifest.json',
+    `${localOrigin}/worlds/synthetic-terrain-demo/manifest.json`,
   );
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/synthetic-terrain-demo/heightfield.f32',
+    `${localOrigin}/worlds/synthetic-terrain-demo/heightfield.f32`,
   );
   await expect(page.locator('canvas.viewer-canvas')).toBeVisible();
 
@@ -747,11 +748,12 @@ test('loads and navigates the local EA terrain package', async ({ page }) => {
     'data-orthometric-meters',
     /^-?\d+\.\d{4}$/,
   );
+  const localOrigin = new URL(page.url()).origin;
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/manifest.json',
+    `${localOrigin}/worlds/torquay-poc-001/manifest.json`,
   );
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/heightfield.f32',
+    `${localOrigin}/worlds/torquay-poc-001/heightfield.f32`,
   );
 
   const realHeightfield = await readFile(

@@ -120,19 +120,18 @@ test('loads the opt-in OSM layer, keeps terrain navigation, and captures both vi
     page.getByRole('link', { name: 'ODbL 1.0 attribution and licence' }),
   ).toHaveAttribute('href', 'https://www.openstreetmap.org/copyright');
 
+  const localOrigin = new URL(page.url()).origin;
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/buildings/manifest.json',
+    `${localOrigin}/worlds/torquay-poc-001/buildings/manifest.json`,
   );
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/buildings/buildings.json',
+    `${localOrigin}/worlds/torquay-poc-001/buildings/buildings.json`,
   );
   expect(requestedUrls).toContain(
-    'http://127.0.0.1:4173/worlds/torquay-poc-001/buildings/qa.json',
+    `${localOrigin}/worlds/torquay-poc-001/buildings/qa.json`,
   );
   expect(
-    requestedUrls.every(
-      (url) => new URL(url).origin === 'http://127.0.0.1:4173',
-    ),
+    requestedUrls.every((url) => new URL(url).origin === localOrigin),
   ).toBe(true);
 
   const initialMeshCount = Number(
