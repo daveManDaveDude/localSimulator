@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0, M1 and TVW-001 through TVW-012 passed their issue reviews. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, and TVW-012 completed the independent three-spot map comparison and issue report. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-013 implementation has been submitted for independent review; TVW-014 and later remain unauthorized.
+**Status:** M0, M1 and TVW-001 through TVW-013 passed their issue reviews. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, TVW-012 completed the independent three-spot map comparison and issue report, and TVW-013 completed ground-following walk mode with 1.7 m eye clearance. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19; M6 was accepted after TVW-013 fix 1 passed independent review on 2026-10-19. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-014 and later remain unauthorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -554,7 +554,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **TVW-011 status:** PASS after Luna fix rounds 1 (`ed29006`) and 2 (`3ae4e3a`) and independent Sol review on 2026-10-19. The local optional road layer is source-bound, reproducible, terrain-draped and browser-verified; the dated extract produced 198 ways, 198 clipped centerline parts, 200 ribbon components, 72,098 render vertices and 98,238 triangles. Rehashed adversarial schema cases, synthetic fallback, provenance and QA checks passed review. See the [TVW-011 handback](milestones/TVW-011.md) for commands, hashes, screenshots and limitations. The AOI remains `selected_pending_coverage` / `not_checked`, and mapped counts do not establish completeness.
 
-**TVW-012 status:** PASS after Luna fix round 2 (`734a0a1`) and independent Sol review on 2026-10-19. Three bounded qualitative comparisons against OS OpenMap–Local passed; report integrity, source/raster registration binding, all 12 static comparison panels, and the retained inconclusive prior candidate passed review. See the [generated comparison report](milestones/TVW-012.md) and [TVW-012 handback](milestones/TVW-012-handback.md) for evidence, commands, results and limits. By coordinator acceptance after that review, the combined M5 exit gate is complete. This result does not establish complete mapped coverage or approve/freeze the AOI, which remains `selected_pending_coverage` / `not_checked`. TVW-013 and later remain unauthorized.
+**TVW-012 status:** PASS after Luna fix round 2 (`734a0a1`) and independent Sol review on 2026-10-19. Three bounded qualitative comparisons against OS OpenMap–Local passed; report integrity, source/raster registration binding, all 12 static comparison panels, and the retained inconclusive prior candidate passed review. See the [generated comparison report](milestones/TVW-012.md) and [TVW-012 handback](milestones/TVW-012-handback.md) for evidence, commands, results and limits. By coordinator acceptance after that review, the combined M5 exit gate is complete. This result does not establish complete mapped coverage or approve/freeze the AOI, which remains `selected_pending_coverage` / `not_checked`.
 
 **User-visible result:** road alignments and major junctions become recognisable; named roads can optionally appear in a selected-road debug label.
 
@@ -579,7 +579,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M6 — Ground-following walk mode
 
-**TVW-013 status:** The user separately authorized TVW-013 on 2026-10-19 after M5 acceptance. The implementation is submitted for independent review. The accepted specification adds normal/Shift movement speeds of 15 / 41.25 m/s in fly and walk modes, preserving the current 2.75× Shift ratio. TVW-014 and later remain unauthorized.
+**TVW-013 status:** PASS after Luna fix 1 (`75e6850`) and independent Sol review on 2026-10-19. Fly/walk navigation follows the active terrain sampler at 1.7 m eye clearance; speeds are 15 / 41.25 m/s in both modes with the 2.75× Shift ratio. Lifecycle suspension, vertical-pitch heading stability, synthetic fallback, browser routes and evidence passed review. See the [TVW-013 handback](milestones/TVW-013.md) for commands, screenshots, results and limitations. The AOI remains `selected_pending_coverage` / `not_checked`, and mapped counts do not establish completeness. TVW-014 and later remain unauthorized.
 
 **User-visible result:** a user can walk along slopes at **~1.7 m eye height**, look around, and switch freely back to flying.
 
@@ -599,6 +599,8 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 - Playwright test checks mode switching and observed position updates; unit tests check height sampling.
 
 **Exit gate — PoC COMPLETE:** person can navigate a recognisable area of Torquay on foot and from above.
+
+**M6 exit gate:** PASS by coordinator on 2026-10-19 after TVW-013 fix 1 passed independent Sol review. This validates the local synthetic/combined navigation PoC only; it does not establish complete mapped coverage or approve/freeze the AOI. The AOI remains `selected_pending_coverage` / `not_checked`. See [TVW-013 handback](milestones/TVW-013.md).
 
 ### M7 — Review, profile and package
 
