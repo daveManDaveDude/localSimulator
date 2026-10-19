@@ -869,6 +869,7 @@ function validateFeature(
   issues: RoadValidationIssue[],
 ): RoadFeature | undefined {
   const path = `roads.features[${index}]`;
+  const initialIssueCount = issues.length;
   if (!isRecord(value)) {
     addIssue(issues, path, 'must be an object');
     return undefined;
@@ -1019,6 +1020,7 @@ function validateFeature(
       path,
       'duplicate references and buffered ribbon metadata are invalid',
     );
+  if (issues.length > initialIssueCount) return undefined;
   return value as unknown as RoadFeature;
 }
 

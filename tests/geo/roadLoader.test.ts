@@ -275,6 +275,32 @@ describe('loadRoadPackage', () => {
     ).rejects.toThrow(/qa\.counts: must match manifest counts/);
   });
 
+  it.each(['null', 'missing'] as const)(
+    'rejects a %s centerlinePartsXZ field after refreshing road and QA hashes',
+    async (mutation) => {
+      const bundle = await createRoadBundle();
+      const feature = bundle.payload.features[0] as unknown as Record<
+        string,
+        unknown
+      >;
+      if (mutation === 'null') feature.centerlinePartsXZ = null;
+      else delete feature.centerlinePartsXZ;
+      await refreshRoadAsset(bundle);
+      await refreshQaAsset(bundle);
+      const { fetcher } = createFetcher(bundle);
+      await expect(
+        loadRoadPackage(
+          manifestUrl,
+          bundle.terrain,
+          bundle.terrainManifestSha256,
+          fetcher,
+        ),
+      ).rejects.toThrow(
+        /roads\.features\[0\]\.centerlinePartsXZ: must include stable IDs/,
+      );
+    },
+  );
+
   it('stops reading a headerless oversized manifest response at the configured cap', async () => {
     const bundle = await createRoadBundle();
     let consumedChunks = 0;
