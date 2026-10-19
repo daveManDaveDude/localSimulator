@@ -1,6 +1,6 @@
 # M8 offline geographic overview handback
 
-**Status:** Implementation submitted for independent review. This handback does not mark M8 accepted.
+**Status:** PASS; coordinator-accepted on 2026-10-19 after final independent Sol review of Luna fix 2 (`9f34784`), following implementation `00aeb53` and fix 1 `81bc911`.
 
 ## Delivered
 
@@ -83,6 +83,8 @@ From `pipeline`, ran `.\.venv\Scripts\python.exe -m torquay_pipeline.cli validat
 #### Fix round 2
 
 The second review found that the publication exception could also hide an ancestor overlap when a custom terrain directory sat under ROOT/docs or data/raw. The exception is now bound to the exact (terrain_dir / "overview", terrain_dir) pair. Regression cases set terrain to ROOT/docs/milestones and ROOT/data/raw/ea_dtm; both are rejected before package validation and create no output. The focused suite passed 20 tests and the full suite passed 219. Default publication succeeded byte-identically, followed by successful validation of the published package using the corrected command above. Node typecheck, lint, format, unit, and both production builds passed in the isolated validation copy.
+
+Final independent Sol re-review returned PASS. It reproduced both nested-path rejections before validation or writes, confirmed the normal terrain/overview publication path remains allowed, and reran the focused Python suite (20/20), Ruff check/format, and `git diff --check`. The reviewer made no edits and did not repeat the browser run; the production-browser screenshots and profiles above remain the recorded visual evidence for this Python-only correction.
 
 The M8-specific browser profiles and unit/format gates were rerun after the compact synthetic-panel change. The full TVW-014 profile subsequently passed with 19 passed, 8 expected profile skips, and no failures. The dedicated TVW-014/015 real/share profiles passed before that final UI-only adjustment; the full profile and M8 profiles exercised the adjusted code.
 
