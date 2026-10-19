@@ -552,7 +552,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M5 — Roads and navigation cues
 
-**TVW-011 status:** Authorized on 2026-10-19; the accepted specification is [TVW-011-spec.md](milestones/TVW-011-spec.md), and Luna 6 xhigh implementation has resumed after a capacity delay. This status does not pass TVW-011 or the combined M5 exit gate. TVW-012 remains separately unauthorized. The AOI stays `selected_pending_coverage` / `not_checked`.
+**TVW-011 status:** Authorized on 2026-10-19; the accepted specification is [TVW-011-spec.md](milestones/TVW-011-spec.md), and the partial Luna 6 xhigh implementation was interrupted by another model-capacity error. No road import, tests or browser verification are complete. This status does not pass TVW-011 or the combined M5 exit gate. TVW-012 remains separately unauthorized. The AOI stays `selected_pending_coverage` / `not_checked`.
 
 **User-visible result:** road alignments and major junctions become recognisable; named roads can optionally appear in a selected-road debug label.
 
