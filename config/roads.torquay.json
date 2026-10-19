@@ -1,0 +1,44 @@
+{
+  "format_version": 1,
+  "id": "torquay-poc-001-roads",
+  "source": {
+    "relative_path": "data/raw/osm/devon-261016.osm.pbf",
+    "manifest_namespace": "osm"
+  },
+  "acquisition_buffer_m": 50.0,
+  "coordinate_quantization_m": 0.001,
+  "minimum_ribbon_area_m2": 0.01,
+  "surface_offset_m": 0.05,
+  "widths_m": {
+    "motorway": 12.0,
+    "trunk": 12.0,
+    "primary": 10.0,
+    "secondary": 8.0,
+    "tertiary": 7.0,
+    "unclassified": 6.0,
+    "residential": 6.0,
+    "motorway_link": 6.0,
+    "trunk_link": 6.0,
+    "primary_link": 6.0,
+    "secondary_link": 6.0,
+    "tertiary_link": 6.0,
+    "living_street": 5.0,
+    "road": 5.0,
+    "service": 3.5,
+    "track": 3.0,
+    "pedestrian": 3.0,
+    "cycleway": 2.0,
+    "bridleway": 2.5,
+    "footway": 1.5,
+    "path": 1.5
+  },
+  "path_classes": ["track", "pedestrian", "cycleway", "bridleway", "footway", "path"],
+  "excluded_classes": [
+    "steps", "construction", "proposed", "abandoned", "disused", "raceway",
+    "bus_guideway", "escape"
+  ],
+  "intermediate_path": "data/intermediate/osm/torquay-poc-001/roads.json",
+  "package_path": "data/generated/roads/torquay-poc-001",
+  "qa_path": "docs/milestones/artifacts/TVW-011-roads-qa.json",
+  "preview_path": "docs/milestones/screenshots/TVW-011-roads-preview.png"
+}

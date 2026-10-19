@@ -390,6 +390,125 @@ body {
   display: none;
 }
 
+.road-controls {
+  position: absolute;
+  right: 26px;
+  bottom: 22px;
+  z-index: 1;
+  width: min(470px, calc(100vw - 52px));
+  max-height: min(36vh, 280px);
+  overflow: auto;
+  padding: 12px 15px;
+  border: 1px solid rgb(205 239 226 / 14%);
+  border-radius: 12px;
+  color: #b8c8c3;
+  background: rgb(12 20 24 / 90%);
+  box-shadow: 0 18px 55px rgb(0 0 0 / 24%);
+  backdrop-filter: blur(12px);
+  font-size: 9px;
+  line-height: 1.5;
+  pointer-events: auto;
+}
+
+.road-controls[hidden] {
+  display: none;
+}
+
+.road-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.road-actions button,
+.road-actions select {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid rgb(165 223 206 / 36%);
+  border-radius: 6px;
+  color: #c9e7dc;
+  background: rgb(255 255 255 / 5%);
+  font: inherit;
+  font-size: 9px;
+}
+
+.road-actions button {
+  cursor: pointer;
+}
+
+.road-actions button:hover:not(:disabled) {
+  color: #10201c;
+  background: #a5dfce;
+}
+
+.road-actions button:focus-visible,
+.road-actions select:focus-visible {
+  outline: 2px solid #e2b17f;
+  outline-offset: 2px;
+}
+
+.road-actions button:disabled,
+.road-actions select:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.road-controls p {
+  margin: 6px 0 0;
+}
+
+.road-controls [data-testid='road-status'][data-state='error'] {
+  color: #ffc8b7;
+}
+
+.road-controls [data-testid='road-error'] {
+  color: #ffe0ce;
+  overflow-wrap: anywhere;
+}
+
+.road-controls [data-testid='road-error'][hidden] {
+  display: none;
+}
+
+.road-recovery {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-top: 6px;
+}
+
+.road-recovery[hidden] {
+  display: none;
+}
+
+.road-recovery button {
+  min-height: 27px;
+  padding: 0 8px;
+  border: 1px solid rgb(165 223 206 / 36%);
+  border-radius: 6px;
+  color: #c9e7dc;
+  background: rgb(255 255 255 / 5%);
+  font: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.road-recovery a {
+  color: #a9d8c8;
+  text-underline-offset: 2px;
+}
+
+.road-width-policy {
+  color: #94a8a2;
+}
+
+.road-attribution a {
+  color: #a9d8c8;
+  text-underline-offset: 2px;
+}
+
 .building-actions {
   display: flex;
   flex-wrap: wrap;
@@ -467,6 +586,11 @@ body {
   width: min(385px, 42vw);
   padding: 15px 18px;
   pointer-events: auto;
+}
+
+.viewer-shell[data-road-state='loaded'] .controls-help,
+.viewer-shell[data-road-state='hidden'] .controls-help {
+  bottom: min(40vh, 305px);
 }
 
 .controls-help[hidden] {
@@ -702,6 +826,19 @@ kbd {
     bottom: 14px;
     width: min(385px, calc(100vw - 28px));
     padding: 12px 14px;
+  }
+
+  .road-controls {
+    right: 14px;
+    bottom: 14px;
+    width: min(450px, calc(100vw - 28px));
+    max-height: 26vh;
+    padding: 10px 12px;
+  }
+
+  .viewer-shell[data-road-state='loaded'] .controls-help,
+  .viewer-shell[data-road-state='hidden'] .controls-help {
+    bottom: 29vh;
   }
 
   .start-card {

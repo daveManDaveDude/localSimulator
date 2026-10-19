@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any
 
 from pyproj.network import is_network_enabled
+from shapely.geometry import Polygon
+from shapely.ops import unary_union
 
 from .aoi import generate_selection, write_selection
 from .building_export import (
@@ -31,6 +33,12 @@ from .building_sources import (
 )
 from .buildings import BuildingConfig, BuildingImportError, import_osm_buildings
 from .config import AoiConfig, AoiConfigError, load_aoi_config, validate_stored_selection
+from .road_config import RoadConfigError, load_road_config
+from .road_export import RoadExportError, build_road_package, validate_road_package
+from .road_geometry import DISPLAY_GROUPS
+from .road_preview import render_road_preview
+from .road_publish import RoadPublishError, publish_road_package
+from .roads import RoadImportError, import_osm_roads
 from .terrain_coverage import (
     DEFAULT_MISSING_THRESHOLD,
     CoverageResult,
@@ -148,7 +156,156 @@ def _parser() -> argparse.ArgumentParser:
                 type=Path,
                 default=Path("../docs/milestones/screenshots/TVW-009-buildings-preview.png"),
             )
+    for name in (
+        "inspect-road-source",
+        "import-roads",
+        "validate-roads",
+        "preview-roads",
+        "publish-roads",
+    ):
+        command = commands.add_parser(name)
+        command.add_argument("--config", type=Path, default=Path("../config/roads.torquay.json"))
+        command.add_argument(
+            "--source-manifest", type=Path, default=Path("../data/source-manifest.json")
+        )
+        command.add_argument("--source", type=Path)
+        if name in {"import-roads", "validate-roads", "preview-roads", "publish-roads"}:
+            command.add_argument(
+                "--aoi-config", type=Path, default=Path("../config/aoi.torquay.json")
+            )
+            command.add_argument(
+                "--aoi-geojson", type=Path, default=Path("../docs/aoi-selection.geojson")
+            )
+            command.add_argument(
+                "--terrain-package", type=Path, default=Path("../public/worlds/torquay-poc-001")
+            )
+        if name in {"validate-roads", "preview-roads", "publish-roads"}:
+            command.add_argument(
+                "--package", type=Path, default=Path("../data/generated/roads/torquay-poc-001")
+            )
+        if name == "import-roads":
+            command.add_argument("--output", type=Path, help="override generated package directory")
+        if name == "preview-roads":
+            command.add_argument(
+                "--qa",
+                type=Path,
+                default=Path("../docs/milestones/artifacts/TVW-011-roads-qa.json"),
+            )
+            command.add_argument(
+                "--output",
+                type=Path,
+                default=Path("../docs/milestones/screenshots/TVW-011-roads-preview.png"),
+            )
     return parser
+
+
+def _road_command(args: argparse.Namespace) -> int:
+    config, root, raw = load_road_config(args.config)
+    source_path = (args.source or _root_path(root, config.source_relative_path)).resolve()
+    source_manifest_path = args.source_manifest.resolve()
+    if args.command == "inspect-road-source":
+        observed = inspect_building_source(source_path)
+        verified = verify_building_source(source_path, source_manifest_path)
+        print(json.dumps({"source": observed, "manifestVerified": verified == observed}, indent=2))
+        print("Road extraction reuses the recorded dated OSM PBF; it does not fetch a replacement.")
+        return 0
+
+    aoi_config = load_aoi_config(args.aoi_config)
+    selection, _geojson, _markdown = generate_selection(aoi_config)
+    validate_stored_selection(
+        aoi_config,
+        selection["aoi"]["center_easting_m"],
+        selection["aoi"]["center_northing_m"],
+        selection["aoi"]["bbox_m"],
+    )
+    expected_ring = _load_aoi_ring(args.aoi_geojson.resolve())
+    terrain_path = args.terrain_package.resolve()
+    if args.command == "validate-roads":
+        result = validate_road_package(
+            args.package.resolve(),
+            expected_aoi=aoi_config,
+            expected_aoi_ring=expected_ring,
+            terrain_package_path=terrain_path,
+            source_path=source_path,
+            source_manifest_path=source_manifest_path,
+            aoi_geojson_path=args.aoi_geojson.resolve(),
+            road_config=config,
+        )
+        print(json.dumps(result, indent=2))
+        return 0
+    if args.command == "publish-roads":
+        result = publish_road_package(
+            args.package.resolve(),
+            terrain_path,
+            expected_aoi=aoi_config,
+            expected_aoi_ring=expected_ring,
+            source_path=source_path,
+            source_manifest_path=source_manifest_path,
+            aoi_geojson_path=args.aoi_geojson.resolve(),
+            road_config=config,
+        )
+        print(f"Published byte-identical validated roads to {result['outputDirectory']}")
+        print(json.dumps(result, indent=2))
+        return 0
+    if args.command == "preview-roads":
+        result = validate_road_package(
+            args.package.resolve(),
+            expected_aoi=aoi_config,
+            expected_aoi_ring=expected_ring,
+            terrain_package_path=terrain_path,
+            source_path=source_path,
+            source_manifest_path=source_manifest_path,
+            aoi_geojson_path=args.aoi_geojson.resolve(),
+            road_config=config,
+        )
+        qa_bytes = (args.package / "qa.json").read_bytes()
+        if qa_bytes != args.qa.read_bytes():
+            raise RoadExportError("external QA differs from integrity-bound package qa.json")
+        payload = json.loads((args.package / "roads.json").read_text(encoding="utf-8"))
+        display: dict[str, Any] = {}
+        for group in DISPLAY_GROUPS:
+            batch = payload["surfaceBatches"][group]
+            vertices = batch["verticesXZ"]
+            polygons = [
+                Polygon([vertices[index] for index in triangle]) for triangle in batch["indices"]
+            ]
+            display[group] = unary_union(polygons) if polygons else Polygon()
+        preview = render_road_preview(
+            display,
+            payload["features"],
+            json.loads(qa_bytes),
+            terrain_path,
+            args.output.resolve(),
+        )
+        print(json.dumps({"package": result, "preview": preview}, indent=2))
+        return 0
+
+    imported = import_osm_roads(source_path, source_manifest_path, aoi_config, config)
+    output_dir = args.output.resolve() if args.output else _root_path(root, config.package_path)
+    qa_path = _root_path(root, config.qa_path)
+    preview_path = _root_path(root, config.preview_path)
+    intermediate_path = _root_path(root, config.intermediate_path)
+    built = build_road_package(
+        imported,
+        aoi_config,
+        config,
+        source_path,
+        source_manifest_path,
+        terrain_path,
+        args.aoi_geojson.resolve(),
+        output_dir,
+        qa_path,
+        preview_path,
+        intermediate_path,
+    )
+    print(f"Imported {built['qa']['counts']['uniqueExportedWays']:,} unique highway ways.")
+    print(f"Road package: {output_dir}")
+    print(f"QA: {qa_path}")
+    print(f"Preview: {preview_path}")
+    print(f"Intermediate with source node IDs and tags: {intermediate_path}")
+    print("AOI remains selected_pending_coverage; coverage_status remains not_checked.")
+    print(json.dumps(built["qa"]["counts"], indent=2))
+    return 0
 
 
 def _building_config(path: Path) -> tuple[BuildingConfig, Path, dict[str, Any]]:
@@ -457,6 +614,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             "publish-buildings",
         }:
             return _building_command(args)
+        if args.command in {
+            "inspect-road-source",
+            "import-roads",
+            "validate-roads",
+            "preview-roads",
+            "publish-roads",
+        }:
+            return _road_command(args)
         config = load_aoi_config(args.config)
         selection, geojson, markdown = generate_selection(config)
         if args.command == "validate-aoi":
@@ -530,6 +695,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         BuildingPublishError,
         BuildingImportError,
         BuildingSourceError,
+        RoadConfigError,
+        RoadImportError,
+        RoadExportError,
+        RoadPublishError,
         TerrainCoverageError,
         TerrainSourceError,
         TerrainExportError,

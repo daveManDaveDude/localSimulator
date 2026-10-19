@@ -1,5 +1,7 @@
 import {
   Group,
+  Mesh,
+  MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
   Timer,
@@ -10,8 +12,10 @@ import { FreeFlyController } from '../camera/FreeFlyController';
 import type { FlightBounds, Vec3Like } from '../camera/movement';
 import { loadWorld } from './worldLoader';
 import { loadBuildingPackage } from './buildingLoader';
+import { loadRoadPackage } from './roadLoader';
 import type { RealTerrainSceneManifest } from '../geo/sceneSchema';
 import type { TerrainGrid } from '../geo/terrainGrid';
+import type { LoadedRoadPackage } from '../geo/roadSchema';
 import { createScene } from '../scene/createScene';
 import {
   createSyntheticWorld,
@@ -19,6 +23,7 @@ import {
 } from '../scene/createSyntheticWorld';
 import { createHeightfieldWorld } from '../scene/createHeightfieldWorld';
 import { createBuildings } from '../scene/createBuildings';
+import { createRoads, createRoadLandmarkMarker } from '../scene/createRoads';
 import { disposeSceneResources } from '../scene/disposeSceneResources';
 import type { HeightfieldWorld } from '../scene/createHeightfieldWorld';
 
@@ -26,6 +31,7 @@ const TERRAIN_MANIFEST_URL = '/worlds/synthetic-terrain-demo/manifest.json';
 const REAL_TERRAIN_MANIFEST_URL = '/worlds/torquay-poc-001/manifest.json';
 const REAL_BUILDINGS_MANIFEST_URL =
   '/worlds/torquay-poc-001/buildings/manifest.json';
+const REAL_ROADS_MANIFEST_URL = '/worlds/torquay-poc-001/roads/manifest.json';
 
 type GroundSampler = (x: number, z: number) => number | null;
 
@@ -52,6 +58,7 @@ interface ViewerWorld {
   gridAndCompass?: HeightfieldWorld['gridAndCompass'];
   terrainGrid?: TerrainGrid;
   realManifest?: RealTerrainSceneManifest;
+  realManifestSha256?: string;
 }
 
 export interface AppHandle {
@@ -67,6 +74,9 @@ export function createApp(container: HTMLElement): AppHandle {
   const initialBuildingsMode =
     initialRealMode &&
     new URLSearchParams(window.location.search).get('buildings') === '1';
+  const initialRoadsMode =
+    initialRealMode &&
+    new URLSearchParams(window.location.search).get('roads') === '1';
   container.innerHTML = `
     <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-load-state="loading" data-renderer-ready="false">
       <canvas class="viewer-canvas" aria-label="Terrain free-fly world"></canvas>
@@ -79,6 +89,8 @@ export function createApp(container: HTMLElement): AppHandle {
           <button type="button" data-testid="world-select-synthetic" aria-pressed="${!m0Mode && !initialRealMode}">Synthetic terrain</button>
           <button type="button" data-testid="world-select-real" aria-pressed="${initialRealMode}">EA terrain</button>
           <a href="?world=torquay-poc-001&amp;buildings=1" data-testid="world-select-buildings">EA terrain + OSM buildings</a>
+          <a href="?world=torquay-poc-001&amp;roads=1" data-testid="world-select-roads">EA terrain + OSM roads</a>
+          <a href="?world=torquay-poc-001&amp;buildings=1&amp;roads=1" data-testid="world-select-all-layers">EA terrain + buildings + roads</a>
           <a href="?world=m0" data-testid="world-select-m0">M0 synthetic demo</a>
         </nav>
         <p class="terrain-loading" data-testid="terrain-loading" role="status"${m0Mode ? ' hidden' : ''}>${initialRealMode ? 'Loading and validating the local Environment Agency terrain package…' : 'Loading and validating the synthetic terrain package…'}</p>
@@ -134,6 +146,26 @@ export function createApp(container: HTMLElement): AppHandle {
           <p class="building-policy" data-testid="building-policy">Footprints use level roofs at the highest sampled terrain under each feature plus its tagged or estimated height. This is a visual placement convention, not a verified roof or foundation height; wall bases are buried 0.02 m to avoid seams. Tagged OSM heights are unverified; remaining values are estimates.</p>
           <p class="building-attribution" data-testid="building-attribution">© OpenStreetMap contributors · extract provided by Geofabrik GmbH · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL 1.0 attribution and licence</a></p>
           <p class="building-completeness">Mapped counts do not establish completeness. Road and remaining feature checks are outstanding; the candidate AOI remains pending.</p>
+        </section>
+        <section class="road-controls" data-testid="road-controls" aria-label="Optional OSM road surface layer" hidden>
+          <div class="road-actions">
+            <button type="button" data-testid="roads-toggle" aria-pressed="false">Load OSM road ribbons</button>
+            <button type="button" data-testid="roads-retry" hidden>Retry road load</button>
+            <button type="button" data-testid="roads-wireframe-toggle" aria-pressed="false">Road wireframe: off</button>
+            <label for="road-landmark-select">Debug context</label>
+            <select id="road-landmark-select" data-testid="road-landmark-select" disabled>
+              <option value="">Load road package to select a context</option>
+            </select>
+          </div>
+          <p data-testid="road-status" role="status" aria-live="polite" data-state="off" data-way-count="0" data-part-count="0" data-triangle-count="0">Optional local OSM road ribbons are off.</p>
+          <p data-testid="road-extract-vintage">OSM extract vintage: not loaded.</p>
+          <p data-testid="road-error" role="alert" hidden></p>
+          <div class="road-recovery" data-testid="road-recovery" hidden>
+            <button type="button" data-testid="roads-terrain-only">Continue with terrain only</button>
+            <a href="/" data-testid="roads-return-synthetic">Return to synthetic terrain</a>
+          </div>
+          <p class="road-width-policy" data-testid="road-width-policy">Widths are configured visual estimates, not measured kerbs; absent bridge/tunnel/layer tags imply only a ground-level rendering assumption. Mapped counts do not establish completeness; the candidate AOI remains selected_pending_coverage / not_checked.</p>
+          <p class="road-attribution" data-testid="road-attribution">© OpenStreetMap contributors · extract by Geofabrik GmbH · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL attribution and licence</a></p>
         </section>
         <aside id="controls-help" class="controls-help" aria-labelledby="controls-title" data-testid="controls-help" hidden>
           <h2 id="controls-title">IN-FLIGHT CONTROLS</h2>
@@ -230,6 +262,36 @@ export function createApp(container: HTMLElement): AppHandle {
   const buildingErrorMessage = container.querySelector<HTMLElement>(
     '[data-testid="building-error-message"]',
   );
+  const roadControls = container.querySelector<HTMLElement>(
+    '[data-testid="road-controls"]',
+  );
+  const roadsToggle = container.querySelector<HTMLButtonElement>(
+    '[data-testid="roads-toggle"]',
+  );
+  const roadsRetry = container.querySelector<HTMLButtonElement>(
+    '[data-testid="roads-retry"]',
+  );
+  const roadsWireframeToggle = container.querySelector<HTMLButtonElement>(
+    '[data-testid="roads-wireframe-toggle"]',
+  );
+  const roadLandmarkSelect = container.querySelector<HTMLSelectElement>(
+    '[data-testid="road-landmark-select"]',
+  );
+  const roadStatus = container.querySelector<HTMLElement>(
+    '[data-testid="road-status"]',
+  );
+  const roadError = container.querySelector<HTMLElement>(
+    '[data-testid="road-error"]',
+  );
+  const roadVintage = container.querySelector<HTMLElement>(
+    '[data-testid="road-extract-vintage"]',
+  );
+  const roadRecovery = container.querySelector<HTMLElement>(
+    '[data-testid="road-recovery"]',
+  );
+  const roadsTerrainOnly = container.querySelector<HTMLButtonElement>(
+    '[data-testid="roads-terrain-only"]',
+  );
   const fpsOutput = container.querySelector<HTMLOutputElement>(
     '[data-testid="frames-per-second"]',
   );
@@ -306,6 +368,16 @@ export function createApp(container: HTMLElement): AppHandle {
     !buildingVintage ||
     !buildingError ||
     !buildingErrorMessage ||
+    !roadControls ||
+    !roadsToggle ||
+    !roadsRetry ||
+    !roadsWireframeToggle ||
+    !roadLandmarkSelect ||
+    !roadStatus ||
+    !roadError ||
+    !roadVintage ||
+    !roadRecovery ||
+    !roadsTerrainOnly ||
     !fpsOutput ||
     !worldType ||
     !sourceMode ||
@@ -357,11 +429,19 @@ export function createApp(container: HTMLElement): AppHandle {
   let currentGridAndCompass: HeightfieldWorld['gridAndCompass'] | undefined;
   let currentTerrainGrid: TerrainGrid | undefined;
   let currentTerrainManifest: RealTerrainSceneManifest | undefined;
+  let currentTerrainManifestSha256: string | undefined;
   let currentBuildingGroup: Group | undefined;
+  let currentRoadGroup: Group | undefined;
+  let currentRoadMarker: Group | undefined;
   let buildingsRequested = initialBuildingsMode;
+  let roadsRequested = initialRoadsMode;
   let buildingLoad: AbortController | undefined;
   let buildingAttempt = 0;
   let buildingMethodSummary = '';
+  let roadLoad: AbortController | undefined;
+  let roadAttempt = 0;
+  let roadMetadataSummary = '';
+  let loadedRoadPackage: LoadedRoadPackage | undefined;
   let pointerLocked = false;
   let disposed = false;
   let hasLoadedWorld = false;
@@ -385,6 +465,7 @@ export function createApp(container: HTMLElement): AppHandle {
 
   const clearCurrentWorld = (): void => {
     clearBuildingLayer();
+    clearRoadLayer();
     controller?.dispose();
     controller = undefined;
     if (currentWorldGroup) {
@@ -398,8 +479,49 @@ export function createApp(container: HTMLElement): AppHandle {
     currentGridAndCompass = undefined;
     currentTerrainGrid = undefined;
     currentTerrainManifest = undefined;
+    currentTerrainManifestSha256 = undefined;
     buildingControls.hidden = true;
+    roadControls.hidden = true;
     hasLoadedWorld = false;
+  };
+
+  const clearRoadLayer = (): void => {
+    roadAttempt += 1;
+    roadLoad?.abort();
+    roadLoad = undefined;
+    if (currentRoadGroup) {
+      scene.remove(currentRoadGroup);
+      disposeSceneResources(currentRoadGroup);
+      currentRoadGroup = undefined;
+    }
+    currentRoadMarker = undefined;
+    loadedRoadPackage = undefined;
+    shell.dataset.roadState = 'off';
+    shell.dataset.roadWayCount = '0';
+    shell.dataset.roadPartCount = '0';
+    shell.dataset.roadVisible = 'false';
+    roadStatus.dataset.state = 'off';
+    roadStatus.dataset.wayCount = '0';
+    roadStatus.dataset.partCount = '0';
+    roadStatus.dataset.triangleCount = '0';
+    roadStatus.textContent = 'Optional local OSM road ribbons are off.';
+    roadMetadataSummary = '';
+    roadsToggle.disabled = false;
+    roadsToggle.setAttribute('aria-pressed', 'false');
+    roadsToggle.textContent = 'Load OSM road ribbons';
+    roadsRetry.hidden = true;
+    roadsWireframeToggle.disabled = true;
+    roadsWireframeToggle.setAttribute('aria-pressed', 'false');
+    roadsWireframeToggle.textContent = 'Road wireframe: off';
+    roadLandmarkSelect.replaceChildren(
+      new Option('Load road package to select a context', ''),
+    );
+    roadLandmarkSelect.disabled = true;
+    roadError.hidden = true;
+    roadRecovery.hidden = true;
+    roadError.textContent = '';
+    roadVintage.textContent = 'OSM extract vintage: not loaded.';
+    roadRecovery.hidden = true;
   };
 
   const clearBuildingLayer = (): void => {
@@ -462,6 +584,237 @@ export function createApp(container: HTMLElement): AppHandle {
       url.searchParams.delete('buildings');
     }
     window.history.pushState({}, '', url);
+  };
+
+  const setRoadRoute = (enabled: boolean): void => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('world', 'torquay-poc-001');
+    if (enabled) url.searchParams.set('roads', '1');
+    else url.searchParams.delete('roads');
+    window.history.pushState({}, '', url);
+  };
+
+  const updateRoadStatus = (
+    packageData: LoadedRoadPackage,
+    visible: boolean,
+  ): void => {
+    const counts = packageData.qa.counts;
+    roadMetadataSummary =
+      `${packageData.features.length.toLocaleString()} mapped ways · ` +
+      `${packageData.partCount.toLocaleString()} clipped line parts · ` +
+      `${counts.excluded_ground_assumption?.toLocaleString() ?? '0'} bridge/tunnel/ambiguous exclusions · ` +
+      `${packageData.countsByGroup.vehicular.toLocaleString()} streets / ` +
+      `${packageData.countsByGroup.cycleway.toLocaleString()} cycleways / ` +
+      `${packageData.countsByGroup.path.toLocaleString()} paths`;
+    roadStatus.dataset.state = visible ? 'loaded' : 'hidden';
+    roadStatus.dataset.wayCount = String(packageData.features.length);
+    roadStatus.dataset.partCount = String(packageData.partCount);
+    roadStatus.dataset.triangleCount = String(counts.renderTriangleCount ?? 0);
+    roadStatus.textContent =
+      `Local OSM road ribbons ${visible ? 'visible' : 'loaded but hidden'} · ` +
+      `${roadMetadataSummary}. Widths are estimated; mapped counts do not establish completeness.`;
+    shell.dataset.roadState = visible ? 'loaded' : 'hidden';
+    shell.dataset.roadWayCount = String(packageData.features.length);
+    shell.dataset.roadPartCount = String(packageData.partCount);
+    shell.dataset.roadVisible = String(visible);
+  };
+
+  const showRoadLandmark = (
+    packageData: LoadedRoadPackage,
+    selectedId: string,
+  ): void => {
+    if (!currentRoadGroup || !currentTerrainGrid) return;
+    if (currentRoadMarker) {
+      currentRoadGroup.remove(currentRoadMarker);
+      disposeSceneResources(currentRoadMarker);
+      currentRoadMarker = undefined;
+    }
+    const context = packageData.qa.landmarkContexts.find(
+      (candidate) => candidate.id === selectedId,
+    );
+    if (!context) return;
+    const position =
+      context.nearestRoad?.nearestPointLocalXZ ??
+      context.buildingRepresentativeLocalXZ;
+    currentRoadMarker = createRoadLandmarkMarker(
+      position,
+      context.label,
+      currentTerrainGrid,
+    );
+    currentRoadGroup.add(currentRoadMarker);
+    const target = context.nearestRoad;
+    const roadText = target
+      ? `${target.name ?? target.highway} · way/${target.wayId} · ${target.distanceFromBuildingRepresentativeM.toFixed(1)} m from the existing building representative point`
+      : 'no eligible road source way was found';
+    roadStatus.dataset.selectedContext = context.id;
+    roadStatus.dataset.selectedRoadWayId = target ? String(target.wayId) : '';
+    roadStatus.textContent = `${roadMetadataSummary}. Debug context: ${context.label}; ${roadText}. This is a placement cue, not a road junction or completeness check.`;
+  };
+
+  const startRoadLoad = async (): Promise<void> => {
+    if (
+      !currentTerrainManifest ||
+      !currentTerrainManifestSha256 ||
+      !currentTerrainGrid ||
+      !hasLoadedWorld
+    ) {
+      return;
+    }
+    if (currentRoadGroup) return;
+    roadAttempt += 1;
+    const attempt = roadAttempt;
+    roadLoad?.abort();
+    const abortController = new AbortController();
+    roadLoad = abortController;
+    roadsRequested = true;
+    shell.dataset.roadState = 'loading';
+    roadStatus.dataset.state = 'loading';
+    roadStatus.textContent =
+      'Loading and validating the local OSM road package…';
+    roadsToggle.disabled = true;
+    roadsToggle.textContent = 'Loading OSM road ribbons…';
+    roadsRetry.hidden = true;
+    roadLandmarkSelect.disabled = true;
+    roadError.hidden = true;
+    try {
+      const packageData = await loadRoadPackage(
+        REAL_ROADS_MANIFEST_URL,
+        currentTerrainManifest,
+        currentTerrainManifestSha256,
+        undefined,
+        abortController.signal,
+      );
+      if (
+        disposed ||
+        attempt !== roadAttempt ||
+        abortController.signal.aborted ||
+        !currentTerrainGrid
+      ) {
+        return;
+      }
+      const group = createRoads(packageData, currentTerrainGrid);
+      if (
+        disposed ||
+        attempt !== roadAttempt ||
+        abortController.signal.aborted
+      ) {
+        disposeSceneResources(group);
+        return;
+      }
+      currentRoadGroup = group;
+      loadedRoadPackage = packageData;
+      scene.add(group);
+      roadVintage.textContent =
+        `OSM extract vintage: ${packageData.manifest.source.extractTimestamp} ` +
+        `(replication sequence ${packageData.manifest.source.replicationSequence}).`;
+      roadLandmarkSelect.replaceChildren(
+        ...packageData.qa.landmarkContexts.map((context) => {
+          const road = context.nearestRoad;
+          const label = road
+            ? `${context.label} — ${road.name ?? road.highway} way/${road.wayId}`
+            : `${context.label} — no extracted road`;
+          return new Option(label, context.id);
+        }),
+      );
+      roadLandmarkSelect.disabled = false;
+      updateRoadStatus(packageData, true);
+      showRoadLandmark(
+        packageData,
+        packageData.qa.landmarkContexts[0]?.id ?? '',
+      );
+      roadsToggle.disabled = false;
+      roadsToggle.setAttribute('aria-pressed', 'true');
+      roadsToggle.textContent = 'Hide OSM road ribbons';
+      roadsWireframeToggle.disabled = false;
+      roadsRetry.hidden = true;
+      roadError.hidden = true;
+      status.textContent =
+        'EA terrain and local OSM road ribbons are ready. Widths are estimated; AOI completeness remains unchecked.';
+    } catch (error) {
+      if (
+        disposed ||
+        attempt !== roadAttempt ||
+        abortController.signal.aborted
+      ) {
+        return;
+      }
+      const detail = error instanceof Error ? error.message : String(error);
+      roadError.textContent = `${detail} From the pipeline folder run .\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-roads. Terrain and any loaded buildings remain available.`;
+      roadError.hidden = false;
+      roadStatus.dataset.state = 'error';
+      roadStatus.textContent =
+        'Road package failed to load; the terrain remains usable.';
+      shell.dataset.roadState = 'error';
+      roadsToggle.disabled = false;
+      roadsToggle.setAttribute('aria-pressed', 'false');
+      roadsToggle.textContent = 'Load OSM road ribbons';
+      roadsRetry.hidden = false;
+      roadRecovery.hidden = false;
+      roadsWireframeToggle.disabled = true;
+      roadLandmarkSelect.disabled = true;
+      status.textContent =
+        'Road package unavailable. Retry or continue without road ribbons.';
+    }
+  };
+
+  const toggleRoads = (): void => {
+    if (currentRoadGroup) {
+      const visible = !currentRoadGroup.visible;
+      currentRoadGroup.visible = visible;
+      roadsRequested = visible;
+      setRoadRoute(visible);
+      roadsToggle.setAttribute('aria-pressed', String(visible));
+      roadsToggle.textContent = visible
+        ? 'Hide OSM road ribbons'
+        : 'Show OSM road ribbons';
+      roadsWireframeToggle.disabled = !visible;
+      updateRoadStatusFromPackage(visible);
+      return;
+    }
+    roadsRequested = true;
+    setRoadRoute(true);
+    void startRoadLoad();
+  };
+
+  const updateRoadStatusFromPackage = (visible: boolean): void => {
+    const counts = roadStatus.dataset;
+    const wayCount = Number(counts.wayCount ?? 0);
+    const partCount = Number(counts.partCount ?? 0);
+    const triangleCount = Number(counts.triangleCount ?? 0);
+    roadStatus.dataset.state = visible ? 'loaded' : 'hidden';
+    roadStatus.textContent =
+      `Local OSM road ribbons ${visible ? 'visible' : 'loaded but hidden'} · ` +
+      `${wayCount.toLocaleString()} mapped ways · ${partCount.toLocaleString()} clipped line parts · ` +
+      `${triangleCount.toLocaleString()} surface triangles · ${roadMetadataSummary}. Widths are estimated; mapped counts do not establish completeness.`;
+    shell.dataset.roadState = visible ? 'loaded' : 'hidden';
+    shell.dataset.roadVisible = String(visible);
+  };
+
+  const toggleRoadWireframe = (): void => {
+    if (!currentRoadGroup) return;
+    const next = !currentRoadGroup.children.some(
+      (child) =>
+        child instanceof Mesh &&
+        child.material instanceof MeshStandardMaterial &&
+        child.material.wireframe,
+    );
+    currentRoadGroup.traverse((child) => {
+      if (
+        child instanceof Mesh &&
+        child.material instanceof MeshStandardMaterial
+      ) {
+        child.material.wireframe = next;
+        child.material.needsUpdate = true;
+      }
+    });
+    roadsWireframeToggle.setAttribute('aria-pressed', String(next));
+    roadsWireframeToggle.textContent = `Road wireframe: ${next ? 'on' : 'off'}`;
+  };
+
+  const selectRoadLandmark = (): void => {
+    if (loadedRoadPackage) {
+      showRoadLandmark(loadedRoadPackage, roadLandmarkSelect.value);
+    }
   };
 
   const startBuildingLoad = async (): Promise<void> => {
@@ -665,7 +1018,9 @@ export function createApp(container: HTMLElement): AppHandle {
     currentGridAndCompass = world.gridAndCompass;
     currentTerrainGrid = world.terrainGrid;
     currentTerrainManifest = world.realManifest;
+    currentTerrainManifestSha256 = world.realManifestSha256;
     buildingControls.hidden = !world.isReal;
+    roadControls.hidden = !world.isReal;
     shell.dataset.buildingVisible = 'false';
     shell.dataset.buildingState = 'off';
     if (world.isReal) {
@@ -744,6 +1099,9 @@ export function createApp(container: HTMLElement): AppHandle {
     if (world.isReal && buildingsRequested) {
       void startBuildingLoad();
     }
+    if (world.isReal && roadsRequested) {
+      void startRoadLoad();
+    }
   };
 
   const showLoadError = (error: unknown): void => {
@@ -807,8 +1165,18 @@ export function createApp(container: HTMLElement): AppHandle {
         );
       }
       let world: HeightfieldWorld;
+      let realManifestFields: Pick<
+        ViewerWorld,
+        'realManifest' | 'realManifestSha256'
+      > = {};
       try {
         world = createHeightfieldWorld(loaded);
+        if ('manifestSha256' in loaded) {
+          realManifestFields = {
+            realManifest: loaded.manifest,
+            realManifestSha256: loaded.manifestSha256,
+          };
+        }
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
         throw new Error(`terrain geometry: ${detail}`, { cause: error });
@@ -842,9 +1210,7 @@ export function createApp(container: HTMLElement): AppHandle {
         terrain: world.terrain,
         gridAndCompass: world.gridAndCompass,
         terrainGrid: world.grid,
-        ...(loaded.manifest.worldType === 'real'
-          ? { realManifest: loaded.manifest }
-          : {}),
+        ...realManifestFields,
       });
     } catch (error) {
       if (
@@ -884,6 +1250,7 @@ export function createApp(container: HTMLElement): AppHandle {
   const updateBrowserRoute = (mode: 'synthetic' | 'real' | 'm0'): void => {
     const url = new URL(window.location.href);
     url.searchParams.delete('buildings');
+    url.searchParams.delete('roads');
     if (mode === 'm0') {
       url.searchParams.set('world', 'm0');
     } else if (mode === 'real') {
@@ -898,6 +1265,7 @@ export function createApp(container: HTMLElement): AppHandle {
     updateRoute = true,
   ): void => {
     buildingsRequested = false;
+    roadsRequested = false;
     if (updateRoute) updateBrowserRoute(mode);
     if (mode === 'm0') {
       selectedWorldMode = 'synthetic';
@@ -926,6 +1294,18 @@ export function createApp(container: HTMLElement): AppHandle {
     setBuildingRoute(true);
     void startBuildingLoad();
   };
+  const retryRoadLoad = (): void => {
+    roadsRequested = true;
+    setRoadRoute(true);
+    void startRoadLoad();
+  };
+  const continueWithoutRoads = (): void => {
+    roadsRequested = false;
+    setRoadRoute(false);
+    clearRoadLayer();
+    status.textContent =
+      'EA terrain is ready without the optional OSM road layer.';
+  };
   const handleViewerShortcut = (event: KeyboardEvent): void => {
     if (event.code === 'KeyH' && !event.repeat) {
       event.preventDefault();
@@ -949,6 +1329,11 @@ export function createApp(container: HTMLElement): AppHandle {
   gridToggle.addEventListener('click', toggleGridFromButton);
   wireframeToggle.addEventListener('click', toggleWireframeFromButton);
   buildingsToggle.addEventListener('click', toggleBuildings);
+  roadsToggle.addEventListener('click', toggleRoads);
+  roadsRetry.addEventListener('click', retryRoadLoad);
+  roadsTerrainOnly.addEventListener('click', continueWithoutRoads);
+  roadsWireframeToggle.addEventListener('click', toggleRoadWireframe);
+  roadLandmarkSelect.addEventListener('change', selectRoadLandmark);
   buildingsRetry.addEventListener('click', retryBuildingLoad);
   buildingsTerrainOnly.addEventListener('click', continueTerrainOnly);
   const retryWorldLoad = (): void => void startWorldLoad(selectedWorldMode);
@@ -960,6 +1345,8 @@ export function createApp(container: HTMLElement): AppHandle {
     const routeWorld = route.get('world');
     buildingsRequested =
       routeWorld === 'torquay-poc-001' && route.get('buildings') === '1';
+    roadsRequested =
+      routeWorld === 'torquay-poc-001' && route.get('roads') === '1';
     if (routeWorld === 'm0') {
       selectedWorldMode = 'synthetic';
       startM0World();
@@ -1107,6 +1494,8 @@ export function createApp(container: HTMLElement): AppHandle {
       activeLoad?.abort();
       buildingAttempt += 1;
       buildingLoad?.abort();
+      roadAttempt += 1;
+      roadLoad?.abort();
       controller?.dispose();
       renderer.setAnimationLoop(null);
       timer.dispose();
@@ -1123,6 +1512,11 @@ export function createApp(container: HTMLElement): AppHandle {
       gridToggle.removeEventListener('click', toggleGridFromButton);
       wireframeToggle.removeEventListener('click', toggleWireframeFromButton);
       buildingsToggle.removeEventListener('click', toggleBuildings);
+      roadsToggle.removeEventListener('click', toggleRoads);
+      roadsRetry.removeEventListener('click', retryRoadLoad);
+      roadsTerrainOnly.removeEventListener('click', continueWithoutRoads);
+      roadsWireframeToggle.removeEventListener('click', toggleRoadWireframe);
+      roadLandmarkSelect.removeEventListener('change', selectRoadLandmark);
       buildingsRetry.removeEventListener('click', retryBuildingLoad);
       buildingsTerrainOnly.removeEventListener('click', continueTerrainOnly);
       retryButton.removeEventListener('click', retryWorldLoad);

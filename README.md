@@ -2,7 +2,7 @@
 
 A Windows-friendly browser proof of concept for a future real-data view of Torquay. The default viewer loads a checked-in synthetic Float32 heightfield and renders its terrain mesh, hill, ridge, grid and north cue. The prior M0 analytic scene remains available at `/?world=m0`. The **EA terrain** selector loads a locally generated 2 m Float32 heightfield from the verified Environment Agency DTM tiles when that ignored package exists in `public/worlds/torquay-poc-001/`. A separate explicit route can add the locally published OSM building layer to that terrain.
 
-The synthetic heightfield, hill, ridge, analytic slope, blocks and their measurements are fictional; they are not Torquay measurements. The real terrain mode uses the actual Environment Agency DTM source tiles and displays their source attribution and Ordnance Survey Newlyn vertical reference. Its heights are stored relative to a deterministic center origin. The HUD links to the publisher catalogue and Open Government Licence v3.0. EA raster coverage and resampling passed for the candidate square. The optional OSM layer displays the separately generated local building-footprint package with contributor credit and an ODbL link. The overall AOI remains `selected_pending_coverage` / `not_checked`: mapped building counts do not establish completeness, and road/OS feature checks remain outstanding. No real roads are loaded.
+The synthetic heightfield, hill, ridge, analytic slope, blocks and their measurements are fictional; they are not Torquay measurements. The real terrain mode uses the actual Environment Agency DTM source tiles and displays their source attribution and Ordnance Survey Newlyn vertical reference. Its heights are stored relative to a deterministic center origin. The HUD links to the publisher catalogue and Open Government Licence v3.0. EA raster coverage and resampling passed for the candidate square. Optional OSM building and road layers load from separately generated local packages with contributor credit and an ODbL link. The overall AOI remains `selected_pending_coverage` / `not_checked`: mapped counts do not establish completeness, and OS feature checks plus TVW-012's independent road comparison/report remain outstanding.
 
 ## Requirements
 
@@ -131,7 +131,25 @@ After restoring the exact source PBF and local EA terrain package and running th
 
 The renderer preserves the package's local XZ positions and shows polygon roofs and terrain-following exterior/courtyard walls. A feature's flat roof is set to the maximum terrain sample under all its components, excluding hole interiors, plus its validated tagged or estimated height. This is a visual placement convention, not a measured roof or foundation height; wall bases are lowered by 0.02 m to avoid seams. The HUD reports the actual feature/component and height-method counts, credits © OpenStreetMap contributors and Geofabrik GmbH, links the ODbL, and states that heights are estimates or tagged-but-unverified. If the optional package is absent or invalid, terrain remains usable and the UI gives retry, terrain-only and synthetic recovery actions.
 
-Mapped building counts do not establish completeness. Road and remaining feature checks remain outstanding; the AOI stays `selected_pending_coverage` / `not_checked` and M2 remains incomplete. See [TVW-010 handback](docs/milestones/TVW-010.md) for implementation evidence and limitations.
+Mapped building counts do not establish completeness. The AOI stays `selected_pending_coverage` / `not_checked` and M2 remains incomplete. See [TVW-010 handback](docs/milestones/TVW-010.md) for implementation evidence and limitations.
+
+### TVW-011 optional browser road ribbons
+
+TVW-011 reuses the dated, locally recorded Geofabrik Devon OSM PBF and creates a separate ignored road package; it does not request data at runtime. From the `pipeline` folder, run the commands below to rebuild and check the package. `publish-roads` validates the source and writes byte-identical files under ignored `public/worlds/torquay-poc-001/roads/`.
+
+```powershell
+Push-Location pipeline
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-road-source
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli import-roads
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-roads
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli preview-roads
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-roads
+Pop-Location
+```
+
+Roads are opt-in at `/?world=torquay-poc-001&roads=1`; combined layers use `/?world=torquay-poc-001&buildings=1&roads=1`. The default synthetic world, `/?world=m0`, terrain-only route and buildings route remain available. The browser uses an exact local terrain grid and same-origin package files only. The extractor excludes bridge/tunnel/ambiguous vertical cases and records them as QA exclusions. Ribbon widths are configurable visual estimates, not measured road widths. TVW-011's dated run mapped 198 ways (171 vehicular streets and 27 paths) across 198 clipped centerline parts; this is not a completeness measure. Those ways form 200 separate clipped ribbon components. The UI reports OSM extract vintage, estimated-width policy and `© OpenStreetMap contributors` / Geofabrik attribution with an ODbL link. A missing or invalid roads package leaves terrain usable and provides retry/terrain-only/synthetic recovery.
+
+The optional road package and source-derived outputs are ignored by Git. Share builds preserve tracked synthetic assets and exclude the whole real terrain parent, including buildings and roads. See [TVW-011 handback](docs/milestones/TVW-011.md), [road data provenance](docs/data-sources.md#osm-highway-roads-tvw-011), and [the road package contract](docs/asset-contract.md#optional-osm-road-package-tvw-011).
 
 Playwright's install command downloads a local Chromium build and requires internet access. After installation, the browser tests use local files. The persistent Chromium suite covers both the retained M0 viewer and loaded terrain, pointer lock and movement, terrain grid and wireframe controls, optional building publication/load/render/toggle and recovery, ground-height telemetry, resize, Escape release, and held-key cleanup. Vitest covers movement, manifest validation, binary decoding/loading, terrain grid/sampling, and Three.js mesh geometry.
 
@@ -148,6 +166,7 @@ Playwright's install command downloads a local Chromium build and requires inter
 - `docs/milestones/TVW-008.md` records the resampling/export QA, local viewer behavior and browser evidence.
 - `docs/milestones/TVW-009.md` records the dated OSM source, local building-footprint QA, placement checks and implementation handback.
 - `docs/milestones/TVW-010.md` records optional building rendering, local package publication and browser evidence.
+- `docs/milestones/TVW-011.md` records the local OSM highway pipeline, terrain-draped ribbons, QA and browser evidence.
 - `docs/data-sources.md` documents publisher provenance, local source-file restoration and the current inspection result.
 - `docs/building-asset-contract.md` documents the local OSM footprint package, coordinates, height provenance and QA meaning.
 - `data/source-manifest.json` records actual source URLs, archive checksums, raster metadata, licence and attribution.

@@ -35,6 +35,7 @@ export interface LoadedSyntheticWorld {
 export interface LoadedRealWorld {
   manifest: RealTerrainSceneManifest;
   heights: Float32Array;
+  manifestSha256: string;
 }
 
 export type LoadedWorld = LoadedSyntheticWorld | LoadedRealWorld;
@@ -148,13 +149,24 @@ export async function loadWorld(
     signal,
   );
 
-  let unknownManifest: unknown;
+  let manifestBytes: ArrayBuffer;
   try {
-    unknownManifest = await manifestResponse.json();
+    manifestBytes = await manifestResponse.arrayBuffer();
   } catch (error) {
     throw new WorldLoadError(
       'manifest response',
-      `response was not valid JSON: ${messageFrom(error)}`,
+      `could not read response bytes: ${messageFrom(error)}`,
+    );
+  }
+  let unknownManifest: unknown;
+  try {
+    unknownManifest = JSON.parse(
+      new TextDecoder('utf-8', { fatal: true }).decode(manifestBytes),
+    ) as unknown;
+  } catch (error) {
+    throw new WorldLoadError(
+      'manifest response',
+      `response was not valid UTF-8 JSON: ${messageFrom(error)}`,
     );
   }
 
@@ -215,9 +227,11 @@ export async function loadWorld(
     throw new WorldLoadError('heightfield decode', messageFrom(error));
   }
 
-  return validation.manifest.worldType === 'synthetic'
-    ? { manifest: validation.manifest, heights }
-    : { manifest: validation.manifest, heights };
+  if (validation.manifest.worldType === 'synthetic') {
+    return { manifest: validation.manifest, heights };
+  }
+  const manifestSha256 = await sha256Hex(manifestBytes);
+  return { manifest: validation.manifest, heights, manifestSha256 };
 }
 
 /** Preserve the typed synthetic-only loader used by the M0/M1 fixtures and tests. */

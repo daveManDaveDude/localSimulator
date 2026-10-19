@@ -179,7 +179,7 @@ describe('loadSyntheticWorld', () => {
     const jsonFailure = createFetcher({ manifestBody: '{invalid json' });
     await expect(
       loadSyntheticWorld(manifestUrl, jsonFailure.fetcher),
-    ).rejects.toThrow('manifest response: response was not valid JSON');
+    ).rejects.toThrow('manifest response: response was not valid UTF-8 JSON');
   });
 
   it('reports binary HTTP and network failures with their stage', async () => {
