@@ -377,11 +377,20 @@ async function configureMode(page, workload) {
   if (workload.id === 'synthetic-m0') {
     // The analytic demo has no external assets but supports the same controls.
   }
-  await page.getByRole('button', { name: 'Start exploring' }).click();
+  const startButton = page.getByRole('button', { name: 'Start exploring' });
+  const startButtonBounds = await startButton.boundingBox();
+  await startButton.click();
   await page.waitForFunction(
     () => document.pointerLockElement === document.querySelector('canvas'),
     undefined,
     { timeout: 10_000 },
+  );
+  await page.waitForFunction(
+    () =>
+      getComputedStyle(document.querySelector('.start-card')).visibility ===
+      'hidden',
+    undefined,
+    { timeout: 5_000 },
   );
   if (workload.mode === 'walk') {
     await page.keyboard.press('f');
@@ -393,6 +402,13 @@ async function configureMode(page, workload) {
       undefined,
       { timeout: 20_000 },
     );
+    if (startButtonBounds) {
+      const lockedPointerX = startButtonBounds.x + startButtonBounds.width / 2;
+      const lockedPointerY = startButtonBounds.y + startButtonBounds.height / 2;
+      await page.mouse.move(lockedPointerX, lockedPointerY - 230, {
+        steps: 10,
+      });
+    }
   }
 }
 
@@ -621,8 +637,8 @@ async function runWorkload(browser, baseUrl, workload, options) {
   await waitForWorkload(page, workload);
   const warmLoadMs = await loadTimeAfterLayers(page);
   const warmNetworkResponses = [...networkResponses.warmContextReload];
-  await page.waitForTimeout(warmupMs);
   await configureMode(page, workload);
+  await page.waitForTimeout(warmupMs);
   const browserMetadata = await readBrowserMetadata(page, browser);
   const assetInventory = await workloadAssets(workload);
   const sceneMetrics = await readSceneMetrics(page);
@@ -862,7 +878,7 @@ async function main() {
           mode,
         })),
         posePolicy:
-          'Route-defined deterministic spawn; no test-only camera hook or injected navigation mutation was used.',
+          'Route-defined deterministic spawn; walk mode uses a 230 CSS-pixel upward pointer-look adjustment after pointer lock. No test-only camera hook or injected navigation mutation is used.',
         sampleDefinition:
           'Inter-requestAnimationFrame intervals measured with performance.now() in a visible, focused local Chromium page.',
         fpsDefinition:
