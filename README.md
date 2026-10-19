@@ -53,13 +53,13 @@ The generator writes the original 3 × 3 loader fixture plus a separate 25 × 19
 
 ## TVW-012 independent road placement comparison
 
-The completed TVW-012 report compares three registered road junctions against the April 2026 OS OpenMap–Local raster and the actual local 3D scene. It records qualitative PASS at Second Avenue / Main Avenue, Pencorse Road / Audley Avenue, and Teignmouth Road / Snowberry Close; the earlier St Vincent’s Road / Chapel Court candidate remains separately preserved as inconclusive. No numeric offset was measured. The combined M5 gate remains pending, and this result does not establish AOI completeness or approval. See [the report and screenshots](docs/milestones/TVW-012.md) and the exact source/member hashes in [the comparison source manifest](data/comparison-source-manifest.json).
+The completed TVW-012 report compares three registered road junctions against the April 2026 OS OpenMap–Local raster and the actual local 3D scene. It records qualitative PASS at Second Avenue / Main Avenue, Pencorse Road / Audley Avenue, and Teignmouth Road / Snowberry Close; the earlier St Vincent’s Road / Chapel Court candidate remains separately preserved as inconclusive. No numeric offset was measured. The combined M5 gate was accepted after independent review. This completes the road import/rendering and three-spot placement work, but it does not establish AOI completeness or approval. See [the report and screenshots](docs/milestones/TVW-012.md) and the exact source/member hashes in [the comparison source manifest](data/comparison-source-manifest.json).
 
 The raw OS comparison archive is not tracked. Its public portal selection was the 349,405,146-byte April 2026 SX GeoTIFF package (SHA-256 `d9a01900c4dd5c26af50d6aed79f419a1957acf4167aedef97bb905ffcdff853`); only the verified `SX96NW.tif` and `SX96SW.tif` members are used. To restore it on a clean clone, create `data/raw/comparison/os_openmap_local/`, download the recorded `openmaplocal-2026-04-sx-geotiff.zip` from the URL in the manifest, then run `inspect-comparison-source`, `compare-alignment` and `validate-alignment-report` from `pipeline`. OS attribution is `Contains Ordnance Survey data © Crown copyright and database right 2026`; the product is under [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
 
 ## AOI and EA DTM inspection
 
-The Python pipeline is separate from the browser and uses no online transformation-grid downloads. The 2026-10-17 user-approved revision derives a 1,000 m × 1,000 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. It keeps the previously verified WGS84 and BNG centre unchanged. The anchor is a postcode centroid, not a property or survey point. The candidate remains `selected_pending_coverage`; OSM building footprints have been imported and QA-checked, but their mapped count does not prove completeness. OS building and OSM/OS road checks remain outstanding, so the AOI is not frozen.
+The Python pipeline is separate from the browser and uses no online transformation-grid downloads. The 2026-10-17 user-approved revision derives a 1,000 m × 1,000 m EPSG:27700 candidate from the configured TQ1 4HN WGS84 postcode centroid using pyproj with explicit longitude/latitude axis order. It keeps the previously verified WGS84 and BNG centre unchanged. The anchor is a postcode centroid, not a property or survey point. The candidate remains `selected_pending_coverage`; OSM building footprints and roads have been imported and QA-checked, and three road placement comparisons are complete. Their mapped counts and local placement checks do not prove complete feature coverage. OS building checks and broader OSM/OS feature-coverage checks remain outstanding, so the AOI is not frozen.
 
 Create the isolated Python environment in PowerShell:
 
@@ -95,7 +95,7 @@ Push-Location pipeline
 Pop-Location
 ```
 
-`inspect-sources` verifies archive and raster hashes/metadata, then samples the source pixel containing each AOI-aligned 1 m cell center. It does not interpolate or fill missing cells. The measured report is `docs/milestones/artifacts/TVW-007-coverage.json`; its result is 1,000,000 valid cells out of 1,000,000, no uncovered, masked, NoData or nonfinite cells, and an EA DTM-only pass against the 1% threshold. The sample range is 29.529–98.171 m; the configured center sample is 47.620 m. At the TVW-007 handback, `coverage_status` remained `not_checked` pending later feature checks; TVW-009 now adds OSM building-footprint measurements, while road and remaining feature checks are still outstanding.
+`inspect-sources` verifies archive and raster hashes/metadata, then samples the source pixel containing each AOI-aligned 1 m cell center. It does not interpolate or fill missing cells. The measured report is `docs/milestones/artifacts/TVW-007-coverage.json`; its result is 1,000,000 valid cells out of 1,000,000, no uncovered, masked, NoData or nonfinite cells, and an EA DTM-only pass against the 1% threshold. The sample range is 29.529–98.171 m; the configured center sample is 47.620 m. At the TVW-007 handback, `coverage_status` remained `not_checked` pending later feature checks. TVW-009 added OSM building-footprint measurements, TVW-011 completed road import and rendering, and TVW-012 completed three qualitative road placement comparisons. Broader OSM/OS feature-coverage checks remain outstanding.
 
 `preview-terrain` writes an actual north-up PNG from those measured samples at `docs/milestones/screenshots/TVW-007-ea-dtm-preview.png`. It shows the exact AOI border, BNG metre axes, 250 m scale bar, centre sample, measured elevation colorbar and Environment Agency attribution. This raster preview is a separate Python QA artifact; TVW-008 adds a locally generated browser heightfield without changing the synthetic default.
 
@@ -111,7 +111,7 @@ Pop-Location
 
 The builder verifies the source archive, TIFF and XML hashes, rechecks EA DTM coverage, bilinearly samples the 1 m area-pixel centers onto the exact 501 × 501, 2 m AOI vertex grid, and writes a center-relative little-endian Float32 field. It refuses missing positive-weight contributors, does not fill or extrapolate, and publishes the manifest last. QA and the actual-data north-up PNG are written to `docs/milestones/artifacts/TVW-008-qa.json` and `docs/milestones/screenshots/TVW-008-terrain-preview.png`.
 
-The generated browser package at `public/worlds/torquay-poc-001/` is intentionally ignored by Git because it is derived from locally restored publisher data. On a clean clone the default synthetic viewer continues to work; the EA selector explains how to restore sources and rebuild the package. To open the real mode directly after building it, use `http://localhost:5173/?world=torquay-poc-001`. To return to the retained analytic demo, use `/?world=m0`. The real mode stays local to the Vite app and adds no network service. The EA cell-level result does not approve the broader candidate AOI; `coverage_status` remains `not_checked` pending road and remaining feature checks, and M2 remains incomplete.
+The generated browser package at `public/worlds/torquay-poc-001/` is intentionally ignored by Git because it is derived from locally restored publisher data. On a clean clone the default synthetic viewer continues to work; the EA selector explains how to restore sources and rebuild the package. To open the real mode directly after building it, use `http://localhost:5173/?world=torquay-poc-001`. To return to the retained analytic demo, use `/?world=m0`. The real mode stays local to the Vite app and adds no network service. The EA cell-level result does not approve the broader candidate AOI; `coverage_status` remains `not_checked` pending broader OSM/OS feature-coverage checks and AOI review. Road import/rendering and three qualitative placement comparisons are complete; M2 remains incomplete.
 
 ### TVW-009 OSM building footprint import and QA
 
@@ -137,7 +137,7 @@ After restoring the exact source PBF and local EA terrain package and running th
 
 The renderer preserves the package's local XZ positions and shows polygon roofs and terrain-following exterior/courtyard walls. A feature's flat roof is set to the maximum terrain sample under all its components, excluding hole interiors, plus its validated tagged or estimated height. This is a visual placement convention, not a measured roof or foundation height; wall bases are lowered by 0.02 m to avoid seams. The HUD reports the actual feature/component and height-method counts, credits © OpenStreetMap contributors and Geofabrik GmbH, links the ODbL, and states that heights are estimates or tagged-but-unverified. If the optional package is absent or invalid, terrain remains usable and the UI gives retry, terrain-only and synthetic recovery actions.
 
-Mapped building counts do not establish completeness. The AOI stays `selected_pending_coverage` / `not_checked` and M2 remains incomplete. See [TVW-010 handback](docs/milestones/TVW-010.md) for implementation evidence and limitations.
+Mapped building and road counts do not establish completeness. The AOI stays `selected_pending_coverage` / `not_checked` and M2 remains incomplete. See [TVW-010 handback](docs/milestones/TVW-010.md) for implementation evidence and limitations.
 
 ### TVW-011 optional browser road ribbons
 
@@ -167,23 +167,23 @@ To regenerate the existing local real-data packages, restore only the exact igno
 
 ```powershell
 Push-Location pipeline
-\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-sources
-\.venv\Scripts\python.exe -m torquay_pipeline.cli build-terrain
-\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-building-source
-\.venv\Scripts\python.exe -m torquay_pipeline.cli import-buildings
-\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-buildings
-\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-buildings
-\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-road-source
-\.venv\Scripts\python.exe -m torquay_pipeline.cli import-roads
-\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-roads
-\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-roads
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-sources
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli build-terrain
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-building-source
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli import-buildings
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-buildings
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-buildings
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli inspect-road-source
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli import-roads
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-roads
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-roads
 Pop-Location
 npm ci
 npm run build
 npm run test:e2e:tvw014:real
 ```
 
-The six benchmark workloads cover synthetic M0, EA terrain, terrain plus either optional layer, and the combined scene in fly and walk modes. The command `npm run benchmark` starts its own production preview on a newly allocated local port and refuses to attach to a pre-existing server. It writes raw frame intervals and a summary to `docs/milestones/artifacts/TVW-014-benchmark.{json,md}` and actual-browser captures to `docs/milestones/screenshots/TVW-014-*.png`. It uses a 1920 × 1080 CSS viewport at DPR 1 when the browser permits, a 3-second warm-up, and three 10-second runs per workload. The report records fresh-context and warm-context load time plus Chromium's observed disk/service-worker/prefetch cache-hit counts, frame interval mean/median/p95/p99/maximum, draw calls, triangles, geometry/texture object counts, package manifest/payload/QA bytes, browser/OS/renderer, and sampled JS heap where Chromium exposes it. Renderer memory geometry/texture values are object counts, not byte counts; JS heap is not total process or GPU memory; FPS is not GPU execution time. Measurements describe only the recorded machine and renderer and have no pass/fail threshold.
+The six benchmark workloads cover synthetic M0, EA terrain, terrain plus either optional layer, and the combined scene in fly and walk modes. The command `npm run benchmark` starts its own production preview on a newly allocated local port and refuses to attach to a pre-existing server. It writes raw frame intervals and a summary to `docs/milestones/artifacts/TVW-014-benchmark.{json,md}` and actual-browser captures to `docs/milestones/screenshots/TVW-014-*.png`. It uses a 1920 × 1080 CSS viewport at DPR 1 when the browser permits, a 3-second warm-up, and three 10-second runs per workload. The report records fresh-context and warm-context load time plus Chromium's observed disk/service-worker/prefetch cache-hit counts, frame interval mean/median/p95/p99/maximum, draw calls, triangles, geometry/texture object counts, package manifest/payload/QA bytes, browser/OS/renderer, and sampled JS heap where Chromium exposes it. Renderer memory geometry/texture values are object counts, not byte counts; JS heap is not total process or GPU memory; FPS is not GPU execution time. Measurements describe only the recorded machine and renderer and have no pass/fail threshold. The benchmark samples focus and visibility on every animation frame and records blur/focus events; any transient loss invalidates the affected run.
 
 The viewer credits the Environment Agency and links its catalogue and Open Government Licence v3.0 for the EA terrain. OSM layers credit © OpenStreetMap contributors, name Geofabrik GmbH as the extract provider, and link the ODbL. The OS OpenMap–Local raster appears only as a separate comparison source in [TVW-012](docs/milestones/TVW-012.md), not as rendered terrain, buildings, or roads. The exact source, product, vintage, attribution, and package identities are documented in the source manifest and the [TVW-014 handback](docs/milestones/TVW-014.md). The 1,000 m candidate remains `selected_pending_coverage` / `not_checked`; EA raster coverage, mapped feature counts, and three qualitative alignment observations do not prove complete feature coverage or approve/freeze the AOI.
 
@@ -211,4 +211,4 @@ The viewer credits the Environment Agency and links its catalogue and Open Gover
 - `config/aoi.torquay.json` is the editable candidate anchor and size; generated bounds and provenance are in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 - `docs/asset-contract.md` describes synthetic and real manifest provenance, coordinates, triangulation and sampling semantics.
 
-The original plan remains preserved unchanged at `docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md`; the canonical copy records the verified anchor and user-approved 1,000 m pending candidate square. EA DTM cell coverage has been measured and passes its 1% threshold. OSM building-footprint counts and placement QA are available; road and remaining feature checks remain M2 work, so the candidate remains pending and is not coverage-approved or frozen.
+The original plan remains preserved unchanged at `docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md`; the canonical copy records the verified anchor and user-approved 1,000 m pending candidate square. EA DTM cell coverage has been measured and passes its 1% threshold. OSM building-footprint counts and placement QA are available; broader OSM/OS feature-coverage checks remain M2 work, so the candidate remains pending and is not coverage-approved or frozen.

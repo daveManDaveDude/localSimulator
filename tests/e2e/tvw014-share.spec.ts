@@ -35,14 +35,25 @@ test('share production build starts synthetic and supports flight controls', asy
     .locator('canvas.viewer-canvas')
     .evaluate((element) => {
       const canvas = element as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
       return {
         width: canvas.width,
         height: canvas.height,
-        rect: canvas.getBoundingClientRect().toJSON(),
+        rect: rect.toJSON(),
+        devicePixelRatio: window.devicePixelRatio,
+        expectedWidth: Math.round(rect.width * pixelRatio),
+        expectedHeight: Math.round(rect.height * pixelRatio),
       };
     });
   expect(canvasBefore.width).toBeGreaterThan(0);
   expect(canvasBefore.height).toBeGreaterThan(0);
+  expect(
+    Math.abs(canvasBefore.width - canvasBefore.expectedWidth),
+  ).toBeLessThanOrEqual(1);
+  expect(
+    Math.abs(canvasBefore.height - canvasBefore.expectedHeight),
+  ).toBeLessThanOrEqual(1);
   await page.screenshot({
     path: testInfo.outputPath('share-synthetic-startup.png'),
     fullPage: true,
@@ -109,13 +120,45 @@ test('share production build starts synthetic and supports flight controls', asy
   await page.setViewportSize({ width: 1280, height: 760 });
   await expect
     .poll(() =>
-      page.locator('canvas.viewer-canvas').evaluate((element) => {
-        const canvas = element as HTMLCanvasElement;
-        const rect = canvas.getBoundingClientRect();
-        return canvas.width >= rect.width && canvas.height >= rect.height;
-      }),
+      page.locator('canvas.viewer-canvas').evaluate(
+        (element, original) => {
+          const canvas = element as HTMLCanvasElement;
+          const rect = canvas.getBoundingClientRect();
+          const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+          const expectedWidth = Math.round(rect.width * pixelRatio);
+          const expectedHeight = Math.round(rect.height * pixelRatio);
+          return (
+            canvas.width !== original.width &&
+            canvas.height !== original.height &&
+            Math.abs(canvas.width - expectedWidth) <= 1 &&
+            Math.abs(canvas.height - expectedHeight) <= 1
+          );
+        },
+        { width: canvasBefore.width, height: canvasBefore.height },
+      ),
     )
     .toBe(true);
+  const canvasAfter = await page
+    .locator('canvas.viewer-canvas')
+    .evaluate((element) => {
+      const canvas = element as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      return {
+        width: canvas.width,
+        height: canvas.height,
+        expectedWidth: Math.round(rect.width * pixelRatio),
+        expectedHeight: Math.round(rect.height * pixelRatio),
+      };
+    });
+  expect(canvasAfter.width).not.toBe(canvasBefore.width);
+  expect(canvasAfter.height).not.toBe(canvasBefore.height);
+  expect(
+    Math.abs(canvasAfter.width - canvasAfter.expectedWidth),
+  ).toBeLessThanOrEqual(1);
+  expect(
+    Math.abs(canvasAfter.height - canvasAfter.expectedHeight),
+  ).toBeLessThanOrEqual(1);
   expect(pageErrors).toEqual([]);
   expect(consoleErrors).toEqual([]);
 });

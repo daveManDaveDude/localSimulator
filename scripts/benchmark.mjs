@@ -6,6 +6,7 @@ import os from 'node:os';
 import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
+import { createFocusMonitor } from './benchmarkFocus.mjs';
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const defaultOutputDirectory = resolve(
@@ -510,36 +511,35 @@ async function sampleHeap(session, durationMs) {
 
 async function measureRun(page, session) {
   const durationMs = runDurationMs;
-  const framePromise = page.evaluate(async (targetDurationMs) => {
-    const start = performance.now();
-    let previous = null;
-    const intervalsMs = [];
-    const hiddenAtStart = document.hidden;
-    let hiddenDuringRun = hiddenAtStart;
-    const handleVisibility = () => {
-      if (document.hidden) hiddenDuringRun = true;
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-    const focusedAtStart = document.hasFocus();
-    await new Promise((resolveRun) => {
-      const step = (now) => {
-        if (previous !== null) intervalsMs.push(now - previous);
-        previous = now;
-        if (now - start < targetDurationMs) requestAnimationFrame(step);
-        else resolveRun();
-      };
-      requestAnimationFrame(step);
-    });
-    document.removeEventListener('visibilitychange', handleVisibility);
-    return {
-      intervalsMs,
-      observedDurationMs: performance.now() - start,
-      hiddenAtStart,
-      hiddenDuringRun,
-      focusedAtStart,
-      focusedAtEnd: document.hasFocus(),
-    };
-  }, durationMs);
+  const createFocusMonitorSource = createFocusMonitor.toString();
+  const framePromise = page.evaluate(`
+    (async (targetDurationMs) => {
+      const createFocusMonitor = ${createFocusMonitorSource};
+      const monitor = createFocusMonitor(window, document, () => performance.now());
+      const start = performance.now();
+      let previous = null;
+      const intervalsMs = [];
+      try {
+        await new Promise((resolveRun) => {
+          const step = (now) => {
+            monitor.sampleFrame();
+            if (previous !== null) intervalsMs.push(now - previous);
+            previous = now;
+            if (now - start < targetDurationMs) requestAnimationFrame(step);
+            else resolveRun();
+          };
+          requestAnimationFrame(step);
+        });
+        return {
+          intervalsMs,
+          observedDurationMs: performance.now() - start,
+          focusVisibility: monitor.snapshot(),
+        };
+      } finally {
+        monitor.dispose();
+      }
+    })(${durationMs})
+  `);
   const heapPromise = sampleHeap(session, durationMs);
   const [frameResult, heap] = await Promise.all([framePromise, heapPromise]);
   const intervals = frameResult.intervalsMs.filter(
@@ -572,17 +572,7 @@ async function measureRun(page, session) {
     p99FrameTimeMs: percentile(0.99),
     maximumFrameTimeMs: sorted.length ? sorted.at(-1) : null,
     rawFrameIntervalsMs: intervals.map((value) => Number(value.toFixed(3))),
-    focusVisibility: {
-      hiddenAtStart: frameResult.hiddenAtStart,
-      hiddenDuringRun: frameResult.hiddenDuringRun,
-      focusedAtStart: frameResult.focusedAtStart,
-      focusedAtEnd: frameResult.focusedAtEnd,
-      validForVisibleFocusedBenchmark:
-        !frameResult.hiddenAtStart &&
-        !frameResult.hiddenDuringRun &&
-        frameResult.focusedAtStart &&
-        frameResult.focusedAtEnd,
-    },
+    focusVisibility: frameResult.focusVisibility,
     jsHeap: heap,
   };
 }
@@ -761,7 +751,7 @@ async function runWorkload(browser, baseUrl, workload, options) {
     benchmarkValid: allFocusedAndVisible && errors.length === 0,
     invalidatingConditions: [
       ...(!allFocusedAndVisible
-        ? ['page hidden or not focused during one or more timed runs']
+        ? ['page hidden or lost focus during one or more timed runs']
         : []),
       ...errors.map((error) => `browser console/page error: ${error}`),
       ...(browserMetadata.isSoftwareRenderer

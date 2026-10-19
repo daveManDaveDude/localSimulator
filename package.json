@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "format:check": "prettier --check \"src/**/*.{ts,css}\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"docs/asset-contract.md\" \"docs/milestones/**/*.md\" \"*.{js,ts,json,md,html}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,css}\" \"tests/**/*.ts\" \"scripts/**/*.{mjs,mts}\" \"docs/asset-contract.md\" \"docs/milestones/**/*.md\" \"*.{js,ts,json,md,html}\"",
     "test": "vitest run",
     "generate:synthetic-heightfield": "node scripts/generate-synthetic-heightfield.mjs",
     "test:e2e:install": "playwright install chromium",
