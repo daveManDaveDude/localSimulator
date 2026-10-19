@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0, M1 and TVW-001 through TVW-009 passed independent review. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA. Mapped building counts do not establish completeness; road and remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. The user separately authorized TVW-010 browser building rendering on 2026-10-18; TVW-011 and later are not authorized.
+**Status:** M0, M1 and TVW-001 through TVW-010 passed independent review. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, and TVW-010 completed optional browser building rendering. Mapped building counts do not establish completeness; road and remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-011 and later are not authorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -523,9 +523,9 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M4 — Real building footprints (3D blocks)
 
-**TVW-009 status:** Passed independent review after Luna fix 2 (`42bafd6`). The completed issue covers building import, height policy, asset validation and QA only. Preserve the current 1,000 m AOI and pending overall coverage status; mapped building counts do not establish completeness. Roads and remaining feature checks are not included. The combined M4 renderer/terrain-footing gate is implemented in TVW-010 and pending independent review.
+**TVW-009 status:** Passed independent review after Luna fix 2 (`42bafd6`). The completed issue covers building import, height policy, asset validation and QA only. Preserve the current 1,000 m AOI and pending overall coverage status; mapped building counts do not establish completeness. Roads and remaining feature checks are not included. TVW-010 completed and passed independent review for browser rendering and terrain footing; roads remain outside this issue.
 
-**TVW-010 status:** User-authorized on 2026-10-18; Sol specification accepted on 2026-10-18. Independent review of Luna fix round 2 confirmed the square/diamond overlap rejection and valid point, shared-edge and island-in-hole cases, but found identical component interiors still pass and render twice. Luna fix round 3 is in progress. Scope is browser loading/rendering of the validated local OSM package on EA terrain with terrain-following wall bases. The documented flat-roof convention is highest terrain beneath each complete footprint plus its validated estimated height. Preserve the synthetic default and pending AOI status. No roads or later issue. See [TVW-010 specification](milestones/TVW-010-spec.md) and [TVW-010 handback](milestones/TVW-010.md).
+**TVW-010 status:** PASS after Luna fix 3 (`fb287fe`) and independent Sol review on 2026-10-19. The optional browser layer loads and renders the validated local OSM package on EA terrain with terrain-following wall bases. Rehashed topology cases, publisher safety, QA identity, mean rounding, bounded streaming and UI provenance/count persistence passed review. The flat-roof convention is highest terrain beneath each complete footprint plus its validated tagged or estimated height. The synthetic default and pending AOI status are preserved. Roads and TVW-011 remain unauthorized. See [TVW-010 specification](milestones/TVW-010-spec.md) and [TVW-010 handback](milestones/TVW-010.md).
 
 **User-visible result:** **real buildings** stand on the slopes at approximately correct plan positions and shapes.
 
@@ -548,7 +548,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **Exit gate:** first credible local-neighbourhood screenshot with real terrain and buildings.
 
-**TVW-009 issue gate:** PASS after Luna fix 2 (`42bafd6`) and independent Sol review. The local OSM footprint package, height policy, provenance/validation and QA report/map are complete and reproducible. This issue did not satisfy the combined M4 screenshot or terrain-footing exit gate; TVW-010 implements that separately authorized scope and is pending independent review.
+**TVW-009 issue gate:** PASS after Luna fix 2 (`42bafd6`) and independent Sol review. The local OSM footprint package, height policy, provenance/validation and QA report/map are complete and reproducible. TVW-010 separately completed and passed the browser building/terrain-footing gate. The overall mapped-area feature gate remains incomplete because roads and remaining feature checks are outstanding.
 
 ### M5 — Roads and navigation cues
 
