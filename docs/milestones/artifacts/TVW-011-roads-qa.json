@@ -303,7 +303,7 @@
   "interpretation": "Extracted and rendered mapped OSM highway ways are not a completeness measure. Width is estimated; absent vertical tags imply only a ground-level visual assumption.",
   "preview": {
     "output": "TVW-011-roads-preview.png",
-    "byteLength": 919530,
+    "byteLength": 919812,
     "widthPixels": 1920,
     "heightPixels": 2000,
     "terrainRows": 501,

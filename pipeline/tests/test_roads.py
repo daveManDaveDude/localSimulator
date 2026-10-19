@@ -19,9 +19,16 @@ from torquay_pipeline.road_geometry import (
     build_display_polygons,
     tessellate_display_polygons,
 )
+from torquay_pipeline.road_preview import NORTH_ARROW_TAIL_AXES, NORTH_ARROW_TIP_AXES
 from torquay_pipeline.roads import ground_skip_reason, import_osm_roads
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_road_preview_north_arrow_points_up_for_negative_z_north():
+    # Matplotlib axes fractions increase upward even though the plotted Z data
+    # limits are inverted so negative Z is north.
+    assert NORTH_ARROW_TIP_AXES[1] > NORTH_ARROW_TAIL_AXES[1]
 
 
 def _write_osm_pbf(

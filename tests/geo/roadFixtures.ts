@@ -3,6 +3,7 @@ import {
   MAX_ROAD_MANIFEST_BYTES,
   MAX_ROAD_QA_BYTES,
   MAX_ROADS_BYTES,
+  ROAD_BNG_TO_WGS84_DEFINITION,
   ROAD_FLOAT32_SLIVER_POLICY,
   ROAD_ESTIMATED_WIDTHS_M,
   type RoadDisplayGroup,
@@ -171,16 +172,11 @@ export async function createRoadBundle() {
   };
   const counts = buildCounts();
   const forwardDefinition = terrain.provenance.coordinateOperation.definition;
-  const reverseDefinition = [
-    'proj=pipeline',
-    'step inv proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy',
-    'step proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector',
-  ].join(' ');
   const coordinateOperation = {
     axisOrder:
       'longitude-latitude for geographic input; easting-northing for BNG',
     wgs84ToBng: operationMetadata(forwardDefinition, 'WGS84 to BNG'),
-    bngToWgs84: operationMetadata(reverseDefinition, 'BNG to WGS84'),
+    bngToWgs84: operationMetadata(ROAD_BNG_TO_WGS84_DEFINITION, 'BNG to WGS84'),
   };
   const terrainIdentity = {
     worldId: terrain.id,

@@ -9,6 +9,43 @@ export const MAX_ROAD_TRIANGLES = 1_000_000;
 export const ROAD_SURFACE_OFFSET_M = 0.05;
 export const ROAD_FLOAT32_SLIVER_POLICY =
   'Cull triangles only when fewer than three distinct [x,z] coordinates remain after Float32 conversion; report the count and omitted area, bounded to 1e-6 m2.';
+export const ROAD_BNG_TO_WGS84_DEFINITION =
+  'proj=pipeline step inv proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy step proj=push v_3 step proj=cart ellps=airy step proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=WGS84 step proj=pop v_3 step proj=unitconvert xy_in=rad xy_out=deg';
+export const ROAD_COORDINATE_AXIS_ORDER =
+  'longitude-latitude for geographic input; easting-northing for BNG';
+export const ROAD_GROUND_TAG_POLICY: Readonly<Record<string, string>> = {
+  bridge: "absent or exactly 'no' accepted; otherwise exclude whole way",
+  tunnel: "absent or exactly 'no' accepted; otherwise exclude whole way",
+  covered: "absent or exactly 'no' accepted; otherwise exclude whole way",
+  layer: 'absent or strict integer zero accepted; all others excluded',
+  tagAbsence: 'visual ground assumption only, not verified elevation',
+};
+const ROAD_MANIFEST_COUNT_KEYS = [
+  'highway_ways_seen',
+  'included_ground_ways_in_buffer',
+  'outside_acquisition_buffer',
+  'excluded_classes',
+  'excluded_area_surfaces',
+  'excluded_ground_assumption',
+  'invalid_missing_locations',
+  'invalid_too_few_vertices',
+  'invalid_transform_or_geometry',
+  'duplicate_source_ways',
+  'clipped_empty_or_non_line',
+  'clipped_ways_with_parts',
+  'unique_exported_ways',
+  'duplicate_contributor_ids',
+  'incomplete_highway_way_ids_recorded',
+  'uniqueExportedWays',
+  'uniquePartIds',
+  'uniqueRibbonPartIds',
+  'float32CollapsedSliverTriangleCount',
+  'surfaceBatchCount',
+  'renderVertexCount',
+  'renderTriangleCount',
+] as const;
+const ROAD_RENDER_AREA_TOLERANCE_M2 = 1e-4;
+const ROAD_TRIANGLE_OVERLAP_TOLERANCE_M2 = 1e-10;
 export const ROAD_ESTIMATED_WIDTHS_M: Readonly<Record<string, number>> = {
   motorway: 12,
   trunk: 12,
@@ -307,6 +344,10 @@ function isPositiveInteger(value: unknown): value is number {
   return Number.isSafeInteger(value) && (value as number) > 0;
 }
 
+function isNonNegativeInteger(value: unknown): value is number {
+  return Number.isSafeInteger(value) && (value as number) >= 0;
+}
+
 function isStringRecord(value: unknown): value is Record<string, string> {
   return (
     isRecord(value) &&
@@ -322,6 +363,19 @@ function sameJson(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function sameStringRecord(
+  value: unknown,
+  expected: Readonly<Record<string, string>>,
+): boolean {
+  if (!isStringRecord(value)) return false;
+  const actualKeys = Object.keys(value).sort();
+  const expectedKeys = Object.keys(expected).sort();
+  return (
+    sameJson(actualKeys, expectedKeys) &&
+    expectedKeys.every((key) => value[key] === expected[key])
+  );
+}
+
 function point(value: unknown): value is [number, number] {
   return (
     Array.isArray(value) &&
@@ -329,6 +383,77 @@ function point(value: unknown): value is [number, number] {
     isFiniteNumber(value[0]) &&
     isFiniteNumber(value[1])
   );
+}
+
+function acceptsGroundVerticalTags(tags: Record<string, string>): boolean {
+  for (const key of ['bridge', 'tunnel', 'covered']) {
+    if (tags[key] !== undefined && tags[key] !== 'no') return false;
+  }
+  const layer = tags.layer;
+  if (layer === undefined) return true;
+  if (layer.trim() !== layer || !/^[+-]?\d+$/.test(layer)) return false;
+  return Number(layer) === 0;
+}
+
+type PointXZ = [number, number];
+type TriangleXZ = [PointXZ, PointXZ, PointXZ];
+
+function triangleCross(a: PointXZ, b: PointXZ, c: PointXZ): number {
+  return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+}
+
+function triangleArea(triangle: TriangleXZ): number {
+  return Math.abs(triangleCross(triangle[0], triangle[1], triangle[2])) / 2;
+}
+
+function geometricTriangleKey(triangle: TriangleXZ): string {
+  return triangle
+    .map(([x, z]) => `${x},${z}`)
+    .sort()
+    .join('|');
+}
+
+function triangleIntersectionArea(
+  subject: TriangleXZ,
+  clip: TriangleXZ,
+): number {
+  // All accepted road faces have clockwise winding in XZ. Convex clipping
+  // computes positive-area intersections while allowing shared edges/points.
+  let polygon: PointXZ[] = subject.map(([x, z]) => [x, z]);
+  for (let edgeIndex = 0; edgeIndex < 3 && polygon.length > 0; edgeIndex += 1) {
+    const edgeStart = clip[edgeIndex]!;
+    const edgeEnd = clip[(edgeIndex + 1) % 3]!;
+    const input = polygon;
+    polygon = [];
+    let previous = input[input.length - 1]!;
+    let previousSide = triangleCross(edgeStart, edgeEnd, previous);
+    for (const current of input) {
+      const currentSide = triangleCross(edgeStart, edgeEnd, current);
+      const previousInside = previousSide <= 0;
+      const currentInside = currentSide <= 0;
+      if (previousInside !== currentInside) {
+        const denominator = previousSide - currentSide;
+        if (denominator !== 0) {
+          const amount = previousSide / denominator;
+          polygon.push([
+            previous[0] + (current[0] - previous[0]) * amount,
+            previous[1] + (current[1] - previous[1]) * amount,
+          ]);
+        }
+      }
+      if (currentInside) polygon.push(current);
+      previous = current;
+      previousSide = currentSide;
+    }
+  }
+  if (polygon.length < 3) return 0;
+  let twiceArea = 0;
+  for (let index = 0; index < polygon.length; index += 1) {
+    const current = polygon[index]!;
+    const next = polygon[(index + 1) % polygon.length]!;
+    twiceArea += current[0] * next[1] - next[0] * current[1];
+  }
+  return Math.abs(twiceArea) / 2;
 }
 
 function addIssue(
@@ -350,7 +475,7 @@ function validateOperation(
   issues: RoadValidationIssue[],
 ): void {
   const path = 'coordinateOperation';
-  if (!isRecord(value) || typeof value.axisOrder !== 'string') {
+  if (!isRecord(value) || value.axisOrder !== ROAD_COORDINATE_AXIS_ORDER) {
     addIssue(
       issues,
       path,
@@ -401,6 +526,12 @@ function validateOperation(
           'does not match the loaded terrain manifest pinned operation and grid caveat',
         );
       }
+    } else if (operation.definition !== ROAD_BNG_TO_WGS84_DEFINITION) {
+      addIssue(
+        issues,
+        `${opPath}.definition`,
+        'must exactly match the pinned EPSG:1314 + EPSG:19916 BNG-to-WGS84 inverse operation',
+      );
     }
     if (
       typeof operation.definition !== 'string' ||
@@ -627,6 +758,7 @@ export function validateRoadManifest(
       policy.float32SliverPolicy !== ROAD_FLOAT32_SLIVER_POLICY ||
       !widthsMatch ||
       !sameJson(policy.pathClasses, [...ROAD_PATH_CLASSES].sort()) ||
+      !sameStringRecord(policy.groundAssumption, ROAD_GROUND_TAG_POLICY) ||
       !Array.isArray(policy.displayPriority) ||
       !sameJson(policy.displayPriority, ['vehicular', 'cycleway', 'path'])
     ) {
@@ -663,6 +795,19 @@ export function validateRoadManifest(
       issues,
       'limits',
       'must match the enforced road package safety limits',
+    );
+  }
+  const manifestCountInput = isRecord(input.counts) ? input.counts : null;
+  if (
+    !manifestCountInput ||
+    ROAD_MANIFEST_COUNT_KEYS.some(
+      (key) => !isNonNegativeInteger(manifestCountInput[key]),
+    )
+  ) {
+    addIssue(
+      issues,
+      'counts',
+      'must include all required nonnegative integer package counts',
     );
   }
   if (
@@ -852,6 +997,12 @@ function validateFeature(
       `${path}.sourceTags`,
       'must retain string tags including its highway class',
     );
+  else if (!acceptsGroundVerticalTags(value.sourceTags))
+    addIssue(
+      issues,
+      `${path}.sourceTags`,
+      'contains bridge/tunnel/covered/layer tags excluded by the declared ground-only policy',
+    );
   if (
     !Array.isArray(value.duplicateWayIds) ||
     !value.duplicateWayIds.every(isPositiveInteger) ||
@@ -902,6 +1053,13 @@ export function validateRoadPayload(
       issues: [{ path: 'qa', message: 'must be a QA object' }],
     };
   const qa = qaInput;
+  const manifestCounts = isRecord(manifest.counts) ? manifest.counts : null;
+  if (!manifestCounts)
+    addIssue(
+      issues,
+      'manifest.counts',
+      'must include the validated package count object',
+    );
   if (
     qa.formatVersion !== 1 ||
     qa.worldId !== manifest.worldId ||
@@ -932,7 +1090,7 @@ export function validateRoadPayload(
     ) ||
     Number(qa.meshNumerics.float32CollapsedSliverTriangleCount) < 0 ||
     qa.meshNumerics.float32CollapsedSliverTriangleCount !==
-      manifest.counts.float32CollapsedSliverTriangleCount ||
+      manifestCounts?.float32CollapsedSliverTriangleCount ||
     !isFiniteNumber(qa.meshNumerics.float32CollapsedSliverAreaM2) ||
     qa.meshNumerics.float32CollapsedSliverAreaM2 < 0 ||
     qa.meshNumerics.float32CollapsedSliverAreaM2 > 1e-6 ||
@@ -1035,6 +1193,16 @@ export function validateRoadPayload(
   const spacing = manifest.terrainIdentity.spacingM;
   const halfWidth = manifest.terrainIdentity.extentM.width / 2;
   const halfDepth = manifest.terrainIdentity.extentM.depth / 2;
+  const geometricTriangleKeys = new Set<string>();
+  const trianglesByTerrainFace = new Map<
+    string,
+    Array<{ triangle: TriangleXZ; path: string }>
+  >();
+  const triangleAreasByGroup: Record<RoadDisplayGroup, number> = {
+    vehicular: 0,
+    cycleway: 0,
+    path: 0,
+  };
   for (const group of ROAD_GROUPS) {
     const batch = input.surfaceBatches[group];
     const path = `roads.surfaceBatches.${group}`;
@@ -1051,8 +1219,10 @@ export function validateRoadPayload(
       );
       continue;
     }
-    if (!batch.verticesXZ.every(point))
+    if (!batch.verticesXZ.every(point)) {
       addIssue(issues, `${path}.verticesXZ`, 'must contain finite [x,z] pairs');
+      continue;
+    }
     const vertices = batch.verticesXZ as [number, number][];
     const indices = batch.indices as unknown[];
     const terrainTriangles = batch.terrainTriangles as unknown[];
@@ -1109,9 +1279,10 @@ export function validateRoadPayload(
         [number, number],
         [number, number],
       ];
-      const cross =
-        (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-      if (!Number.isFinite(cross) || cross >= -1e-12)
+      const triangle: TriangleXZ = [a, b, c];
+      const cross = triangleCross(a, b, c);
+      const validWinding = Number.isFinite(cross) && cross < -1e-12;
+      if (!validWinding)
         addIssue(
           issues,
           `${path}.indices[${index}]`,
@@ -1136,7 +1307,8 @@ export function validateRoadPayload(
         );
         return;
       }
-      for (const [x, z] of [a, b, c]) {
+      let insideClaimedTerrainFace = true;
+      for (const [x, z] of triangle) {
         const u = (x + halfWidth) / spacing - cell[1];
         const v = (z + halfDepth) / spacing - cell[0];
         const inCell =
@@ -1149,13 +1321,63 @@ export function validateRoadPayload(
             `${path}.terrainTriangles[${index}]`,
             'face vertex lies outside its claimed fixed terrain triangle',
           );
+          insideClaimedTerrainFace = false;
           break;
         }
+      }
+      if (validWinding && insideClaimedTerrainFace) {
+        const triangleKey = geometricTriangleKey(triangle);
+        if (geometricTriangleKeys.has(triangleKey))
+          addIssue(
+            issues,
+            `${path}.indices[${index}]`,
+            'duplicates another triangle by geometric coordinates',
+          );
+        geometricTriangleKeys.add(triangleKey);
+        triangleAreasByGroup[group] += triangleArea(triangle);
+        const terrainFaceKey = `${cell[0]}:${cell[1]}:${cell[2]}`;
+        const faceTriangles = trianglesByTerrainFace.get(terrainFaceKey) ?? [];
+        faceTriangles.push({
+          triangle,
+          path: `${path}.indices[${index}]`,
+        });
+        trianglesByTerrainFace.set(terrainFaceKey, faceTriangles);
       }
     });
     totalVertices += vertices.length;
     totalTriangles += indices.length;
     batches[group] = batch as unknown as RoadSurfaceBatch;
+  }
+  for (const faceTriangles of trianglesByTerrainFace.values()) {
+    let overlapFound = false;
+    for (
+      let firstIndex = 0;
+      firstIndex < faceTriangles.length;
+      firstIndex += 1
+    ) {
+      const first = faceTriangles[firstIndex]!;
+      for (
+        let secondIndex = firstIndex + 1;
+        secondIndex < faceTriangles.length;
+        secondIndex += 1
+      ) {
+        const second = faceTriangles[secondIndex]!;
+        const overlapArea = triangleIntersectionArea(
+          first.triangle,
+          second.triangle,
+        );
+        if (overlapArea > ROAD_TRIANGLE_OVERLAP_TOLERANCE_M2) {
+          addIssue(
+            issues,
+            second.path,
+            `triangle interior overlaps another rendered surface by ${overlapArea} m2`,
+          );
+          overlapFound = true;
+          break;
+        }
+      }
+      if (overlapFound) break;
+    }
   }
   if (totalVertices > MAX_ROAD_VERTICES || totalTriangles > MAX_ROAD_TRIANGLES)
     addIssue(issues, 'roads.surfaceBatches', 'exceeds safe render limits');
@@ -1190,6 +1412,7 @@ export function validateRoadPayload(
         summary.vertexCount !== batch.verticesXZ.length ||
         summary.triangleCount !== batch.indices.length ||
         !isFiniteNumber(summary.surfaceAreaM2) ||
+        summary.surfaceAreaM2 < 0 ||
         !isFiniteNumber(summary.bufferedAreaBeforePriorityM2)
       ) {
         addIssue(
@@ -1197,8 +1420,56 @@ export function validateRoadPayload(
           `qa.displayBatches.${group}`,
           'does not reconcile with validated features and render geometry',
         );
+        continue;
+      }
+      if (
+        Math.abs(triangleAreasByGroup[group] - summary.surfaceAreaM2) >
+        ROAD_RENDER_AREA_TOLERANCE_M2
+      ) {
+        addIssue(
+          issues,
+          `qa.displayBatches.${group}.surfaceAreaM2`,
+          'does not reconcile with the summed rendered triangle area',
+        );
       }
     }
+  }
+  const qaAreas = isRecord(qa.areas) ? qa.areas : null;
+  const qaAreasByGroup =
+    qaAreas && isRecord(qaAreas.byDisplayGroupM2)
+      ? qaAreas.byDisplayGroupM2
+      : null;
+  if (
+    !qaAreasByGroup ||
+    ROAD_GROUPS.some(
+      (group) =>
+        !isFiniteNumber(qaAreasByGroup[group]) ||
+        Math.abs(Number(qaAreasByGroup[group]) - triangleAreasByGroup[group]) >
+          ROAD_RENDER_AREA_TOLERANCE_M2,
+    )
+  ) {
+    addIssue(
+      issues,
+      'qa.areas.byDisplayGroupM2',
+      'does not reconcile with the rendered triangle areas',
+    );
+  }
+  const totalTriangleArea = ROAD_GROUPS.reduce(
+    (total, group) => total + triangleAreasByGroup[group],
+    0,
+  );
+  if (
+    !qaAreas ||
+    !isFiniteNumber(qaAreas.totalDisjointSurfaceM2) ||
+    Math.abs(qaAreas.totalDisjointSurfaceM2 - totalTriangleArea) >
+      ROAD_RENDER_AREA_TOLERANCE_M2 ||
+    qaAreas.areaDifferenceWithinDeclaredTolerance !== true
+  ) {
+    addIssue(
+      issues,
+      'qa.areas.totalDisjointSurfaceM2',
+      'must reconcile with all non-overlapping rendered surface triangles',
+    );
   }
   if (issues.length > 0) return { ok: false, issues };
   return {

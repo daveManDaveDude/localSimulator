@@ -29,6 +29,9 @@ NAMES = {
     "cycleway": "Cycleway",
     "path": "Path / pedestrian way",
 }
+NORTH_ARROW_TIP_AXES = (0.965, 0.94)
+NORTH_ARROW_TAIL_AXES = (0.965, 0.83)
+NORTH_LABEL_AXES = (0.965, 0.965)
 
 
 def _patch_for_polygon(polygon: Polygon) -> PathPatch:
@@ -120,16 +123,21 @@ def render_road_preview(
         zorder=9,
     )
     ax.scatter([0], [0], marker="+", s=60, color="white", linewidths=1.8, zorder=10)
-    ax.annotate(
+    ax.text(
+        *NORTH_LABEL_AXES,
         "N",
-        xy=(0.965, 0.88),
-        xytext=(0.965, 0.96),
-        xycoords="axes fraction",
-        textcoords="axes fraction",
+        transform=ax.transAxes,
         ha="center",
-        va="center",
+        va="bottom",
         weight="bold",
         color="#182332",
+    )
+    ax.annotate(
+        "",
+        xy=NORTH_ARROW_TIP_AXES,
+        xytext=NORTH_ARROW_TAIL_AXES,
+        xycoords="axes fraction",
+        textcoords="axes fraction",
         arrowprops={"arrowstyle": "-|>", "color": "#182332", "lw": 1.8},
     )
     ax.set_title(
