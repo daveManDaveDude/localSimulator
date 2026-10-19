@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0, M1 and TVW-001 through TVW-013 passed their issue reviews. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, TVW-012 completed the independent three-spot map comparison and issue report, and TVW-013 completed ground-following walk mode with 1.7 m eye clearance. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19; M6 was accepted after TVW-013 fix 1 passed independent review on 2026-10-19. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-014 was separately authorized on 2026-10-19 and is the active issue; TVW-015 and later remain unauthorized.
+**Status:** M0, M1 and TVW-001 through TVW-014 passed their issue reviews. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, TVW-012 completed the independent three-spot map comparison and issue report, TVW-013 completed ground-following walk mode with 1.7 m eye clearance, and TVW-014 completed clean-clone synthetic smoke, repeatable local-source regeneration, production browser checks and descriptive benchmark reporting. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19; M6 was accepted after TVW-013 fix 1 passed independent review on 2026-10-19; M7 was accepted after TVW-014 fix 1 passed independent review on 2026-10-19. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode. TVW-015 and later remain unauthorized.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -604,7 +604,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M7 — Review, profile and package
 
-**TVW-014 status:** User separately authorized TVW-014 on 2026-10-19. The coordinator accepted the implementation specification in [TVW-014-spec.md](milestones/TVW-014-spec.md). Implementation is active; TVW-015 and later remain unauthorized.
+**TVW-014 status:** PASS; the coordinator accepted TVW-014 on 2026-10-19 after final independent Sol review of handback correction `f3e62c3` (implementation fix `d2d4ade`). The handback records the clean-clone synthetic smoke, verified source regeneration and production checks, six-workload software-renderer benchmark, screenshots, quality gates and known limits. The AOI remains `selected_pending_coverage` / `not_checked`; this issue does not establish feature completeness. TVW-015 and later remain unauthorized.
 
 **User-visible result:** clean local project demo plus benchmark and instructions; polished enough to show someone else.
 
