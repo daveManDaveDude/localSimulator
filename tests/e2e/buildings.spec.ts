@@ -98,6 +98,27 @@ test('loads the opt-in OSM layer, keeps terrain navigation, and captures both vi
 
   await page.goto('/?world=torquay-poc-001&buildings=1');
   const shell = page.locator('.viewer-shell');
+  try {
+    await shell.waitFor({ state: 'attached', timeout: 30_000 });
+  } catch {
+    const bodyText = await page
+      .locator('body')
+      .innerText()
+      .catch(() => '<body text unavailable>');
+    throw new Error(
+      [
+        'Viewer shell did not attach within 30 seconds after navigation.',
+        `URL: ${page.url()}`,
+        `Title: ${await page.title().catch(() => '<title unavailable>')}`,
+        `Page errors: ${JSON.stringify(pageErrors)}`,
+        `Console errors: ${JSON.stringify(consoleErrors)}`,
+        `Failed requests: ${JSON.stringify(failedRequests)}`,
+        `Bad responses: ${JSON.stringify(badResponses)}`,
+        `Recent requests: ${JSON.stringify(requestedUrls.slice(-30))}`,
+        `Body text: ${bodyText.slice(0, 4_000)}`,
+      ].join('\n'),
+    );
+  }
   await expect(shell).toHaveAttribute('data-load-state', 'loaded');
   await expect(shell).toHaveAttribute('data-renderer-ready', 'true');
   await expect(shell).toHaveAttribute('data-building-state', 'loaded');
