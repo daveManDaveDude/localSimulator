@@ -23,9 +23,12 @@
     "test:e2e:tvw014:full": "playwright test --config=playwright.tvw014-full.config.ts",
     "test:e2e:tvw015:real": "npm run build && playwright test --config=playwright.tvw015-real.config.ts",
     "test:e2e:tvw015:share": "npm run build:share && playwright test --config=playwright.tvw015-share.config.ts",
+    "test:e2e:overview:real": "npm run build && playwright test --config=playwright.overview-real.config.ts",
+    "test:e2e:overview:share": "npm run build:share && playwright test --config=playwright.overview-share.config.ts",
     "benchmark": "node scripts/benchmark.mjs"
   },
   "dependencies": {
+    "maplibre-gl": "6.15.0",
     "three": "0.186.1"
   },
   "devDependencies": {

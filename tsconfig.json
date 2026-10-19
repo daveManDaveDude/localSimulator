@@ -26,6 +26,8 @@
     "playwright.tvw014-share.config.ts",
     "playwright.tvw014-real.config.ts",
     "playwright.tvw014-full.config.ts",
+    "playwright.overview-real.config.ts",
+    "playwright.overview-share.config.ts",
     "vitest.config.ts"
   ]
 }

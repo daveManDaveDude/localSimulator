@@ -320,6 +320,8 @@ export interface RoadValidationIssue {
 
 export interface LoadedRoadPackage {
   manifest: RoadPackageManifest;
+  /** SHA-256 of the exact validated manifest response bytes, added by the loader. */
+  manifestSha256?: string;
   features: RoadFeature[];
   batches: Record<RoadDisplayGroup, RoadSurfaceBatch>;
   qa: RoadQaSummary;

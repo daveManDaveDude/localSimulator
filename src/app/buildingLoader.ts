@@ -282,6 +282,7 @@ export async function loadBuildingPackage(
     MAX_BUILDING_MANIFEST_BYTES,
     signal,
   );
+  const manifestSha256 = await sha256Hex(manifestBytes);
   const unknownManifest = await parseJson(manifestBytes, 'manifest response');
   const manifestResult = validateBuildingPackageManifest(
     unknownManifest,
@@ -323,5 +324,5 @@ export async function loadBuildingPackage(
       formatBuildingIssues(payloadResult.issues),
     );
   }
-  return payloadResult.value;
+  return { ...payloadResult.value, manifestSha256 };
 }

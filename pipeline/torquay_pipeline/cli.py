@@ -40,6 +40,33 @@ from .building_sources import (
 from .buildings import BuildingConfig, BuildingImportError, import_osm_buildings
 from .comparison_sources import ComparisonSourceError, verify_comparison_source
 from .config import AoiConfig, AoiConfigError, load_aoi_config, validate_stored_selection
+from .overview_export import (
+    DEFAULT_AOI_CONFIG as DEFAULT_OVERVIEW_AOI_CONFIG,
+)
+from .overview_export import (
+    DEFAULT_AOI_GEOJSON as DEFAULT_OVERVIEW_AOI_GEOJSON,
+)
+from .overview_export import (
+    DEFAULT_BUILDINGS_DIR as DEFAULT_OVERVIEW_BUILDINGS_DIR,
+)
+from .overview_export import (
+    DEFAULT_OUTPUT_DIR as DEFAULT_OVERVIEW_OUTPUT_DIR,
+)
+from .overview_export import (
+    DEFAULT_ROADS_DIR as DEFAULT_OVERVIEW_ROADS_DIR,
+)
+from .overview_export import (
+    DEFAULT_SOURCE_MANIFEST as DEFAULT_OVERVIEW_SOURCE_MANIFEST,
+)
+from .overview_export import (
+    DEFAULT_TERRAIN_DIR as DEFAULT_OVERVIEW_TERRAIN_DIR,
+)
+from .overview_export import (
+    OverviewExportError,
+    build_overview_package,
+    validate_overview_package,
+)
+from .overview_publish import OverviewPublishError, publish_overview_package
 from .road_config import RoadConfigError, load_road_config
 from .road_export import RoadExportError, build_road_package, validate_road_package
 from .road_geometry import DISPLAY_GROUPS
@@ -202,6 +229,29 @@ def _parser() -> argparse.ArgumentParser:
                 "--output",
                 type=Path,
                 default=Path("../docs/milestones/screenshots/TVW-011-roads-preview.png"),
+            )
+    for name in ("build-overview", "validate-overview", "publish-overview"):
+        command = commands.add_parser(
+            name, help=f"{name.replace('-', ' ')} from validated local packages"
+        )
+        command.add_argument("--terrain-dir", type=Path, default=DEFAULT_OVERVIEW_TERRAIN_DIR)
+        command.add_argument("--roads-dir", type=Path, default=DEFAULT_OVERVIEW_ROADS_DIR)
+        command.add_argument("--buildings-dir", type=Path, default=DEFAULT_OVERVIEW_BUILDINGS_DIR)
+        command.add_argument("--aoi-config", type=Path, default=DEFAULT_OVERVIEW_AOI_CONFIG)
+        command.add_argument("--aoi-geojson", type=Path, default=DEFAULT_OVERVIEW_AOI_GEOJSON)
+        command.add_argument(
+            "--source-manifest", type=Path, default=DEFAULT_OVERVIEW_SOURCE_MANIFEST
+        )
+        if name == "build-overview":
+            command.add_argument("--layers", default="aoi,roads,buildings")
+            command.add_argument("--output-dir", type=Path, default=DEFAULT_OVERVIEW_OUTPUT_DIR)
+        else:
+            command.add_argument(
+                "--package-dir", type=Path, default=Path("data/generated/overview")
+            )
+        if name == "publish-overview":
+            command.add_argument(
+                "--output-dir", type=Path, default=Path("public/worlds/torquay-poc-001/overview")
             )
     command = commands.add_parser(
         "inspect-comparison-source",
@@ -405,6 +455,34 @@ def _road_command(args: argparse.Namespace) -> int:
     print(f"Intermediate with source node IDs and tags: {intermediate_path}")
     print("AOI remains selected_pending_coverage; coverage_status remains not_checked.")
     print(json.dumps(built["qa"]["counts"], indent=2))
+    return 0
+
+
+def _overview_command(args: argparse.Namespace) -> int:
+    common = {
+        "terrain_dir": args.terrain_dir,
+        "roads_dir": args.roads_dir,
+        "buildings_dir": args.buildings_dir,
+        "aoi_config_path": args.aoi_config,
+        "aoi_geojson_path": args.aoi_geojson,
+        "source_manifest_path": args.source_manifest,
+    }
+    if args.command == "build-overview":
+        layers = tuple(item.strip() for item in args.layers.split(",") if item.strip())
+        result = build_overview_package(
+            **common,
+            layers=layers,
+            output_dir=args.output_dir,
+        )
+    elif args.command == "validate-overview":
+        result = validate_overview_package(args.package_dir, **common)
+    else:
+        result = publish_overview_package(
+            args.package_dir,
+            output_dir=args.output_dir,
+            **common,
+        )
+    print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -722,6 +800,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             "publish-roads",
         }:
             return _road_command(args)
+        if args.command in {"build-overview", "validate-overview", "publish-overview"}:
+            return _overview_command(args)
         if args.command in {
             "inspect-comparison-source",
             "compare-alignment",
@@ -807,6 +887,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         RoadImportError,
         RoadExportError,
         RoadPublishError,
+        OverviewExportError,
+        OverviewPublishError,
         TerrainCoverageError,
         TerrainSourceError,
         TerrainExportError,

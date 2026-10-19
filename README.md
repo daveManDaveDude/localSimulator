@@ -163,6 +163,22 @@ On the explicit real-terrain roads route, `/?world=torquay-poc-001&roads=1`, wai
 
 These are screen annotations rather than physical signs: they are not depth-occluded by terrain or buildings and their counts describe only current display candidates, not road coverage. OSM contributor and Geofabrik attribution stays visible with the road layer. `npm run test:e2e:tvw015:real` builds and checks the production local-data route on an isolated preview port; `npm run test:e2e:tvw015:share` builds the clean share variant and checks that synthetic startup has no road assets or names. Both use local packages only.
 
+### M8 optional offline geographic overview
+
+On the explicit real terrain route, use **Open overview** to lazily load a fixed north-up MapLibre view of the selected AOI ring, plus road centerlines and building footprints only when those optional layers are already loaded and visible in the main viewer. The panel includes a legend, north cue, metric scale, OSM/Geofabrik attribution when OSM features are shown, separate EA source context, and MapLibre licence credit. It is a local GeoJSON overview: it does not show the EA raster, follow the camera, or make a new alignment/completeness claim. Synthetic worlds report that geographic overview is unavailable and never assign real coordinates to fictional geometry.
+
+To build, validate and publish the separate derived overview after restoring the exact local terrain, road and building packages described above:
+
+```powershell
+Push-Location pipeline
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli build-overview
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli validate-overview
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli publish-overview
+Pop-Location
+```
+
+The commands use the configured AOI and current validated local packages; they do not download inputs. The generated package is ignored under `data/generated/overview/`, and the byte-identical browser copy is ignored under `public/worlds/torquay-poc-001/overview/`. A clean clone without that copy keeps the synthetic viewer working and presents a retry message on the real overview. The share build excludes the complete real-world parent. MapLibre GL JS 6.15.0 and its CSS/worker are bundled locally and loaded only when a real-world user opens the panel; the overview has no remote style, tiles, fonts, sprites or service. Production build output adds approximately 1.09 MB of minified MapLibre JavaScript, 71 KB CSS, and a 518 KB worker asset (plus a small worker URL wrapper); the worker and map code are lazy-loaded. See the [overview asset contract](docs/overview-asset-contract.md) and [M8 handback](docs/milestones/M8-overview-minimap.md) for hashes, browser evidence and exact limits.
+
 Playwright's install command downloads a local Chromium build and requires internet access. After installation, the browser tests use local files. The persistent Chromium suite covers both the retained M0 viewer and loaded terrain, pointer lock and movement, terrain grid and wireframe controls, optional building publication/load/render/toggle and recovery, ground-height telemetry, resize, Escape release, and held-key cleanup. Vitest covers movement, manifest validation, binary decoding/loading, terrain grid/sampling, and Three.js mesh geometry.
 
 ## M7 clean demo, local real-data rebuild, and benchmark
@@ -209,6 +225,8 @@ The viewer credits the Environment Agency and links its catalogue and Open Gover
 - `docs/milestones/TVW-011.md` records the local OSM highway pipeline, terrain-draped ribbons, QA and browser evidence.
 - `docs/milestones/TVW-015.md` records optional street-name labels, the production browser evidence and the labels-off/on observation.
 - `docs/milestones/TVW-014.md` records the clean-clone smoke, restored-source regeneration, production checks, benchmark, screenshots and limitations.
+- `docs/milestones/M8-overview-minimap.md` records the fixed local geographic overview implementation and browser evidence.
+- `docs/overview-asset-contract.md` documents the separate RFC 7946 overview derivative, integrity checks and recovery behavior.
 - `docs/data-sources.md` documents publisher provenance, local source-file restoration and the current inspection result.
 - `docs/building-asset-contract.md` documents the local OSM footprint package, coordinates, height provenance and QA meaning.
 - `data/source-manifest.json` records actual source URLs, archive checksums, raster metadata, licence and attribution.

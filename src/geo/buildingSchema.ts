@@ -189,6 +189,8 @@ export interface BuildingQaSummary {
 
 export interface LoadedBuildingPackage {
   manifest: BuildingPackageManifest;
+  /** SHA-256 of the exact validated manifest response bytes, added by the loader. */
+  manifestSha256?: string;
   features: BuildingFeature[];
   qa: BuildingQaSummary;
   componentCount: number;

@@ -265,6 +265,7 @@ export async function loadRoadPackage(
     MAX_ROAD_MANIFEST_BYTES,
     signal,
   );
+  const manifestSha256 = await sha256Hex(manifestBytes, 'manifest validation');
   const unknownManifest = await parseJson(manifestBytes, 'manifest response');
   const manifestResult = validateRoadManifest(unknownManifest, terrainManifest);
   if (!manifestResult.ok) {
@@ -310,5 +311,5 @@ export async function loadRoadPackage(
       formatRoadIssues(result.issues),
     );
   }
-  return result.value;
+  return { ...result.value, manifestSha256 };
 }

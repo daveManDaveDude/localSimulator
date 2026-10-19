@@ -16,6 +16,7 @@ import { loadRoadPackage } from './roadLoader';
 import type { RealTerrainSceneManifest } from '../geo/sceneSchema';
 import type { TerrainGrid } from '../geo/terrainGrid';
 import type { LoadedRoadPackage } from '../geo/roadSchema';
+import type { LoadedBuildingPackage } from '../geo/buildingSchema';
 import { createScene } from '../scene/createScene';
 import {
   createSyntheticWorld,
@@ -28,6 +29,10 @@ import { disposeSceneResources } from '../scene/disposeSceneResources';
 import type { HeightfieldWorld } from '../scene/createHeightfieldWorld';
 import { installAlignmentQaCamera } from './alignmentQaCamera';
 import { createRoadLabelOverlay } from './createRoadLabels';
+import {
+  createOverviewController,
+  type OverviewContext,
+} from './createOverview';
 
 const TERRAIN_MANIFEST_URL = '/worlds/synthetic-terrain-demo/manifest.json';
 const REAL_TERRAIN_MANIFEST_URL = '/worlds/torquay-poc-001/manifest.json';
@@ -94,6 +99,7 @@ export function createApp(container: HTMLElement): AppHandle {
           <a href="?world=torquay-poc-001&amp;roads=1" data-testid="world-select-roads">EA terrain + OSM roads</a>
           <a href="?world=torquay-poc-001&amp;buildings=1&amp;roads=1" data-testid="world-select-all-layers">EA terrain + buildings + roads</a>
           <a href="?world=m0" data-testid="world-select-m0">M0 synthetic demo</a>
+          <button type="button" data-testid="overview-toggle" aria-controls="geographic-overview" aria-expanded="false">Open overview</button>
         </nav>
         <p class="terrain-loading" data-testid="terrain-loading" role="status"${m0Mode ? ' hidden' : ''}>${initialRealMode ? 'Loading and validating the local Environment Agency terrain package…' : 'Loading and validating the synthetic terrain package…'}</p>
         <section class="world-error" data-testid="world-load-error" role="alert" hidden>
@@ -173,6 +179,24 @@ export function createApp(container: HTMLElement): AppHandle {
           </div>
           <p class="road-width-policy" data-testid="road-width-policy">Widths are configured visual estimates, not measured kerbs; absent bridge/tunnel/layer tags imply only a ground-level rendering assumption. Mapped counts do not establish completeness; the candidate AOI remains selected_pending_coverage / not_checked.</p>
           <p class="road-attribution" data-testid="road-attribution">© OpenStreetMap contributors · extract by Geofabrik GmbH · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL attribution and licence</a></p>
+        </section>
+        <section id="geographic-overview" class="overview-panel" data-testid="geographic-overview" aria-labelledby="overview-title" hidden data-state="closed">
+          <header class="overview-header">
+            <div><p class="overview-eyebrow">FIXED · NORTH UP</p><h2 id="overview-title">Geographic overview</h2></div>
+            <button type="button" data-testid="overview-close" aria-label="Close geographic overview">Close</button>
+          </header>
+          <p class="overview-status" data-testid="overview-status" role="status" aria-live="polite">Overview closed.</p>
+          <div class="overview-map-wrap" data-testid="overview-map-wrap">
+            <div class="overview-map" data-testid="overview-map" role="img" aria-label="Fixed geographic overview map"></div>
+            <span class="overview-north" aria-label="North">N <span aria-hidden="true">↑</span></span>
+            <div class="overview-legend" aria-label="Map legend"><span><i class="legend-aoi"></i>Candidate AOI</span><span><i class="legend-road"></i>Road centreline</span><span><i class="legend-building"></i>Building footprint</span></div>
+          </div>
+          <p class="overview-layers" data-testid="overview-layer-status">Optional geographic layers are not loaded.</p>
+          <p class="overview-disclaimer" data-testid="overview-disclaimer">Local package overview; no live camera position and no terrain raster. AOI selection remains pending; coverage is not checked.</p>
+          <p class="overview-osm-attribution" data-testid="overview-osm-attribution" hidden>© OpenStreetMap contributors · Geofabrik Devon extract · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL 1.0</a></p>
+          <p class="overview-ea-context">EA terrain is source context only; this map does not draw the terrain raster. <a href="https://www.data.gov.uk/dataset/01b3ee39-da3f-47b6-83da-dc98e73a461f/lidar-composite-dtm-2022-1m" target="_blank" rel="noopener noreferrer">EA catalogue and licence</a></p>
+          <p class="overview-maplibre-attribution">MapLibre GL JS · <a href="https://github.com/maplibre/maplibre-gl-js/blob/main/LICENSE.txt" target="_blank" rel="noopener noreferrer">BSD 3-Clause licence</a></p>
+          <div class="overview-actions"><button type="button" data-testid="overview-retry" hidden>Retry overview load</button></div>
         </section>
         <aside id="controls-help" class="controls-help" aria-labelledby="controls-title" data-testid="controls-help" hidden>
           <h2 id="controls-title">NAVIGATION CONTROLS</h2>
@@ -366,6 +390,33 @@ export function createApp(container: HTMLElement): AppHandle {
   const boundaryState = container.querySelector<HTMLOutputElement>(
     '[data-testid="boundary-state"]',
   );
+  const overviewButton = container.querySelector<HTMLButtonElement>(
+    '[data-testid="overview-toggle"]',
+  );
+  const overviewPanel = container.querySelector<HTMLElement>(
+    '[data-testid="geographic-overview"]',
+  );
+  const overviewClose = container.querySelector<HTMLButtonElement>(
+    '[data-testid="overview-close"]',
+  );
+  const overviewRetry = container.querySelector<HTMLButtonElement>(
+    '[data-testid="overview-retry"]',
+  );
+  const overviewStatus = container.querySelector<HTMLElement>(
+    '[data-testid="overview-status"]',
+  );
+  const overviewLayerStatus = container.querySelector<HTMLElement>(
+    '[data-testid="overview-layer-status"]',
+  );
+  const overviewDisclaimer = container.querySelector<HTMLElement>(
+    '[data-testid="overview-disclaimer"]',
+  );
+  const overviewMapContainer = container.querySelector<HTMLElement>(
+    '[data-testid="overview-map"]',
+  );
+  const overviewOsmAttribution = container.querySelector<HTMLElement>(
+    '[data-testid="overview-osm-attribution"]',
+  );
 
   if (
     !shell ||
@@ -425,7 +476,16 @@ export function createApp(container: HTMLElement): AppHandle {
     !cameraPosition ||
     !cameraOrientation ||
     !flightSpeed ||
-    !boundaryState
+    !boundaryState ||
+    !overviewButton ||
+    !overviewPanel ||
+    !overviewClose ||
+    !overviewRetry ||
+    !overviewStatus ||
+    !overviewLayerStatus ||
+    !overviewDisclaimer ||
+    !overviewMapContainer ||
+    !overviewOsmAttribution
   ) {
     throw new Error('The viewer interface could not be initialized.');
   }
@@ -480,6 +540,7 @@ export function createApp(container: HTMLElement): AppHandle {
   let roadAttempt = 0;
   let roadMetadataSummary = '';
   let loadedRoadPackage: LoadedRoadPackage | undefined;
+  let loadedBuildingPackage: LoadedBuildingPackage | undefined;
   let pointerLocked = false;
   let disposed = false;
   let hasLoadedWorld = false;
@@ -491,6 +552,33 @@ export function createApp(container: HTMLElement): AppHandle {
     : 'synthetic';
   let currentWorldGroup: Scene['children'][number] | undefined;
   let resizeRenderer: () => void = () => undefined;
+
+  const overview = createOverviewController({
+    openButton: overviewButton,
+    closeButton: overviewClose,
+    retryButton: overviewRetry,
+    panel: overviewPanel,
+    status: overviewStatus,
+    layerStatus: overviewLayerStatus,
+    disclaimer: overviewDisclaimer,
+    mapContainer: overviewMapContainer,
+    osmAttribution: overviewOsmAttribution,
+    getContext: (): OverviewContext => ({
+      isReal: selectedWorldMode === 'real',
+      ...(currentTerrainManifest === undefined
+        ? {}
+        : { terrain: currentTerrainManifest }),
+      ...(currentTerrainManifestSha256 === undefined
+        ? {}
+        : { terrainManifestSha256: currentTerrainManifestSha256 }),
+      ...(loadedRoadPackage === undefined ? {} : { roads: loadedRoadPackage }),
+      roadsVisible: currentRoadGroup?.visible ?? false,
+      ...(loadedBuildingPackage === undefined
+        ? {}
+        : { buildings: loadedBuildingPackage }),
+      buildingsVisible: currentBuildingGroup?.visible ?? false,
+    }),
+  });
 
   const setWorldSelection = (mode: 'synthetic' | 'real' | 'm0'): void => {
     shell.dataset.worldMode = mode;
@@ -521,6 +609,7 @@ export function createApp(container: HTMLElement): AppHandle {
     buildingControls.hidden = true;
     roadControls.hidden = true;
     hasLoadedWorld = false;
+    overview.setContext();
   };
 
   const clearRoadLayer = (): void => {
@@ -561,6 +650,7 @@ export function createApp(container: HTMLElement): AppHandle {
     roadError.textContent = '';
     roadVintage.textContent = 'OSM extract vintage: not loaded.';
     roadRecovery.hidden = true;
+    overview.refreshLayers();
   };
 
   const clearBuildingLayer = (): void => {
@@ -583,12 +673,14 @@ export function createApp(container: HTMLElement): AppHandle {
     buildingStatus.textContent = 'Optional local OSM layer is off.';
     buildingVintage.textContent = 'OSM extract vintage: not loaded.';
     buildingMethodSummary = '';
+    loadedBuildingPackage = undefined;
     buildingsToggle.disabled = false;
     buildingsToggle.setAttribute('aria-pressed', 'false');
     buildingsToggle.textContent = 'Load OSM buildings';
     buildingsRetry.hidden = true;
     buildingsTerrainOnly.hidden = true;
     buildingError.hidden = true;
+    overview.refreshLayers();
   };
 
   const setControlsHelpVisible = (visible: boolean): void => {
@@ -744,6 +836,7 @@ export function createApp(container: HTMLElement): AppHandle {
       currentRoadGroup = group;
       loadedRoadPackage = packageData;
       scene.add(group);
+      overview.refreshLayers();
       roadLabels.setPackage(
         packageData,
         (x, z) => currentTerrainGrid?.sampleHeight(x, z) ?? null,
@@ -815,6 +908,7 @@ export function createApp(container: HTMLElement): AppHandle {
         : 'Show OSM road ribbons';
       roadsWireframeToggle.disabled = !visible;
       updateRoadStatusFromPackage(visible);
+      overview.refreshLayers();
       return;
     }
     roadsRequested = true;
@@ -907,6 +1001,7 @@ export function createApp(container: HTMLElement): AppHandle {
         return;
       }
       currentBuildingGroup = group;
+      loadedBuildingPackage = packageData;
       scene.add(group);
       shell.dataset.buildingState = 'loaded';
       shell.dataset.buildingCount = String(packageData.features.length);
@@ -937,6 +1032,7 @@ export function createApp(container: HTMLElement): AppHandle {
       buildingsRetry.hidden = true;
       buildingsTerrainOnly.hidden = true;
       buildingError.hidden = true;
+      overview.refreshLayers();
       status.textContent =
         'Terrain and local OSM footprints ready. Heights are unverified or estimated.';
     } catch (error) {
@@ -983,6 +1079,7 @@ export function createApp(container: HTMLElement): AppHandle {
         `${Number(buildingStatus.dataset.buildingCount).toLocaleString()} footprints / ` +
         `${Number(buildingStatus.dataset.componentCount).toLocaleString()} components · ` +
         `${buildingMethodSummary}.`;
+      overview.refreshLayers();
       return;
     }
     setBuildingRoute(true);
@@ -1184,6 +1281,7 @@ export function createApp(container: HTMLElement): AppHandle {
     errorPanel.hidden = true;
     startButton.disabled = false;
     hasLoadedWorld = true;
+    overview.setContext();
     shell.dataset.loadState = 'loaded';
     status.textContent =
       'World ready. Click Start to capture the pointer; Esc releases it.';
@@ -1576,6 +1674,7 @@ export function createApp(container: HTMLElement): AppHandle {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    overview.resize();
   };
 
   const resizeObserver = new ResizeObserver(resizeRenderer);
@@ -1636,6 +1735,7 @@ export function createApp(container: HTMLElement): AppHandle {
       roadAttempt += 1;
       roadLoad?.abort();
       roadLabels.dispose();
+      overview.dispose();
       controller?.dispose();
       renderer.setAnimationLoop(null);
       timer.dispose();

@@ -40,6 +40,7 @@ const LABEL_PANEL_SELECTORS = [
   '.building-controls',
   '.road-controls',
   '.controls-help',
+  '.overview-panel',
   '.start-card',
   '.corner-note',
 ] as const;

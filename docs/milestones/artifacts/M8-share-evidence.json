@@ -1,0 +1,17 @@
+{
+  "browser": {
+    "name": "chromium",
+    "version": "156.0.8078.4"
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "devicePixelRatio": 1.5,
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "maplibreResources": 0,
+  "realPackageRequests": [],
+  "externalRequests": [],
+  "syntheticWorld": "M0 analytic synthetic demo",
+  "screenshot": "docs/milestones/screenshots/M8-overview-synthetic-unavailable.png"
+}

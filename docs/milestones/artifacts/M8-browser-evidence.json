@@ -1,0 +1,67 @@
+{
+  "browser": {
+    "name": "chromium",
+    "version": "156.0.8078.4"
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "devicePixelRatio": 1.5,
+  "mainRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "mapRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "mapCanvas": {
+    "width": 567,
+    "height": 375
+  },
+  "mapCssRect": {
+    "width": 378,
+    "height": 250
+  },
+  "maplibreResources": [
+    {
+      "name": "maplibre-gl-qvkd0SPb.css",
+      "transferSize": 10419,
+      "decodedBodySize": 71339
+    },
+    {
+      "name": "maplibre-gl-CvMElhY5.js",
+      "transferSize": 293692,
+      "decodedBodySize": 1094337
+    },
+    {
+      "name": "maplibre-gl-worker-C6A_gd82.js",
+      "transferSize": 368,
+      "decodedBodySize": 68
+    },
+    {
+      "name": "maplibre-gl-worker-UMzBwfZH.js",
+      "transferSize": 148353,
+      "decodedBodySize": 518443
+    }
+  ],
+  "activationNote": "Measured from click to ready state in the test process.",
+  "overviewActivationMs": 32570,
+  "overviewPackage": {
+    "manifestSha256": "226d2bb12618c578848d09767a1698b5535dad1e398a903b8ebd2b93dac9cc76",
+    "featuresSha256": "8c6e2e7155337bf1bcb931592b5463ad1936feab7ebacd2ce308b3f492148916",
+    "featuresByteLength": 450896,
+    "featureCounts": {
+      "aoi": 1,
+      "roads": 196,
+      "buildings": 1000,
+      "total": 1197
+    },
+    "terrainManifestSha256": "a398e519ee8537af3bcdcdb781a1501a3e0f45e58e47a4bdd2a986e15a06788f"
+  },
+  "requests": [
+    "/worlds/torquay-poc-001/overview/manifest.json",
+    "/worlds/torquay-poc-001/overview/features.geojson",
+    "/worlds/torquay-poc-001/overview/manifest.json"
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "screenshot": "docs/milestones/screenshots/M8-overview-real.png",
+  "syntheticScreenshot": "docs/milestones/screenshots/M8-overview-synthetic-unavailable.png",
+  "qualification": "The geographic overview is a fixed 2D local GeoJSON view. It does not contain a live camera marker, terrain raster, or independent completeness/alignment result."
+}
