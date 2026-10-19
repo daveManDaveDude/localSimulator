@@ -575,9 +575,11 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **TVW-011 issue gate:** local road ribbons load on terrain; extraction, provenance, schema/geometry QA and synthetic fallback pass; bounded placement observations and screenshots are recorded.
 
-**Combined M5 exit gate:** remains pending the formal independent three-spot comparison and issue report in TVW-012. Do not treat TVW-011's mapped counts or bounded placement observations as a completeness check or AOI approval.
+**Combined M5 exit gate:** PASS by coordinator on 2026-10-19 after the formal TVW-012 report and independent Sol review returned PASS. This does not establish complete mapped coverage or approve/freeze the AOI; the AOI remains `selected_pending_coverage` / `not_checked`. See [TVW-012 handback](milestones/TVW-012-handback.md).
 
 ### M6 — Ground-following walk mode
+
+**TVW-013 status:** The user separately authorized TVW-013 on 2026-10-19 after M5 acceptance. The accepted specification adds normal/Shift movement speeds of 15 / 41.25 m/s in fly and walk modes, preserving the current 2.75× Shift ratio. TVW-014 and later remain unauthorized.
 
 **User-visible result:** a user can walk along slopes at **~1.7 m eye height**, look around, and switch freely back to flying.
 
@@ -585,6 +587,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 - Implement walking camera using shared heightfield sampling.
 - Ensure frame-rate-independent movement, bounds clamping, stable camera near tile edge and smooth transitions when changing mode.
+- Use normalized horizontal movement in walk mode; walking speed is a fast navigation control, not a realistic pedestrian speed.
 - Optional speed cap, slope warning and start position on a road.
 - Explicitly defer building collision and road-surface collision.
 
