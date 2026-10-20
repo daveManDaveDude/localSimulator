@@ -946,9 +946,18 @@ test('loads and navigates the local EA terrain package', async ({ page }) => {
 test('explains an unavailable local EA package and recovers to synthetic terrain', async ({
   page,
 }) => {
-  await page.route('**/worlds/torquay-poc-001/manifest.json', (route) =>
-    route.fulfill({ status: 404, body: 'package not generated' }),
+  const readinessRequests: string[] = [];
+  const downstreamRealRequests: string[] = [];
+  await page.route('**/worlds/torquay-poc-001-2km/ready.json', (route) =>
+    route.fulfill({ status: 404, body: 'release not published' }),
   );
+  page.on('request', (request) => {
+    if (request.url().endsWith('/worlds/torquay-poc-001-2km/ready.json')) {
+      readinessRequests.push(request.url());
+    } else if (request.url().includes('/worlds/torquay-poc-001-2km/')) {
+      downstreamRealRequests.push(request.url());
+    }
+  });
   await page.goto('/');
   await expect(page.locator('.viewer-shell')).toHaveAttribute(
     'data-load-state',
@@ -960,8 +969,10 @@ test('explains an unavailable local EA package and recovers to synthetic terrain
     'HTTP 404',
   );
   await expect(page.getByTestId('world-error-message')).toContainText(
-    'build-terrain',
+    'publish-scene',
   );
+  expect(readinessRequests).toHaveLength(1);
+  expect(downstreamRealRequests).toEqual([]);
   await page.getByTestId('recover-synthetic').click();
   await expect(page.locator('.viewer-shell')).toHaveAttribute(
     'data-load-state',

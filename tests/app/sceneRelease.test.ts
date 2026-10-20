@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CURRENT_2KM_RUNTIME_FILES,
+  CURRENT_2KM_HEIGHTFIELD_BYTE_LENGTH,
   loadCurrent2kmRelease,
 } from '../../src/app/sceneRelease';
 
@@ -28,7 +29,11 @@ function sortKeys(value: unknown): unknown {
   );
 }
 
-async function makeReleaseResponses(): Promise<{
+async function makeReleaseResponses(
+  byteLengthOverrides: Partial<
+    Record<(typeof CURRENT_2KM_RUNTIME_FILES)[number], number>
+  > = {},
+): Promise<{
   ready: Uint8Array;
   inventory: Uint8Array;
   assets: Map<string, Uint8Array>;
@@ -36,11 +41,14 @@ async function makeReleaseResponses(): Promise<{
   const assets = new Map<string, Uint8Array>();
   const entries = await Promise.all(
     CURRENT_2KM_RUNTIME_FILES.map(async (path) => {
-      const bytes = new TextEncoder().encode(`fixture:${path}`);
+      const bytes =
+        path === 'heightfield.f32'
+          ? new Uint8Array(CURRENT_2KM_HEIGHTFIELD_BYTE_LENGTH)
+          : new TextEncoder().encode(`fixture:${path}`);
       assets.set(path, bytes);
       return {
         path,
-        byteLength: bytes.byteLength,
+        byteLength: byteLengthOverrides[path] ?? bytes.byteLength,
         sha256: await sha256(bytes),
       };
     }),
@@ -153,6 +161,40 @@ describe('current 2 km readiness and immutable release pin', () => {
       true,
     );
   });
+
+  it.each([
+    ['manifest.json', 64 * 1024 + 1],
+    ['heightfield.f32', CURRENT_2KM_HEIGHTFIELD_BYTE_LENGTH - 4],
+  ] as const)(
+    'rejects an impossible %s descriptor before requesting any runtime asset',
+    async (path, byteLength) => {
+      const fixture = await makeReleaseResponses({ [path]: byteLength });
+      const requests: string[] = [];
+      await expect(
+        loadCurrent2kmRelease(
+          'http://localhost/worlds/torquay-poc-001-2km/ready.json',
+          async (url) => {
+            requests.push(url.pathname);
+            return url.pathname.endsWith('/ready.json')
+              ? response(fixture.ready)
+              : response(fixture.inventory);
+          },
+        ),
+      ).rejects.toThrow(/byteLength.*permitted current_2km size/);
+      expect(requests).toHaveLength(2);
+      expect(requests[0]).toBe('/worlds/torquay-poc-001-2km/ready.json');
+      expect(requests[1]).toContain('/inventory.json');
+      expect(
+        requests.some(
+          (request) =>
+            request.endsWith('/manifest.json') ||
+            request.endsWith('/heightfield.f32') ||
+            request.endsWith('/roads.json') ||
+            request.endsWith('/buildings.json'),
+        ),
+      ).toBe(false);
+    },
+  );
 
   it('rejects runtime response bytes that differ from the pinned inventory', async () => {
     const fixture = await makeReleaseResponses();

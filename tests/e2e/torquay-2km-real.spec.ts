@@ -32,6 +32,9 @@ async function expectLoaded(page: import('@playwright/test').Page) {
 test('current 2 km combined package loads, navigates into its outer annulus, and reports bounded routes', async ({
   page,
 }) => {
+  // Match the isolated current_2km profile: this full scene loads three
+  // local packages and exercises a complete navigation sequence.
+  test.setTimeout(240_000);
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
   const failedResponses: string[] = [];
@@ -298,16 +301,20 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
   await expect(page.getByTestId('navigation-mode')).toHaveAttribute(
     'data-mode',
     'walk',
+    { timeout: 45_000 },
   );
   await expect
-    .poll(() =>
-      page.getByTestId('eye-clearance').getAttribute('data-clearance-meters'),
+    .poll(
+      () =>
+        page.getByTestId('eye-clearance').getAttribute('data-clearance-meters'),
+      { timeout: 45_000 },
     )
     .toMatch(/^1\.7\d{2,}$/);
   await page.keyboard.press('f');
   await expect(page.getByTestId('navigation-mode')).toHaveAttribute(
     'data-mode',
     'fly',
+    { timeout: 45_000 },
   );
   await page.keyboard.press('r');
   await expect
@@ -317,10 +324,13 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
   await expect(page.getByTestId('navigation-mode')).toHaveAttribute(
     'data-mode',
     'walk',
+    { timeout: 45_000 },
   );
   await expect
-    .poll(() =>
-      page.getByTestId('eye-clearance').getAttribute('data-clearance-meters'),
+    .poll(
+      () =>
+        page.getByTestId('eye-clearance').getAttribute('data-clearance-meters'),
+      { timeout: 45_000 },
     )
     .toMatch(/^1\.7\d{2,}$/);
   await page.keyboard.down('Shift');

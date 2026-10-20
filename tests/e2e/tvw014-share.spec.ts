@@ -172,20 +172,23 @@ test('share build gives a recoverable message when local EA assets are absent', 
   );
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
-  const manifestRequests: string[] = [];
-  const manifestResponses: Array<{ status: number; contentType: string }> = [];
+  const readinessRequests: string[] = [];
+  const readinessResponses: Array<{ status: number; contentType: string }> = [];
+  const downstreamRealRequests: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
   page.on('request', (request) => {
-    if (request.url().endsWith('/worlds/torquay-poc-001-2km/manifest.json')) {
-      manifestRequests.push(request.url());
+    if (request.url().endsWith('/worlds/torquay-poc-001-2km/ready.json')) {
+      readinessRequests.push(request.url());
+    } else if (request.url().includes('/worlds/torquay-poc-001-2km/')) {
+      downstreamRealRequests.push(request.url());
     }
   });
   page.on('response', (response) => {
-    if (response.url().endsWith('/worlds/torquay-poc-001-2km/manifest.json')) {
-      manifestResponses.push({
+    if (response.url().endsWith('/worlds/torquay-poc-001-2km/ready.json')) {
+      readinessResponses.push({
         status: response.status(),
         contentType: response.headers()['content-type'] ?? '',
       });
@@ -216,16 +219,17 @@ test('share build gives a recoverable message when local EA assets are absent', 
   );
   expect(pageErrors).toEqual([]);
   expect(consoleErrors).toEqual([]);
-  expect(manifestRequests).toHaveLength(1);
-  expect(manifestResponses).toHaveLength(1);
-  const manifestResponse = manifestResponses.at(0);
-  if (manifestResponse === undefined) {
+  expect(readinessRequests).toHaveLength(1);
+  expect(readinessResponses).toHaveLength(1);
+  expect(downstreamRealRequests).toEqual([]);
+  const readinessResponse = readinessResponses.at(0);
+  if (readinessResponse === undefined) {
     throw new Error(
-      'The attempted missing manifest request produced no response.',
+      'The attempted missing readiness request produced no response.',
     );
   }
   expect(
-    manifestResponse.status >= 400 ||
-      !manifestResponse.contentType.includes('application/json'),
+    readinessResponse.status >= 400 ||
+      !readinessResponse.contentType.includes('application/json'),
   ).toBe(true);
 });

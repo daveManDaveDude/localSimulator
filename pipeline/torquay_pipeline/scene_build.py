@@ -26,7 +26,12 @@ from .config import AoiConfig, load_aoi_config, validate_stored_selection
 from .road_config import load_road_config
 from .road_export import RoadExportError, build_road_package, validate_road_package
 from .roads import import_osm_roads
-from .scene_release import publish_scene_release, validate_published_scene
+from .scene_release import (
+    SceneReleaseError,
+    assert_no_reparse_components,
+    publish_scene_release,
+    validate_published_scene,
+)
 from .terrain_coverage import analyze_coverage
 from .terrain_export import TerrainExportError, build_terrain_package
 from .terrain_sources import verify_source_manifest
@@ -53,7 +58,12 @@ def _file_sha256(path: Path) -> str:
 
 
 def _resolve(path: Path, root: Path) -> Path:
-    return path.resolve() if path.is_absolute() else (root / path).resolve()
+    candidate = path if path.is_absolute() else root / path
+    try:
+        assert_no_reparse_components(candidate)
+    except SceneReleaseError as exc:
+        raise SceneBuildError(str(exc)) from exc
+    return candidate.resolve()
 
 
 def _paths_overlap(first: Path, second: Path) -> bool:
@@ -69,7 +79,13 @@ def _validate_output_path(
     protected_inputs: list[Path],
 ) -> Path:
     """Reject any destination overlap before creating or replacing output files."""
-    output = output_dir.resolve(strict=False)
+    try:
+        root_lexical = assert_no_reparse_components(project_root)
+        output_lexical = assert_no_reparse_components(output_dir)
+    except SceneReleaseError as exc:
+        raise SceneBuildError(str(exc)) from exc
+    output = output_lexical.resolve(strict=False)
+    root = root_lexical.resolve(strict=True)
     if output.exists() and output.is_symlink():
         raise SceneBuildError(f"output directory must not be a symlink: '{output}'")
     protected = [
@@ -82,12 +98,15 @@ def _validate_output_path(
         *protected_inputs,
     ]
     for value in protected:
-        if _paths_overlap(output, value):
-            raise SceneBuildError(
-                f"output '{output}' overlaps protected input '{value.resolve(strict=False)}'"
-            )
+        try:
+            value_lexical = assert_no_reparse_components(value)
+        except SceneReleaseError as exc:
+            raise SceneBuildError(str(exc)) from exc
+        value_resolved = value_lexical.resolve(strict=False)
+        if _paths_overlap(output, value_resolved):
+            raise SceneBuildError(f"output '{output}' overlaps protected input '{value_resolved}'")
     try:
-        output.relative_to(project_root.resolve())
+        output.relative_to(root)
     except ValueError as exc:
         raise SceneBuildError("output directory must remain inside the project workspace") from exc
     return output
@@ -406,7 +425,24 @@ def build_scene_package(
     missing_threshold: float = 0.01,
 ) -> dict[str, Any]:
     """Build, validate and atomically publish the isolated 2 km terrain/buildings/roads scene."""
-    root = project_root.resolve()
+    # Inspect every caller-supplied lexical path before resolving any of them.
+    # In particular, Path.resolve() follows a Windows junction and would erase
+    # the directory entry that must be rejected before reads or writes.
+    try:
+        for candidate in (
+            project_root,
+            aoi_config_path,
+            source_manifest_path,
+            source_dir,
+            source_path,
+            buildings_config_path,
+            roads_config_path,
+            output_dir,
+        ):
+            assert_no_reparse_components(candidate)
+    except SceneReleaseError as exc:
+        raise SceneBuildError(str(exc)) from exc
+    root = project_root.resolve(strict=True)
     aoi_config_path = _resolve(aoi_config_path, root)
     source_manifest_path = _resolve(source_manifest_path, root)
     source_dir = _resolve(source_dir, root)
@@ -421,11 +457,16 @@ def build_scene_package(
         raise SceneBuildError("source manifest has no verified EA raster files")
     verify_building_source(source_path, source_manifest_path)
     raster_records = source_manifest.get("sources", [])
-    raster_paths = [
-        (source_dir / str(record["raster_relative_path"])).resolve()
-        for record in raster_records
-        if isinstance(record, dict) and isinstance(record.get("raster_relative_path"), str)
-    ]
+    raster_paths: list[Path] = []
+    for record in raster_records:
+        if not isinstance(record, dict) or not isinstance(record.get("raster_relative_path"), str):
+            continue
+        raster_lexical = source_dir / str(record["raster_relative_path"])
+        try:
+            assert_no_reparse_components(raster_lexical)
+        except SceneReleaseError as exc:
+            raise SceneBuildError(str(exc)) from exc
+        raster_paths.append(raster_lexical.resolve())
     if not raster_paths:
         raise SceneBuildError("EA source manifest contains no safe raster paths")
     coverage = analyze_coverage(aoi, raster_paths, missing_threshold)

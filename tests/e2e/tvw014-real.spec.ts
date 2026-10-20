@@ -20,11 +20,8 @@ async function waitForRoute(page: import('@playwright/test').Page) {
     'Environment Agency copyright',
   );
   await expect(page.getByTestId('real-package-extent-notice')).toBeVisible();
-  await expect(page.getByTestId('real-package-extent-notice')).toContainText(
-    'earlier 1 km browser packages',
-  );
-  await expect(page.getByTestId('real-package-extent-notice')).toContainText(
-    '2 km candidate is pending and is not rendered',
+  await expect(page.getByTestId('real-package-extent-notice')).toHaveText(
+    'Historical 1 km package. The current 2 km candidate remains pending; mapped counts do not establish completeness.',
   );
   await expect(page.getByTestId('real-package-extent-notice')).toBeInViewport({
     ratio: 1,

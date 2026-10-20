@@ -84,15 +84,25 @@ def assert_no_reparse_components(path: Path) -> Path:
     This deliberately runs before ``resolve``: resolving a Windows junction
     would erase the path entry that the guard needs to reject.
     """
-    absolute = Path(os.path.abspath(path))
-    current = Path(absolute.anchor)
-    for component in absolute.parts[1:]:
-        current /= component
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = Path.cwd() / candidate
+    anchor = Path(candidate.anchor)
+    components: list[str] = []
+    for component in candidate.parts[1:]:
+        if component in ("", "."):
+            continue
+        if component == "..":
+            if components:
+                components.pop()
+            continue
+        components.append(component)
+        current = anchor.joinpath(*components)
         if _is_reparse_point(current):
             raise SceneReleaseError(
                 f"symlink path component or junction/reparse point is not allowed: '{current}'"
             )
-    return absolute
+    return anchor.joinpath(*components)
 
 
 def _assert_no_symlink_components(path: Path, *, project_root: Path) -> None:

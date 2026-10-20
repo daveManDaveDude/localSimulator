@@ -924,18 +924,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         }:
             return _road_command(args)
         if args.command in {"build-scene", "validate-scene", "publish-scene"}:
-            if args.command == "publish-scene":
-                for input_path in (
-                    args.aoi_config,
-                    args.source_manifest,
-                    args.source_dir,
-                    args.source,
-                    args.buildings_config,
-                    args.roads_config,
-                    args.validated_stage,
-                    args.package_root,
-                ):
-                    assert_no_reparse_components(input_path)
+            # Check lexical paths before any resolve() or command-specific
+            # work. Resolving first can follow a Windows junction and hide it.
+            scene_paths = [
+                PROJECT_ROOT,
+                args.aoi_config,
+                args.source_manifest,
+                args.source_dir,
+                args.source,
+                args.buildings_config,
+                args.roads_config,
+            ]
+            if args.command == "build-scene":
+                scene_paths.append(args.output_dir)
+            elif args.command == "validate-scene":
+                scene_paths.append(args.package_dir)
+            else:
+                scene_paths.extend((args.validated_stage, args.package_root))
+            for input_path in scene_paths:
+                assert_no_reparse_components(input_path)
             common = {
                 "aoi_config_path": args.aoi_config.resolve(),
                 "source_manifest_path": args.source_manifest.resolve(),

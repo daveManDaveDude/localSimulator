@@ -13,6 +13,23 @@ export const CURRENT_2KM_RUNTIME_FILES = [
 
 export type Current2kmRuntimeFile = (typeof CURRENT_2KM_RUNTIME_FILES)[number];
 
+/** Exact Float32 payload size for the fixed 1001 × 1001 current_2km grid. */
+export const CURRENT_2KM_HEIGHTFIELD_BYTE_LENGTH = 4_008_004;
+
+const MAX_RUNTIME_FILE_BYTES: Readonly<Record<Current2kmRuntimeFile, number>> =
+  {
+    'buildings/buildings.json': 32 * 1024 * 1024,
+    'buildings/manifest.json': 64 * 1024,
+    'buildings/qa.json': 1024 * 1024,
+    'heightfield.f32': CURRENT_2KM_HEIGHTFIELD_BYTE_LENGTH,
+    'manifest.json': 64 * 1024,
+    'qa.json': 1024 * 1024,
+    'roads/manifest.json': 64 * 1024,
+    'roads/qa.json': 1024 * 1024,
+    'roads/roads.json': 128 * 1024 * 1024,
+    'scene-qa.json': 256 * 1024,
+  };
+
 export interface SceneReleaseFile {
   path: Current2kmRuntimeFile;
   byteLength: number;
@@ -312,7 +329,7 @@ function parseInventory(
       ) ||
       typeof item['byteLength'] !== 'number' ||
       !Number.isSafeInteger(item['byteLength']) ||
-      item['byteLength'] < 0 ||
+      item['byteLength'] <= 0 ||
       !isSafeSha256(item['sha256'])
     ) {
       throw new SceneReleaseLoadError(
@@ -321,6 +338,17 @@ function parseInventory(
       );
     }
     const path = item['path'] as Current2kmRuntimeFile;
+    const maximumBytes = MAX_RUNTIME_FILE_BYTES[path];
+    if (
+      item['byteLength'] > maximumBytes ||
+      (path === 'heightfield.f32' &&
+        item['byteLength'] !== CURRENT_2KM_HEIGHTFIELD_BYTE_LENGTH)
+    ) {
+      throw new SceneReleaseLoadError(
+        'inventory validation',
+        `inventory.files[${index}] byteLength for '${path}' is outside its permitted current_2km size`,
+      );
+    }
     if (files.has(path)) {
       throw new SceneReleaseLoadError(
         'inventory validation',
