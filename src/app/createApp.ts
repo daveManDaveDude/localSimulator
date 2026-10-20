@@ -86,14 +86,21 @@ export function createApp(container: HTMLElement): AppHandle {
     'world',
   );
   const m0Mode = requestedWorld === 'm0';
-  const initialRealProfile = realSceneProfileForRoute(requestedWorld);
+  // Synthetic and historical URLs are internal reproduction routes. The
+  // product entry point always selects the current combined local package.
+  const initialRealProfile =
+    requestedWorld === 'synthetic' || m0Mode
+      ? undefined
+      : (realSceneProfileForRoute(requestedWorld) ?? CURRENT_2KM_SCENE);
   const initialRealMode = initialRealProfile !== undefined;
   const initialBuildingsMode =
     initialRealMode &&
-    new URLSearchParams(window.location.search).get('buildings') === '1';
+    (initialRealProfile.profile === 'current_2km' ||
+      new URLSearchParams(window.location.search).get('buildings') === '1');
   const initialRoadsMode =
     initialRealMode &&
-    new URLSearchParams(window.location.search).get('roads') === '1';
+    (initialRealProfile.profile === 'current_2km' ||
+      new URLSearchParams(window.location.search).get('roads') === '1');
   container.innerHTML = `
     <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-scene-profile="${initialRealProfile?.profile ?? ''}" data-load-state="loading" data-renderer-ready="false">
       <canvas class="viewer-canvas" aria-label="Terrain navigation world"></canvas>
@@ -236,6 +243,83 @@ export function createApp(container: HTMLElement): AppHandle {
       </div>
     </main>
   `;
+
+  // Retain the existing read-only telemetry and loader regression hooks in an
+  // inaccessible diagnostics subtree. Product controls are assembled separately
+  // so no world, layer, or rendering options enter the user navigation flow.
+  const productControls = document.createElement('div');
+  productControls.className = 'product-controls';
+  const navigationActions = container.querySelector('.debug-actions');
+  if (navigationActions) productControls.append(navigationActions);
+  const extentNotice = container.querySelector(
+    '[data-testid="real-package-extent-notice"]',
+  );
+  if (extentNotice) productControls.append(extentNotice);
+  productControls.insertAdjacentHTML(
+    'beforeend',
+    `
+    <p class="fallback-notice" data-testid="fallback-notice" role="status" hidden></p>
+    <button type="button" data-testid="retry-torquay" hidden>Retry Torquay</button>
+    <details class="sources" data-testid="sources">
+      <summary>Sources</summary>
+      <div data-testid="active-source-details"></div>
+      <div data-testid="torquay-source-details">
+        <p>Torquay package: EA Composite DTM 1 m (2022), rendered at 2 m spacing; heights reference Ordnance Survey Newlyn. Tile metadata spans 2003–2022; this is not a 2026 survey.</p>
+        <p>OSM Devon extract: 16 October 2026, provided by Geofabrik. Building heights are tagged or estimated and unverified; road widths are visual estimates, not measured kerbs.</p>
+        <p>Only three historical road contexts were compared qualitatively; no numeric offset was measured. The recorded coordinate operation reports 2 m accuracy; the preferred OSTN15 grid was unavailable.</p>
+        <p>Finer EA products exist. Saved local index metadata lists 0.5 m footprints dated April 2010 over 9.9407% of the candidate; no finer raster was checked or adopted.</p>
+        <p><a href="https://www.data.gov.uk/dataset/01b3ee39-da3f-47b6-83da-dc98e73a461f/lidar-composite-dtm-2022-1m" target="_blank" rel="noopener noreferrer">EA source catalogue</a> · <a href="https://www.data.gov.uk/dataset/8275e71e-1516-42a1-bb0c-4fa73807fe2b/lidar-dtm-time-stamped-tiles" target="_blank" rel="noopener noreferrer">EA time-stamped products</a></p>
+      </div>
+    </details>
+    <div class="layer-recovery" data-testid="layer-recovery"></div>
+  `,
+  );
+  const sourceDetails = productControls.querySelector(
+    '[data-testid="active-source-details"]',
+  );
+  for (const id of [
+    'world-attribution',
+    'provenance-links',
+    'building-attribution',
+  ]) {
+    const element = container.querySelector(`[data-testid="${id}"]`);
+    if (element) sourceDetails?.append(element);
+  }
+  const recovery = productControls.querySelector(
+    '[data-testid="layer-recovery"]',
+  );
+  for (const id of [
+    'building-error',
+    'buildings-retry',
+    'road-error',
+    'roads-retry',
+  ]) {
+    const element = container.querySelector(`[data-testid="${id}"]`);
+    if (element) recovery?.append(element);
+  }
+  // OSM attribution is always available while navigating, even when Sources is closed.
+  productControls.insertAdjacentHTML(
+    'beforeend',
+    `<p class="map-credit" data-testid="map-credit">Environment Agency © 2022 · <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank" rel="noopener noreferrer">OGL</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> · Geofabrik</p>`,
+  );
+  container.querySelector('.viewer-ui')?.append(productControls);
+  for (const selector of [
+    '.world-selector',
+    '.debug-hud',
+    '.building-controls',
+    '.road-controls',
+    '.overview-panel',
+    '.corner-note',
+    '.terrain-key-hint',
+    '[data-testid="return-m0"]',
+  ]) {
+    const element = container.querySelector<HTMLElement>(selector);
+    if (element) {
+      element.classList.add('internal-diagnostics');
+      element.hidden = true;
+      element.inert = true;
+    }
+  }
 
   const shell = container.querySelector<HTMLElement>('.viewer-shell');
   const canvas = container.querySelector<HTMLCanvasElement>('.viewer-canvas');
@@ -611,11 +695,11 @@ export function createApp(container: HTMLElement): AppHandle {
     if (mode === 'real') {
       realPackageExtentNotice.textContent =
         selectedRealProfile.profile === 'current_2km'
-          ? 'Current 2 km candidate · AOI selection remains pending and coverage is not checked. Mapped feature counts do not establish completeness.'
+          ? '2 km candidate · AOI pending; feature coverage not checked.'
           : 'Historical 1 km package. The current 2 km candidate remains pending; mapped counts do not establish completeness.';
       welcomeCopy.textContent =
         selectedRealProfile.profile === 'current_2km'
-          ? 'REAL EA LIDAR · current 2 km candidate terrain with dated local OSM layers. Coverage remains not checked; mapped counts do not establish completeness.'
+          ? 'Explore the current 2 km Torquay candidate with terrain, buildings and roads.'
           : 'REAL EA LIDAR · retained historical 1 km terrain and optional OSM layers. The current 2 km candidate remains pending.';
     } else if (mode === 'synthetic') {
       welcomeCopy.textContent =
@@ -629,6 +713,18 @@ export function createApp(container: HTMLElement): AppHandle {
       String(mode === 'synthetic'),
     );
     realWorldButton.setAttribute('aria-pressed', String(mode === 'real'));
+    const credits = container.querySelector<HTMLElement>(
+      '[data-testid="map-credit"]',
+    );
+    if (credits) credits.hidden = mode !== 'real';
+    const torquayDetails = container.querySelector<HTMLElement>(
+      '[data-testid="torquay-source-details"]',
+    );
+    if (torquayDetails) torquayDetails.hidden = mode !== 'real';
+    const osmCredit = container.querySelector<HTMLElement>(
+      '[data-testid="building-attribution"]',
+    );
+    if (osmCredit) osmCredit.hidden = mode !== 'real';
   };
 
   const clearCurrentWorld = (): void => {
@@ -941,11 +1037,9 @@ export function createApp(container: HTMLElement): AppHandle {
         return;
       }
       const detail = error instanceof Error ? error.message : String(error);
-      const publisherCommand =
-        selectedRealProfile.profile === 'current_2km'
-          ? '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli build-scene --profile current_2km'
-          : '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-roads';
-      roadError.textContent = `${detail} From the pipeline folder run ${publisherCommand}. Terrain and any loaded buildings remain available.`;
+      roadError.dataset.detail = detail;
+      roadError.textContent =
+        'Roads could not be loaded. Terrain and any loaded buildings remain usable.';
       roadError.hidden = false;
       roadStatus.dataset.state = 'error';
       roadLabels.clear();
@@ -1113,12 +1207,9 @@ export function createApp(container: HTMLElement): AppHandle {
         return;
       }
       const detail = error instanceof Error ? error.message : String(error);
-      const publisherCommand =
-        selectedRealProfile.profile === 'current_2km'
-          ? '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli build-scene --profile current_2km'
-          : '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-buildings';
-      const publishCommand = `From the pipeline folder run ${publisherCommand}.`;
-      buildingErrorMessage.textContent = `${detail} ${publishCommand} The terrain remains available; no buildings are shown.`;
+      buildingErrorMessage.dataset.detail = detail;
+      buildingErrorMessage.textContent =
+        'Buildings could not be loaded. Terrain remains usable.';
       buildingError.hidden = false;
       shell.dataset.buildingState = 'error';
       buildingStatus.dataset.state = 'error';
@@ -1288,7 +1379,7 @@ export function createApp(container: HTMLElement): AppHandle {
       buildingStatus.dataset.state = 'off';
       buildingsToggle.disabled = false;
     }
-    setGridVisible(true);
+    setGridVisible(false);
     setWireframeVisible(false);
     controller = new FreeFlyController(
       camera,
@@ -1391,6 +1482,14 @@ export function createApp(container: HTMLElement): AppHandle {
     realProfile?: RealSceneProfileConfig,
   ): Promise<void> => {
     if (mode === 'real') {
+      const notice = container.querySelector<HTMLElement>(
+        '[data-testid="fallback-notice"]',
+      );
+      const retry = container.querySelector<HTMLElement>(
+        '[data-testid="retry-torquay"]',
+      );
+      if (notice) notice.hidden = true;
+      if (retry) retry.hidden = true;
       if (realProfile) selectedRealProfile = realProfile;
       else if (selectedRealProfile.profile === 'current_2km') {
         // Retry from the fixed profile root; never retain a prior release URL.
@@ -1525,6 +1624,25 @@ export function createApp(container: HTMLElement): AppHandle {
         return;
       }
       showLoadError(error);
+      // A missing local package is normal on clean/share clones. Fall back
+      // without changing the bookmarked product route or concealing the cause.
+      if (mode === 'real' && selectedRealProfile.profile === 'current_2km') {
+        const detail = error instanceof Error ? error.message : String(error);
+        const notice = container.querySelector<HTMLElement>(
+          '[data-testid="fallback-notice"]',
+        );
+        const retry = container.querySelector<HTMLElement>(
+          '[data-testid="retry-torquay"]',
+        );
+        if (notice) {
+          notice.dataset.failureDetail = detail;
+          notice.textContent =
+            'Torquay package unavailable — showing fictional demo terrain. The local package could not be loaded or validated. See README.md for restoration, then retry.';
+          notice.hidden = false;
+        }
+        if (retry) retry.hidden = false;
+        await startWorldLoad('synthetic');
+      }
     }
   };
 
@@ -1624,10 +1742,6 @@ export function createApp(container: HTMLElement): AppHandle {
       setControlsHelpVisible(controlsHelp.hidden === true);
       return;
     }
-    if (event.code === 'KeyG' && !event.repeat && currentGridAndCompass) {
-      event.preventDefault();
-      setGridVisible(!currentGridAndCompass.visible);
-    }
   };
   const toggleNavigationMode = (): void => {
     controller?.toggleNavigationMode();
@@ -1655,15 +1769,36 @@ export function createApp(container: HTMLElement): AppHandle {
   buildingsTerrainOnly.addEventListener('click', continueTerrainOnly);
   const retryWorldLoad = (): void => void startWorldLoad(selectedWorldMode);
   retryButton.addEventListener('click', retryWorldLoad);
+  const retryTorquayButton = container.querySelector<HTMLButtonElement>(
+    '[data-testid="retry-torquay"]',
+  );
+  const retryTorquay = (): void => {
+    buildingsRequested = true;
+    roadsRequested = true;
+    const notice = container.querySelector<HTMLElement>(
+      '[data-testid="fallback-notice"]',
+    );
+    if (notice) notice.hidden = true;
+    if (retryTorquayButton) retryTorquayButton.hidden = true;
+    void startWorldLoad('real', CURRENT_2KM_SCENE);
+  };
+  retryTorquayButton?.addEventListener('click', retryTorquay);
   canvas.addEventListener('click', requestLockFromCanvas);
   window.addEventListener('keydown', handleViewerShortcut);
   const handlePopState = (): void => {
     const route = new URLSearchParams(window.location.search);
     const routeWorld = route.get('world');
-    const routeProfile = realSceneProfileForRoute(routeWorld);
+    const routeProfile =
+      routeWorld === 'synthetic' || routeWorld === 'm0'
+        ? undefined
+        : (realSceneProfileForRoute(routeWorld) ?? CURRENT_2KM_SCENE);
     buildingsRequested =
-      routeProfile !== undefined && route.get('buildings') === '1';
-    roadsRequested = routeProfile !== undefined && route.get('roads') === '1';
+      routeProfile !== undefined &&
+      (routeProfile.profile === 'current_2km' ||
+        route.get('buildings') === '1');
+    roadsRequested =
+      routeProfile !== undefined &&
+      (routeProfile.profile === 'current_2km' || route.get('roads') === '1');
     if (routeWorld === 'm0') {
       selectedWorldMode = 'synthetic';
       startM0World();
@@ -1887,6 +2022,7 @@ export function createApp(container: HTMLElement): AppHandle {
       buildingsRetry.removeEventListener('click', retryBuildingLoad);
       buildingsTerrainOnly.removeEventListener('click', continueTerrainOnly);
       retryButton.removeEventListener('click', retryWorldLoad);
+      retryTorquayButton?.removeEventListener('click', retryTorquay);
       canvas.removeEventListener('click', requestLockFromCanvas);
       disposeSceneResources(scene);
       renderer.dispose();

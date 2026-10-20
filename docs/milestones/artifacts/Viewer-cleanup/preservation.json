@@ -1,0 +1,602 @@
+{
+  "protectedFileCount": 149,
+  "changed": [],
+  "files": {
+    ".codex/torquay-plan-implementation.md": {
+      "bytes": 61742,
+      "sha256": "8faccd63578eb9851759dce4512fed437193b86d669c1c867eb9608197109eae"
+    },
+    "config/alignment.torquay.json": {
+      "bytes": 7735,
+      "sha256": "ea0e08ab16a7a91a0a721badb3390f47a2448f7f0460b88a300645666717472d"
+    },
+    "config/aoi.torquay-1km.json": {
+      "bytes": 973,
+      "sha256": "2611857be58adb74a0a1fd48768f8437d02daba73d3f084ea9311fdc9e240b70"
+    },
+    "config/aoi.torquay.json": {
+      "bytes": 970,
+      "sha256": "205aa50e58e807e0f54f7f74d9f546052da6fca627ae9c3411ec4af334a2a6e5"
+    },
+    "config/buildings.torquay-2km.json": {
+      "bytes": 707,
+      "sha256": "56142ad206e28d59de5dcc8519559c18ab74db7e19ede9d21d08ea376b7bde27"
+    },
+    "config/buildings.torquay.json": {
+      "bytes": 671,
+      "sha256": "8c1e0bf3e32977f3f900a9c9274e0df4466fe7f89b1191dcc112fb413790a7e4"
+    },
+    "config/roads.torquay-2km.json": {
+      "bytes": 1407,
+      "sha256": "e839624bebdf915903923d7749e62fe267b4480777efa21e4ace70ff858d2ed1"
+    },
+    "config/roads.torquay.json": {
+      "bytes": 1278,
+      "sha256": "ce96f7cd7da42773d4278d54c9c8ef9ccd57f7db7a6ac3d164338567298ccf6d"
+    },
+    "data/comparison-source-manifest.json": {
+      "bytes": 6058,
+      "sha256": "79a42273d0182546002d782cbf99a3a877ccad4920f95c69f430aa674d40c660"
+    },
+    "data/raw/comparison/os_openmap_local/openmaplocal-2026-04-sx-geotiff.zip": {
+      "bytes": 349405146,
+      "sha256": "d9a01900c4dd5c26af50d6aed79f419a1957acf4167aedef97bb905ffcdff853"
+    },
+    "data/raw/comparison/os_openmap_local/rough-aoi.png": {
+      "bytes": 1128807,
+      "sha256": "dcb10876ccd4c93fe89ad6ea79c053c42b292dcf5d304ad176254cd3048a75d7"
+    },
+    "data/raw/comparison/os_openmap_local/selected-members/licence.txt": {
+      "bytes": 190,
+      "sha256": "65f3f555aa3e42e93b4db24a29ad277beefd12bc4871076d558c1cc41a6b216d"
+    },
+    "data/raw/comparison/os_openmap_local/selected-members/readme.txt": {
+      "bytes": 1488,
+      "sha256": "d32d1cd25d883ec2321c5af824d93b10fa4e4feda7ebf9177d2e10bbd181a17c"
+    },
+    "data/raw/comparison/os_openmap_local/selected-members/SX96NW.tif": {
+      "bytes": 2620996,
+      "sha256": "fec960fdb94a2e2cc3cdcfa201c35c6070871ae7c86b6c80617bad550799ae1a"
+    },
+    "data/raw/comparison/os_openmap_local/selected-members/SX96SW.tif": {
+      "bytes": 2248452,
+      "sha256": "546c7a7c60b8c372c35dfd7ad21ddbbd71437ba45966235f6a09264352181838"
+    },
+    "data/raw/ea_dtm/lidar_composite_dtm-2022-1-SX96nw.zip": {
+      "bytes": 68662575,
+      "sha256": "22ac2c453ea79ca050a5c1b5a382ba1409a1f9f2c795ab274e6b78fffb4aecf6"
+    },
+    "data/raw/ea_dtm/lidar_composite_dtm-2022-1-SX96sw.zip": {
+      "bytes": 57405975,
+      "sha256": "46caf90e77dafc3bca95bf7cc0a81bc13601eb9593f7cb9818c25565d9020e6e"
+    },
+    "data/raw/ea_dtm/SX96nw/SX96nw_DTM_1m.tfw": {
+      "bytes": 88,
+      "sha256": "6008684bd01601123ca35ddb4dfac8458e15acbaf1454a4623b1b80936f204da"
+    },
+    "data/raw/ea_dtm/SX96nw/SX96nw_DTM_1m.tif": {
+      "bytes": 69538064,
+      "sha256": "665441c4022f06044e17b501e6e1fe4bf3a2c25f87a7f2fea91c01c1054ba8e1"
+    },
+    "data/raw/ea_dtm/SX96nw/SX96nw_DTM_1m.tif.aux.xml": {
+      "bytes": 2588,
+      "sha256": "c3c3065f5637fa8a9be06ba33f3ee2e78134afe5a56d4bb84062d41ae0dab685"
+    },
+    "data/raw/ea_dtm/SX96nw/SX96nw_DTM_1m.tif.xml": {
+      "bytes": 20545,
+      "sha256": "4e24fa849e7b2a50a1446122de00fc30c29571248fa8bb0110a7f3283c9fb500"
+    },
+    "data/raw/ea_dtm/SX96nw/SX96nw_DTM_1m_Metadata.gpkg": {
+      "bytes": 172032,
+      "sha256": "4c7c11733e224916b3bc4c2439d9504a446e880b811726d24824db31a58d5e98"
+    },
+    "data/raw/ea_dtm/SX96sw/SX96sw_DTM_1m.tfw": {
+      "bytes": 88,
+      "sha256": "ceb54107342fcec794761ecf2218f2aba1bc6a4967ce13043094dc7106338575"
+    },
+    "data/raw/ea_dtm/SX96sw/SX96sw_DTM_1m.tif": {
+      "bytes": 57969482,
+      "sha256": "8438a544a9f4b4c675d72fd16824d5b75802899e7291edb585e98334da53211f"
+    },
+    "data/raw/ea_dtm/SX96sw/SX96sw_DTM_1m.tif.aux.xml": {
+      "bytes": 2563,
+      "sha256": "04f1346380ec115eedde195a56aa02027cb9ee3a1b765f90968d8c9b72a47806"
+    },
+    "data/raw/ea_dtm/SX96sw/SX96sw_DTM_1m.tif.xml": {
+      "bytes": 20545,
+      "sha256": "6122fd3fe59b6b64b57a0273dc926f29387736ee070886fe353ad7993e658d33"
+    },
+    "data/raw/ea_dtm/SX96sw/SX96sw_DTM_1m_Metadata.gpkg": {
+      "bytes": 184320,
+      "sha256": "c10b91c6d631f058c99ac5f77a254e40f64e1d39b8d3ee1e551555ee6b52e8e0"
+    },
+    "data/raw/ea_dtm_time_stamped_index/2026-10-20/response.geojson": {
+      "bytes": 904542,
+      "sha256": "0f9b9700c6e433c7726ef4cdce0d09559d5a952c80b94805963fdecdf5999425"
+    },
+    "data/raw/ea_dtm_time_stamped_index/final-capture-2026-10-20/ea-dtm-time-stamped-current_2km-2026-10-20.geojson": {
+      "bytes": 904542,
+      "sha256": "cda7ce43af709ac2177cf000b404525d59476426ab22ad8a7404498d39a71de4"
+    },
+    "data/raw/ea_dtm_time_stamped_index/final-capture-2026-10-20/ea-dtm-time-stamped-current_2km-2026-10-20.source.json": {
+      "bytes": 3092,
+      "sha256": "b680a957f7e9c70fe6c35852e63bd64dec6bb18ff89ca73364cd6c7a21860645"
+    },
+    "data/raw/ea_dtm_time_stamped_index/live-refresh-2026-10-20/ea-dtm-time-stamped-current_2km-2026-10-20.geojson": {
+      "bytes": 904542,
+      "sha256": "dc4449f3499a2b5f3bb8488084bc11e90729c90d59b76188334d38eb87bc220e"
+    },
+    "data/raw/ea_dtm_time_stamped_index/live-refresh-2026-10-20/ea-dtm-time-stamped-current_2km-2026-10-20.source.json": {
+      "bytes": 3158,
+      "sha256": "1aa50c162b98324cd514a8e6dfa1f80be91b156356bf2d728774472a57b6144b"
+    },
+    "data/raw/osm/devon-261016.osm.pbf": {
+      "bytes": 58254938,
+      "sha256": "52942b39636e1cb002e5d78a004668996cb469ee9c9e9b9b93049c66b9ac2cd5"
+    },
+    "data/raw/osm/devon-261016.osm.pbf.md5": {
+      "bytes": 55,
+      "sha256": "fac0306ef585aa738a0b9e808e4f84d4a61a8c75ef2e584038937381ab6884ec"
+    },
+    "data/source-manifest.json": {
+      "bytes": 9493,
+      "sha256": "e2a5237d99fd8b0b0dd0174430ba18b58f2d778f498275c609c24bed5c3ccf8c"
+    },
+    "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson": {
+      "bytes": 1532,
+      "sha256": "10b3fd5163e23c279c34eb52850f6f2508a5b443054611f69c74c98811558db3"
+    },
+    "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.json": {
+      "bytes": 4081,
+      "sha256": "5d8cd8a5cb84c447543554db670a96f2321548354d60df0535e9a49517475359"
+    },
+    "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.md": {
+      "bytes": 3180,
+      "sha256": "ebbaf8c53baa9a0146c7c308d1e6461ed23b06ec6170789009f3731e8fb5977d"
+    },
+    "docs/milestones/artifacts/AOI-2km-1m-coverage.json": {
+      "bytes": 8030,
+      "sha256": "12055299e34ac568b964df1be7acc23082af856aa7dd6f5563ea28775124f235"
+    },
+    "docs/milestones/artifacts/AOI-2km-resolution-index.json": {
+      "bytes": 7359,
+      "sha256": "a7788fc919ed247a21508c68ba889c538c6999c589de6649f06c82b43a8e0cf6"
+    },
+    "docs/milestones/artifacts/M8-browser-evidence.json": {
+      "bytes": 2140,
+      "sha256": "59f412db0d5196b6aa59425dc6525792e94baf7d6a45b17983348edcac116cdd"
+    },
+    "docs/milestones/artifacts/M8-share-evidence.json": {
+      "bytes": 488,
+      "sha256": "a8a8f051799c94c366a1385426ddafd5db4c4a7b3735a013649e9e1071bff951"
+    },
+    "docs/milestones/artifacts/Torquay-2km-browser-evidence.json": {
+      "bytes": 3938,
+      "sha256": "3f1c47b3267fae8ad5bf317152a58d29d1e1ee8fa2d0bd33bb051240c5b920ae"
+    },
+    "docs/milestones/artifacts/Torquay-2km-determinism.json": {
+      "bytes": 22426,
+      "sha256": "65d77ee5f1b6e02605d3dbe888f254437f50d8cbe37012cef674d7d82d48f9b5"
+    },
+    "docs/milestones/artifacts/TVW-007-coverage.json": {
+      "bytes": 7996,
+      "sha256": "d257b7c925fa414e51712367e9d133304ac6ace2fea999ae69340e2eb8ce6cea"
+    },
+    "docs/milestones/artifacts/TVW-008-qa.json": {
+      "bytes": 8297,
+      "sha256": "45affe371b9b13c4f1d7b6a979fa32c2c23bff20d6a15be6aec2b966b4660ae2"
+    },
+    "docs/milestones/artifacts/TVW-009-buildings-qa.json": {
+      "bytes": 14480,
+      "sha256": "b28ed40f0daf7ee521b016a231b01cdd754738bad6626e061e7e502409c5debd"
+    },
+    "docs/milestones/artifacts/TVW-010-chrome-hardware.json": {
+      "bytes": 886,
+      "sha256": "09dc0a8551a86b179fc6136987b278e76d39d51d2627acda55ea90200e5c6699"
+    },
+    "docs/milestones/artifacts/TVW-011-roads-qa.json": {
+      "bytes": 11832,
+      "sha256": "2c164fec3822f56030d22bfb7f48acb5c16b462e8e9829f1886a4120595d5f94"
+    },
+    "docs/milestones/artifacts/TVW-012-alignment.json": {
+      "bytes": 32508,
+      "sha256": "08ac49078013ec358fd1ec5c930a3463b0d8e6ac4812aebc1e3454efed8c517c"
+    },
+    "docs/milestones/artifacts/TVW-012-browser-evidence.json": {
+      "bytes": 3354,
+      "sha256": "8e3107bbe92e3a9760f5199c1371e63efdc9c17107c272cb44bc09e15a76c7cd"
+    },
+    "docs/milestones/artifacts/TVW-012-prior-sw-inconclusive.json": {
+      "bytes": 5418,
+      "sha256": "3db68c240bf0f77138ea5aaaf174d7a983f0cefd2f963644743aa5e769963b24"
+    },
+    "docs/milestones/artifacts/TVW-014-benchmark.json": {
+      "bytes": 85007,
+      "sha256": "ec4fe86c13c997f02a10c717d17d558f57e1a28fd2812b391a4b6737b30c2a9b"
+    },
+    "docs/milestones/artifacts/TVW-014-benchmark.md": {
+      "bytes": 3058,
+      "sha256": "303fb3d4326a209f15e781b7f189a1597c4775abf7dcf6fa58c6c4ba70a888f7"
+    },
+    "docs/milestones/artifacts/TVW-015-label-overhead.json": {
+      "bytes": 3299,
+      "sha256": "1352a4c0019d00984a847371e9f74379694c0734e9a529bcc4cdf4ee71cebf56"
+    },
+    "docs/milestones/artifacts/TVW-015-label-overhead.md": {
+      "bytes": 1746,
+      "sha256": "df671c645ca35701d0eba79e9cf0290e0aed4ca76c755e8c78258de2d0998acb"
+    },
+    "docs/milestones/screenshots/AOI-2km-1m-preview.png": {
+      "bytes": 593147,
+      "sha256": "f59ef055575e19a6c430a99332b74298de1f880d4afffda02fc7c842d78976d8"
+    },
+    "docs/milestones/screenshots/AOI-2km-independent-OSM-context.png": {
+      "bytes": 1769495,
+      "sha256": "262e0fb2fca9de16170274b087a084923256a5a711ee6f274f8d0a310f041567"
+    },
+    "docs/milestones/screenshots/AOI-2km-real-route-1km-package-notice.png": {
+      "bytes": 1120372,
+      "sha256": "0f559bb4789402ba942cb8b913f92868ef85bc3e59e125c28bb8095a542dfe6a"
+    },
+    "docs/milestones/screenshots/M0-synthetic.png": {
+      "bytes": 188054,
+      "sha256": "e236bb1d61b85c137d7b039ec2833d1b4ad146df8d9e51bb6c87c5d99555c994"
+    },
+    "docs/milestones/screenshots/M1-synthetic-heightfield.png": {
+      "bytes": 260170,
+      "sha256": "58ea05ea63bf097ab4be346419aa4818aa80f76ad936c6f3e3408392078efe2e"
+    },
+    "docs/milestones/screenshots/M8-overview-real.png": {
+      "bytes": 1290577,
+      "sha256": "74b6295ded2e52e5f1b4025b51592bc2a2ceb28e674f92050e3006c68b5b764d"
+    },
+    "docs/milestones/screenshots/M8-overview-synthetic-unavailable.png": {
+      "bytes": 222998,
+      "sha256": "d97958e5c7203a8402713e2d32aa35fb1571f94332a01ff33be350f1808ff906"
+    },
+    "docs/milestones/screenshots/Torquay-2km-outer-annulus.png": {
+      "bytes": 283640,
+      "sha256": "5d6417d11ca8e11272a69a381674ea1b8ea3497e0cc334d5683867c661e5fb4f"
+    },
+    "docs/milestones/screenshots/Torquay-2km-overview.png": {
+      "bytes": 1335257,
+      "sha256": "c97bd7e172a1cbd38807eae47ab7bb429be8ee19d3aa81415f57aa9ad176255d"
+    },
+    "docs/milestones/screenshots/TVW-006-aoi-boundary-1km.png": {
+      "bytes": 1085354,
+      "sha256": "06ac9f10eb6e5cc14ffa27852cd2c7009223ffe8a85620a4cde653a22098b6c4"
+    },
+    "docs/milestones/screenshots/TVW-006-aoi-boundary.png": {
+      "bytes": 680428,
+      "sha256": "a52359de2215c45c6117aac09822958eac77bd2528024c0599785732e3d19fe2"
+    },
+    "docs/milestones/screenshots/TVW-006-postcode-context.png": {
+      "bytes": 404946,
+      "sha256": "c1378bb644ad462f956debc8c206c0ca2fcd774ddef13349bf91ac70120a6b9a"
+    },
+    "docs/milestones/screenshots/TVW-007-ea-dtm-preview.png": {
+      "bytes": 504012,
+      "sha256": "4602c71dad488d781db4bdcac78e0518f7c87936213a44758af8333df9938072"
+    },
+    "docs/milestones/screenshots/TVW-008-real-terrain.png": {
+      "bytes": 735996,
+      "sha256": "5a0872c32a85a6486c8f77c7ae132e9a06c09c5ebbd3c15037083e0432d2a36a"
+    },
+    "docs/milestones/screenshots/TVW-008-terrain-preview.png": {
+      "bytes": 213228,
+      "sha256": "37d36c5f6577f3130a881b0cd7cea5136872530cb61e76ac299d5756bdadae9d"
+    },
+    "docs/milestones/screenshots/TVW-009-buildings-preview.png": {
+      "bytes": 720968,
+      "sha256": "b2f42f7111b6f88da614317720733fcc316f60da433fb130b9b285c806701ff1"
+    },
+    "docs/milestones/screenshots/TVW-009-object-ne.png": {
+      "bytes": 152253,
+      "sha256": "51af10054bc578106145937ae5f5198c7f64fd4080f91a6654ee490b9e008e3f"
+    },
+    "docs/milestones/screenshots/TVW-009-object-nw.png": {
+      "bytes": 177508,
+      "sha256": "ca43991ff6fa2e09ed96f7cd347605fc9ee2d995af274cb381964f6e069de132"
+    },
+    "docs/milestones/screenshots/TVW-009-object-sw.png": {
+      "bytes": 154714,
+      "sha256": "c81729d9902cd22b562c4557d7985d12c416be5be23e9d3765f25f793b4f5612"
+    },
+    "docs/milestones/screenshots/TVW-010-buildings-ground-eye.png": {
+      "bytes": 83357,
+      "sha256": "6602e1554435c83e57b7314adb27be5319ef6d6fbd5fc5303948450b41fa223d"
+    },
+    "docs/milestones/screenshots/TVW-010-buildings-overhead.png": {
+      "bytes": 1009367,
+      "sha256": "f135c87037bd8da51084d2c696424adaf6a3036c9fbb3adb78cfabdcf1e374be"
+    },
+    "docs/milestones/screenshots/TVW-010-fix1-overhead.png": {
+      "bytes": 1009282,
+      "sha256": "13ea66da175e1ba222edf7897457b288bcb87adf13c96092dcaa09d23b49caec"
+    },
+    "docs/milestones/screenshots/TVW-011-roads-ground.png": {
+      "bytes": 101107,
+      "sha256": "3551b7becd9f45f7697d4060fe4360c9094f1740d7ac0893f6bb6dcf4e87cd2a"
+    },
+    "docs/milestones/screenshots/TVW-011-roads-overview.png": {
+      "bytes": 1133384,
+      "sha256": "81c0d2f1158df3c213fc300638e98f9055eed5f54b7c0b9177dd60f546e7052e"
+    },
+    "docs/milestones/screenshots/TVW-011-roads-preview.png": {
+      "bytes": 919812,
+      "sha256": "591f9f2992857201c7ef7d2efd3ec96fd23fb99fc027d495d84ca8bafffa1639"
+    },
+    "docs/milestones/screenshots/TVW-012-ne-second-main-overlay.png": {
+      "bytes": 269551,
+      "sha256": "2664cf099f221ec62ca90031396e60e56c8f8bd5d7a2ea6dc718d479fd0c000b"
+    },
+    "docs/milestones/screenshots/TVW-012-ne-second-main-package.png": {
+      "bytes": 230582,
+      "sha256": "ae13e5edf099bcdcb3894b0fba46595a4d12c3c66484ef90a443253765c6b9be"
+    },
+    "docs/milestones/screenshots/TVW-012-ne-second-main-reference.png": {
+      "bytes": 102707,
+      "sha256": "49dc728503c395b2ac0ceda65a732fee20edf8f355a3f65fdf7d8ffe4d09a6a5"
+    },
+    "docs/milestones/screenshots/TVW-012-ne-second-main-scene.png": {
+      "bytes": 451963,
+      "sha256": "b3d3e2a6cb70ffd37b2ec72990a93e6ccbf0d36d64b4a4881ae356c25edded56"
+    },
+    "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-overlay.png": {
+      "bytes": 243496,
+      "sha256": "38e97955925c5cb4c29d023ed94ebc280ca3d69018c4201e034c57455d86f139"
+    },
+    "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-package.png": {
+      "bytes": 198844,
+      "sha256": "5f005956d9c4ef50aaae459d8b879e29ce612a137385cd87fcaad696f89d0aa8"
+    },
+    "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-reference.png": {
+      "bytes": 114975,
+      "sha256": "411f7dea20e4f5f71585d58df893c73f23e399e33f77f96dd1251a8885820e54"
+    },
+    "docs/milestones/screenshots/TVW-012-nw-audley-pencorse-scene.png": {
+      "bytes": 410971,
+      "sha256": "e27b9fa452f7bc8a406738cd389a5fbf8e7287702ebce3237df65de1ec7c3d6f"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-overlay.png": {
+      "bytes": 274552,
+      "sha256": "c99e1c8fcc5aa2c7a2e6f88b76bdd6fb66296e916e3c5c478f94a4487a6b38f1"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-package.png": {
+      "bytes": 227506,
+      "sha256": "c86a819ff2cc4166b89cd7c62f00d52daec7d0f1ba941903b22c35709a298dc1"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-reference.png": {
+      "bytes": 118098,
+      "sha256": "07e3f74f1de8faf64b253b39873c6d83e69c16e8d581485e65292bfdae4bb773"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-st-vincent-chapel-scene.png": {
+      "bytes": 524283,
+      "sha256": "f27fa39de4302b488da69cf0301414961a7fc142727d851b884e4631d43f2e53"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-overlay.png": {
+      "bytes": 304758,
+      "sha256": "9e7e4ddd471a5091e26001232bcb2fbabccda950cde676ec69da4c5a0fc80ce4"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-package.png": {
+      "bytes": 247113,
+      "sha256": "40770dd75c766f59d488278bb0d25add4d8ae6d10a2be0bd6986ac54390d5374"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-reference.png": {
+      "bytes": 127195,
+      "sha256": "7298370a5cccc318e066d2fdfe807bc3bae1d8e06e07a8757fca822ddb5cc402"
+    },
+    "docs/milestones/screenshots/TVW-012-sw-teignmouth-snowberry-scene.png": {
+      "bytes": 425063,
+      "sha256": "52f224bb57c4bb6d8a84d0d9fdbd988f4edbdab7f69a2000869a5e14186183ee"
+    },
+    "docs/milestones/screenshots/TVW-013-flying-combined.png": {
+      "bytes": 1136096,
+      "sha256": "80e890ea3f260bd114ffaf0cbe30d44cd64367b8292ad355dcd72f4801badeac"
+    },
+    "docs/milestones/screenshots/TVW-013-walking-combined.png": {
+      "bytes": 265698,
+      "sha256": "733a1abaf4b6f03ac13618f2c1214a5b3913b0fef1b20e5e7ce2af275f46da68"
+    },
+    "docs/milestones/screenshots/TVW-014-combined-fly.png": {
+      "bytes": 841949,
+      "sha256": "2b7921d1d23aee0561bf5b7d61ff64f10873b6d54839616314d037119440031f"
+    },
+    "docs/milestones/screenshots/TVW-014-combined-walk.png": {
+      "bytes": 231472,
+      "sha256": "fed06cf844ec439f3a03269799996a311455568b347aa4620ff223d619e4907f"
+    },
+    "docs/milestones/screenshots/TVW-014-synthetic-startup.png": {
+      "bytes": 165872,
+      "sha256": "70d562e87f57e8faf494d8e29154284615cd346bd741d1b8ec27993ba37a274d"
+    },
+    "docs/milestones/screenshots/TVW-015-street-labels-overview.png": {
+      "bytes": 1034035,
+      "sha256": "0522d4983fba144bcce953a043b0c9af387aa06fd39575f4b88dd3721e952b1f"
+    },
+    "docs/milestones/screenshots/TVW-015-street-labels-walk.png": {
+      "bytes": 566303,
+      "sha256": "4747d6a3ee1418205041086e12d21172ccbf83d77b5d96eb3ff2cc266d399813"
+    },
+    "docs/Torquay_JS_Virtual_World_PoC_Codex_Plan.md": {
+      "bytes": 52677,
+      "sha256": "144c9c704ea1c10fa2d503dba3233b089528585be7d36b7b94164d28ba40d571"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/buildings/buildings.json": {
+      "bytes": 6015566,
+      "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/buildings/manifest.json": {
+      "bytes": 7240,
+      "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/buildings/qa.json": {
+      "bytes": 14484,
+      "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/heightfield.f32": {
+      "bytes": 4008004,
+      "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/manifest.json": {
+      "bytes": 7835,
+      "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/qa/buildings-intermediate.json": {
+      "bytes": 3993392,
+      "sha256": "325c61ee9adb9ae8521dadd818c52a04126a8d2b7d7baaed1fd97962d3c74c09"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/qa/buildings-preview.png": {
+      "bytes": 858412,
+      "sha256": "d1e27175b2c289afc1b23c6a6b393b61477adabca6d9bc20e714750d5a5a3f93"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/qa/buildings-qa.json": {
+      "bytes": 14484,
+      "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/qa/roads-intermediate.json": {
+      "bytes": 2722014,
+      "sha256": "44da19146b881fe65e2f26baa56c61819b1a759893894aaa98a52462801558cb"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/qa/roads-preview.png": {
+      "bytes": 1689792,
+      "sha256": "af25262af92649ca2930febadfea44241877bca99a712f6d842bd4afa4ec27e4"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/qa/roads-qa.json": {
+      "bytes": 11911,
+      "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/qa.json": {
+      "bytes": 8326,
+      "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/roads/manifest.json": {
+      "bytes": 10832,
+      "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/roads/qa.json": {
+      "bytes": 11911,
+      "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/roads/roads.json": {
+      "bytes": 87338409,
+      "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/scene-qa.json": {
+      "bytes": 3779,
+      "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+    },
+    "public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/terrain-preview.png": {
+      "bytes": 240734,
+      "sha256": "733e30a6e24a8e9b8f93b30796c587f5057a4ff95be3d6abd37db65f88a277f0"
+    },
+    "public/worlds/synthetic-heightfield/heightfield.f32": {
+      "bytes": 36,
+      "sha256": "4e5e18b484af53448acdee1bffed54035c3bef7607381c3249ce255f2e2ceb14"
+    },
+    "public/worlds/synthetic-heightfield/manifest.json": {
+      "bytes": 918,
+      "sha256": "2ac408b8d4257eada1d8d4cabf24e8a7c9634f8665135d28d2cbdf27cc36b9e2"
+    },
+    "public/worlds/synthetic-terrain-demo/heightfield.f32": {
+      "bytes": 1900,
+      "sha256": "cf57dd9d5551eaad413c5e1ea43c8d2f9acb709c410bb016e8fbf7afd95dcd3b"
+    },
+    "public/worlds/synthetic-terrain-demo/manifest.json": {
+      "bytes": 947,
+      "sha256": "378b3eeed8b7b59f347efe1430c2443e2f30973fbd0f3aaf391501009e6fa260"
+    },
+    "public/worlds/torquay-poc-001/buildings/buildings.json": {
+      "bytes": 1636289,
+      "sha256": "7ffe824db1f0bafadf48c14f610a357f2a001791658078b12442a71e13ea8f48"
+    },
+    "public/worlds/torquay-poc-001/buildings/manifest.json": {
+      "bytes": 7172,
+      "sha256": "25af81f6211aa137b80bf496172d2789815e08650c69c0c6630ad4282b750541"
+    },
+    "public/worlds/torquay-poc-001/buildings/qa.json": {
+      "bytes": 14480,
+      "sha256": "b28ed40f0daf7ee521b016a231b01cdd754738bad6626e061e7e502409c5debd"
+    },
+    "public/worlds/torquay-poc-001/heightfield.f32": {
+      "bytes": 1004004,
+      "sha256": "1d0a9f27d9e150a422541b3ba2bd175f05d18c5ef58f8d8f4a4f586694c48183"
+    },
+    "public/worlds/torquay-poc-001/manifest.json": {
+      "bytes": 7838,
+      "sha256": "a398e519ee8537af3bcdcdb781a1501a3e0f45e58e47a4bdd2a986e15a06788f"
+    },
+    "public/worlds/torquay-poc-001/overview/features.geojson": {
+      "bytes": 450896,
+      "sha256": "8c6e2e7155337bf1bcb931592b5463ad1936feab7ebacd2ce308b3f492148916"
+    },
+    "public/worlds/torquay-poc-001/overview/manifest.json": {
+      "bytes": 14428,
+      "sha256": "226d2bb12618c578848d09767a1698b5535dad1e398a903b8ebd2b93dac9cc76"
+    },
+    "public/worlds/torquay-poc-001/roads/manifest.json": {
+      "bytes": 10715,
+      "sha256": "b9896cb1d88f0bfdf1010a2a5001443b270c7162defff210bbd7cf93313bc8af"
+    },
+    "public/worlds/torquay-poc-001/roads/qa.json": {
+      "bytes": 11832,
+      "sha256": "2c164fec3822f56030d22bfb7f48acb5c16b462e8e9829f1886a4120595d5f94"
+    },
+    "public/worlds/torquay-poc-001/roads/roads.json": {
+      "bytes": 18160963,
+      "sha256": "56d017df60cfb4c655cf484c58e17cc858d0959da211c225501ca56676fd1ec3"
+    },
+    "public/worlds/torquay-poc-001-2km/ready.json": {
+      "bytes": 375,
+      "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json": {
+      "bytes": 6015566,
+      "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/manifest.json": {
+      "bytes": 7240,
+      "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/qa.json": {
+      "bytes": 14484,
+      "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32": {
+      "bytes": 4008004,
+      "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/inventory.json": {
+      "bytes": 1399,
+      "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json": {
+      "bytes": 7835,
+      "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/qa.json": {
+      "bytes": 8326,
+      "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json": {
+      "bytes": 10832,
+      "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/qa.json": {
+      "bytes": 11911,
+      "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json": {
+      "bytes": 87338409,
+      "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+    },
+    "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/scene-qa.json": {
+      "bytes": 3779,
+      "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+    },
+    "TMOG-Task-Manager-1.0.1-Setup.exe": {
+      "bytes": 7385192,
+      "sha256": "b4edf70fa040968958c662ffb09feeeb0eeca07759e6ed7742606bcc39f29fc6"
+    }
+  }
+}

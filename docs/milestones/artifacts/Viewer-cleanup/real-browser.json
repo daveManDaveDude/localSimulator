@@ -1,0 +1,27 @@
+{
+  "browser": "156.0.8078.4",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "devicePixelRatio": 1.5,
+  "durationMs": 195151,
+  "start": {
+    "x": 0,
+    "y": 176.703682,
+    "z": 400
+  },
+  "outer": {
+    "x": 0,
+    "y": 10.616128,
+    "z": 595.9375
+  },
+  "releaseIds": [
+    "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a"
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "failedResponses": [],
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "observations": "Default current 2km loaded all layers; real pointer lock/look/movement/boost/walk/reset/help/resize passed. Helpers stayed hidden after G. Source panel and outer-annulus screenshots captured."
+}

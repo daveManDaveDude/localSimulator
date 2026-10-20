@@ -17,7 +17,7 @@
     "test": "vitest run",
     "generate:synthetic-heightfield": "node scripts/generate-synthetic-heightfield.mjs",
     "test:e2e:install": "playwright install chromium",
-    "test:e2e": "playwright test",
+    "test:e2e": "npm run build:share && playwright test",
     "test:e2e:tvw014:share": "playwright test --config=playwright.tvw014-share.config.ts",
     "test:e2e:tvw014:real": "playwright test --config=playwright.tvw014-real.config.ts",
     "test:e2e:tvw014:full": "playwright test --config=playwright.tvw014-full.config.ts",
@@ -26,6 +26,8 @@
     "test:e2e:overview:real": "npm run build && playwright test --config=playwright.overview-real.config.ts",
     "test:e2e:overview:share": "npm run build:share && playwright test --config=playwright.overview-share.config.ts",
     "test:e2e:torquay2km:real": "npm run build && playwright test --config=playwright.torquay2km-real.config.ts",
+    "test:e2e:cleanup:real": "npm run build && playwright test --config=playwright.viewer-cleanup-real.config.ts",
+    "test:e2e:cleanup:share": "npm run build:share && playwright test --config=playwright.viewer-cleanup-share.config.ts",
     "benchmark": "node scripts/benchmark.mjs"
   },
   "dependencies": {

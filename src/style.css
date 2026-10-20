@@ -10,6 +10,113 @@
   font-weight: 400;
 }
 
+/* Internal loader/regression observations never participate in product UI. */
+.internal-diagnostics,
+[hidden] {
+  display: none !important;
+}
+
+.product-controls {
+  position: absolute;
+  top: 78px;
+  right: 26px;
+  width: min(380px, calc(100vw - 44px));
+  display: grid;
+  gap: 10px;
+  pointer-events: auto;
+  color: #d4e1dc;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.product-controls p {
+  margin: 0;
+}
+
+.product-controls .debug-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.product-controls .debug-actions button {
+  background: rgb(12 20 24 / 90%);
+  color: #e1eeea;
+  font-size: 11px;
+}
+
+.product-controls button,
+.sources {
+  border: 1px solid rgb(205 239 226 / 24%);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: rgb(12 20 24 / 90%);
+  color: #e1eeea;
+  font: inherit;
+}
+
+.product-controls button,
+.sources summary {
+  cursor: pointer;
+}
+
+.sources {
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.sources p,
+.sources [data-testid='world-attribution'],
+.sources [data-testid='provenance-links'] {
+  margin-top: 10px;
+}
+
+.product-controls a {
+  color: #a9d8c8;
+}
+
+.product-controls .real-package-caveat,
+.fallback-notice,
+.map-credit {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgb(12 20 24 / 90%);
+}
+
+.map-credit {
+  font-size: 10px;
+}
+
+.layer-recovery [role='alert'] {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-left: 2px solid #e2b17f;
+  border-radius: 6px;
+  color: #ffe0ce;
+  background: rgb(12 20 24 / 90%);
+}
+
+.viewer-shell .controls-help {
+  bottom: 22px;
+}
+
+@media (max-width: 760px) {
+  .product-controls {
+    top: 90px;
+    right: 12px;
+    width: min(340px, calc(100vw - 24px));
+  }
+
+  .product-controls .debug-actions {
+    font-size: 11px;
+  }
+
+  .sources {
+    max-height: 30vh;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
