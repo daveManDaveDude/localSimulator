@@ -67,7 +67,7 @@ The actual north-up [DTM preview PNG](milestones/screenshots/TVW-007-ea-dtm-prev
 
 ## Current 2 km candidate and resolution assessment (2026-10-20)
 
-The user approved a 2,000 m × 2,000 m revision around the same TQ1 4HN postcode centroid on 2026-10-20. The verified BNG center remains E `291108.9018176432`, N `65353.48350844931`; current bounds are `[290108.9018176432, 64353.48350844931, 292108.9018176432, 66353.48350844931]` in west, south, east, north order. The status remains `selected_pending_coverage` / `not_checked`.
+On 2026-10-20, the user authorized expanding the pending candidate to 2,000 m × 2,000 m around the same TQ1 4HN postcode centroid. The verified BNG center remains E `291108.9018176432`, N `65353.48350844931`; current bounds are `[290108.9018176432, 64353.48350844931, 292108.9018176432, 66353.48350844931]` in west, south, east, north order. The status remains `selected_pending_coverage` / `not_checked`.
 
 The original 1 m Composite DTM raster inputs were checked again against this larger AOI without changing `data/source-manifest.json`. [`AOI-2km-1m-coverage.json`](milestones/artifacts/AOI-2km-1m-coverage.json) reports 4,000,000/4,000,000 1 m cell centers valid (4,000,000 m²), zero uncovered/masked/NoData/nonfinite cells, and an EA raster threshold result of `pass`. The exact center sample remains 47.620 m from `SX96nw_DTM_1m.tif`; the measured range is 12.288–104.356 m. The new [north-up 2 km preview](milestones/screenshots/AOI-2km-1m-preview.png) was generated from those measured samples and visually inspected. It shows the exact 2 km boundary, BNG metre axes, north arrow, 250 m scale, center marker and attribution. The older 1 km report and screenshot remain unchanged.
 

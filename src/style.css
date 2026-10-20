@@ -352,6 +352,16 @@ body {
   align-items: baseline;
 }
 
+.real-package-caveat {
+  margin: 12px 0 0;
+  padding: 9px 10px;
+  border-left: 2px solid #e2b17f;
+  color: #f0d9bc;
+  background: rgb(71 49 33 / 42%);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 .debug-hud dt {
   color: #809391;
   font-size: 10px;

@@ -120,6 +120,7 @@ export function createApp(container: HTMLElement): AppHandle {
               <button type="button" data-testid="help-toggle" aria-controls="controls-help" aria-expanded="false">Show controls</button>
             </div>
           </div>
+          <p class="real-package-caveat" data-testid="real-package-extent-notice"${initialRealMode ? '' : ' hidden'}>The visible EA terrain and any optional OSM buildings or roads use the retained earlier 1 km browser packages. The 2 km candidate is pending and is not rendered by these packages.</p>
           <dl>
             <div><dt>World</dt><dd data-testid="world-type" data-world-id="">Loading synthetic terrain…</dd></div>
             <div><dt>Source mode</dt><dd data-testid="world-source-mode">HEIGHTFIELD</dd></div>
@@ -211,7 +212,7 @@ export function createApp(container: HTMLElement): AppHandle {
         <section class="start-card" aria-labelledby="page-title">
           <p class="eyebrow">LOCAL BROWSER PROOF OF CONCEPT</p>
           <h1 id="page-title">Torquay <span>Virtual World</span></h1>
-          <p class="welcome-copy" data-testid="welcome-copy">${m0Mode ? 'M0 ANALYTIC DEMO · fictional slope and blocks; no Torquay measurements or map data are used.' : initialRealMode ? 'REAL EA LIDAR · local, verified 2 m heightfield for the pending candidate AOI. OSM/OS feature coverage remains unchecked.' : 'SYNTHETIC HEIGHTFIELD · fictional slope, hill, and ridge loaded from a local Float32 fixture; no Torquay measurements or map data are used.'}</p>
+          <p class="welcome-copy" data-testid="welcome-copy">${m0Mode ? 'M0 ANALYTIC DEMO · fictional slope and blocks; no Torquay measurements or map data are used.' : initialRealMode ? 'REAL EA LIDAR · local 2 m heightfield from the retained earlier 1 km browser package. The 2 km candidate is pending and is not rendered here.' : 'SYNTHETIC HEIGHTFIELD · fictional slope, hill, and ridge loaded from a local Float32 fixture; no Torquay measurements or map data are used.'}</p>
           <button class="start-button" type="button" data-testid="start-button"${m0Mode ? '' : ' disabled'}>Start exploring</button>
           <div class="control-hints" aria-label="Free-flight controls">
             <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Move forward / back and strafe</span></p>
@@ -230,6 +231,9 @@ export function createApp(container: HTMLElement): AppHandle {
   const startButton =
     container.querySelector<HTMLButtonElement>('.start-button');
   const status = container.querySelector<HTMLElement>('.flight-status');
+  const realPackageExtentNotice = container.querySelector<HTMLElement>(
+    '[data-testid="real-package-extent-notice"]',
+  );
   const provenanceBadge = container.querySelector<HTMLElement>(
     '[data-testid="provenance-badge"]',
   );
@@ -423,6 +427,7 @@ export function createApp(container: HTMLElement): AppHandle {
     !canvas ||
     !startButton ||
     !status ||
+    !realPackageExtentNotice ||
     !provenanceBadge ||
     !syntheticWorldButton ||
     !realWorldButton ||
@@ -582,6 +587,7 @@ export function createApp(container: HTMLElement): AppHandle {
 
   const setWorldSelection = (mode: 'synthetic' | 'real' | 'm0'): void => {
     shell.dataset.worldMode = mode;
+    realPackageExtentNotice.hidden = mode !== 'real';
     syntheticWorldButton.setAttribute(
       'aria-pressed',
       String(mode === 'synthetic'),

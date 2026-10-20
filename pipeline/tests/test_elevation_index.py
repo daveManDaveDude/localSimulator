@@ -190,6 +190,25 @@ def test_assessment_is_deterministic_and_unions_overlap_and_holes_once(tmp_path:
     assert first_report["halfMetreIndexFootprint"]["aoiFraction"] == pytest.approx(0.96)
 
 
+def test_survey_dates_accept_naive_date_and_timezone_aware_datetime_and_normalize_utc(
+    tmp_path: Path,
+) -> None:
+    config = _small_config()
+    feature = _feature(
+        "mixed-timezones",
+        Polygon([(0, 0), (10, 0), (10, 10), (0, 10), (0, 0)]),
+    )
+    feature["properties"]["sdflown"] = "2010-04-04"
+    feature["properties"]["edflown"] = "2010-04-04T23:30:00-01:00"
+    index, source = _write_fixture(tmp_path, config, [feature])
+
+    report = assess_ea_resolution_index(config, index, source)
+
+    assert report["halfMetreIndexFootprint"]["surveyDateRanges"] == [
+        ["2010-04-04T00:00:00Z", "2010-04-05T00:30:00Z"]
+    ]
+
+
 @pytest.mark.parametrize(
     ("mutation", "message"),
     [

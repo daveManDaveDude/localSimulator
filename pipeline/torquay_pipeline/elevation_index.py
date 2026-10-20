@@ -72,6 +72,25 @@ def _number(value: Any, field: str) -> float:
     return result
 
 
+def _parse_utc_survey_datetime(value: str, field: str) -> datetime:
+    """Parse an EA survey date, treating a naive value as UTC and normalizing it."""
+    normalized_value = value[:-1] + "+00:00" if value.endswith(("Z", "z")) else value
+    try:
+        parsed = datetime.fromisoformat(normalized_value)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC)
+    except (OverflowError, ValueError) as exc:
+        raise ElevationIndexError(
+            f"{field} must be a valid ISO-8601 survey date representable in UTC"
+        ) from exc
+
+
+def _format_utc_survey_datetime(value: datetime) -> str:
+    """Serialize a normalized survey datetime with a stable UTC suffix."""
+    return value.isoformat(timespec="auto").replace("+00:00", "Z")
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     try:
@@ -678,13 +697,8 @@ def assess_ea_resolution_index(
             year = int(year)
         if isinstance(year, bool) or not isinstance(year, int) or not 1900 <= year <= 2100:
             raise ElevationIndexError(f"index feature {index}.year must be a valid integer year")
-        try:
-            start = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
-            end = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
-        except ValueError as exc:
-            raise ElevationIndexError(
-                f"index feature {index} survey dates must be ISO-8601 timestamps"
-            ) from exc
+        start = _parse_utc_survey_datetime(start_date, f"index feature {index}.sdflown")
+        end = _parse_utc_survey_datetime(end_date, f"index feature {index}.edflown")
         if start > end or start.year != year:
             raise ElevationIndexError(
                 f"index feature {index} survey dates do not match its recorded year or order"
@@ -695,8 +709,8 @@ def assess_ea_resolution_index(
                 "dtmName": dtm_name,
                 "osTile": os_tile,
                 "year": year,
-                "surveyStart": start_date,
-                "surveyEnd": end_date,
+                "surveyStart": _format_utc_survey_datetime(start),
+                "surveyEnd": _format_utc_survey_datetime(end),
                 "nominalResolutionM": resolution,
                 "coordinateOperation": transform,
                 "verticalReference": geoid,

@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { resolve } from 'node:path';
+
+const packageNoticeScreenshot = resolve(
+  'docs/milestones/screenshots/AOI-2km-real-route-1km-package-notice.png',
+);
 
 async function waitForRoute(page: import('@playwright/test').Page) {
   const shell = page.locator('.viewer-shell');
@@ -13,6 +18,19 @@ async function waitForRoute(page: import('@playwright/test').Page) {
   );
   await expect(page.getByTestId('world-attribution')).toContainText(
     'Environment Agency copyright',
+  );
+  await expect(page.getByTestId('real-package-extent-notice')).toBeVisible();
+  await expect(page.getByTestId('real-package-extent-notice')).toContainText(
+    'earlier 1 km browser packages',
+  );
+  await expect(page.getByTestId('real-package-extent-notice')).toContainText(
+    '2 km candidate is pending and is not rendered',
+  );
+  await expect(page.getByTestId('real-package-extent-notice')).toBeInViewport({
+    ratio: 1,
+  });
+  await expect(page.getByTestId('terrain-details')).toHaveText(
+    '501 columns × 501 rows · 2 m spacing',
   );
   await expect(page.getByTestId('flight-speed')).toHaveAttribute(
     'data-meters-per-second',
@@ -57,6 +75,10 @@ test('production terrain, buildings, roads and combined local routes load with p
         'loaded',
         { timeout: 30_000 },
       );
+      await expect(page.getByTestId('building-status')).toHaveAttribute(
+        'data-building-count',
+        '1000',
+      );
       await expect(page.getByTestId('building-attribution')).toContainText(
         'OpenStreetMap contributors',
       );
@@ -72,6 +94,10 @@ test('production terrain, buildings, roads and combined local routes load with p
         'loaded',
         { timeout: 30_000 },
       );
+      await expect(page.getByTestId('road-status')).toHaveAttribute(
+        'data-way-count',
+        '198',
+      );
       await expect(page.getByTestId('road-attribution')).toContainText(
         'OpenStreetMap contributors',
       );
@@ -82,6 +108,28 @@ test('production terrain, buildings, roads and combined local routes load with p
       );
     }
   }
+
+  await page.getByTestId('start-button').click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.pointerLockElement === document.querySelector('canvas'),
+      ),
+    )
+    .toBe(true);
+  await page.screenshot({ path: packageNoticeScreenshot });
+  await page.keyboard.press('Escape');
+  await expect
+    .poll(() => page.evaluate(() => document.pointerLockElement === null))
+    .toBe(true);
+
+  await page.goto('/');
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-load-state',
+    'loaded',
+    { timeout: 30_000 },
+  );
+  await expect(page.getByTestId('real-package-extent-notice')).toBeHidden();
 
   const hasProductionQaHook = await page.evaluate(
     () => '__torquayAlignmentQa' in window,
