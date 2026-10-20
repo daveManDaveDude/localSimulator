@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import uuid
 from collections.abc import Callable, Mapping
 from pathlib import Path
@@ -60,13 +61,42 @@ def canonical_json_bytes(value: Any) -> bytes:
     ).encode("utf-8")
 
 
-def _assert_no_symlink_components(path: Path, *, project_root: Path) -> None:
+def _is_reparse_point(path: Path) -> bool:
+    """Detect links and Windows reparse points without following the entry."""
+    try:
+        entry = path.lstat()
+    except FileNotFoundError:
+        return False
+    except OSError as exc:
+        raise SceneReleaseError(f"cannot inspect path component '{path}': {exc}") from exc
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    attributes = getattr(entry, "st_file_attributes", 0)
+    return (
+        stat.S_ISLNK(entry.st_mode)
+        or bool(attributes & reparse_flag)
+        or (hasattr(path, "is_junction") and path.is_junction())
+    )
+
+
+def assert_no_reparse_components(path: Path) -> Path:
+    """Return an absolute lexical path after rejecting links/junctions in it.
+
+    This deliberately runs before ``resolve``: resolving a Windows junction
+    would erase the path entry that the guard needs to reject.
+    """
     absolute = Path(os.path.abspath(path))
     current = Path(absolute.anchor)
     for component in absolute.parts[1:]:
         current /= component
-        if current.exists() and current.is_symlink():
-            raise SceneReleaseError(f"symlink path component is not allowed: '{current}'")
+        if _is_reparse_point(current):
+            raise SceneReleaseError(
+                f"symlink path component or junction/reparse point is not allowed: '{current}'"
+            )
+    return absolute
+
+
+def _assert_no_symlink_components(path: Path, *, project_root: Path) -> None:
+    absolute = assert_no_reparse_components(path)
     resolved = absolute.resolve(strict=False)
     try:
         resolved.relative_to(project_root)
@@ -85,14 +115,14 @@ def _resolve_validated_stage(validated_stage: Path, project_root: Path) -> Path:
 
 
 def _resolve_package_root(package_root: Path, project_root: Path) -> Path:
-    expected = (project_root / "public/worlds/torquay-poc-001-2km").resolve(strict=False)
-    _assert_no_symlink_components(package_root, project_root=project_root)
-    output = package_root.resolve(strict=False)
+    expected = Path(os.path.abspath(project_root / "public/worlds/torquay-poc-001-2km"))
+    output = assert_no_reparse_components(package_root)
+    _assert_no_symlink_components(output, project_root=project_root)
     if output != expected:
         raise SceneReleaseError(
             f"release root must be the fixed local path '{expected}', received '{output}'"
         )
-    historical = (project_root / "public/worlds/torquay-poc-001").resolve(strict=False)
+    historical = Path(os.path.abspath(project_root / "public/worlds/torquay-poc-001"))
     if output == historical or historical in output.parents or output in historical.parents:
         raise SceneReleaseError("release root overlaps the immutable historical 1 km package")
     return output
@@ -103,7 +133,8 @@ def _runtime_inventory(stage: Path) -> tuple[list[dict[str, Any]], dict[str, tup
     digests: dict[str, tuple[int, str]] = {}
     for relative in RUNTIME_FILES:
         source = stage.joinpath(*relative.split("/"))
-        if source.is_symlink() or not source.is_file():
+        assert_no_reparse_components(source)
+        if not source.is_file():
             raise SceneReleaseError(f"runtime stage file is missing or unsafe: '{relative}'")
         byte_length = source.stat().st_size
         sha256 = _sha256_file(source)
@@ -125,7 +156,8 @@ def _inventory_document(entries: list[dict[str, Any]]) -> tuple[str, bytes]:
 
 
 def _verify_file(path: Path, expected: tuple[int, str], *, label: str) -> None:
-    if path.is_symlink() or not path.is_file():
+    assert_no_reparse_components(path)
+    if not path.is_file():
         raise SceneReleaseError(f"release file is missing or unsafe: '{label}'")
     byte_length, sha256 = expected
     actual_length = path.stat().st_size
@@ -143,13 +175,20 @@ def _verify_file(path: Path, expected: tuple[int, str], *, label: str) -> None:
 
 def _release_file_inventory(release_dir: Path) -> set[str]:
     found: set[str] = set()
-    for item in release_dir.rglob("*"):
-        if item.is_symlink():
-            raise SceneReleaseError(f"release contains a symlink: '{item}'")
-        if item.is_file():
-            found.add(item.relative_to(release_dir).as_posix())
-        elif item.exists() and not item.is_dir():
-            raise SceneReleaseError(f"release contains an unsupported filesystem entry: '{item}'")
+    pending = [release_dir]
+    while pending:
+        directory = pending.pop()
+        for item in directory.iterdir():
+            if _is_reparse_point(item):
+                raise SceneReleaseError(f"release contains a symlink or junction: '{item}'")
+            if item.is_dir():
+                pending.append(item)
+            elif item.is_file():
+                found.add(item.relative_to(release_dir).as_posix())
+            else:
+                raise SceneReleaseError(
+                    f"release contains an unsupported filesystem entry: '{item}'"
+                )
     return found
 
 
@@ -173,13 +212,16 @@ def _validate_release_files(
 
 def _copy_exclusive(source: Path, destination: Path, relative: str) -> None:
     """Create a file once, stream exact bytes, then verify length and digest."""
+    assert_no_reparse_components(source)
+    assert_no_reparse_components(destination)
+    assert_no_reparse_components(destination.parent)
     if destination.exists():
         raise SceneReleaseError(f"refusing to overwrite immutable release file '{relative}'")
     input_stream = source.open("rb")
     try:
         destination.parent.mkdir(parents=True, exist_ok=True)
-        if destination.parent.is_symlink():
-            raise SceneReleaseError(f"release parent is a symlink for '{relative}'")
+        if _is_reparse_point(destination.parent):
+            raise SceneReleaseError(f"release parent is a reparse point for '{relative}'")
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
         descriptor = os.open(destination, flags, 0o666)
     except Exception:
@@ -201,6 +243,7 @@ def _copy_exclusive(source: Path, destination: Path, relative: str) -> None:
 
 
 def _write_exclusive(path: Path, content: bytes, *, label: str) -> None:
+    assert_no_reparse_components(path)
     if path.exists():
         existing = path.read_bytes()
         if existing != content:
@@ -222,8 +265,9 @@ def _write_exclusive(path: Path, content: bytes, *, label: str) -> None:
 
 def _atomic_activate_ready(package_root: Path, ready_bytes: bytes) -> None:
     ready_path = package_root / READY_FILENAME
-    if ready_path.is_symlink():
-        raise SceneReleaseError("ready.json must not be a symlink")
+    assert_no_reparse_components(ready_path)
+    if _is_reparse_point(ready_path):
+        raise SceneReleaseError("ready.json must not be a reparse point")
     temporary_path = package_root / f".ready.json.pending-{uuid.uuid4().hex}"
     descriptor = os.open(temporary_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
     try:
@@ -269,6 +313,8 @@ def publish_scene_release(
     validation only when it has just validated that same stage in-process.
     """
     root = project_root.resolve(strict=True)
+    assert_no_reparse_components(validated_stage)
+    assert_no_reparse_components(package_root)
     stage = _resolve_validated_stage(validated_stage, root)
     output = _resolve_package_root(package_root, root)
     if stage == output or stage in output.parents or output in stage.parents:
@@ -283,8 +329,8 @@ def publish_scene_release(
         _assert_no_symlink_components(path, project_root=root)
     output.mkdir(parents=True, exist_ok=True)
     releases_root.mkdir(parents=True, exist_ok=True)
-    if release_dir.exists() and release_dir.is_symlink():
-        raise SceneReleaseError("content-addressed release directory must not be a symlink")
+    if _is_reparse_point(release_dir):
+        raise SceneReleaseError("content-addressed release directory must not be a reparse point")
     release_dir.mkdir(exist_ok=True)
 
     existing_names = _release_file_inventory(release_dir)
@@ -331,10 +377,12 @@ def validate_published_scene(
 ) -> dict[str, Any]:
     """Validate readiness, immutable inventory, every file and full scene data."""
     root = project_root.resolve(strict=True)
+    assert_no_reparse_components(package_root)
     output = _resolve_package_root(package_root, root)
     ready_path = output / READY_FILENAME
-    if ready_path.is_symlink():
-        raise SceneReleaseError("ready.json must not be a symlink")
+    assert_no_reparse_components(ready_path)
+    if _is_reparse_point(ready_path):
+        raise SceneReleaseError("ready.json must not be a reparse point")
     try:
         ready_bytes = ready_path.read_bytes()
         if len(ready_bytes) > READY_LIMIT_BYTES:

@@ -46,6 +46,7 @@ export interface SceneReleaseIntegrity {
   readonly releaseRootUrl: URL;
   readonly files: ReadonlyMap<Current2kmRuntimeFile, SceneReleaseFile>;
   assertAssetUrl(url: URL, label: string): void;
+  expectedByteLength(url: URL, label: string): number;
   verifyAsset(url: URL, bytes: ArrayBuffer, label: string): Promise<void>;
 }
 
@@ -427,11 +428,24 @@ export async function loadCurrent2kmRelease(
       );
     }
   };
+  const expectedByteLength = (url: URL, label: string): number => {
+    assertAssetUrl(url, label);
+    const relative = url.pathname.slice(releaseRootUrl.pathname.length);
+    const descriptor = files.get(relative as Current2kmRuntimeFile);
+    if (!descriptor) {
+      throw new SceneReleaseLoadError(
+        'asset integrity',
+        `${label} has no byte-length descriptor in the pinned inventory`,
+      );
+    }
+    return descriptor.byteLength;
+  };
   return {
     releaseId: ready.releaseId,
     releaseRootUrl,
     files,
     assertAssetUrl,
+    expectedByteLength,
     async verifyAsset(
       url: URL,
       bytes: ArrayBuffer,

@@ -40,6 +40,8 @@ function createFetcher(
     manifestStatus?: number;
     heightfieldBytes?: ArrayBuffer;
     heightfieldStatus?: number;
+    manifestResponse?: Response;
+    heightfieldResponse?: Response;
     failOn?: 'manifest' | 'heightfield';
   } = {},
 ): { fetcher: WorldFetch; requests: string[] } {
@@ -51,6 +53,9 @@ function createFetcher(
       throw new Error('simulated network failure');
     }
     if (isManifest) {
+      if (options.manifestResponse !== undefined) {
+        return options.manifestResponse;
+      }
       if (options.manifestBody !== undefined) {
         return new Response(options.manifestBody, {
           status: options.manifestStatus ?? 200,
@@ -63,6 +68,9 @@ function createFetcher(
         },
       );
     }
+    if (options.heightfieldResponse !== undefined) {
+      return options.heightfieldResponse;
+    }
     return new Response(
       options.heightfieldBytes ?? readSyntheticFixtureBytes(),
       {
@@ -71,6 +79,38 @@ function createFetcher(
     );
   };
   return { fetcher, requests };
+}
+
+function streamingResponse(
+  chunks: Uint8Array[],
+  headers: Record<string, string> = {},
+): { response: Response; cancelled: () => boolean; pulls: () => number } {
+  let next = 0;
+  let wasCancelled = false;
+  let pullCount = 0;
+  const body = new ReadableStream<Uint8Array>(
+    {
+      pull(controller) {
+        pullCount += 1;
+        const chunk = chunks[next];
+        if (chunk === undefined) {
+          controller.close();
+          return;
+        }
+        next += 1;
+        controller.enqueue(chunk);
+      },
+      cancel() {
+        wasCancelled = true;
+      },
+    },
+    { highWaterMark: 0 },
+  );
+  return {
+    response: new Response(body, { headers }),
+    cancelled: () => wasCancelled,
+    pulls: () => pullCount,
+  };
 }
 
 async function sha256Hex(bytes: ArrayBuffer): Promise<string> {
@@ -142,8 +182,60 @@ describe('loadSyntheticWorld', () => {
     });
 
     await expect(loadWorld(realManifestUrl, fetcher)).rejects.toThrow(
-      'heightfield response: byte length mismatch',
+      'heightfield response: https://local.test/worlds/torquay-poc-001/heightfield.f32 byte length mismatch',
     );
+  });
+
+  it.each(['35', '37'])(
+    'rejects and cancels a false heightfield Content-Length of %s bytes',
+    async (contentLength) => {
+      const streamed = streamingResponse(
+        [new Uint8Array(readSyntheticFixtureBytes())],
+        { 'content-length': contentLength },
+      );
+      const { fetcher } = createFetcher({
+        heightfieldResponse: streamed.response,
+      });
+
+      await expect(loadWorld(manifestUrl, fetcher)).rejects.toThrow(
+        `heightfield response: https://local.test/worlds/synthetic-heightfield/heightfield.f32 byte length mismatch: Content-Length declares ${contentLength} bytes; expected 36`,
+      );
+      expect(streamed.cancelled()).toBe(true);
+      expect(streamed.pulls()).toBe(0);
+    },
+  );
+
+  it('accepts an exact heightfield Content-Length while streaming bytes', async () => {
+    const streamed = streamingResponse(
+      [new Uint8Array(readSyntheticFixtureBytes())],
+      { 'content-length': '36' },
+    );
+    const { fetcher } = createFetcher({
+      heightfieldResponse: streamed.response,
+    });
+
+    const loaded = await loadSyntheticWorld(manifestUrl, fetcher);
+
+    expect([...loaded.heights]).toHaveLength(9);
+    expect(streamed.cancelled()).toBe(false);
+    expect(streamed.pulls()).toBe(2);
+  });
+
+  it('cancels an oversized heightfield stream without relying on Content-Length', async () => {
+    const streamed = streamingResponse([
+      new Uint8Array(readSyntheticFixtureBytes()),
+      new Uint8Array([0, 0, 0, 0]),
+      new Uint8Array([0, 0, 0, 0]),
+    ]);
+    const { fetcher } = createFetcher({
+      heightfieldResponse: streamed.response,
+    });
+
+    await expect(loadWorld(manifestUrl, fetcher)).rejects.toThrow(
+      'heightfield response: https://local.test/worlds/synthetic-heightfield/heightfield.f32 exceeded the 36-byte response bound',
+    );
+    expect(streamed.cancelled()).toBe(true);
+    expect(streamed.pulls()).toBeLessThan(3);
   });
 
   it('does not request binary data when manifest validation fails', async () => {
@@ -182,6 +274,44 @@ describe('loadSyntheticWorld', () => {
     ).rejects.toThrow('manifest response: response was not valid UTF-8 JSON');
   });
 
+  it('cancels a headerless oversized manifest stream at the metadata cap', async () => {
+    const streamed = streamingResponse([
+      new Uint8Array(256 * 1024 + 1),
+      new Uint8Array([1]),
+    ]);
+    const { fetcher, requests } = createFetcher({
+      manifestResponse: streamed.response,
+    });
+
+    await expect(loadWorld(manifestUrl, fetcher)).rejects.toThrow(
+      'manifest response: https://local.test/worlds/synthetic-heightfield/manifest.json exceeded the 262144-byte response bound',
+    );
+    expect(streamed.cancelled()).toBe(true);
+    expect(streamed.pulls()).toBeLessThan(3);
+    expect(requests).toEqual([manifestUrl.href]);
+  });
+
+  it('rejects and cancels a manifest whose declared length exceeds the cap', async () => {
+    const streamed = streamingResponse(
+      [
+        new TextEncoder().encode(
+          JSON.stringify(readSyntheticFixtureManifest()),
+        ),
+      ],
+      { 'content-length': String(256 * 1024 + 1) },
+    );
+    const { fetcher, requests } = createFetcher({
+      manifestResponse: streamed.response,
+    });
+
+    await expect(loadWorld(manifestUrl, fetcher)).rejects.toThrow(
+      'manifest response: https://local.test/worlds/synthetic-heightfield/manifest.json byte length mismatch: Content-Length declares 262145 bytes; expected at most 262144',
+    );
+    expect(streamed.cancelled()).toBe(true);
+    expect(streamed.pulls()).toBe(0);
+    expect(requests).toEqual([manifestUrl.href]);
+  });
+
   it('reports binary HTTP and network failures with their stage', async () => {
     const httpFailure = createFetcher({ heightfieldStatus: 404 });
     await expect(
@@ -202,7 +332,7 @@ describe('loadSyntheticWorld', () => {
     );
   });
 
-  it('reports decoder failures after a valid checksum', async () => {
+  it('rejects a dimensionally short binary before checksum or decoding', async () => {
     const bytes = new ArrayBuffer(8);
     new DataView(bytes).setFloat32(0, 1, true);
     new DataView(bytes).setFloat32(4, 2, true);
@@ -212,7 +342,7 @@ describe('loadSyntheticWorld', () => {
     );
     const { fetcher } = createFetcher({ manifest, heightfieldBytes: bytes });
     await expect(loadSyntheticWorld(manifestUrl, fetcher)).rejects.toThrow(
-      'heightfield decode: heightfield byte length 8 does not match',
+      'heightfield response: https://local.test/worlds/synthetic-heightfield/heightfield.f32 byte length mismatch',
     );
   });
 

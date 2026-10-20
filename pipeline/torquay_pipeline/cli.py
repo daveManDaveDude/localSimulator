@@ -82,7 +82,11 @@ from .scene_build import (
     validate_scene_package,
     validate_scene_root,
 )
-from .scene_release import SceneReleaseError, publish_scene_release
+from .scene_release import (
+    SceneReleaseError,
+    assert_no_reparse_components,
+    publish_scene_release,
+)
 from .terrain_coverage import (
     DEFAULT_MISSING_THRESHOLD,
     CoverageResult,
@@ -920,6 +924,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         }:
             return _road_command(args)
         if args.command in {"build-scene", "validate-scene", "publish-scene"}:
+            if args.command == "publish-scene":
+                for input_path in (
+                    args.aoi_config,
+                    args.source_manifest,
+                    args.source_dir,
+                    args.source,
+                    args.buildings_config,
+                    args.roads_config,
+                    args.validated_stage,
+                    args.package_root,
+                ):
+                    assert_no_reparse_components(input_path)
             common = {
                 "aoi_config_path": args.aoi_config.resolve(),
                 "source_manifest_path": args.source_manifest.resolve(),
@@ -933,8 +949,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 result = build_scene_package(output_dir=args.output_dir.resolve(), **common)
             elif args.command == "publish-scene":
                 result = publish_scene_release(
-                    args.validated_stage.resolve(),
-                    args.package_root.resolve(),
+                    args.validated_stage,
+                    args.package_root,
                     project_root=PROJECT_ROOT,
                     validator=lambda package: validate_scene_package(package, **common),
                     # The CLI argument is intentionally an already validated

@@ -37,6 +37,7 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
   const failedResponses: string[] = [];
   const requestedUrls: string[] = [];
   const manifests = new Map<string, Record<string, unknown>>();
+  let releaseInventory: Record<string, unknown> | undefined;
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
@@ -49,6 +50,13 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
     const releasePath = new URL(response.url()).pathname.match(
       /\/worlds\/torquay-poc-001-2km\/releases\/[a-f0-9]{64}\/(.+)$/,
     )?.[1];
+    if (releasePath === 'inventory.json') {
+      try {
+        releaseInventory = await response.json();
+      } catch {
+        // The readiness/inventory loader reports malformed release metadata.
+      }
+    }
     if (releasePath?.endsWith('manifest.json')) {
       try {
         manifests.set(releasePath, await response.json());
@@ -60,6 +68,7 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
 
   await mkdir(screenshotDir, { recursive: true });
   await mkdir(resolve('docs/milestones/artifacts'), { recursive: true });
+  const loadStartedAt = Date.now();
   await page.goto('/?world=torquay-poc-001-2km&buildings=1&roads=1');
   await expectLoaded(page);
   const buildingStatus = page.getByTestId('building-status');
@@ -67,9 +76,24 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
   await expect(buildingStatus).toHaveAttribute('data-state', 'loaded', {
     timeout: 120_000,
   });
-  await expect(roadStatus).toHaveAttribute('data-state', 'loaded', {
-    timeout: 120_000,
-  });
+  await expect
+    .poll(() => roadStatus.getAttribute('data-state'), { timeout: 120_000 })
+    .toMatch(/^(loaded|error)$/);
+  const roadState = await roadStatus.getAttribute('data-state');
+  expect(
+    roadState,
+    `road load details: ${await page.getByTestId('road-error').textContent()}\n` +
+      `requests: ${requestedUrls.join('\n')}\nfailed responses: ${failedResponses.join('\n')}`,
+  ).toBe('loaded');
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-road-float32-reoriented-triangles',
+    '1',
+  );
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-road-float32-collapsed-triangles',
+    '1',
+  );
+  const loadTimeMs = Date.now() - loadStartedAt;
   const buildingCount = Number(
     await buildingStatus.getAttribute('data-building-count'),
   );
@@ -84,6 +108,9 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
   );
 
   await expect.poll(() => manifests.size).toBeGreaterThanOrEqual(3);
+  await expect
+    .poll(() => Array.isArray(releaseInventory?.['files']))
+    .toBe(true);
   const terrainManifest = manifests.get('manifest.json');
   const buildingManifest = manifests.get('buildings/manifest.json');
   const roadManifest = manifests.get('roads/manifest.json');
@@ -110,6 +137,20 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
     }),
   );
   expect(releaseIds.size).toBe(1);
+  const [pinnedReleaseId] = [...releaseIds];
+  expect(pinnedReleaseId).toBeDefined();
+  for (const layerManifest of [
+    'buildings/manifest.json',
+    'roads/manifest.json',
+  ]) {
+    expect(
+      requestedUrls.some(
+        (value) =>
+          new URL(value).pathname ===
+          `/worlds/torquay-poc-001-2km/releases/${pinnedReleaseId}/${layerManifest}`,
+      ),
+    ).toBe(true);
+  }
   expect(
     requestedUrls.some(
       (value) =>
@@ -130,11 +171,43 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
       ),
     )
     .toBe(true);
+  const overviewCapture = await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      devicePixelRatio: window.devicePixelRatio,
+      canvas: canvas
+        ? {
+            cssWidth: canvas.getBoundingClientRect().width,
+            cssHeight: canvas.getBoundingClientRect().height,
+            bufferWidth: canvas.width,
+            bufferHeight: canvas.height,
+          }
+        : null,
+      camera: {
+        x: document
+          .querySelector('[data-testid="camera-position"]')
+          ?.getAttribute('data-x'),
+        y: document
+          .querySelector('[data-testid="camera-position"]')
+          ?.getAttribute('data-y'),
+        z: document
+          .querySelector('[data-testid="camera-position"]')
+          ?.getAttribute('data-z'),
+      },
+      groundHeight: document
+        .querySelector('[data-testid="ground-height"]')
+        ?.getAttribute('data-height-meters'),
+      mode: document
+        .querySelector('[data-testid="navigation-mode"]')
+        ?.getAttribute('data-mode'),
+    };
+  });
+  await page.screenshot({ path: overviewScreenshot });
   await page.keyboard.press('Escape');
   await expect
     .poll(() => page.evaluate(() => document.pointerLockElement === null))
     .toBe(true);
-  await page.screenshot({ path: overviewScreenshot });
 
   await page.getByTestId('overview-toggle').click();
   const overviewPanel = page.getByTestId('geographic-overview');
@@ -145,24 +218,33 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
   await expect(overviewPanel).toHaveAttribute('data-map-engine', 'none');
   await page.getByTestId('overview-close').click();
 
+  const canvasBuffer = () =>
+    page.locator('canvas').evaluate((element) => {
+      const canvas = element as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      return {
+        cssWidth: rect.width,
+        cssHeight: rect.height,
+        bufferWidth: canvas.width,
+        bufferHeight: canvas.height,
+        dpr: window.devicePixelRatio,
+      };
+    });
+  const bufferBeforeResize = await canvasBuffer();
   await page.setViewportSize({ width: 1280, height: 800 });
-  const resizedCanvas = await page.locator('canvas').evaluate((element) => {
-    const canvas = element as HTMLCanvasElement;
-    const rect = canvas.getBoundingClientRect();
-    return {
-      cssWidth: rect.width,
-      cssHeight: rect.height,
-      bufferWidth: canvas.width,
-      bufferHeight: canvas.height,
-      dpr: window.devicePixelRatio,
-    };
-  });
-  expect(resizedCanvas.bufferWidth).toBe(
-    Math.round(resizedCanvas.cssWidth * resizedCanvas.dpr),
-  );
-  expect(resizedCanvas.bufferHeight).toBe(
-    Math.round(resizedCanvas.cssHeight * resizedCanvas.dpr),
-  );
+  await expect
+    .poll(async () => {
+      const size = await canvasBuffer();
+      const cappedPixelRatio = Math.min(size.dpr, 1);
+      return (
+        size.bufferWidth === Math.round(size.cssWidth * cappedPixelRatio) &&
+        size.bufferHeight === Math.round(size.cssHeight * cappedPixelRatio)
+      );
+    })
+    .toBe(true);
+  const resizedCanvas = await canvasBuffer();
+  expect(resizedCanvas.bufferWidth).not.toBe(bufferBeforeResize.bufferWidth);
+  expect(resizedCanvas.bufferHeight).not.toBe(bufferBeforeResize.bufferHeight);
 
   const initial = {
     x: Number(await page.getByTestId('camera-position').getAttribute('data-x')),
@@ -247,14 +329,37 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
     '41.25',
   );
   await page.keyboard.down('s');
-  await page.waitForTimeout(4200);
+  await page.waitForTimeout(4850);
   await page.keyboard.up('s');
   await page.keyboard.up('Shift');
+  // Move to a QA pose just off the mapped road, then look along it with nearby
+  // terrain and buildings in frame. This remains outside the centerline ribbon.
+  await page.keyboard.down('a');
+  await page.waitForTimeout(6000);
+  await page.keyboard.up('a');
+  await page.mouse.move(475, 280, { steps: 8 });
+  await expect
+    .poll(() =>
+      page
+        .getByTestId('camera-orientation')
+        .getAttribute('data-bearing-degrees'),
+    )
+    .toBe('336.5');
+  await expect
+    .poll(() =>
+      page.getByTestId('camera-orientation').getAttribute('data-pitch-degrees'),
+    )
+    .toMatch(/^-(?:[5-9]|1[0-5])\.\d$/);
+  const outerX = Number(
+    await page.getByTestId('camera-position').getAttribute('data-x'),
+  );
   const outerZ = Number(
     await page.getByTestId('camera-position').getAttribute('data-z'),
   );
-  expect(outerZ).toBeGreaterThan(500);
-  expect(outerZ).toBeLessThan(1000);
+  expect(outerX).toBeLessThan(-80);
+  expect(outerX).toBeGreaterThan(-100);
+  expect(outerZ).toBeGreaterThan(585);
+  expect(outerZ).toBeLessThan(615);
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -289,11 +394,132 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
       }),
     )
     .toBeLessThan(1.75);
+  const outerCapture = await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      devicePixelRatio: window.devicePixelRatio,
+      canvas: canvas
+        ? {
+            cssWidth: canvas.getBoundingClientRect().width,
+            cssHeight: canvas.getBoundingClientRect().height,
+            bufferWidth: canvas.width,
+            bufferHeight: canvas.height,
+          }
+        : null,
+      camera: {
+        x: document
+          .querySelector('[data-testid="camera-position"]')
+          ?.getAttribute('data-x'),
+        y: document
+          .querySelector('[data-testid="camera-position"]')
+          ?.getAttribute('data-y'),
+        z: document
+          .querySelector('[data-testid="camera-position"]')
+          ?.getAttribute('data-z'),
+      },
+      groundHeight: document
+        .querySelector('[data-testid="ground-height"]')
+        ?.getAttribute('data-height-meters'),
+      mode: document
+        .querySelector('[data-testid="navigation-mode"]')
+        ?.getAttribute('data-mode'),
+      orientation: {
+        bearingDegrees: document
+          .querySelector('[data-testid="camera-orientation"]')
+          ?.getAttribute('data-bearing-degrees'),
+        pitchDegrees: document
+          .querySelector('[data-testid="camera-orientation"]')
+          ?.getAttribute('data-pitch-degrees'),
+      },
+    };
+  });
+  await page.screenshot({ path: outerScreenshot });
   await page.keyboard.press('Escape');
   await expect
     .poll(() => page.evaluate(() => document.pointerLockElement === null))
     .toBe(true);
-  await page.screenshot({ path: outerScreenshot });
+
+  const frameMetrics = await page.evaluate(async () => {
+    const frameIntervals: number[] = [];
+    let firstFrame: number | undefined;
+    let previousFrame: number | undefined;
+    const durationMs = 5_000;
+    await new Promise<void>((resolveFrame) => {
+      const sample = (timestamp: number): void => {
+        firstFrame ??= timestamp;
+        if (previousFrame !== undefined) {
+          frameIntervals.push(timestamp - previousFrame);
+        }
+        previousFrame = timestamp;
+        if (timestamp - firstFrame < durationMs) {
+          requestAnimationFrame(sample);
+        } else {
+          resolveFrame();
+        }
+      };
+      requestAnimationFrame(sample);
+    });
+    const ordered = [...frameIntervals].sort((left, right) => left - right);
+    const percentile = (fraction: number): number => {
+      if (ordered.length === 0) return 0;
+      return ordered[Math.max(0, Math.ceil(ordered.length * fraction) - 1)]!;
+    };
+    const round = (value: number): number => Math.round(value * 1000) / 1000;
+    const canvas = document.querySelector('canvas');
+    const context = canvas?.getContext('webgl2') ?? canvas?.getContext('webgl');
+    const debugInfo = context?.getExtension('WEBGL_debug_renderer_info');
+    const shell = document.querySelector('.viewer-shell');
+    return {
+      frameCount: frameIntervals.length,
+      frameTimeMs: {
+        p50: round(percentile(0.5)),
+        p95: round(percentile(0.95)),
+        p99: round(percentile(0.99)),
+        maximum: round(ordered.at(-1) ?? 0),
+      },
+      medianFps: round(1000 / Math.max(percentile(0.5), 0.001)),
+      renderer: {
+        webglVersion: context?.getParameter(context.VERSION) ?? null,
+        vendor: context
+          ? context.getParameter(
+              debugInfo?.UNMASKED_VENDOR_WEBGL ?? context.VENDOR,
+            )
+          : null,
+        renderer: context
+          ? context.getParameter(
+              debugInfo?.UNMASKED_RENDERER_WEBGL ?? context.RENDERER,
+            )
+          : null,
+      },
+      drawCalls: Number(shell?.getAttribute('data-draw-calls') ?? 0),
+      triangles: Number(shell?.getAttribute('data-triangles') ?? 0),
+      canvas: canvas
+        ? {
+            cssWidth: canvas.getBoundingClientRect().width,
+            cssHeight: canvas.getBoundingClientRect().height,
+            bufferWidth: canvas.width,
+            bufferHeight: canvas.height,
+          }
+        : null,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      devicePixelRatio: window.devicePixelRatio,
+      hudFps: Number(
+        document
+          .querySelector('[data-testid="frames-per-second"]')
+          ?.getAttribute('data-fps') ?? 0,
+      ),
+    };
+  });
+  expect(frameMetrics.frameCount).toBeGreaterThan(0);
+  const inventoryFiles = Array.isArray(releaseInventory?.['files'])
+    ? (releaseInventory['files'] as Array<{ byteLength?: unknown }>)
+    : [];
+  expect(inventoryFiles.length).toBeGreaterThan(0);
+  const packageByteLength = inventoryFiles.reduce((total, item) => {
+    expect(Number.isSafeInteger(item.byteLength)).toBe(true);
+    return total + Number(item.byteLength);
+  }, 0);
 
   const browserEvidence = await page.evaluate(() => {
     const canvas = document.querySelector('canvas');
@@ -340,7 +566,15 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
       {
         profile: 'current_2km',
         browser: browserEvidence,
+        browserVersion: page.context().browser()?.version() ?? 'unknown',
+        loadTimeMs,
+        performance: frameMetrics,
         counts: { buildings: buildingCount, roads: roadCount },
+        packageByteLength,
+        releaseInventoryByteLength: inventoryFiles.reduce(
+          (total, item) => total + Number(item.byteLength),
+          0,
+        ),
         packageAssets: {
           terrainHeightfield: terrainManifest?.heightfield,
           buildings: buildingManifest?.assets,
@@ -350,7 +584,17 @@ test('current 2 km combined package loads, navigates into its outer annulus, and
           overviewScreenshot: overviewScreenshot.replaceAll('\\', '/'),
           outerAnnulusScreenshot: outerScreenshot.replaceAll('\\', '/'),
         },
-        outerAnnulus: { initialZ: initial.z, finalZ: outerZ },
+        screenshots: {
+          overview: overviewCapture,
+          outerAnnulus: outerCapture,
+        },
+        releaseId: pinnedReleaseId ?? null,
+        outerAnnulus: {
+          initialX: initial.x,
+          initialZ: initial.z,
+          finalX: outerX,
+          finalZ: outerZ,
+        },
         noHistoricalOverviewRequested: true,
         noUnexpectedPageConsoleOrHttpErrors: true,
       },

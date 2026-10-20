@@ -74,6 +74,7 @@ interface ViewerWorld {
   terrainGrid?: TerrainGrid;
   realManifest?: RealTerrainSceneManifest;
   realManifestSha256?: string;
+  sceneRelease?: SceneReleaseIntegrity;
 }
 
 export interface AppHandle {
@@ -682,6 +683,8 @@ export function createApp(container: HTMLElement): AppHandle {
     shell.dataset.roadWayCount = '0';
     shell.dataset.roadPartCount = '0';
     shell.dataset.roadVisible = 'false';
+    shell.dataset.roadFloat32ReorientedTriangles = '0';
+    shell.dataset.roadFloat32CollapsedTriangles = '0';
     roadStatus.dataset.state = 'off';
     roadStatus.dataset.wayCount = '0';
     roadStatus.dataset.partCount = '0';
@@ -891,6 +894,12 @@ export function createApp(container: HTMLElement): AppHandle {
       currentRoadGroup = group;
       loadedRoadPackage = packageData;
       scene.add(group);
+      shell.dataset.roadFloat32ReorientedTriangles = String(
+        group.userData['float32ReorientedTriangles'] ?? 0,
+      );
+      shell.dataset.roadFloat32CollapsedTriangles = String(
+        group.userData['float32CollapsedTriangles'] ?? 0,
+      );
       overview.refreshLayers();
       roadLabels.setPackage(
         packageData,
@@ -1269,6 +1278,7 @@ export function createApp(container: HTMLElement): AppHandle {
     currentTerrainGrid = world.terrainGrid;
     currentTerrainManifest = world.realManifest;
     currentTerrainManifestSha256 = world.realManifestSha256;
+    currentSceneRelease = world.sceneRelease;
     buildingControls.hidden = !world.isReal;
     roadControls.hidden = !world.isReal;
     shell.dataset.buildingVisible = 'false';
@@ -1422,7 +1432,6 @@ export function createApp(container: HTMLElement): AppHandle {
         ) {
           return;
         }
-        currentSceneRelease = releaseIntegrity;
         selectedRealProfile = current2kmSceneForRelease(releaseIntegrity);
       }
       const manifestUrl =
@@ -1503,6 +1512,9 @@ export function createApp(container: HTMLElement): AppHandle {
         gridAndCompass: world.gridAndCompass,
         terrainGrid: world.grid,
         ...realManifestFields,
+        ...(releaseIntegrity === undefined
+          ? {}
+          : { sceneRelease: releaseIntegrity }),
       });
     } catch (error) {
       if (

@@ -64,4 +64,57 @@ describe('createRoads', () => {
       /crosses its claimed terrain triangle/,
     );
   });
+
+  it('repairs Float32 winding flips and omits a Float32-collapsed sliver', () => {
+    const grid = createTerrainGrid({
+      columns: 1001,
+      rows: 1001,
+      spacingM: 2,
+      widthM: 2000,
+      depthM: 2000,
+      heights: new Float32Array(1001 * 1001),
+    });
+    const roads = {
+      manifest: {},
+      features: [],
+      qa: {},
+      partCount: 0,
+      countsByGroup: { vehicular: 0, cycleway: 0, path: 0 },
+      batches: {
+        vehicular: {
+          verticesXZ: [
+            [528.0857104781996, -294.0],
+            [528.037549784934, -294.03754978493396],
+            [528.0856213450894, -294.00006048510386],
+            [-251.99997548305203, 889.999975483052],
+            [-252.0, 890.0],
+            [-251.99995252749667, 890.0],
+          ],
+          indices: [
+            [0, 1, 2],
+            [3, 4, 5],
+          ],
+          terrainTriangles: [
+            [352, 764, 1],
+            [944, 374, 1],
+          ],
+        },
+        cycleway: { verticesXZ: [], indices: [], terrainTriangles: [] },
+        path: { verticesXZ: [], indices: [], terrainTriangles: [] },
+      },
+    } as unknown as LoadedRoadPackage;
+
+    const group = createRoads(roads, grid);
+    const mesh = group.children[0];
+    expect(mesh).toBeDefined();
+    expect(group.userData['float32ReorientedTriangles']).toBe(1);
+    expect(group.userData['float32CollapsedTriangles']).toBe(1);
+    expect((mesh as Mesh).geometry.getIndex()?.array).toEqual(
+      new Uint32Array([0, 2, 1]),
+    );
+    const normals = (mesh as Mesh).geometry.getAttribute('normal');
+    for (const index of [0, 1, 2]) {
+      expect(normals.getY(index)).toBeGreaterThan(0);
+    }
+  });
 });

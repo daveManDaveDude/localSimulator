@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
-import { cpSync } from 'node:fs';
-import { resolve, sep } from 'node:path';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { copySharePublicAssets } from './scripts/share-assets';
 
 export default defineConfig(({ mode }) => {
   const shareableBuild = mode === 'share';
@@ -16,22 +16,7 @@ export default defineConfig(({ mode }) => {
           {
             name: 'copy-public-assets-without-local-real-worlds',
             closeBundle() {
-              const localWorlds = [
-                resolve('public/worlds/torquay-poc-001'),
-                resolve('public/worlds/torquay-poc-001-2km'),
-              ];
-              cpSync(resolve('public'), resolve('dist'), {
-                recursive: true,
-                force: true,
-                filter: (source) => {
-                  const candidate = resolve(source);
-                  return !localWorlds.some(
-                    (localWorld) =>
-                      candidate === localWorld ||
-                      candidate.startsWith(`${localWorld}${sep}`),
-                  );
-                },
-              });
+              copySharePublicAssets(resolve('public'), resolve('dist'));
             },
           },
         ]

@@ -63,6 +63,8 @@ export function createRoads(
 ): Group {
   const root = new Group();
   root.name = 'OSM road surfaces · estimated visual widths';
+  let float32ReorientedTriangles = 0;
+  let float32CollapsedTriangles = 0;
   const ownedGeometries: BufferGeometry[] = [];
   const ownedMaterials: MeshStandardMaterial[] = [];
 
@@ -101,6 +103,8 @@ export function createRoads(
       }
 
       const indices = new Uint32Array(batch.indices.length * 3);
+      const referencedVertices = new Uint8Array(batch.verticesXZ.length);
+      let writtenIndexCount = 0;
       for (
         let faceIndex = 0;
         faceIndex < batch.indices.length;
@@ -136,7 +140,6 @@ export function createRoads(
             positions[vertexIndex * 3 + 1]!,
             positions[vertexIndex * 3 + 2]!,
           ]);
-          indices[faceIndex * 3 + corner] = vertexIndex;
         }
         const centroidX =
           (facePositions[0]![0] + facePositions[1]![0] + facePositions[2]![0]) /
@@ -156,12 +159,47 @@ export function createRoads(
             `${groupName}: face ${faceIndex} exceeds the 1 mm terrain-triangle drape tolerance`,
           );
         }
+
+        // The package's 64-bit schema checks the source triangle winding.
+        // Float32 renderer coordinates can collapse a sub-mm sliver or flip
+        // its horizontal winding, so make that representational effect
+        // explicit before Three computes shared vertex normals.
+        const first = facePositions[0]!;
+        const second = facePositions[1]!;
+        const third = facePositions[2]!;
+        const horizontalCross =
+          (second[0] - first[0]) * (third[2] - first[2]) -
+          (second[2] - first[2]) * (third[0] - first[0]);
+        if (!Number.isFinite(horizontalCross)) {
+          throw new Error(
+            `${groupName}: face ${faceIndex} has a non-finite Float32 winding`,
+          );
+        }
+        if (horizontalCross === 0) {
+          float32CollapsedTriangles += 1;
+          continue;
+        }
+
+        const offset = writtenIndexCount;
+        indices[offset] = face[0]!;
+        indices[offset + 1] = horizontalCross < 0 ? face[1]! : face[2]!;
+        indices[offset + 2] = horizontalCross < 0 ? face[2]! : face[1]!;
+        if (horizontalCross > 0) float32ReorientedTriangles += 1;
+        for (const vertexIndex of face) referencedVertices[vertexIndex] = 1;
+        writtenIndexCount += 3;
+      }
+      if (writtenIndexCount === 0) {
+        throw new Error(
+          `${groupName}: all faces collapsed after Float32 conversion`,
+        );
       }
 
       const geometry = new BufferGeometry();
       ownedGeometries.push(geometry);
       geometry.setAttribute('position', new BufferAttribute(positions, 3));
-      geometry.setIndex(new BufferAttribute(indices, 1));
+      geometry.setIndex(
+        new BufferAttribute(indices.subarray(0, writtenIndexCount), 1),
+      );
       geometry.computeVertexNormals();
       geometry.computeBoundingBox();
       geometry.computeBoundingSphere();
@@ -169,6 +207,7 @@ export function createRoads(
       assertFiniteAttribute(positions, `${groupName} positions`);
       assertFiniteAttribute(normals, `${groupName} normals`);
       for (let index = 0; index < normals.length; index += 3) {
+        if (referencedVertices[index / 3] === 0) continue;
         if (normals[index + 1]! <= 0) {
           throw new Error(
             `${groupName}: road vertex normal ${index / 3} is not upward-facing`,
@@ -194,8 +233,12 @@ export function createRoads(
       mesh.name = `OSM ${groupName} road surfaces`;
       mesh.userData.displayGroup = groupName;
       mesh.userData.estimatedWidth = true;
+      mesh.userData.float32ReorientedTriangles = float32ReorientedTriangles;
+      mesh.userData.float32CollapsedTriangles = float32CollapsedTriangles;
       root.add(mesh);
     }
+    root.userData.float32ReorientedTriangles = float32ReorientedTriangles;
+    root.userData.float32CollapsedTriangles = float32CollapsedTriangles;
     return root;
   } catch (error) {
     disposeSceneResources(root);

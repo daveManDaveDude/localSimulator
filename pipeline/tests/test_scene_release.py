@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -251,3 +252,94 @@ def test_refuses_symlink_stage_and_non_fixed_output_root(tmp_path: Path) -> None
             project_root=root,
             validator=validator,
         )
+
+
+def _make_directory_junction(path: Path, target: Path) -> None:
+    if os.name != "nt":
+        pytest.skip("Windows directory junction regression requires Windows")
+    command = f"mklink /J {path} {target}"
+    result = subprocess.run(
+        ["cmd.exe", "/c", command],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0 or not path.is_junction():
+        pytest.skip(
+            "this Windows filesystem cannot create a junction: "
+            f"{result.stdout.strip()} {result.stderr.strip()}"
+        )
+
+
+def test_rejects_output_junction_before_validation_or_any_write(tmp_path: Path) -> None:
+    root, stage, package_root = _workspace(tmp_path)
+    validator, calls = _validator_calls()
+    public = root / "public"
+    public.mkdir()
+    protected_target = tmp_path / "protected-target"
+    protected_package = protected_target / "torquay-poc-001-2km"
+    protected_package.mkdir(parents=True)
+    sentinel = protected_package / "keep.txt"
+    sentinel.write_bytes(b"protected output target")
+    junction = public / "worlds"
+    _make_directory_junction(junction, protected_target)
+
+    with pytest.raises(SceneReleaseError, match="junction/reparse"):
+        publish_scene_release(
+            stage,
+            package_root,
+            project_root=root,
+            validator=validator,
+        )
+
+    assert calls == []
+    assert sentinel.read_bytes() == b"protected output target"
+    assert sorted(path.name for path in protected_package.iterdir()) == ["keep.txt"]
+
+
+def test_rejects_stage_junction_before_validation_or_any_write(tmp_path: Path) -> None:
+    root, stage, package_root = _workspace(tmp_path)
+    validator, calls = _validator_calls()
+    stage_link = root / ".torquay-poc-001-2km.stage-junction"
+    _make_directory_junction(stage_link, stage)
+    sentinel = stage / "manifest.json"
+    original = sentinel.read_bytes()
+
+    with pytest.raises(SceneReleaseError, match="junction/reparse"):
+        publish_scene_release(
+            stage_link,
+            package_root,
+            project_root=root,
+            validator=validator,
+        )
+
+    assert calls == []
+    assert sentinel.read_bytes() == original
+    assert not package_root.exists()
+
+
+def test_publish_cli_rejects_junction_before_resolving_input(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from torquay_pipeline import cli
+
+    root, stage, package_root = _workspace(tmp_path)
+    stage_link = root / ".torquay-poc-001-2km.stage-cli-junction"
+    _make_directory_junction(stage_link, stage)
+    monkeypatch.setattr(cli, "PROJECT_ROOT", root)
+    monkeypatch.chdir(root)
+
+    result = cli.main(
+        [
+            "publish-scene",
+            "--validated-stage",
+            str(stage_link),
+            "--package-root",
+            str(package_root),
+        ]
+    )
+
+    assert result == 2
+    assert "junction/reparse" in capsys.readouterr().err
+    assert not package_root.exists()
+    assert stage.joinpath("manifest.json").read_bytes() == b"fixture:manifest.json:v1"

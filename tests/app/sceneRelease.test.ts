@@ -100,6 +100,9 @@ describe('current 2 km readiness and immutable release pin', () => {
     for (const path of CURRENT_2KM_RUNTIME_FILES) {
       const url = new URL(path, release.releaseRootUrl);
       release.assertAssetUrl(url, path);
+      expect(release.expectedByteLength(url, path)).toBe(
+        fixture.assets.get(path)!.byteLength,
+      );
       await release.verifyAsset(
         url,
         fixture.assets.get(path)!.buffer as ArrayBuffer,
