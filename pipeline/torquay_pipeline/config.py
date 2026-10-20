@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 
 class AoiConfigError(ValueError):
@@ -31,6 +31,7 @@ class Anchor:
 @dataclass(frozen=True)
 class AoiConfig:
     format_version: int
+    profile: Literal["current_2km", "historical_1km"]
     id: str
     name: str
     selection_status: str
@@ -91,6 +92,7 @@ def parse_aoi_config(raw: Any) -> AoiConfig:
         root,
         {
             "format_version",
+            "profile",
             "id",
             "name",
             "selection_status",
@@ -104,6 +106,15 @@ def parse_aoi_config(raw: Any) -> AoiConfig:
     version = root.get("format_version")
     if isinstance(version, bool) or not isinstance(version, int) or version != 1:
         raise AoiConfigError("format_version must be the integer 1")
+
+    profile_value = root.get("profile", "current_2km")
+    if not isinstance(profile_value, str) or profile_value not in {
+        "current_2km",
+        "historical_1km",
+    }:
+        raise AoiConfigError("profile must be 'current_2km' or 'historical_1km'")
+    profile: Literal["current_2km", "historical_1km"] = profile_value
+    expected_size_m = 2000.0 if profile == "current_2km" else 1000.0
 
     identifier = _required_string(root.get("id"), "id")
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", identifier):
@@ -184,8 +195,11 @@ def parse_aoi_config(raw: Any) -> AoiConfig:
         raise AoiConfigError("aoi.crs must be EPSG:27700")
     width_m = _required_number(aoi_raw.get("width_m"), "aoi.width_m")
     height_m = _required_number(aoi_raw.get("height_m"), "aoi.height_m")
-    if width_m != 1000 or height_m != 1000:
-        raise AoiConfigError("TVW-006 candidate dimensions must be exactly 1,000 m by 1,000 m")
+    if width_m != expected_size_m or height_m != expected_size_m:
+        raise AoiConfigError(
+            f"profile '{profile}' requires exactly {expected_size_m:,.0f} m by "
+            f"{expected_size_m:,.0f} m dimensions"
+        )
     stored_values: dict[str, tuple[float, ...]] = {}
     for field, count in (("center_bng_m", 2), ("bbox_m", 4)):
         values = aoi_raw.get(field)
@@ -202,7 +216,9 @@ def parse_aoi_config(raw: Any) -> AoiConfig:
     if not math.isclose(east - west, width_m, rel_tol=0, abs_tol=1e-7) or not math.isclose(
         north - south, height_m, rel_tol=0, abs_tol=1e-7
     ):
-        raise AoiConfigError("aoi.bbox_m must describe the configured 1,000 m by 1,000 m square")
+        raise AoiConfigError(
+            f"aoi.bbox_m must describe the configured {expected_size_m:,.0f} m square"
+        )
     if not math.isclose((west + east) / 2, center[0], rel_tol=0, abs_tol=1e-7):
         raise AoiConfigError("aoi.bbox_m easting midpoint must match aoi.center_bng_m[0]")
     if not math.isclose((south + north) / 2, center[1], rel_tol=0, abs_tol=1e-7):
@@ -213,6 +229,7 @@ def parse_aoi_config(raw: Any) -> AoiConfig:
 
     return AoiConfig(
         format_version=1,
+        profile=profile,
         id=identifier,
         name=name,
         selection_status=selection_status,
@@ -247,5 +264,6 @@ def validate_stored_selection(
         for stored, expected in zip(config.bbox_m, bbox_m, strict=True)
     ):
         raise AoiConfigError(
-            "aoi.bbox_m does not match the configured anchor's 1,000 m EPSG:27700 square"
+            f"aoi.bbox_m does not match the configured anchor's "
+            f"{config.width_m:,.0f} m EPSG:27700 square"
         )

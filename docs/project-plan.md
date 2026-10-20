@@ -2,7 +2,7 @@
 
 **Project plan and Codex implementation specification**  
 **Version:** 1.0 · **Prepared:** 17 October 2026  
-**Status:** M0, M1 and TVW-001 through TVW-015 passed their issue reviews; the M8 overview/minimap issue also passed independent review and was coordinator-accepted on 2026-10-19. The 1,000 m AOI revision and EA DTM inspection passed; TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, TVW-012 completed the independent three-spot map comparison and issue report, TVW-013 completed ground-following walk mode with 1.7 m eye clearance, TVW-014 completed clean-clone synthetic smoke, repeatable local-source regeneration, production browser checks and descriptive benchmark reporting, and TVW-015 completed the optional street-name-label slice of M8. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19; M6 was accepted after TVW-013 fix 1 passed independent review on 2026-10-19; M7 was accepted after TVW-014 fix 1 passed independent review on 2026-10-19; TVW-015 and the M8 overview/minimap issue were accepted after their final independent reviews on 2026-10-19. TVW-016 and later remain unauthorized. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode.
+**Status:** M0, M1 and TVW-001 through TVW-015 passed their issue reviews; the M8 overview/minimap issue also passed independent review and was coordinator-accepted on 2026-10-19. The original 1,000 m AOI revision and EA DTM inspection passed; a user-approved 2,000 m AOI size revision and separate 2 km DTM/index assessment are recorded on 2026-10-20. TVW-009 completed building import, height policy and QA, TVW-010 completed optional browser building rendering, TVW-011 completed optional road rendering, TVW-012 completed the independent three-spot map comparison and issue report, TVW-013 completed ground-following walk mode with 1.7 m eye clearance, TVW-014 completed clean-clone synthetic smoke, repeatable local-source regeneration, production browser checks and descriptive benchmark reporting, and TVW-015 completed the optional street-name-label slice of M8. The combined M5 exit gate was accepted by the coordinator after TVW-012's independent review on 2026-10-19; M6 was accepted after TVW-013 fix 1 passed independent review on 2026-10-19; M7 was accepted after TVW-014 fix 1 passed independent review on 2026-10-19; TVW-015 and the M8 overview/minimap issue were accepted after their final independent reviews on 2026-10-19. TVW-016 and later remain unauthorized. Mapped feature counts do not establish completeness; remaining feature checks are outstanding, so the AOI remains pending and is not approved or frozen. TVW-008/M3 is complete as a terrain-only local browser mode.
 **Target platform:** Windows 11 development machine; recent desktop Chrome/Edge; locally served web application
 
 ---
@@ -11,7 +11,7 @@
 
 **Build this in TypeScript, Three.js and Vite, not Unreal Engine.** Use a small offline Python GIS pipeline to transform real Torquay elevation and mapping data into lightweight local scene assets. The browser renders those assets and provides a moveable camera. No imagery streaming, Google Maps API key, Unity or Unreal installation is required for the PoC.
 
-The first proof is deliberately modest: **a recognisable 1,000 m × 1,000 m section of Torquay**, showing believable real elevation, real building outlines as simple extruded blocks, real road alignments, and a camera controllable by mouse and keyboard. The first release is a **world viewer**, not a complete game or driving simulator.
+The original proof target was a recognisable 1,000 m × 1,000 m Torquay section. On 2026-10-20 the user expanded the pending candidate to 2,000 m × 2,000 m around the same postcode centroid. Existing local browser packages and viewer captures still represent the earlier 1,000 m build; the updated candidate has not been exported to a new browser scene. The first release is a **world viewer**, not a complete game or driving simulator.
 
 **Non-negotiable rule:** each milestone must produce something directly viewable and testable. Build and demonstrate synthetic data **before** relying on geographic downloads. Codex should not attempt the full town before a small scene is working.
 
@@ -19,7 +19,7 @@ The first proof is deliberately modest: **a recognisable 1,000 m × 1,000 m sect
 
 A user runs `npm run dev`, opens a local URL, and can:
 
-1. See actual hills and slopes for the selected 1,000 m Torquay area.
+1. See actual hills and slopes for the current 2,000 m Torquay candidate after an explicitly authorized export; the retained browser terrain currently represents the previous 1,000 m build.
 2. Recognise local streets from road positions and building footprints.
 3. Move a camera with WASD, steer with the mouse, and switch between free-flight and ground-following walking modes.
 4. Read position, elevation, FPS, and current data-source information in a small on-screen debug panel.
@@ -159,17 +159,19 @@ Useful references: https://www.nationalarchives.gov.uk/doc/open-government-licen
 
 **Candidate anchor:** postcode **TQ1 4HN**. Postcodes.io returned quality 1 and WGS84 longitude `-3.536013`, latitude `50.477853` on 2026-10-17; these are postcode-centroid coordinates, not a property or survey point. The provider's rounded BNG values were easting `291110`, northing `65355`. Independent OpenStreetMap context was inspected at zoom 18 around the anchor and zoom 17 with the original 500 m candidate boundary overlaid. The dated marker-only and 500 m boundary screenshots are historical: `docs/milestones/screenshots/TVW-006-postcode-context.png` and `docs/milestones/screenshots/TVW-006-aoi-boundary.png`. On 2026-10-17 the user approved a 1,000 m square around the same centroid; its boundary capture is `docs/milestones/screenshots/TVW-006-aoi-boundary-1km.png`.
 
-The original TVW-006 scope derived a **500 m × 500 m EPSG:27700 candidate** at the same centre; its bounds and dated screenshot remain historical in `docs/milestones/TVW-006.md`. On 2026-10-17 the user approved a **1,000 m × 1,000 m revision** without changing the WGS84 or projected centre. Current bounds are `[290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931]` in `[west, south, east, north]` order. The tool pins non-ballpark EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid), reporting 2 m accuracy; the selected operation uses no grid. PROJ network access is disabled. In this environment the preferred 1 m operation is unavailable because `uk_os_OSTN15_NTv2_OSGBtoETRS.tif` is missing; the tool records `best_available`, missing operation/grid names, and the selected operation definition in `docs/aoi-selection.json`. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
+The original TVW-006 scope derived a **500 m × 500 m EPSG:27700 candidate** at the same centre; its bounds and dated screenshot remain historical in `docs/milestones/TVW-006.md`. On 2026-10-17 the user approved a **1,000 m × 1,000 m revision** without changing the WGS84 or projected centre. Its bounds `[290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931]` and screenshots are historical evidence. On 2026-10-20 the user approved a **2,000 m × 2,000 m revision** around that same center; the current bounds are `[290108.9018176432, 64353.48350844931, 292108.9018176432, 66353.48350844931]` in `[west, south, east, north]` order. The tool pins non-ballpark EPSG operation 1314 (OSGB36 to WGS 84 (6)) plus EPSG operation 19916 (British National Grid), reporting 2 m accuracy; the selected operation uses no grid. PROJ network access is disabled. In this environment the preferred 1 m operation is unavailable because `uk_os_OSTN15_NTv2_OSGBtoETRS.tif` is missing; the tool records `best_available`, missing operation/grid names, and the selected operation definition in `docs/aoi-selection.json`. Full operation metadata and WGS84 QA GeoJSON are generated in `docs/aoi-selection.json` and `docs/aoi-selection.geojson`.
 
-The current config status remains `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. TVW-007's independently reviewed EA DTM center-coverage check passes its 1% missing-cell threshold; see `docs/milestones/TVW-007.md`. TVW-009 adds local OSM building-footprint counts and placement QA, but these counts do not establish completeness; road/remaining feature checks and the M2 exit gate remain pending. Do not describe this candidate as overall coverage-approved or frozen.
+The current config status remains `selection_status: selected_pending_coverage` and `coverage_status: not_checked`. The 1 km TVW-007 DTM result is historical; the 2026-10-20 reassessment reports 4,000,000/4,000,000 valid 1 m raster cell centers for the current 2 km candidate. The separate EA time-stamped DTM index reports partial 0.5 m product-footprint metadata only, not 0.5 m raster coverage. TVW-009 building counts and other mapped counts do not establish completeness; remaining source-coverage checks and the M2 exit gate remain pending. The old browser packages are still 1 km and have not been regenerated. Do not describe this candidate as overall coverage-approved or frozen.
+
+The editable `config/aoi.torquay.json` uses the typed `current_2km` profile. `config/aoi.torquay-1km.json` preserves the same center and pending status under an explicit `historical_1km` profile so earlier packages can be validated or regenerated without treating their extent as current. The old selection snapshot is retained under `docs/milestones/artifacts/AOI-1km-selection/`; current selection outputs are the 2 km files at `docs/aoi-selection.*`.
 
 **Selection protocol (Codex task):**
 
 1. The TQ1 4HN postcode centroid and independent OSM map context are documented in TVW-006 evidence.
 2. Transform WGS84 longitude/latitude to EPSG:27700 with `pyproj` and `always_xy=True`.
-3. Construct the user-approved **1,000 m × 1,000 m candidate AOI in British National Grid metres** around that transformed centre.
+3. Construct the current user-approved **2,000 m × 2,000 m candidate AOI in British National Grid metres** around that transformed centre (the 500 m and 1,000 m versions are historical revisions).
 4. Generate RFC 7946 WGS84 QA GeoJSON with a closed exterior polygon and anchor point.
-5. **TVW-007 status:** PASS after Luna fix 1 and independent Sol re-review. The EA 1 m DTM center-grid check passes its threshold; inspect candidate OSM/OS building and road counts only in the next separately authorized issue.
+5. **TVW-007 status:** PASS after Luna fix 1 and independent Sol re-review for the then-current 1 km square. The 2026-10-20 size revision separately measured the current 2 km candidate's EA 1 m DTM centers and assessed EA nominal-resolution index polygons; neither result completes the overall AOI gate. Keep these separately described in the dated assessment handback.
 6. Keep the editable anchor, dimensions, and regenerated projected centre/bounds in `config/aoi.torquay.json`; publish operation metadata and QA output under `docs/`.
 7. Allow moving the candidate square by changing the input config alone and rerunning the selection CLI.
 
@@ -254,7 +256,7 @@ public/worlds/torquay-poc-001/
 
 **IMPORTANT:** `origin` values of zero above are just schema examples, not valid real-scene values. Real generated files must contain measured AOI-local projected coordinates and a documented local elevation origin. The manifest should additionally include geographic AOI bounds, source provenance, input hashes and asset checksums in the implementation.
 
-At 2 m spacing, the 1,000 m square has **501 × 501 = 251,001 height samples**, about **1.00 MB** of uncompressed float32 height data. This is small enough for straightforward local browser loading. Retain the **1 m DTM source** for later resampling/LOD rather than discarding it.
+At 2 m spacing, the current 2,000 m square would have **1,001 × 1,001 = 1,002,001 height samples**, about **4.01 MB** of uncompressed float32 height data. The existing 501 × 501 browser heightfield and terrain/building/road packages are for the earlier 1,000 m square; this AOI revision did not regenerate or publish a new scene. Retain the **1 m DTM source** for later resampling/LOD rather than discarding it.
 
 For `buildings.json`, store polygon rings in world **XZ metres**, `heightM`, `heightMethod`, footprint provenance and unique ID. Keep a typed schema and validation. For `roads.json`, store line vertices in XZ, name, classification, approximate width, and a non-ground flag for bridges/tunnels when known. **Do not store absolute projected easting/northing** in every browser vertex.
 
@@ -472,11 +474,11 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M2 — Freeze Torquay AOI and verify elevation acquisition
 
-**TVW-006 status:** Original 500 m scope passed after Luna fix 1 and independent re-review. The user authorized a 1,000 m size revision on 2026-10-17; that revision passed independent review by Sol on 2026-10-17. It retains the same postcode-centred candidate and deterministic operation/grid diagnostics. The EA DTM check is documented under TVW-007; OSM/OS feature counts remain unverified, so do not call the AOI coverage-approved or mark the M2 exit gate complete.
+**TVW-006 status:** Original 500 m scope and the user-authorized 1,000 m size revision passed independent review. On 2026-10-20 the user authorized a further 2,000 m size revision around the same postcode centroid. The exact current config/selection and the separate 2 km DTM/index assessment are documented in the dated AOI assessment handback. The AOI remains pending: OSM/OS feature coverage is unverified, so do not call the AOI coverage-approved or mark the M2 exit gate complete.
 
-**User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with selected 1,000 m AOI drawn on it. The browser can still run synthetic scene.
+**User-visible result:** a **data-inspection report and 2D preview** of actual Torquay elevation, with the current selected 2,000 m AOI drawn on it. The browser can still run the synthetic scene; existing real browser packages remain the previous 1,000 m build.
 
-**TVW-007 status:** PASS after Luna fix 1 and independent Sol re-review. The public EA LIDAR Composite DTM 1 m (2022) `SX96nw` and `SX96sw` archives were acquired and verified, with extracted TIFF/XML files cryptographically bound to named archive members. The aligned 1 m AOI report measures 1,000,000/1,000,000 valid cell centers, no uncovered/NoData/nonfinite cells, and a pass against the 1% DTM missing threshold. The overall AOI remains pending because OSM/OS building and road counts are not part of this issue and remain unchecked. See `docs/data-sources.md`, `data/source-manifest.json`, and `docs/milestones/TVW-007.md`.
+**TVW-007 status:** PASS after Luna fix 1 and independent Sol re-review for the then-current 1 km candidate. The public EA LIDAR Composite DTM 1 m (2022) `SX96nw` and `SX96sw` archives were acquired and verified, with extracted TIFF/XML files cryptographically bound to named archive members; its report measured 1,000,000/1,000,000 valid cell centers. The 2026-10-20 size revision reran the same verified 1 m raster check and measured 4,000,000/4,000,000 valid centers across the 2 km candidate. A separate EA LIDAR DTM Time Stamped Tiles WFS query found partial 0.5 m index polygons over 9.9407% of the AOI; no 0.5 m raster coverage is claimed. Overall AOI status remains pending because OSM/OS building and road completeness is not established. See the dated 2 km assessment handback and `docs/data-sources.md`.
 
 **Work:**
 
@@ -488,7 +490,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **Acceptance:**
 
-- AOI exactly 1,000 m × 1,000 m in EPSG:27700; the raster preview draws the exact AOI boundary and uses EPSG:27700 metre axes. Road/landmark context and OSM/OS feature counts are separate checks; the DTM raster does not supply road labels.
+- Current AOI exactly 2,000 m × 2,000 m in EPSG:27700; the new raster preview draws the exact AOI boundary and uses EPSG:27700 metre axes. Road/landmark context and OSM/OS feature counts are separate checks; the DTM raster does not supply road labels.
 - Report identifies correct source GeoTIFF(s) and sane elevations; no guessed or silently patched coverage.
 - Python tests cover coordinate transformations, bounds and NoData.
 - Changing AOI config changes the preview without code changes.
@@ -497,7 +499,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M3 — Render real Torquay terrain
 
-**TVW-008 status:** PASS after two focused fixes and independent Sol review on 2026-10-17. The delivered terrain-only feature is a selectable, local EA DTM package for the current 1,000 m pending candidate; this does not freeze or otherwise approve the full AOI. See the [TVW-008 handback](milestones/TVW-008.md).
+**TVW-008 status:** PASS after two focused fixes and independent Sol review on 2026-10-17. The delivered terrain-only feature is a selectable, local EA DTM package for the then-current 1,000 m pending candidate. It was not rebuilt for the 2026-10-20 2,000 m AOI revision and does not represent that larger candidate; this does not freeze or otherwise approve the AOI. See the [TVW-008 handback](milestones/TVW-008.md).
 
 **User-visible result:** replace synthetic ground with **true Torquay LiDAR-derived topography** in browser. Fly over recognisable slopes.
 
@@ -523,7 +525,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 ### M4 — Real building footprints (3D blocks)
 
-**TVW-009 status:** Passed independent review after Luna fix 2 (`42bafd6`). The completed issue covers building import, height policy, asset validation and QA only. Preserve the current 1,000 m AOI and pending overall coverage status; mapped building counts do not establish completeness. Roads and remaining feature checks are not included. TVW-010 completed and passed independent review for browser rendering and terrain footing; roads remain outside this issue.
+**TVW-009 status:** Passed independent review after Luna fix 2 (`42bafd6`). The completed issue covers building import, height policy, asset validation and QA only. Its imported building package was clipped to the then-current 1,000 m AOI and was not regenerated for the 2 km revision. Preserve the current pending overall coverage status; mapped building counts do not establish completeness. Roads and remaining feature checks are not included. TVW-010 completed and passed independent review for browser rendering and terrain footing; roads remain outside this issue.
 
 **TVW-010 status:** PASS after Luna fix 3 (`fb287fe`) and independent Sol review on 2026-10-19. The optional browser layer loads and renders the validated local OSM package on EA terrain with terrain-following wall bases. Rehashed topology cases, publisher safety, QA identity, mean rounding, bounded streaming and UI provenance/count persistence passed review. The flat-roof convention is highest terrain beneath each complete footprint plus its validated tagged or estimated height. The synthetic default and pending AOI status are preserved; roads were outside TVW-010 and were authorized separately under TVW-011. See [TVW-010 specification](milestones/TVW-010-spec.md) and [TVW-010 handback](milestones/TVW-010.md).
 
@@ -629,7 +631,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 
 **M8 overview/minimap status:** PASS; coordinator-accepted on 2026-10-19 after final independent Sol review of Luna fix 2 (`9f34784`; implementation `00aeb53`, fix 1 `81bc911`). The accepted specification is [M8-overview-minimap-spec.md](milestones/M8-overview-minimap-spec.md), and the [M8 handback](milestones/M8-overview-minimap.md) records commands, test results, browser screenshots, provenance, path-safety corrections, and known limits. Scope is a fixed, offline MapLibre overview backed by a separate Python-derived WGS84 package; it has no live camera marker or terrain raster. Synthetic worlds remain usable with a truthful unavailable state. The AOI remains `selected_pending_coverage` / `not_checked`; mapped counts and the overview do not establish completeness. TVW-016 and later remain unauthorized.
 
-- 1 km × 1 km AOI, or 250 m × 250 m chunks with consistent edge height samples.
+- Current 2 km × 2 km AOI, or 250 m × 250 m chunks with consistent edge height samples. The existing viewer's combined GIS packages remain the previous 1 km build.
 - Load chunks near camera with frustum culling and/or low-detail terrain at a distance.
 - DSM-assisted approximate building heights with confidence scoring.
 - Trees, basic land-use colouring, pedestrian paths and roof styles.
@@ -674,7 +676,7 @@ Each milestone ends with a browser-visible demo, test results, a checklist and (
 | Error case (missing dataset) | Visible error text and passing negative test |
 | Performance | Browser/version/GPU/viewport/FPS log in milestone notes |
 
-**Initial performance aspiration:** steady ~60 FPS on the developer's Windows desktop at 1080p with the 1,000 m AOI; 30 FPS may be acceptable while profiling. These are **targets to measure**, not promises and not automated pass/fail gates until the target machine is defined.
+**Initial performance aspiration:** steady ~60 FPS on the developer's Windows desktop at 1080p with the original 1,000 m AOI; 30 FPS may be acceptable while profiling. Existing measurements are for that earlier scene and do not establish performance for a future 2,000 m browser package. These are **targets to measure**, not promises and not automated pass/fail gates until the target machine is defined.
 
 ---
 
@@ -797,7 +799,7 @@ Use the following order, splitting into sub-issues if implementation grows beyon
 | ADR-003 | EPSG:27700 to local metre coordinates | UK data alignment, stable precision | Expanding far beyond Devon |
 | ADR-004 | Download/compile geodata offline | No API keys, streaming artefacts or per-frame API costs | Frequent map updates become core requirement |
 | ADR-005 | Heightfield + JSON first, GLB optional | Inspectable, testable, easy to change | Asset size or loading becomes a bottleneck |
-| ADR-006 | 1,000 m AOI, 2 m render grid | User-approved area with a manageable 501×501 render grid | M6 signed off and performance measured |
+| ADR-006 | Current 2,000 m candidate; 2 m grid would be 1,001×1,001 | User-approved expanded pending area; 501×501 is the retained earlier 1 km package | M6 signed off; expanded scene requires separately authorized export and performance measurement |
 | ADR-007 | OSM footprints, OS fallback | Start with adaptable coverage, preserve a richer fallback | Inspection reveals insufficient buildings |
 | ADR-008 | Ground-following camera before physics | Matches initial objective with little complexity | Building collisions or vehicles are required |
 

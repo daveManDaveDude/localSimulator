@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from torquay_pipeline.cli import main
+from torquay_pipeline.cli import _aoi_geojson_path, main
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "config" / "aoi.torquay.json"
@@ -30,6 +30,47 @@ def test_validate_and_select_commands(tmp_path: Path, capsys) -> None:
         result["aoi"]["center_easting_m"],
         result["aoi"]["center_northing_m"],
     ]
+    assert result["profile"] == "current_2km"
+
+
+def test_explicit_historical_profile_validates_and_regenerates_one_kilometre_snapshot(
+    tmp_path: Path,
+) -> None:
+    raw = json.loads(CONFIG.read_text(encoding="utf-8"))
+    raw["profile"] = "historical_1km"
+    raw["aoi"]["width_m"] = 1000.0
+    raw["aoi"]["height_m"] = 1000.0
+    raw["aoi"]["bbox_m"] = [
+        290608.9018176432,
+        64853.48350844931,
+        291608.9018176432,
+        65853.48350844931,
+    ]
+    config_path = tmp_path / "aoi.torquay-1km.json"
+    config_path.write_text(json.dumps(raw), encoding="utf-8")
+    output_dir = tmp_path / "historical-selection"
+
+    assert main(["validate-aoi", "--config", str(config_path)]) == 0
+    assert main(["select-aoi", "--config", str(config_path), "--output-dir", str(output_dir)]) == 0
+
+    selection = json.loads((output_dir / "aoi-selection.json").read_text(encoding="utf-8"))
+    assert selection["profile"] == "historical_1km"
+    assert selection["aoi"]["width_m"] == selection["aoi"]["height_m"] == 1000
+    assert selection["aoi"]["bbox_m"] == raw["aoi"]["bbox_m"]
+    assert json.loads(config_path.read_text(encoding="utf-8"))["profile"] == "historical_1km"
+
+
+def test_cli_selects_geojson_ring_for_matching_aoi_profile_and_honors_override(
+    tmp_path: Path,
+) -> None:
+    historical_ring = ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
+    current_ring = ROOT / "docs/aoi-selection.geojson"
+    assert _aoi_geojson_path("current_2km", None) == current_ring
+    assert _aoi_geojson_path("historical_1km", None) == historical_ring
+
+    override = tmp_path / "explicit-ring.geojson"
+    override.write_text("{}", encoding="utf-8")
+    assert _aoi_geojson_path("historical_1km", override) == override.resolve()
 
 
 def test_invalid_config_returns_actionable_nonzero_status(tmp_path: Path, capsys) -> None:
@@ -108,7 +149,7 @@ def test_build_terrain_reports_unsupported_source_coverage_cleanly(
         ("center_bng_m", None, "aoi.center_bng_m"),
         ("bbox_m", None, "aoi.bbox_m"),
         ("center_bng_m", [1, 2], "aoi.bbox_m"),
-        ("bbox_m", [0, 0, 1000, 1000], "aoi.bbox_m"),
+        ("bbox_m", [0, 0, 2000, 2000], "aoi.bbox_m"),
     ],
 )
 def test_validate_rejects_invalid_or_stale_stored_projection(

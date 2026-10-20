@@ -1,10 +1,11 @@
 {
   "format_version": 1,
+  "profile": "current_2km",
   "id": "torquay-poc-001",
   "name": "TQ1 4HN candidate area of interest",
   "selection_status": "selected_pending_coverage",
   "coverage_status": "not_checked",
-  "coverage_note": "The EA DTM 1 m cell-coverage check in TVW-007 passed its 1% missing threshold. OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending.",
+  "coverage_note": "EA DTM cell coverage is measured separately from the broader AOI gate. OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending.",
   "anchor": {
     "postcode": "TQ1 4HN",
     "coordinates": {
@@ -26,29 +27,29 @@
     "center_easting_m": 291108.9018176432,
     "center_northing_m": 65353.48350844931,
     "bbox_m": [
-      290608.9018176432,
-      64853.48350844931,
-      291608.9018176432,
-      65853.48350844931
+      290108.9018176432,
+      64353.48350844931,
+      292108.9018176432,
+      66353.48350844931
     ],
-    "width_m": 1000.0,
-    "height_m": 1000.0,
+    "width_m": 2000.0,
+    "height_m": 2000.0,
     "corner_coordinates_wgs84": [
       [
-        -3.542910651853897,
-        50.47326489870257
+        -3.5498069791321853,
+        50.46867640263527
       ],
       [
-        -3.528823875124863,
-        50.473450849062345
+        -3.5216360951366497,
+        50.4690482443
       ],
       [
-        -3.5291139928135884,
-        50.48244068998469
+        -3.5222136603237235,
+        50.48702798479993
       ],
       [
-        -3.5432034396837033,
-        50.48225468056402
+        -3.5503952248835833,
+        50.48665590689169
       ]
     ]
   },

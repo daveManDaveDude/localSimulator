@@ -1,7 +1,7 @@
 # AOI selection candidate
 
 **Status:** `selected_pending_coverage`<br>
-**Coverage:** `not_checked` — The EA DTM 1 m cell-coverage check in TVW-007 passed its 1% missing threshold. OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending.
+**Coverage:** `not_checked` — EA DTM cell coverage is measured separately from the broader AOI gate. OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending.
 
 ## Anchor provenance
 
@@ -13,9 +13,10 @@
 
 ## Candidate square
 
+- Selection profile: `current_2km`
 - Projected centre: `291108.902 m E, 65353.484 m N` (EPSG:27700)
-- Bounds `[west, south, east, north]`: `[290608.902, 64853.484, 291608.902, 65853.484] m`
-- Dimensions: `1000.0 m × 1000.0 m`
+- Bounds `[west, south, east, north]`: `[290108.902, 64353.484, 292108.902, 66353.484] m`
+- Dimensions: `2000.0 m × 2000.0 m`
 - This is a derived postcode-centred candidate. It is not coverage-approved or frozen.
 
 ## Transformation evidence
@@ -31,7 +32,7 @@ PROJ network access was disabled. The tool pins EPSG operation 1314 (OSGB36 to W
 
 ## Map context and limits
 
-This link is generated from the configured WGS84 anchor and centres OpenStreetMap on the current candidate. It is a visual map-context link only; regenerated reports make no fixed road or landmark assertions. The separate EA DTM check passed its 1% missing-cell threshold; OSM/OS feature counts and overall AOI coverage remain unchecked and pending.
+This link is generated from the configured WGS84 anchor and centres OpenStreetMap on the current candidate. It is a visual map-context link only; regenerated reports make no fixed road or landmark assertions. EA DTM cell coverage is assessed separately; OSM/OS feature counts and overall AOI coverage remain unchecked and pending.
 
 Map: [OpenStreetMap view](https://www.openstreetmap.org/?mlat=50.47785300&mlon=-3.53601300#map=16/50.47785300/-3.53601300). © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 Provider reference: [Postcodes.io API documentation](https://postcodes.io/docs/).

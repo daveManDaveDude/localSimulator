@@ -213,7 +213,7 @@ def _dump_json(path: Path, value) -> None:
 
 def _build_fixture_package(tmp_path, monkeypatch):
     source_path, source_manifest_path, terrain_path = _write_fixtures(tmp_path, monkeypatch)
-    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
+    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay-1km.json")
     package = tmp_path / "package"
     build_building_package(
         _fixture_result(),
@@ -221,7 +221,7 @@ def _build_fixture_package(tmp_path, monkeypatch):
         source_path,
         source_manifest_path,
         terrain_path,
-        REPO_ROOT / "docs/aoi-selection.geojson",
+        REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson",
         package,
         tmp_path / "qa.json",
         tmp_path / "preview.png",
@@ -258,7 +258,7 @@ def _refresh_building_package_integrity(package: Path) -> None:
 
 def test_building_package_hashes_actual_payload_and_is_deterministic(tmp_path, monkeypatch):
     source_path, source_manifest_path, terrain_path = _write_fixtures(tmp_path, monkeypatch)
-    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
+    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay-1km.json")
     package = tmp_path / "package"
     qa_path = tmp_path / "qa.json"
     preview_path = tmp_path / "preview.png"
@@ -269,7 +269,8 @@ def test_building_package_hashes_actual_payload_and_is_deterministic(tmp_path, m
         "source_path": source_path,
         "source_manifest_path": source_manifest_path,
         "terrain_package_path": terrain_path,
-        "aoi_geojson_path": REPO_ROOT / "docs/aoi-selection.geojson",
+        "aoi_geojson_path": REPO_ROOT
+        / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson",
         "package_path": package,
         "qa_path": qa_path,
         "preview_path": preview_path,
@@ -307,7 +308,9 @@ def test_building_package_hashes_actual_payload_and_is_deterministic(tmp_path, m
     validated = validate_building_package(
         package,
         expected_aoi=aoi,
-        expected_aoi_ring=export_module._load_aoi_ring(REPO_ROOT / "docs/aoi-selection.geojson"),
+        expected_aoi_ring=export_module._load_aoi_ring(
+            REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
+        ),
         terrain_package_path=terrain_path,
         source_path=source_path,
         source_manifest_path=source_manifest_path,
@@ -324,11 +327,11 @@ def test_building_package_detects_corrupt_payload(tmp_path, monkeypatch):
     package = tmp_path / "package"
     build_building_package(
         _fixture_result(),
-        load_aoi_config(REPO_ROOT / "config/aoi.torquay.json"),
+        load_aoi_config(REPO_ROOT / "config/aoi.torquay-1km.json"),
         source_path,
         source_manifest_path,
         terrain_path,
-        REPO_ROOT / "docs/aoi-selection.geojson",
+        REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson",
         package,
         tmp_path / "qa.json",
         tmp_path / "preview.png",
@@ -339,9 +342,9 @@ def test_building_package_detects_corrupt_payload(tmp_path, monkeypatch):
     with pytest.raises(BuildingExportError, match="byteLength"):
         validate_building_package(
             package,
-            expected_aoi=load_aoi_config(REPO_ROOT / "config/aoi.torquay.json"),
+            expected_aoi=load_aoi_config(REPO_ROOT / "config/aoi.torquay-1km.json"),
             expected_aoi_ring=export_module._load_aoi_ring(
-                REPO_ROOT / "docs/aoi-selection.geojson"
+                REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
             ),
             terrain_package_path=terrain_path,
             source_path=source_path,
@@ -415,7 +418,7 @@ def test_validator_rejects_adversarial_feature_copies(tmp_path, monkeypatch, mut
             package,
             expected_aoi=aoi,
             expected_aoi_ring=export_module._load_aoi_ring(
-                REPO_ROOT / "docs/aoi-selection.geojson"
+                REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
             ),
             terrain_package_path=terrain,
             source_path=source,
@@ -461,7 +464,7 @@ def test_validator_recomputes_height_distributions_from_features(
             package,
             expected_aoi=aoi,
             expected_aoi_ring=export_module._load_aoi_ring(
-                REPO_ROOT / "docs/aoi-selection.geojson"
+                REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
             ),
             terrain_package_path=terrain,
             source_path=source,
@@ -515,7 +518,7 @@ def test_validator_binds_manifest_aoi_terrain_policies_and_qa(
             package,
             expected_aoi=aoi,
             expected_aoi_ring=export_module._load_aoi_ring(
-                REPO_ROOT / "docs/aoi-selection.geojson"
+                REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
             ),
             terrain_package_path=terrain,
             source_path=source,
@@ -529,7 +532,7 @@ def test_package_validator_detects_modified_local_terrain_origin(tmp_path, monke
     terrain_manifest = json.loads(terrain_manifest_path.read_text(encoding="utf-8"))
     terrain_manifest["origin"]["eastingM"] += 1000
     _dump_json(terrain_manifest_path, terrain_manifest)
-    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
+    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay-1km.json")
     with pytest.raises(BuildingExportError, match="origin eastingM"):
         build_building_package(
             _fixture_result(),
@@ -537,7 +540,7 @@ def test_package_validator_detects_modified_local_terrain_origin(tmp_path, monke
             source_path,
             source_manifest_path,
             terrain_path,
-            REPO_ROOT / "docs/aoi-selection.geojson",
+            REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson",
             tmp_path / "package",
             tmp_path / "qa.json",
             tmp_path / "preview.png",
@@ -554,7 +557,7 @@ def test_package_validator_detects_corrupted_package_qa(tmp_path, monkeypatch):
             package,
             expected_aoi=aoi,
             expected_aoi_ring=export_module._load_aoi_ring(
-                REPO_ROOT / "docs/aoi-selection.geojson"
+                REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
             ),
             terrain_package_path=terrain,
             source_path=source,
@@ -614,7 +617,7 @@ def test_build_side_rejects_mutated_feature_before_publishing(tmp_path, monkeypa
     else:
         feature["heightM"] = True
         expected_message = "heightM"
-    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay.json")
+    aoi = load_aoi_config(REPO_ROOT / "config/aoi.torquay-1km.json")
     package = tmp_path / "package"
     with pytest.raises(BuildingExportError, match=expected_message):
         build_building_package(
@@ -623,7 +626,7 @@ def test_build_side_rejects_mutated_feature_before_publishing(tmp_path, monkeypa
             source_path,
             source_manifest_path,
             terrain_path,
-            REPO_ROOT / "docs/aoi-selection.geojson",
+            REPO_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson",
             package,
             tmp_path / "qa.json",
             tmp_path / "preview.png",

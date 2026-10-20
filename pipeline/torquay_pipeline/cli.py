@@ -9,6 +9,7 @@ import os
 import sys
 import tempfile
 from collections.abc import Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -40,11 +41,13 @@ from .building_sources import (
 from .buildings import BuildingConfig, BuildingImportError, import_osm_buildings
 from .comparison_sources import ComparisonSourceError, verify_comparison_source
 from .config import AoiConfig, AoiConfigError, load_aoi_config, validate_stored_selection
-from .overview_export import (
-    DEFAULT_AOI_CONFIG as DEFAULT_OVERVIEW_AOI_CONFIG,
+from .elevation_index import (
+    ElevationIndexError,
+    assess_ea_resolution_index,
+    capture_ea_resolution_index,
 )
 from .overview_export import (
-    DEFAULT_AOI_GEOJSON as DEFAULT_OVERVIEW_AOI_GEOJSON,
+    DEFAULT_AOI_CONFIG as DEFAULT_OVERVIEW_AOI_CONFIG,
 )
 from .overview_export import (
     DEFAULT_BUILDINGS_DIR as DEFAULT_OVERVIEW_BUILDINGS_DIR,
@@ -84,6 +87,17 @@ from .terrain_export import TerrainExportError, build_terrain_package
 from .terrain_preview import write_terrain_preview
 from .terrain_sources import TerrainSourceError, verify_source_manifest
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _aoi_geojson_path(profile: str, override: Path | None) -> Path:
+    """Select the frozen AOI ring matching a config profile unless overridden."""
+    if override is not None:
+        return override.resolve()
+    if profile == "historical_1km":
+        return PROJECT_ROOT / "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
+    return PROJECT_ROOT / "docs/aoi-selection.geojson"
+
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="torquay-aoi", description=__doc__)
@@ -113,13 +127,13 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument(
                 "--report",
                 type=Path,
-                default=Path("../docs/milestones/artifacts/TVW-007-coverage.json"),
+                default=Path("../docs/milestones/artifacts/AOI-2km-1m-coverage.json"),
             )
         elif name == "preview-terrain":
             command.add_argument(
                 "--output",
                 type=Path,
-                default=Path("../docs/milestones/screenshots/TVW-007-ea-dtm-preview.png"),
+                default=Path("../docs/milestones/screenshots/AOI-2km-1m-preview.png"),
             )
         else:
             command.add_argument(
@@ -138,6 +152,46 @@ def _parser() -> argparse.ArgumentParser:
                 type=Path,
                 default=Path("../docs/milestones/screenshots/TVW-008-terrain-preview.png"),
             )
+    capture_command = commands.add_parser(
+        "capture-resolution-index",
+        help="explicitly capture one bounded official EA WFS response for offline assessment",
+    )
+    capture_command.add_argument("--config", type=Path, default=Path("../config/aoi.torquay.json"))
+    capture_command.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("../data/raw/ea_dtm_time_stamped_index/capture"),
+        help="new local directory for the raw WFS response and provenance sidecar",
+    )
+    capture_command.add_argument(
+        "--timeout-seconds",
+        type=int,
+        default=30,
+        help="bounded request timeout (1–120 seconds; default 30)",
+    )
+    index_command = commands.add_parser(
+        "assess-resolution-index",
+        help="measure official EA time-stamped DTM index footprints (metadata only)",
+    )
+    index_command.add_argument("--config", type=Path, default=Path("../config/aoi.torquay.json"))
+    index_command.add_argument(
+        "--index",
+        type=Path,
+        default=Path("../data/elevation-index/ea-dtm-time-stamped-2km-2026-10-20.geojson"),
+        help="saved official EA WFS FeatureCollection snapshot",
+    )
+    index_command.add_argument(
+        "--source-metadata",
+        type=Path,
+        default=Path("../data/elevation-index/ea-dtm-time-stamped-2km-2026-10-20.source.json"),
+        help="query, retrieval and snapshot integrity metadata",
+    )
+    index_command.add_argument(
+        "--report",
+        type=Path,
+        default=Path("../docs/milestones/artifacts/AOI-2km-resolution-index.json"),
+        help="deterministic assessment JSON output",
+    )
     for name in (
         "inspect-building-source",
         "import-buildings",
@@ -166,9 +220,7 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument(
                 "--terrain-package", type=Path, default=Path("../public/worlds/torquay-poc-001")
             )
-            command.add_argument(
-                "--aoi-geojson", type=Path, default=Path("../docs/aoi-selection.geojson")
-            )
+            command.add_argument("--aoi-geojson", type=Path)
         elif name in {"validate-buildings", "preview-buildings", "publish-buildings"}:
             command.add_argument(
                 "--package", type=Path, default=Path("../data/generated/buildings/torquay-poc-001")
@@ -176,9 +228,7 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument(
                 "--terrain-package", type=Path, default=Path("../public/worlds/torquay-poc-001")
             )
-            command.add_argument(
-                "--aoi-geojson", type=Path, default=Path("../docs/aoi-selection.geojson")
-            )
+            command.add_argument("--aoi-geojson", type=Path)
         if name == "preview-buildings":
             command.add_argument(
                 "--qa",
@@ -207,9 +257,7 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument(
                 "--aoi-config", type=Path, default=Path("../config/aoi.torquay.json")
             )
-            command.add_argument(
-                "--aoi-geojson", type=Path, default=Path("../docs/aoi-selection.geojson")
-            )
+            command.add_argument("--aoi-geojson", type=Path)
             command.add_argument(
                 "--terrain-package", type=Path, default=Path("../public/worlds/torquay-poc-001")
             )
@@ -238,7 +286,7 @@ def _parser() -> argparse.ArgumentParser:
         command.add_argument("--roads-dir", type=Path, default=DEFAULT_OVERVIEW_ROADS_DIR)
         command.add_argument("--buildings-dir", type=Path, default=DEFAULT_OVERVIEW_BUILDINGS_DIR)
         command.add_argument("--aoi-config", type=Path, default=DEFAULT_OVERVIEW_AOI_CONFIG)
-        command.add_argument("--aoi-geojson", type=Path, default=DEFAULT_OVERVIEW_AOI_GEOJSON)
+        command.add_argument("--aoi-geojson", type=Path)
         command.add_argument(
             "--source-manifest", type=Path, default=DEFAULT_OVERVIEW_SOURCE_MANIFEST
         )
@@ -368,7 +416,8 @@ def _road_command(args: argparse.Namespace) -> int:
         selection["aoi"]["center_northing_m"],
         selection["aoi"]["bbox_m"],
     )
-    expected_ring = _load_aoi_ring(args.aoi_geojson.resolve())
+    aoi_geojson_path = _aoi_geojson_path(aoi_config.profile, args.aoi_geojson)
+    expected_ring = _load_aoi_ring(aoi_geojson_path)
     terrain_path = args.terrain_package.resolve()
     if args.command == "validate-roads":
         result = validate_road_package(
@@ -378,7 +427,7 @@ def _road_command(args: argparse.Namespace) -> int:
             terrain_package_path=terrain_path,
             source_path=source_path,
             source_manifest_path=source_manifest_path,
-            aoi_geojson_path=args.aoi_geojson.resolve(),
+            aoi_geojson_path=aoi_geojson_path,
             road_config=config,
         )
         print(json.dumps(result, indent=2))
@@ -391,7 +440,7 @@ def _road_command(args: argparse.Namespace) -> int:
             expected_aoi_ring=expected_ring,
             source_path=source_path,
             source_manifest_path=source_manifest_path,
-            aoi_geojson_path=args.aoi_geojson.resolve(),
+            aoi_geojson_path=aoi_geojson_path,
             road_config=config,
         )
         print(f"Published byte-identical validated roads to {result['outputDirectory']}")
@@ -405,7 +454,7 @@ def _road_command(args: argparse.Namespace) -> int:
             terrain_package_path=terrain_path,
             source_path=source_path,
             source_manifest_path=source_manifest_path,
-            aoi_geojson_path=args.aoi_geojson.resolve(),
+            aoi_geojson_path=aoi_geojson_path,
             road_config=config,
         )
         qa_bytes = (args.package / "qa.json").read_bytes()
@@ -442,7 +491,7 @@ def _road_command(args: argparse.Namespace) -> int:
         source_path,
         source_manifest_path,
         terrain_path,
-        args.aoi_geojson.resolve(),
+        aoi_geojson_path,
         output_dir,
         qa_path,
         preview_path,
@@ -459,12 +508,20 @@ def _road_command(args: argparse.Namespace) -> int:
 
 
 def _overview_command(args: argparse.Namespace) -> int:
+    aoi_config_path = (
+        args.aoi_config if args.aoi_config.is_absolute() else PROJECT_ROOT / args.aoi_config
+    ).resolve()
+    aoi_config = load_aoi_config(aoi_config_path)
+    aoi_geojson_override = args.aoi_geojson
+    if aoi_geojson_override is not None and not aoi_geojson_override.is_absolute():
+        aoi_geojson_override = PROJECT_ROOT / aoi_geojson_override
+    aoi_geojson_path = _aoi_geojson_path(aoi_config.profile, aoi_geojson_override)
     common = {
         "terrain_dir": args.terrain_dir,
         "roads_dir": args.roads_dir,
         "buildings_dir": args.buildings_dir,
-        "aoi_config_path": args.aoi_config,
-        "aoi_geojson_path": args.aoi_geojson,
+        "aoi_config_path": aoi_config_path,
+        "aoi_geojson_path": aoi_geojson_path,
         "source_manifest_path": args.source_manifest,
     }
     if args.command == "build-overview":
@@ -569,6 +626,8 @@ def _building_command(args: argparse.Namespace) -> int:
         print(json.dumps({"source": observed, "manifestVerified": verified == observed}, indent=2))
         print("OSM source bytes and PBF metadata match the separate source-manifest namespace.")
         return 0
+    aoi_config = load_aoi_config(args.aoi_config)
+    aoi_geojson_path = _aoi_geojson_path(aoi_config.profile, args.aoi_geojson)
     if args.command == "validate-buildings":
         verify_building_source(source_path, source_manifest_path)
         aoi_config = load_aoi_config(args.aoi_config)
@@ -582,7 +641,7 @@ def _building_command(args: argparse.Namespace) -> int:
         result = validate_building_package(
             args.package.resolve(),
             expected_aoi=aoi_config,
-            expected_aoi_ring=_load_aoi_ring(args.aoi_geojson.resolve()),
+            expected_aoi_ring=_load_aoi_ring(aoi_geojson_path),
             terrain_package_path=args.terrain_package.resolve(),
             source_path=source_path,
             source_manifest_path=source_manifest_path,
@@ -603,7 +662,7 @@ def _building_command(args: argparse.Namespace) -> int:
             args.package.resolve(),
             args.terrain_package.resolve(),
             expected_aoi=aoi_config,
-            expected_aoi_ring=_load_aoi_ring(args.aoi_geojson.resolve()),
+            expected_aoi_ring=_load_aoi_ring(aoi_geojson_path),
             source_path=source_path,
             source_manifest_path=source_manifest_path,
         )
@@ -623,7 +682,7 @@ def _building_command(args: argparse.Namespace) -> int:
         package_status = validate_building_package(
             args.package.resolve(),
             expected_aoi=aoi_config,
-            expected_aoi_ring=_load_aoi_ring(args.aoi_geojson.resolve()),
+            expected_aoi_ring=_load_aoi_ring(aoi_geojson_path),
             terrain_package_path=args.terrain_package.resolve(),
             source_path=source_path,
             source_manifest_path=source_manifest_path,
@@ -661,7 +720,7 @@ def _building_command(args: argparse.Namespace) -> int:
         source_path,
         source_manifest_path,
         args.terrain_package.resolve(),
-        args.aoi_geojson.resolve(),
+        aoi_geojson_path,
         path_config["package_path"],
         path_config["qa_path"],
         path_config["preview_path"],
@@ -802,6 +861,49 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _road_command(args)
         if args.command in {"build-overview", "validate-overview", "publish-overview"}:
             return _overview_command(args)
+        if args.command == "assess-resolution-index":
+            config = _validated_selection_config(args.config)
+            report = assess_ea_resolution_index(config, args.index, args.source_metadata)
+            atomic_write_json(args.report, report)
+            footprint = report["halfMetreIndexFootprint"]
+            print(f"Wrote EA time-stamped DTM index assessment to {args.report.resolve()}")
+            print(
+                f"0.5 m index polygons intersect {footprint['coveredUnionAreaM2']:.3f} m² of "
+                f"{footprint['aoiAreaM2']:.3f} m² ({footprint['aoiPercent']:.4f}%); "
+                "this is metadata footprint only, not raster-cell coverage."
+            )
+            print(
+                "AOI selection_status remains selected_pending_coverage; "
+                "coverage_status remains not_checked."
+            )
+            return 0
+        if args.command == "capture-resolution-index":
+            config = _validated_selection_config(args.config)
+            output_dir = args.output_dir.resolve()
+            day = datetime.now(UTC).date()
+            stem = f"ea-dtm-time-stamped-{config.profile}-{day.isoformat()}"
+            index_path = output_dir / f"{stem}.geojson"
+            source_path = output_dir / f"{stem}.source.json"
+            metadata = capture_ea_resolution_index(
+                config,
+                index_path,
+                source_path,
+                timeout_seconds=args.timeout_seconds,
+            )
+            assessment = assess_ea_resolution_index(config, index_path, source_path)
+            print(f"Captured raw EA WFS response: {index_path}")
+            print(f"Captured provenance sidecar: {source_path}")
+            print(
+                f"Complete single page: {metadata['response']['numberReturned']} of "
+                f"{metadata['response']['numberMatched']} records; "
+                f"SHA-256 {metadata['response']['sha256']}"
+            )
+            print(
+                "0.5 m index footprint: "
+                f"{assessment['halfMetreIndexFootprint']['aoiPercent']:.4f}% metadata only; "
+                "no raster coverage claim."
+            )
+            return 0
         if args.command in {
             "inspect-comparison-source",
             "compare-alignment",
@@ -889,6 +991,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         RoadPublishError,
         OverviewExportError,
         OverviewPublishError,
+        ElevationIndexError,
         TerrainCoverageError,
         TerrainSourceError,
         TerrainExportError,

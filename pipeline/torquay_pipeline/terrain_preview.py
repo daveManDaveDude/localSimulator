@@ -83,6 +83,20 @@ def write_terrain_preview(result: CoverageResult, output_path: Path) -> dict[str
     axis.set_ylim(south, north)
     axis.grid(color="white", linewidth=0.35, alpha=0.5)
     axis.legend(loc="lower left", framealpha=0.9, fontsize=8)
+    north_x = east - (east - west) * 0.045
+    axis.annotate(
+        "N",
+        xy=(north_x, north - (north - south) * 0.035),
+        xytext=(north_x, north - (north - south) * 0.11),
+        ha="center",
+        va="center",
+        color="#111111",
+        fontsize=10,
+        fontweight="bold",
+        arrowprops={"arrowstyle": "-|>", "color": "#111111", "linewidth": 1.8},
+        bbox={"facecolor": "white", "alpha": 0.85, "edgecolor": "none", "pad": 1.5},
+        zorder=8,
+    )
     axis.set_title(
         "Environment Agency LIDAR Composite DTM 1 m (2022)\n"
         f"Measured AOI elevations {minimum:.2f} to {maximum:.2f} m"
@@ -198,6 +212,7 @@ def write_terrain_preview(result: CoverageResult, output_path: Path) -> dict[str
             f"{report['analysis_grid']['rows']} rows at 1 m"
         ),
         "aoi_boundary_drawn": True,
+        "north_indicator_drawn": True,
         "missing_cells_distinct": True,
         "publisher_attribution_drawn": True,
     }

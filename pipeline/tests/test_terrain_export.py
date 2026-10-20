@@ -21,7 +21,7 @@ from torquay_pipeline.terrain_export import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-CONFIG_PATH = ROOT / "config" / "aoi.torquay.json"
+CONFIG_PATH = ROOT / "config" / "aoi.torquay-1km.json"
 
 
 def small_config() -> AoiConfig:
@@ -217,7 +217,9 @@ def test_fixture_config_remains_pending_and_exactly_one_kilometer() -> None:
 
 def test_real_manifest_boundary_uses_generated_attributable_geojson_ring() -> None:
     config = load_aoi_config(CONFIG_PATH)
-    geojson_path = ROOT / "docs" / "aoi-selection.geojson"
+    geojson_path = (
+        ROOT / "docs" / "milestones" / "artifacts" / "AOI-1km-selection" / "aoi-selection.geojson"
+    )
     geojson = json.loads(geojson_path.read_text(encoding="utf-8"))
     aoi_feature = next(
         feature for feature in geojson["features"] if feature["id"] == f"{config.id}-aoi"
@@ -234,7 +236,16 @@ def test_real_manifest_boundary_uses_generated_attributable_geojson_ring() -> No
 
 def test_real_manifest_boundary_rejects_stale_geojson_ring(tmp_path: Path) -> None:
     config = load_aoi_config(CONFIG_PATH)
-    source = json.loads((ROOT / "docs" / "aoi-selection.geojson").read_text(encoding="utf-8"))
+    source = json.loads(
+        (
+            ROOT
+            / "docs"
+            / "milestones"
+            / "artifacts"
+            / "AOI-1km-selection"
+            / "aoi-selection.geojson"
+        ).read_text(encoding="utf-8")
+    )
     aoi_feature = next(
         feature for feature in source["features"] if feature["id"] == f"{config.id}-aoi"
     )

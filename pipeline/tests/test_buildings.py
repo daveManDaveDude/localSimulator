@@ -20,6 +20,7 @@ from torquay_pipeline.coordinates import pinned_transformer
 def _fixture_aoi() -> AoiConfig:
     return AoiConfig(
         format_version=1,
+        profile="historical_1km",
         id="synthetic-building-fixture",
         name="Fictional geometry fixture AOI",
         selection_status="selected_pending_coverage",

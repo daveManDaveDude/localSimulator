@@ -232,6 +232,7 @@ def analyze_coverage(
         },
         "aoi": {
             "id": config.id,
+            "profile": config.profile,
             "crs": config.crs,
             "bounds_m": [west, south, east, north],
             "width_m": config.width_m,

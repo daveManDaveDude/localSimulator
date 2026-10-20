@@ -12,7 +12,7 @@ The tile XML `useLimit` contains that 2022 reuse instruction. An XML `idCredit` 
 
 ## Downloaded source files
 
-The public [Environment Agency survey portal](https://environment.data.gov.uk/survey) was used on 2026-10-17. The AOI used for source selection is the reviewed 1,000 m square in EPSG:27700, bounds `[290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931]` in west, south, east, north order. The portal map was used to find candidate 1 m composite tiles on both sides of northing 65000; the tile endpoints below returned the ZIPs. The committed AOI polygon is available at [aoi-selection.geojson](aoi-selection.geojson). Portal map selection is recorded as candidate discovery; the exact coverage result comes from reading the raster pixels against the AOI bounds.
+The public [Environment Agency survey portal](https://environment.data.gov.uk/survey) was used on 2026-10-17 for the then-current historical 1,000 m square in EPSG:27700, bounds `[290608.9018176432, 64853.48350844931, 291608.9018176432, 65853.48350844931]` in west, south, east, north order. The portal map was used to find candidate 1 m composite tiles on both sides of northing 65000; the tile endpoints below returned the ZIPs. This is the earlier raster source-selection record; the exact 2 km cell result was re-run on 2026-10-20. `config/aoi.torquay-1km.json` and the saved historical AOI selection are available for validating or reproducing outputs from the earlier 1 km packages.
 
 | Tile     | Portal download URL                                                                                       | Archive filename                        |             Size | SHA-256                                                            |
 | -------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------- | ---------------: | ------------------------------------------------------------------ |
@@ -50,11 +50,11 @@ The pinned Windows-tested Python runtime uses Python 3.13.7, Rasterio 1.5.2, Num
 
 The inventory scans each complete raster in bounded memory. It measured zero masked/NoData pixels and zero nonfinite pixels in both 25-million-pixel tiles. Full-tile elevation ranges and all measured metadata are recorded in the source manifest.
 
-## AOI coverage method and current result
+## Original 1 km AOI coverage method and TVW-007 result (2026-10-17)
 
 Coverage analysis constructs an exact 1 m grid aligned to the configured AOI bounds. The grid has 1,000 columns × 1,000 rows and a denominator of 1,000,000 cells / 1,000,000 m². Each cell is sampled at its center by selecting the containing source pixel. The algorithm does not interpolate, extrapolate, reproject, or replace NoData with zero. It distinguishes uncovered centers, masked/NoData samples and nonfinite samples. Valid zero and negative elevations remain valid. If tiles overlap, inputs are sorted by path and the first valid source sample wins; overlap cells are counted once and differing overlapping values are reported.
 
-The generated [coverage report](milestones/artifacts/TVW-007-coverage.json) records the current result:
+The generated [coverage report](milestones/artifacts/TVW-007-coverage.json) records the result for the then-current 1 km candidate:
 
 - 1,000,000 valid cells (100%).
 - 0 uncovered, masked/NoData, nonfinite, or otherwise invalid cells.
@@ -63,7 +63,33 @@ The generated [coverage report](milestones/artifacts/TVW-007-coverage.json) reco
 
 This is the EA DTM threshold result only. `selection_status` remains `selected_pending_coverage` and overall `coverage_status` remains `not_checked` because planned OSM/OS road and building feature counts are not inspected in TVW-007. The two source tiles and the measured preview are not loaded into the synthetic browser.
 
-The actual north-up [DTM preview PNG](milestones/screenshots/TVW-007-ea-dtm-preview.png) has metre axes, a 250 m scale bar, the exact AOI border, center marker, elevation colorbar, missing-cell display and EA attribution. The preview is generated from the same sampled grid as the report.
+The actual north-up [DTM preview PNG](milestones/screenshots/TVW-007-ea-dtm-preview.png) has metre axes, a 250 m scale bar, the then-current AOI border, center marker, elevation colorbar, missing-cell display and EA attribution. It remains historical evidence and was preserved during the later size revision.
+
+## Current 2 km candidate and resolution assessment (2026-10-20)
+
+The user approved a 2,000 m × 2,000 m revision around the same TQ1 4HN postcode centroid on 2026-10-20. The verified BNG center remains E `291108.9018176432`, N `65353.48350844931`; current bounds are `[290108.9018176432, 64353.48350844931, 292108.9018176432, 66353.48350844931]` in west, south, east, north order. The status remains `selected_pending_coverage` / `not_checked`.
+
+The original 1 m Composite DTM raster inputs were checked again against this larger AOI without changing `data/source-manifest.json`. [`AOI-2km-1m-coverage.json`](milestones/artifacts/AOI-2km-1m-coverage.json) reports 4,000,000/4,000,000 1 m cell centers valid (4,000,000 m²), zero uncovered/masked/NoData/nonfinite cells, and an EA raster threshold result of `pass`. The exact center sample remains 47.620 m from `SX96nw_DTM_1m.tif`; the measured range is 12.288–104.356 m. The new [north-up 2 km preview](milestones/screenshots/AOI-2km-1m-preview.png) was generated from those measured samples and visually inspected. It shows the exact 2 km boundary, BNG metre axes, north arrow, 250 m scale, center marker and attribution. The older 1 km report and screenshot remain unchanged.
+
+For the separate nominal-resolution assessment, the official [Environment Agency LIDAR DTM Time Stamped Tiles catalogue](https://www.data.gov.uk/dataset/8275e71e-1516-42a1-bb0c-4fa73807fe2b/lidar-dtm-time-stamped-tiles), updated 2026-04-07, documents 25 cm, 50 cm, 1 m and 2 m output resolutions. The publisher describes 5 km GeoTIFF tiles, metre elevations referenced to Ordnance Survey Newlyn and ±15 cm RMSE vertical accuracy; these are product-catalogue statements, not measurements of the 0.5 m polygons in this AOI. The product is under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) and requests `© Environment Agency copyright and/or database right 2020. All rights reserved.`
+
+On 2026-10-20, an HTTP 200 OGC WFS 2.0.0 `GetFeature` request was made to the official [EA survey index service](https://environment.data.gov.uk/spatialdata/survey-index-files/wfs), layer `dataset-9f0fa3fc-a860-4729-adc9-47fe53f658d0:LIDAR_DTM_Time_Stamped_Extents`, using the exact 2 km EPSG:27700 bounding box and `count=1000`. The client captured the response at `2026-10-20T06:03:41Z`; its server response timestamp is `2026-10-20T06:03:41.185Z`. The bounded single page returned/matched 50 records in EPSG:27700, so the result is complete for this request. The saved response is 904,542 bytes, SHA-256 `cda7ce43af709ac2177cf000b404525d59476426ab22ad8a7404498d39a71de4`, at [`data/elevation-index/ea-dtm-time-stamped-2km-2026-10-20.geojson`](../data/elevation-index/ea-dtm-time-stamped-2km-2026-10-20.geojson). The exact URL, retrieval time, response timestamp/status/type, count/pagination policy, catalogue provenance and licence are in its companion `.source.json` file. The index returned 42 nominal 1 m features, 4 nominal 2 m features and 4 nominal 0.5 m features.
+
+The four 0.5 m records all report survey date 2010-04-04 and `OSTN'02` / `OSGM'02`: `SX9064` (`DTM_F0129793_20100404_20100404`), `SX9164` (`DTM_F0129795_20100404_20100404`), `SX9165` (`DTM_F0129796_20100404_20100404`) and `SX9265` (`DTM_F0129797_20100404_20100404`). Their clipped polygons have a union area of 397,628.696 m², 9.9407% of the 4,000,000 m² AOI. The union counts overlaps once and excludes outside-AOI portions. The deterministic report is [`AOI-2km-resolution-index.json`](milestones/artifacts/AOI-2km-resolution-index.json).
+
+This is index-footprint coverage only. No 0.5 m raster was acquired, downloaded, opened or tested for availability, cell validity or NoData; the measured 1 m raster check is a separate operation. Point-cloud spacing is a separate product property and was not assessed by this DTM output-resolution query. Existing ignored terrain/building/road browser packages still describe the earlier 1 km candidate and were left byte-for-byte unchanged; the updated AOI GeoJSON and this assessment do not regenerate or imply a 2 km browser scene. OSM/OS feature completeness and overall AOI approval remain pending.
+
+The report is reproduced offline with the checked-in GeoJSON snapshot and sidecar. Tests use synthetic fixtures only and do not contact the WFS. An explicit online snapshot command is available when a new source response is needed:
+
+```powershell
+Push-Location pipeline
+# Use a new output directory for each immutable capture.
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli capture-resolution-index --config ..\config\aoi.torquay.json --output-dir ..\data\raw\ea_dtm_time_stamped_index\capture-2026-10-20
+.\.venv\Scripts\python.exe -m torquay_pipeline.cli assess-resolution-index --config ..\config\aoi.torquay.json --index ..\data\elevation-index\ea-dtm-time-stamped-2km-2026-10-20.geojson --source-metadata ..\data\elevation-index\ea-dtm-time-stamped-2km-2026-10-20.source.json
+Pop-Location
+```
+
+The capture makes one request with `startIndex=0` (the service default) and `count=1000`, and is bounded to a 30-second request timeout and 16 MiB body. It verifies HTTP 200, JSON, CRS, exact request URL/bounds, and WFS `numberMatched == numberReturned == feature count`. If those counts differ, it refuses to save partial output; it does not silently paginate or claim completeness beyond the one AOI query. The raw response and provenance sidecar are written together to a new local ignored directory. The normal assessment reads only saved bytes and makes no network request.
 
 ## OpenStreetMap building footprints (TVW-009)
 
@@ -87,7 +113,7 @@ The import checks the byte length, SHA-256, publisher MD5 and PBF header against
 
 The importer uses libosmium area assembly across the full PBF before applying its buffered spatial filter. It retains polygon and multipolygon footprints with `building=*`, excluding `building=no` and features tagged only with `building:part`. It rejects malformed or invalid geometry without `buffer(0)` repair, clips accepted geometry to the exact unbuffered AOI, and excludes final footprints below 1 m². Output vertices are quantized to 1 mm and stored as local XZ coordinates. `data/generated/buildings/torquay-poc-001/` contains the generated local package and is ignored by Git; `data/intermediate/osm/torquay-poc-001/` contains the raw-tag buffered intermediate and is also ignored.
 
-The current deterministic run produced 1,000 building features and 1,002 polygon components, with no exported interior rings. It recorded 17 `building=no` areas, 2,139 `building:part`-only areas, 37 areas outside the acquisition buffer, 192 areas outside the exact AOI, 3 below the 1 m² minimum, and 0 failed `multipolygon`/`boundary` assemblies. Five tagged relations (`7660489`, `9226944`, `9233555`, `9301051`, and `7726123`) have non-area `type=building` or `type=site`; they are intentionally skipped and separately identified with available member-way bounds, not described as failed building areas or AOI features. No candidate geometry was rejected as invalid, and the measured exact-duplicate and near-overlap counts were zero. These counts describe what the dated extract maps; they do not estimate feature completeness.
+The historical 1 km deterministic run produced 1,000 building features and 1,002 polygon components, with no exported interior rings. It recorded 17 `building=no` areas, 2,139 `building:part`-only areas, 37 areas outside the acquisition buffer, 192 areas outside the exact AOI, 3 below the 1 m² minimum, and 0 failed `multipolygon`/`boundary` assemblies. Five tagged relations (`7660489`, `9226944`, `9233555`, `9301051`, and `7726123`) have non-area `type=building` or `type=site`; they are intentionally skipped and separately identified with available member-way bounds, not described as failed building areas or AOI features. No candidate geometry was rejected as invalid, and the measured exact-duplicate and near-overlap counts were zero. These counts describe what the dated extract maps; they do not estimate feature completeness or describe the current 2 km candidate.
 
 The clipped footprints total 172,969.138 m², or 0.172969 km² per square kilometre of candidate AOI. Height policy is `height` first (metres, or explicitly identified feet/inches), then a positive integer `building:levels × 3 m`, then 8 m visual default; usable values are clamped to 1–150 m. The actual export contains 998 defaults and 2 level-based estimates; no feature had a usable direct `height` tag. All OSM tagged heights are treated as unverified, `roof:height` and `min_height` are preserved only as tags, and they do not alter footprint extrusion height.
 

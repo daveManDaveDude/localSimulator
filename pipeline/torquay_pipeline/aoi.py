@@ -72,12 +72,13 @@ def generate_selection(config: AoiConfig) -> tuple[dict[str, Any], dict[str, Any
     }
     selection = {
         "format_version": config.format_version,
+        "profile": config.profile,
         "id": config.id,
         "name": config.name,
         "selection_status": config.selection_status,
         "coverage_status": config.coverage_status,
         "coverage_note": (
-            "The EA DTM 1 m cell-coverage check in TVW-007 passed its 1% missing threshold. "
+            "EA DTM cell coverage is measured separately from the broader AOI gate. "
             "OSM/OS feature counts remain unchecked, so overall AOI coverage is still pending."
         ),
         "anchor": anchor,
@@ -108,6 +109,7 @@ def generate_selection(config: AoiConfig) -> tuple[dict[str, Any], dict[str, Any
                     "name": f"{config.name} — candidate square",
                     "selection_status": config.selection_status,
                     "coverage_status": config.coverage_status,
+                    "profile": config.profile,
                     "projected_crs": config.crs,
                     "width_m": config.width_m,
                     "height_m": config.height_m,
@@ -209,6 +211,7 @@ def render_selection_markdown(selection: dict[str, Any]) -> str:
         "",
         "## Candidate square",
         "",
+        f"- Selection profile: `{selection['profile']}`",
         center_text,
         bounds_text,
         f"- Dimensions: `{aoi['width_m']:.1f} m × {aoi['height_m']:.1f} m`",
@@ -249,9 +252,9 @@ def render_selection_markdown(selection: dict[str, Any]) -> str:
         (
             "This link is generated from the configured WGS84 anchor and centres OpenStreetMap "
             "on the current candidate. It is a visual map-context link only; regenerated reports "
-            "make no fixed road or landmark assertions. The separate EA DTM check passed its "
-            "1% missing-cell threshold; OSM/OS feature counts and overall AOI coverage remain "
-            "unchecked and pending."
+            "make no fixed road or landmark assertions. EA DTM cell coverage is assessed "
+            "separately; OSM/OS feature counts and overall AOI coverage remain unchecked and "
+            "pending."
         ),
         "",
         (

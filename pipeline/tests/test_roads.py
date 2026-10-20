@@ -109,7 +109,7 @@ def test_ground_vertical_tag_assumption_is_conservative(tags, reason):
 
 
 def test_actual_pyosmium_path_resolves_order_filters_classes_and_reports_exclusions(tmp_path):
-    aoi = load_aoi_config(ROOT / "config" / "aoi.torquay.json")
+    aoi = load_aoi_config(ROOT / "config" / "aoi.torquay-1km.json")
     # Place a through-line across both AOI edges using the pinned inverse transform.
     xs = [aoi.center_bng_m[0] - 650, aoi.center_bng_m[0], aoi.center_bng_m[0] + 650]
     ys = [aoi.center_bng_m[1], aoi.center_bng_m[1] + 10, aoi.center_bng_m[1]]
@@ -173,7 +173,7 @@ def test_reverse_and_collinear_duplicate_key_preserves_distinct_parallel_lines()
 
 def test_width_buffers_are_flat_capped_and_priority_groups_do_not_overlap():
     config = _road_config()
-    aoi = load_aoi_config(ROOT / "config" / "aoi.torquay.json")
+    aoi = load_aoi_config(ROOT / "config" / "aoi.torquay-1km.json")
     features = [
         {
             "id": "way/1",
@@ -274,7 +274,7 @@ def test_package_validation_rederives_source_geometry_after_hashes_are_refreshed
     from torquay_pipeline.aoi import generate_selection
     from torquay_pipeline.building_export import _configured_aoi_ring
 
-    aoi = load_aoi_config(ROOT / "config" / "aoi.torquay.json")
+    aoi = load_aoi_config(ROOT / "config" / "aoi.torquay-1km.json")
     config = _road_config()
     center_e, center_n = aoi.center_bng_m
     longitude, latitude, _operation = transform_bng_to_wgs84(

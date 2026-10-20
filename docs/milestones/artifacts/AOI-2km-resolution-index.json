@@ -1,0 +1,196 @@
+{
+  "formatVersion": 1,
+  "assessment": "Environment Agency LIDAR DTM time-stamped index resolution assessment",
+  "measurementStatus": "completed",
+  "interpretation": "metadata_footprint_only",
+  "aoi": {
+    "id": "torquay-poc-001",
+    "profile": "current_2km",
+    "crs": "EPSG:27700",
+    "boundsM": [
+      290108.9018176432,
+      64353.48350844931,
+      292108.9018176432,
+      66353.48350844931
+    ],
+    "widthM": 2000.0,
+    "heightM": 2000.0,
+    "areaM2": 4000000.0,
+    "selectionStatus": "selected_pending_coverage",
+    "overallCoverageStatus": "not_checked"
+  },
+  "source": {
+    "formatVersion": 1,
+    "publisher": "Environment Agency",
+    "product": "LIDAR DTM Time Stamped Tiles",
+    "aoiProfile": "current_2km",
+    "datasetId": "dbadf364-0192-4bcf-a223-f3d403f08682",
+    "indexResourceId": "dataset-9f0fa3fc-a860-4729-adc9-47fe53f658d0",
+    "featureType": "dataset-9f0fa3fc-a860-4729-adc9-47fe53f658d0:LIDAR_DTM_Time_Stamped_Extents",
+    "endpoint": "https://environment.data.gov.uk/spatialdata/survey-index-files/wfs",
+    "service": "OGC Web Feature Service 2.0.0 GetFeature",
+    "retrievedDate": "2026-10-20",
+    "retrievedAtUtc": "2026-10-20T06:03:41Z",
+    "catalogueUpdatedDate": "2026-04-07",
+    "publisherMetadataUrl": "https://environment.data.gov.uk/dataset/dbadf364-0192-4bcf-a223-f3d403f08682",
+    "productResolutionOptionsM": [
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "requestUrl": "https://environment.data.gov.uk/spatialdata/survey-index-files/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=dataset-9f0fa3fc-a860-4729-adc9-47fe53f658d0%3ALIDAR_DTM_Time_Stamped_Extents&bbox=290108.9018176432%2C64353.48350844931%2C292108.9018176432%2C66353.48350844931%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A27700&outputFormat=application%2Fjson&count=1000",
+    "query": {
+      "typeNames": "dataset-9f0fa3fc-a860-4729-adc9-47fe53f658d0:LIDAR_DTM_Time_Stamped_Extents",
+      "bboxM": [
+        290108.9018176432,
+        64353.48350844931,
+        292108.9018176432,
+        66353.48350844931
+      ],
+      "bboxCrs": "urn:ogc:def:crs:EPSG::27700",
+      "outputFormat": "application/json",
+      "count": 1000,
+      "startIndex": 0
+    },
+    "pagination": {
+      "mode": "single_page_fail_if_truncated",
+      "pageCount": 1,
+      "startIndex": 0,
+      "pageSize": 1000,
+      "complete": true,
+      "numberMatched": 50,
+      "numberReturned": 50
+    },
+    "capturePolicy": {
+      "timeoutSeconds": 30,
+      "maximumResponseBytes": 16777216
+    },
+    "response": {
+      "file": "ea-dtm-time-stamped-2km-2026-10-20.geojson",
+      "sizeBytes": 904542,
+      "sha256": "cda7ce43af709ac2177cf000b404525d59476426ab22ad8a7404498d39a71de4",
+      "numberMatched": 50,
+      "numberReturned": 50,
+      "crs": "urn:ogc:def:crs:EPSG::27700",
+      "timeStamp": "2026-10-20T06:03:41.185Z",
+      "httpStatus": 200,
+      "contentType": "application/json;charset=UTF-8",
+      "finalUrl": "https://environment.data.gov.uk/spatialdata/survey-index-files/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=dataset-9f0fa3fc-a860-4729-adc9-47fe53f658d0%3ALIDAR_DTM_Time_Stamped_Extents&bbox=290108.9018176432%2C64353.48350844931%2C292108.9018176432%2C66353.48350844931%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A27700&outputFormat=application%2Fjson&count=1000"
+    },
+    "license": "Open Government Licence v3.0",
+    "licenseUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "attribution": "© Environment Agency copyright and/or database right 2020. All rights reserved.",
+    "publisherVerticalReference": "Ordnance Survey Newlyn",
+    "publisherVerticalAccuracy": "±15 cm RMSE",
+    "metadataUrl": "https://www.data.gov.uk/dataset/8275e71e-1516-42a1-bb0c-4fa73807fe2b/lidar-dtm-time-stamped-tiles"
+  },
+  "publisherProductMetadata": {
+    "catalogueUpdatedDate": "2026-04-07",
+    "documentedOutputResolutionsM": [
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "verticalReferenceClaim": "Ordnance Survey Newlyn",
+    "verticalAccuracyClaim": "±15 cm RMSE",
+    "claimsAreCatalogueLevelNotPerRasterMetadata": true
+  },
+  "indexSummary": {
+    "matchedFeatureCount": 50,
+    "resolutionFeatureCounts": {
+      "0.5": 4,
+      "1": 42,
+      "2": 4
+    },
+    "sourceCrs": "EPSG:27700",
+    "resolutionFieldMeaning": "published nominal DTM output cell size in metres",
+    "publisherDocumentedProductResolutionsM": [
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "indexFeatureResolutionCountsAreAOIQueryResults": true
+  },
+  "halfMetreIndexFootprint": {
+    "status": "partial_metadata_footprint",
+    "featureCount": 4,
+    "coveredUnionAreaM2": 397628.69577878254,
+    "aoiAreaM2": 4000000.0,
+    "aoiFraction": 0.09940717394469563,
+    "aoiPercent": 9.940717394469562,
+    "surveyDateRanges": [
+      [
+        "2010-04-04T00:00:00Z",
+        "2010-04-04T00:00:00Z"
+      ]
+    ],
+    "coordinateOperations": [
+      "OSTN'02"
+    ],
+    "verticalReferences": [
+      "OSGM'02"
+    ],
+    "features": [
+      {
+        "featureId": "LIDAR_DTM_Time_Stamped_Extents.93989",
+        "dtmName": "DTM_F0129793_20100404_20100404",
+        "osTile": "SX9064",
+        "year": 2010,
+        "surveyStart": "2010-04-04T00:00:00Z",
+        "surveyEnd": "2010-04-04T00:00:00Z",
+        "nominalResolutionM": 0.5,
+        "coordinateOperation": "OSTN'02",
+        "verticalReference": "OSGM'02",
+        "aoiIntersectionAreaM2": 57158.037851570494
+      },
+      {
+        "featureId": "LIDAR_DTM_Time_Stamped_Extents.93990",
+        "dtmName": "DTM_F0129795_20100404_20100404",
+        "osTile": "SX9164",
+        "year": 2010,
+        "surveyStart": "2010-04-04T00:00:00Z",
+        "surveyEnd": "2010-04-04T00:00:00Z",
+        "nominalResolutionM": 0.5,
+        "coordinateOperation": "OSTN'02",
+        "verticalReference": "OSGM'02",
+        "aoiIntersectionAreaM2": 72621.67099879832
+      },
+      {
+        "featureId": "LIDAR_DTM_Time_Stamped_Extents.93991",
+        "dtmName": "DTM_F0129796_20100404_20100404",
+        "osTile": "SX9165",
+        "year": 2010,
+        "surveyStart": "2010-04-04T00:00:00Z",
+        "surveyEnd": "2010-04-04T00:00:00Z",
+        "nominalResolutionM": 0.5,
+        "coordinateOperation": "OSTN'02",
+        "verticalReference": "OSGM'02",
+        "aoiIntersectionAreaM2": 234234.78780902803
+      },
+      {
+        "featureId": "LIDAR_DTM_Time_Stamped_Extents.93992",
+        "dtmName": "DTM_F0129797_20100404_20100404",
+        "osTile": "SX9265",
+        "year": 2010,
+        "surveyStart": "2010-04-04T00:00:00Z",
+        "surveyEnd": "2010-04-04T00:00:00Z",
+        "nominalResolutionM": 0.5,
+        "coordinateOperation": "OSTN'02",
+        "verticalReference": "OSGM'02",
+        "aoiIntersectionAreaM2": 33614.199119385514
+      }
+    ],
+    "overlapUnionCountsAreaOnce": true
+  },
+  "limits": [
+    "Index polygons are published footprints, not raster-pixel coverage.",
+    "No 0.5 m raster was acquired; pixel validity and availability are unknown.",
+    "Raster-cell coverage requires the separate 1 m source-raster assessment.",
+    "Point-cloud spacing is separate and was not assessed by this DTM resolution query.",
+    "Existing GIS browser packages remain 1 km and do not represent this AOI.",
+    "The AOI remains pending; OSM/OS feature coverage and approval are outstanding."
+  ]
+}

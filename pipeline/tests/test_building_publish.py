@@ -11,7 +11,7 @@ from torquay_pipeline.building_export import BuildingExportError
 from torquay_pipeline.config import load_aoi_config
 
 ROOT = Path(__file__).resolve().parents[2]
-AOI = load_aoi_config(ROOT / "config" / "aoi.torquay.json")
+AOI = load_aoi_config(ROOT / "config" / "aoi.torquay-1km.json")
 FILES = {
     "manifest.json": b'{"formatVersion":1}',
     "buildings.json": b'{"buildings":[]}',
