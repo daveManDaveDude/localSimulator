@@ -1,0 +1,570 @@
+{
+  "formatVersion": 1,
+  "purpose": "Auditable byte-for-byte repeatability comparison for the isolated current_2km scene build.",
+  "comparisonStatus": "pass",
+  "generatedAtUtc": "2026-10-20T13:41:55.197992Z",
+  "execution": {
+    "startedAtUtc": "2026-10-20T13:09:51.915886Z",
+    "completedAtUtc": "2026-10-20T13:41:55.198001Z",
+    "workingDirectory": "C:\\vibe\\localSimulator",
+    "shell": "PowerShell",
+    "command": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe C:\\vibe\\localSimulator\\pipeline\\scripts\\compare_current_2km_builds.py --run-a-root C:\\vibe\\localSimulator-2km-determinism-20261020\\run-a --run-b-root C:\\vibe\\localSimulator-2km-determinism-20261020\\run-b --report C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Torquay-2km-determinism.json",
+    "reportOutputPath": "C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Torquay-2km-determinism.json",
+    "implementation": "pipeline.scripts.compare_current_2km_builds.main -> torquay_pipeline.scene_build.build_scene_package",
+    "parameters": {
+      "profile": "current_2km",
+      "missingThreshold": 0.01,
+      "builds": 2,
+      "outputsRetained": true
+    }
+  },
+  "pipeline": {
+    "gitCommit": "aa7df25dcc7023c529d9626f2403ad446fcdce9a",
+    "workingTreeShortStatus": [
+      " M .codex/torquay-plan-implementation.md",
+      "?? TMOG-Task-Manager-1.0.1-Setup.exe",
+      "?? public/worlds/.torquay-poc-001-2km.stage-recovery-20261020-b1/"
+    ],
+    "pipelineSourceFilesClean": true,
+    "pipelineSourceShortStatus": [],
+    "scriptPath": "C:\\vibe\\localSimulator\\pipeline\\scripts\\compare_current_2km_builds.py",
+    "scriptSha256": "9e842dfc0c6b009ac4155e48392d2b9cf3eca9fc2644f10f2d541a8b2722512f",
+    "pythonVersion": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "versions": {
+      "rasterio": "1.5.2",
+      "numpy": "2.5.4",
+      "pyproj": "3.8.0",
+      "osmium": "4.3.1",
+      "shapely": "2.2.0"
+    }
+  },
+  "inputIdentities": {
+    "sourceManifest": {
+      "path": "C:\\vibe\\localSimulator\\data\\source-manifest.json",
+      "byteLength": 9493,
+      "sha256": "e2a5237d99fd8b0b0dd0174430ba18b58f2d778f498275c609c24bed5c3ccf8c"
+    },
+    "aoiConfig": {
+      "path": "C:\\vibe\\localSimulator\\config\\aoi.torquay.json",
+      "byteLength": 970,
+      "sha256": "205aa50e58e807e0f54f7f74d9f546052da6fca627ae9c3411ec4af334a2a6e5"
+    },
+    "buildingConfig": {
+      "path": "C:\\vibe\\localSimulator\\config\\buildings.torquay-2km.json",
+      "byteLength": 707,
+      "sha256": "56142ad206e28d59de5dcc8519559c18ab74db7e19ede9d21d08ea376b7bde27"
+    },
+    "roadConfig": {
+      "path": "C:\\vibe\\localSimulator\\config\\roads.torquay-2km.json",
+      "byteLength": 1407,
+      "sha256": "e839624bebdf915903923d7749e62fe267b4480777efa21e4ace70ff858d2ed1"
+    },
+    "aoiGeoJson": {
+      "path": "C:\\vibe\\localSimulator\\docs\\aoi-selection.geojson",
+      "byteLength": 1527,
+      "sha256": "8bedc98e1564a28ea0873d89aa6e667953ec1e88d01f205109554c97c71c87d4"
+    },
+    "osmPbf": {
+      "path": "C:\\vibe\\localSimulator\\data\\raw\\osm\\devon-261016.osm.pbf",
+      "expectedSha256": "52942b39636e1cb002e5d78a004668996cb469ee9c9e9b9b93049c66b9ac2cd5",
+      "expectedByteLength": 58254938,
+      "byteLength": 58254938,
+      "sha256": "52942b39636e1cb002e5d78a004668996cb469ee9c9e9b9b93049c66b9ac2cd5"
+    },
+    "eaTiles": [
+      {
+        "tileName": "SX96nw",
+        "files": {
+          "archive": {
+            "path": "C:\\vibe\\localSimulator\\data\\raw\\ea_dtm\\lidar_composite_dtm-2022-1-SX96nw.zip",
+            "byteLength": 68662575,
+            "sha256": "22ac2c453ea79ca050a5c1b5a382ba1409a1f9f2c795ab274e6b78fffb4aecf6"
+          },
+          "raster": {
+            "path": "C:\\vibe\\localSimulator\\data\\raw\\ea_dtm\\SX96nw\\SX96nw_DTM_1m.tif",
+            "byteLength": 69538064,
+            "sha256": "665441c4022f06044e17b501e6e1fe4bf3a2c25f87a7f2fea91c01c1054ba8e1"
+          },
+          "xml": {
+            "path": "C:\\vibe\\localSimulator\\data\\raw\\ea_dtm\\SX96nw\\SX96nw_DTM_1m.tif.xml",
+            "byteLength": 20545,
+            "sha256": "4e24fa849e7b2a50a1446122de00fc30c29571248fa8bb0110a7f3283c9fb500"
+          }
+        }
+      },
+      {
+        "tileName": "SX96sw",
+        "files": {
+          "archive": {
+            "path": "C:\\vibe\\localSimulator\\data\\raw\\ea_dtm\\lidar_composite_dtm-2022-1-SX96sw.zip",
+            "byteLength": 57405975,
+            "sha256": "46caf90e77dafc3bca95bf7cc0a81bc13601eb9593f7cb9818c25565d9020e6e"
+          },
+          "raster": {
+            "path": "C:\\vibe\\localSimulator\\data\\raw\\ea_dtm\\SX96sw\\SX96sw_DTM_1m.tif",
+            "byteLength": 57969482,
+            "sha256": "8438a544a9f4b4c675d72fd16824d5b75802899e7291edb585e98334da53211f"
+          },
+          "xml": {
+            "path": "C:\\vibe\\localSimulator\\data\\raw\\ea_dtm\\SX96sw\\SX96sw_DTM_1m.tif.xml",
+            "byteLength": 20545,
+            "sha256": "6122fd3fe59b6b64b57a0273dc926f29387736ee070886fe353ad7993e658d33"
+          }
+        }
+      }
+    ],
+    "aoiStatus": {
+      "selectionStatus": "selected_pending_coverage",
+      "coverageStatus": "not_checked",
+      "boundsM": [
+        290108.9018176432, 64353.48350844931, 292108.9018176432,
+        66353.48350844931
+      ],
+      "note": "AOI approval/completeness is not asserted by a build hash comparison."
+    }
+  },
+  "runs": {
+    "runA": {
+      "packageRoot": "C:\\vibe\\localSimulator-2km-determinism-20261020\\run-a\\public\\worlds\\torquay-poc-001-2km",
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "ready": {
+        "byteLength": 375,
+        "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+        "path": "C:\\vibe\\localSimulator-2km-determinism-20261020\\run-a\\public\\worlds\\torquay-poc-001-2km\\ready.json"
+      },
+      "inventory": {
+        "byteLength": 1399,
+        "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+        "path": "C:\\vibe\\localSimulator-2km-determinism-20261020\\run-a\\public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\inventory.json"
+      },
+      "runtimeFiles": {
+        "buildings/buildings.json": {
+          "byteLength": 6015566,
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "buildings/manifest.json": {
+          "byteLength": 7240,
+          "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+        },
+        "buildings/qa.json": {
+          "byteLength": 14484,
+          "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+        },
+        "heightfield.f32": {
+          "byteLength": 4008004,
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "manifest.json": {
+          "byteLength": 7835,
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "qa.json": {
+          "byteLength": 8326,
+          "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+        },
+        "roads/manifest.json": {
+          "byteLength": 10832,
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "roads/qa.json": {
+          "byteLength": 11911,
+          "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+        },
+        "roads/roads.json": {
+          "byteLength": 87338409,
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        },
+        "scene-qa.json": {
+          "byteLength": 3779,
+          "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+        }
+      },
+      "startedAtUtc": "2026-10-20T13:09:52.064821Z",
+      "durationSeconds": 961.423,
+      "buildResult": {
+        "status": "pass",
+        "sceneProfile": "current_2km",
+        "worldId": "torquay-poc-001",
+        "terrainBuild": {
+          "columns": 1001,
+          "rows": 1001,
+          "spacingM": 2.0
+        },
+        "validation": "source stage and published release both validated by build_scene_package"
+      }
+    },
+    "runB": {
+      "packageRoot": "C:\\vibe\\localSimulator-2km-determinism-20261020\\run-b\\public\\worlds\\torquay-poc-001-2km",
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "ready": {
+        "byteLength": 375,
+        "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+        "path": "C:\\vibe\\localSimulator-2km-determinism-20261020\\run-b\\public\\worlds\\torquay-poc-001-2km\\ready.json"
+      },
+      "inventory": {
+        "byteLength": 1399,
+        "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+        "path": "C:\\vibe\\localSimulator-2km-determinism-20261020\\run-b\\public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\inventory.json"
+      },
+      "runtimeFiles": {
+        "buildings/buildings.json": {
+          "byteLength": 6015566,
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "buildings/manifest.json": {
+          "byteLength": 7240,
+          "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+        },
+        "buildings/qa.json": {
+          "byteLength": 14484,
+          "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+        },
+        "heightfield.f32": {
+          "byteLength": 4008004,
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "manifest.json": {
+          "byteLength": 7835,
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "qa.json": {
+          "byteLength": 8326,
+          "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+        },
+        "roads/manifest.json": {
+          "byteLength": 10832,
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "roads/qa.json": {
+          "byteLength": 11911,
+          "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+        },
+        "roads/roads.json": {
+          "byteLength": 87338409,
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        },
+        "scene-qa.json": {
+          "byteLength": 3779,
+          "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+        }
+      },
+      "startedAtUtc": "2026-10-20T13:25:53.556106Z",
+      "durationSeconds": 961.508,
+      "buildResult": {
+        "status": "pass",
+        "sceneProfile": "current_2km",
+        "worldId": "torquay-poc-001",
+        "terrainBuild": {
+          "columns": 1001,
+          "rows": 1001,
+          "spacingM": 2.0
+        },
+        "validation": "source stage and published release both validated by build_scene_package"
+      }
+    },
+    "activeBefore": {
+      "packageRoot": "C:\\vibe\\localSimulator\\public\\worlds\\torquay-poc-001-2km",
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "ready": {
+        "byteLength": 375,
+        "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+        "path": "C:\\vibe\\localSimulator\\public\\worlds\\torquay-poc-001-2km\\ready.json"
+      },
+      "inventory": {
+        "byteLength": 1399,
+        "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+        "path": "C:\\vibe\\localSimulator\\public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\inventory.json"
+      },
+      "runtimeFiles": {
+        "buildings/buildings.json": {
+          "byteLength": 6015566,
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "buildings/manifest.json": {
+          "byteLength": 7240,
+          "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+        },
+        "buildings/qa.json": {
+          "byteLength": 14484,
+          "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+        },
+        "heightfield.f32": {
+          "byteLength": 4008004,
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "manifest.json": {
+          "byteLength": 7835,
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "qa.json": {
+          "byteLength": 8326,
+          "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+        },
+        "roads/manifest.json": {
+          "byteLength": 10832,
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "roads/qa.json": {
+          "byteLength": 11911,
+          "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+        },
+        "roads/roads.json": {
+          "byteLength": 87338409,
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        },
+        "scene-qa.json": {
+          "byteLength": 3779,
+          "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+        }
+      }
+    },
+    "active": {
+      "packageRoot": "C:\\vibe\\localSimulator\\public\\worlds\\torquay-poc-001-2km",
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "ready": {
+        "byteLength": 375,
+        "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+        "path": "C:\\vibe\\localSimulator\\public\\worlds\\torquay-poc-001-2km\\ready.json"
+      },
+      "inventory": {
+        "byteLength": 1399,
+        "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+        "path": "C:\\vibe\\localSimulator\\public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\inventory.json"
+      },
+      "runtimeFiles": {
+        "buildings/buildings.json": {
+          "byteLength": 6015566,
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "buildings/manifest.json": {
+          "byteLength": 7240,
+          "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+        },
+        "buildings/qa.json": {
+          "byteLength": 14484,
+          "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+        },
+        "heightfield.f32": {
+          "byteLength": 4008004,
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "manifest.json": {
+          "byteLength": 7835,
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "qa.json": {
+          "byteLength": 8326,
+          "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+        },
+        "roads/manifest.json": {
+          "byteLength": 10832,
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "roads/qa.json": {
+          "byteLength": 11911,
+          "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+        },
+        "roads/roads.json": {
+          "byteLength": 87338409,
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        },
+        "scene-qa.json": {
+          "byteLength": 3779,
+          "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+        }
+      }
+    }
+  },
+  "comparison": {
+    "releaseIdSameAcrossAll": true,
+    "readyBytesSameAcrossAll": true,
+    "inventoryBytesSameAcrossAll": true,
+    "runtimeFilesSameAcrossAll": true,
+    "activePackageUnchangedDuringBuilds": true,
+    "runtimeFileCount": 10,
+    "runtimeByteLengthTotal": 97426386,
+    "files": [
+      {
+        "path": "buildings/buildings.json",
+        "runA": {
+          "byteLength": 6015566,
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "runB": {
+          "byteLength": 6015566,
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "active": {
+          "byteLength": 6015566,
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "buildings/manifest.json",
+        "runA": {
+          "byteLength": 7240,
+          "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+        },
+        "runB": {
+          "byteLength": 7240,
+          "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+        },
+        "active": {
+          "byteLength": 7240,
+          "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "buildings/qa.json",
+        "runA": {
+          "byteLength": 14484,
+          "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+        },
+        "runB": {
+          "byteLength": 14484,
+          "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+        },
+        "active": {
+          "byteLength": 14484,
+          "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "heightfield.f32",
+        "runA": {
+          "byteLength": 4008004,
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "runB": {
+          "byteLength": 4008004,
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "active": {
+          "byteLength": 4008004,
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "manifest.json",
+        "runA": {
+          "byteLength": 7835,
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "runB": {
+          "byteLength": 7835,
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "active": {
+          "byteLength": 7835,
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "qa.json",
+        "runA": {
+          "byteLength": 8326,
+          "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+        },
+        "runB": {
+          "byteLength": 8326,
+          "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+        },
+        "active": {
+          "byteLength": 8326,
+          "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "roads/manifest.json",
+        "runA": {
+          "byteLength": 10832,
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "runB": {
+          "byteLength": 10832,
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "active": {
+          "byteLength": 10832,
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "roads/qa.json",
+        "runA": {
+          "byteLength": 11911,
+          "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+        },
+        "runB": {
+          "byteLength": 11911,
+          "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+        },
+        "active": {
+          "byteLength": 11911,
+          "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "roads/roads.json",
+        "runA": {
+          "byteLength": 87338409,
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        },
+        "runB": {
+          "byteLength": 87338409,
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        },
+        "active": {
+          "byteLength": 87338409,
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      },
+      {
+        "path": "scene-qa.json",
+        "runA": {
+          "byteLength": 3779,
+          "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+        },
+        "runB": {
+          "byteLength": 3779,
+          "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+        },
+        "active": {
+          "byteLength": 3779,
+          "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+        },
+        "runAEqualsRunB": true,
+        "runAEqualsActive": true,
+        "runBEqualsActive": true
+      }
+    ]
+  },
+  "scopeNote": "A deterministic package comparison does not approve the AOI, establish source completeness, or change selected_pending_coverage / not_checked."
+}
