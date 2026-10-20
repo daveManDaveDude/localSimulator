@@ -1,6 +1,6 @@
 # v0.1.0 viewer cleanup handback
 
-**State:** Implemented and verified; independent review and coordinator acceptance are pending. User authorization covers this descriptive cleanup only, with Sol implementation. TVW-016 and later remain unauthorized.
+**State:** Accepted after independent Sol review and coordinator acceptance on 2026-10-20. User authorization covers this descriptive cleanup only, with Sol implementation. TVW-016 and later remain unauthorized.
 
 ## Result
 
@@ -69,7 +69,7 @@ QA records a coordinate operation with 2 m reported accuracy, `best_available=fa
 
 A protected-file snapshot and post-run comparison cover source/config/package/fixture files, prior screenshots/evidence, installer, recovery tree, immutable source plan and private checkpoint: **149 files, zero changes**, recorded in [the preservation report](artifacts/Viewer-cleanup/preservation.json). The source plan remains SHA-256 `144c9c704ea1c10fa2d503dba3233b089528585be7d36b7b94164d28ba40d571`; installer `b4edf70fa040968958c662ffb09feeeb0eeca07759e6ed7742606bcc39f29fc6`; current readiness `08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4`. The checkpoint's pre-existing modification remains coordinator-owned and uncommitted by this issue.
 
-Next step: independent Sol review and coordinator acceptance of this focused cleanup. Remaining feature coverage and AOI approval remain outstanding; no subsequent implementation is authorized.
+Remaining feature coverage and AOI approval remain outstanding; this does not authorize subsequent implementation.
 
 ## Default road-name amendment and marker correction
 
@@ -85,4 +85,10 @@ Correction verification passed:
 
 The fresh [labelled scene without a QA marker](screenshots/Viewer-cleanup/labels-active-no-marker.png) was captured after Start and opened for inspection. It visibly shows source names including Lymington Road, Chatto Road, Haslam Road and Wright's Lane, with no red QA marker or label toggle. The refreshed Sources, active/outer-area and share fallback images remain under this issue's evidence folder; the labelled active and share fallback captures were inspected. Chromium was 156.0.8078.4, at 1440 × 960 CSS pixels and DPR 1.5 before the existing resize check; the recorded renderer remains ANGLE/Vulkan **SwiftShader software rendering**, not hardware performance validation.
 
-The saved initial [149-file preservation snapshot](artifacts/Viewer-cleanup/preservation.json) remains historical and unchanged. A separate [correction comparison](artifacts/Viewer-cleanup/correction-preservation.json) confirms **148 protected files unchanged**, excluding only the coordinator-private checkpoint from the historical comparison because the coordinator changed it between phases. The source/package/config/fixture, installer, recovery-tree and older evidence identities still match. This correction does not edit that checkpoint or the original snapshot. No GIS input, geometry, transform, AOI, resolution, dependency or version change was made. Independent review and coordinator acceptance remain pending.
+The saved initial [149-file preservation snapshot](artifacts/Viewer-cleanup/preservation.json) remains historical and unchanged. A separate [correction comparison](artifacts/Viewer-cleanup/correction-preservation.json) confirms **148 protected files unchanged**, excluding only the coordinator-private checkpoint from the historical comparison because the coordinator changed it between phases. The source/package/config/fixture, installer, recovery-tree and older evidence identities still match. The implementation correction did not edit that checkpoint or the original snapshot. No GIS input, geometry, transform, AOI, resolution, dependency or version change was made.
+
+## Independent review and coordinator acceptance
+
+Final independent Sol review of `c504cb4`, `b6f1d28` and `32c4cf3` returned **PASS** on 2026-10-20, with no remaining actionable findings. The reviewer independently ran typecheck, lint, formatting, `git diff --check` and all 299 Vitest tests; these passed. An isolated Chromium probe on port 4212 verified the current real map, Start/pointer lock, H/G/Escape, 11 default source-derived labels matched to immutable release names and clipped-part identities within 500 m, and zero attached QA markers. Invalid readiness preserved the full bookmark, fell back to clearly labelled synthetic terrain, displayed zero real road names, and caused no page errors. The reviewer inspected the fresh labelled, Sources and outer-area captures and independently confirmed 148 protected files match. The full real/share E2E profile results are recorded above and were reviewed from implementation evidence rather than rerun during independent review. The preview on port 4212 was stopped; the user's port 5173 remained running and untouched.
+
+Coordinator acceptance is limited to v0.1.0 presentation cleanup. The AOI remains `selected_pending_coverage` / `not_checked`, feature completeness remains unverified, and TVW-016 or later work is not authorized.
