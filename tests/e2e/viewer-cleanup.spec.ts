@@ -1,11 +1,97 @@
 import { expect, test, type Page } from '@playwright/test';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const real = process.env.VIEWER_CLEANUP_PROFILE === 'real';
 const evidenceDir = resolve('docs/milestones/artifacts/Viewer-cleanup');
 const screenshotDir = resolve('docs/milestones/screenshots/Viewer-cleanup');
 const readyPath = '/worlds/torquay-poc-001-2km/ready.json';
+const visibleLabelSelector =
+  '.road-name-label:not(.road-name-measure):not([hidden])';
+
+async function expectedCurrentRoadNames() {
+  const root = resolve('public/worlds/torquay-poc-001-2km');
+  const pointer = JSON.parse(
+    await readFile(resolve(root, 'ready.json'), 'utf8'),
+  ) as { releaseId: string };
+  expect(pointer.releaseId).toMatch(/^[a-f0-9]{64}$/);
+  const roads = JSON.parse(
+    await readFile(
+      resolve(root, 'releases', pointer.releaseId, 'roads/roads.json'),
+      'utf8',
+    ),
+  ) as {
+    features: Array<{
+      source: { osmId: number };
+      sourceTags: { name?: string };
+      centerlinePartsXZ: unknown[];
+    }>;
+  };
+  const names = new Map<string, string>();
+  for (const feature of roads.features) {
+    const name = feature.sourceTags.name?.trim();
+    if (name)
+      feature.centerlinePartsXZ.forEach((_, index) =>
+        names.set(`${feature.source.osmId}:${index}`, name),
+      );
+  }
+  return { releaseId: pointer.releaseId, names };
+}
+
+async function observeLabels(page: Page) {
+  return page.locator(visibleLabelSelector).evaluateAll((elements) =>
+    elements.map((element) => ({
+      name: element.textContent ?? '',
+      key: element.getAttribute('data-road-label-key') ?? '',
+      distanceM: Number(element.getAttribute('data-distance-meters')),
+    })),
+  );
+}
+
+async function assertDefaultLabels(page: Page, expected: Map<string, string>) {
+  await expect
+    .poll(() => page.locator(visibleLabelSelector).count())
+    .toBeGreaterThan(0);
+  const labels = await observeLabels(page);
+  expect(labels.length).toBeLessThanOrEqual(20);
+  expect(new Set(labels.map((label) => label.name)).size).toBe(labels.length);
+  for (const label of labels) {
+    expect(label.name).toBe(expected.get(label.key));
+    expect(label.distanceM).toBeGreaterThanOrEqual(0);
+    expect(label.distanceM).toBeLessThanOrEqual(500);
+  }
+  await expect
+    .poll(() =>
+      page.evaluate((selector) => {
+        const rects = [...document.querySelectorAll(selector)].map((element) =>
+          element.getBoundingClientRect(),
+        );
+        const panel = document
+          .querySelector('.product-controls')!
+          .getBoundingClientRect();
+        const overlaps = (a: DOMRect, b: DOMRect) =>
+          a.left < b.right &&
+          a.right > b.left &&
+          a.top < b.bottom &&
+          a.bottom > b.top;
+        return rects.some(
+          (rect, index) =>
+            overlaps(rect, panel) ||
+            rects.slice(index + 1).some((other) => overlaps(rect, other)),
+        );
+      }, visibleLabelSelector),
+    )
+    .toBe(false);
+  await expect(page.locator('.road-label-overlay')).toHaveCSS(
+    'pointer-events',
+    'none',
+  );
+  await expect(page.locator('.viewer-shell')).toHaveAttribute(
+    'data-road-qa-marker-count',
+    '0',
+  );
+  return labels;
+}
 
 async function ready(page: Page, mode: 'real' | 'synthetic' | 'm0') {
   const shell = page.locator('.viewer-shell');
@@ -14,6 +100,8 @@ async function ready(page: Page, mode: 'real' | 'synthetic' | 'm0') {
   });
   await expect(shell).toHaveAttribute('data-world-mode', mode);
   await expect(shell).toHaveAttribute('data-grid-visible', 'false');
+  if (mode !== 'real')
+    await expect(page.locator(visibleLabelSelector)).toHaveCount(0);
   await expect(page.getByTestId('debug-hud')).toBeHidden();
   for (const id of [
     'world-select-real',
@@ -104,6 +192,7 @@ test('default real map loads all layers, retains navigation, and exposes compact
       failedResponses.push(`${response.status()} ${response.url()}`);
   });
   const started = Date.now();
+  const sourceNames = await expectedCurrentRoadNames();
   await page.goto('/');
   await ready(page, 'real');
   const shell = page.locator('.viewer-shell');
@@ -116,6 +205,7 @@ test('default real map loads all layers, retains navigation, and exposes compact
   });
   await expect(shell).toHaveAttribute('data-building-count', '3613');
   await expect(shell).toHaveAttribute('data-road-way-count', '1044');
+  await assertDefaultLabels(page, sourceNames.names);
   await expect(page.getByTestId('real-package-extent-notice')).toHaveText(
     '2 km candidate · AOI pending; feature coverage not checked.',
   );
@@ -141,6 +231,7 @@ test('default real map loads all layers, retains navigation, and exposes compact
   await expect(
     sources.getByRole('link', { name: 'EA time-stamped products' }),
   ).toBeInViewport();
+  await assertDefaultLabels(page, sourceNames.names);
   await screenshot(page, 'sources');
   await sources.locator('summary').click();
   await screenshot(page, 'default-map');
@@ -150,6 +241,8 @@ test('default real map loads all layers, retains navigation, and exposes compact
   await expect(page.getByTestId('controls-help')).toBeHidden();
   await page.keyboard.press('g');
   await expect(shell).toHaveAttribute('data-grid-visible', 'false');
+  const labelsAtStart = await assertDefaultLabels(page, sourceNames.names);
+  await screenshot(page, 'labels-active-no-marker');
   await screenshot(page, 'active-overview');
   const bearing = await page
     .getByTestId('camera-orientation')
@@ -286,6 +379,12 @@ test('default real map loads all layers, retains navigation, and exposes compact
         pageErrors,
         consoleErrors,
         failedResponses,
+        labelsAtStart,
+        labelSourceRelease: sourceNames.releaseId,
+        sourceNamedPartCount: sourceNames.names.size,
+        roadQaMarkerCount: await shell.getAttribute(
+          'data-road-qa-marker-count',
+        ),
         renderer: await page
           .locator('canvas.viewer-canvas')
           .evaluate((canvas: HTMLCanvasElement) => {
@@ -466,6 +565,9 @@ test('share default needs no real package and synthetic controls remain usable',
         pageErrors: errors,
         unexpectedConsoleErrors,
         unexpectedResponses,
+        visibleRoadNameLabelCount: await page
+          .locator(visibleLabelSelector)
+          .count(),
         observation:
           'Share build auto-fell back after readiness; no GIS runtime assets requested. Synthetic movement/reset/walk passed.',
       },

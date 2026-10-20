@@ -908,6 +908,8 @@ export function createApp(container: HTMLElement): AppHandle {
     packageData: LoadedRoadPackage,
     selectedId: string,
   ): void => {
+    // Product worlds never display a QA context marker, including after retry.
+    if (selectedRealProfile.profile === 'current_2km') return;
     if (!currentRoadGroup || !currentTerrainGrid) return;
     if (currentRoadMarker) {
       currentRoadGroup.remove(currentRoadMarker);
@@ -1002,6 +1004,7 @@ export function createApp(container: HTMLElement): AppHandle {
         (x, z) => currentTerrainGrid?.sampleHeight(x, z) ?? null,
       );
       roadLabels.setRoadVisible(true);
+      roadLabels.setEnabled(selectedRealProfile.profile === 'current_2km');
       roadVintage.textContent =
         `OSM extract vintage: ${packageData.manifest.source.extractTimestamp} ` +
         `(replication sequence ${packageData.manifest.source.replicationSequence}).`;
@@ -1016,10 +1019,12 @@ export function createApp(container: HTMLElement): AppHandle {
       );
       roadLandmarkSelect.disabled = false;
       updateRoadStatus(packageData, true);
-      showRoadLandmark(
-        packageData,
-        packageData.qa.landmarkContexts[0]?.id ?? '',
-      );
+      if (selectedRealProfile.profile === 'historical_1km') {
+        showRoadLandmark(
+          packageData,
+          packageData.qa.landmarkContexts[0]?.id ?? '',
+        );
+      }
       roadsToggle.disabled = false;
       roadsToggle.setAttribute('aria-pressed', 'true');
       roadsToggle.textContent = 'Hide OSM road ribbons';
@@ -1963,6 +1968,12 @@ export function createApp(container: HTMLElement): AppHandle {
     renderer.render(scene, camera);
     roadLabels.update();
     shell.dataset.drawCalls = String(renderer.info.render.calls);
+    // Observe the actual attached road children for product helper regressions.
+    shell.dataset.roadQaMarkerCount = String(
+      currentRoadGroup?.children.filter(
+        (child) => child.userData['qaContextOnly'] === true,
+      ).length ?? 0,
+    );
     shell.dataset.triangles = String(renderer.info.render.triangles);
     // Keep renderer counters observable to the local benchmark without
     // exposing a mutable production hook or relying on test-only camera state.

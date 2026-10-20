@@ -27,6 +27,7 @@ export interface RoadLabelOverlay {
   ) => void;
   clear: () => void;
   setRoadVisible: (visible: boolean) => void;
+  setEnabled: (enabled: boolean) => void;
   toggle: () => void;
   update: () => void;
   dispose: () => void;
@@ -36,6 +37,7 @@ const LABEL_POOL_SIZE = 20;
 const LABEL_PANEL_SELECTORS = [
   '.viewer-topline',
   '.world-selector',
+  '.product-controls',
   '.debug-hud',
   '.building-controls',
   '.road-controls',
@@ -124,6 +126,7 @@ export function createRoadLabelOverlay({
     for (const label of labelNodes) {
       label.textContent = '';
       delete label.dataset.roadLabelKey;
+      delete label.dataset.distanceMeters;
       label.hidden = true;
     }
     measureNode.textContent = '';
@@ -176,6 +179,12 @@ export function createRoadLabelOverlay({
     renderState();
   };
 
+  const setEnabled = (requested: boolean): void => {
+    enabled =
+      requested && !disposed && roadVisible && stateByCandidate.length > 0;
+    renderState();
+  };
+
   const update = (): void => {
     if (disposed || !enabled || !roadVisible || stateByCandidate.length === 0) {
       return;
@@ -205,7 +214,12 @@ export function createRoadLabelOverlay({
       const element = panelElements[index];
       const rect = panelRects[index];
       if (!element || !rect) continue;
-      if (element.hidden || getComputedStyle(element).display === 'none') {
+      const style = getComputedStyle(element);
+      if (
+        element.hidden ||
+        style.display === 'none' ||
+        style.visibility === 'hidden'
+      ) {
         rect.left = rect.right = rect.top = rect.bottom = 0;
         continue;
       }
@@ -236,6 +250,7 @@ export function createRoadLabelOverlay({
         label.textContent = placement.candidate.name;
       }
       label.dataset.roadLabelKey = placement.candidate.key;
+      label.dataset.distanceMeters = placement.distanceM.toFixed(4);
       label.hidden = false;
       label.style.left = `${placement.screenX}px`;
       label.style.top = `${placement.screenY}px`;
@@ -263,6 +278,7 @@ export function createRoadLabelOverlay({
     setPackage,
     clear,
     setRoadVisible,
+    setEnabled,
     toggle: toggleEnabled,
     update,
     dispose,

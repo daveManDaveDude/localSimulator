@@ -1,0 +1,9 @@
+{
+  "baseline": "preservation.json",
+  "baselineSha256": "c508e9e15b822f6ae4de8f6f12e0fdc8e98ca2f6488c826396626e996465cb5c",
+  "historicalBaselineFileCount": 149,
+  "comparedFileCount": 148,
+  "excludedCoordinatorCheckpoint": ".codex/torquay-plan-implementation.md",
+  "exclusionReason": "The coordinator changed this private checkpoint after the initial implementation. The historical 149-file snapshot is retained unchanged; this correction does not edit the checkpoint.",
+  "changed": []
+}

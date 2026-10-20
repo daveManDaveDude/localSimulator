@@ -12,5 +12,6 @@
   "pageErrors": [],
   "unexpectedConsoleErrors": [],
   "unexpectedResponses": [],
+  "visibleRoadNameLabelCount": 0,
   "observation": "Share build auto-fell back after readiness; no GIS runtime assets requested. Synthetic movement/reset/walk passed."
 }
