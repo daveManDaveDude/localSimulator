@@ -1,13 +1,13 @@
 # v0.1.0 viewer cleanup specification
 
-The user authorized one descriptive cleanup issue on 2026-10-20 and explicitly selected Sol for implementation. This changes presentation and entry behavior of the existing MVP; it is not TVW-016 and authorizes no source-data or GIS changes.
+The user authorized one descriptive cleanup issue on 2026-10-20 and explicitly selected Sol for implementation. A follow-up instruction requires roads and road names on by default. This changes presentation and entry behavior of the existing MVP; it is not TVW-016 and authorizes no source-data or GIS changes.
 
 ## Acceptance
 
 - `/` and the existing current 2 km bookmark load the active immutable terrain/buildings/roads release. Current-profile layer query flags do not disable layers.
-- The product presents one map, Start, fly/walk, Reset, Controls help, concise load/error/retry feedback, Sources and attribution. Remove visible world/layer selectors, telemetry, grid/axes/north helpers, wireframes, debug landmarks, street-name options and the unavailable overview. `G` must not change helpers.
+- The product presents one map, Start, fly/walk, Reset, Controls help, concise load/error/retry feedback, Sources and attribution. Remove visible world/layer selectors, telemetry, grid/axes/north helpers, wireframes, debug landmarks and the unavailable overview. `G` must not change helpers. Roads and their OSM name labels are on by default in the current 2 km product, with no label toggle. Labels use only validated source names and retain the existing 20-label / 500 m / collision-filter limits.
 - Show `2 km candidate · AOI pending; feature coverage not checked.` while the real current scene is active. Sources retain EA/OSM credit/licence links, vintages, 1 m source / 2 m mesh distinction and estimated-height/width caveats.
-- A missing or invalid current package automatically loads clearly labelled fictional synthetic terrain, preserves the Torquay bookmark, states why it fell back, and offers Retry Torquay. Layer failures preserve terrain and offer focused retries.
+- A missing or invalid current package automatically loads clearly labelled fictional synthetic terrain, preserves the Torquay bookmark, states why it fell back, and offers Retry Torquay. Layer failures preserve terrain and offer focused retries. When named road features are in view, source-derived labels appear without user activation; labels must never invent names or imply complete road coverage.
 - Preserve pointer lock, mouse look, WASD, fly vertical movement, Shift, F/R/H/Escape, 15/41.25 m/s speed, 1.7 m walk clearance, reset, bounds and resize behavior.
 - Preserve synthetic fixtures and internal reproduction routes, historical 1 km package and provenance, exact TQ1 4HN center, pending statuses, and all source/current package bytes. No pipeline/config/source/package changes, resolution change, geometry repair, dependency or version change.
 
