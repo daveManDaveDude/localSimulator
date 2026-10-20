@@ -1,6 +1,6 @@
 # 2 km terrain, buildings and roads handback
 
-**Status:** implementation submitted for independent review. The overall AOI remains `selected_pending_coverage` / `not_checked`; mapped feature counts do not establish completeness.
+**Status:** PASS; coordinator-accepted on 2026-10-20 after final independent Sol review. The overall AOI remains `selected_pending_coverage` / `not_checked`; mapped feature counts do not establish completeness.
 
 ## Published scene
 
@@ -56,6 +56,10 @@ Vite emitted its existing native-config extension warning for `scripts/share-ass
 - The historical 1 km package and prior milestone screenshots were not modified. The 2 km real package's readiness pointer, inventory and GIS payloads were not regenerated for this fix.
 
 No AOI status, data source, dependency, source payload, or 1 km package was changed. The 2 km world remains an explicit local route; the synthetic default and share build remain available.
+
+## Next step
+
+Play-test the current scene at `/?world=torquay-poc-001-2km&buildings=1&roads=1` on the local development server. The next implementation issue is not authorized yet. If desired, separately authorize the remaining-feature coverage checks needed to assess the pending AOI; do not infer completeness from the imported counts or this repeatability result.
 
 ## Fix round 2 (2026-10-20)
 
