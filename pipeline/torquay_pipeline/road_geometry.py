@@ -21,10 +21,25 @@ class RoadGeometryError(ValueError):
 
 DISPLAY_GROUPS = ("vehicular", "cycleway", "path")
 GROUP_PRIORITY = {"vehicular": 0, "cycleway": 1, "path": 2}
+FLOAT32_SLIVER_MAX_AREA_M2 = 1e-6
+CURRENT_2KM_FLOAT32_SLIVER_MAX_AREA_M2 = 2e-5
 FLOAT32_SLIVER_POLICY = (
     "Cull triangles only when fewer than three distinct [x,z] coordinates remain after "
     "Float32 conversion; report the count and omitted area, bounded to 1e-6 m2."
 )
+CURRENT_2KM_FLOAT32_SLIVER_POLICY = (
+    "Cull triangles only when fewer than three distinct [x,z] coordinates remain after "
+    "Float32 conversion; report the count and omitted area, bounded to 2e-5 m2 for the "
+    "expanded current_2km network."
+)
+
+
+def float32_sliver_policy(maximum_omitted_area_m2: float) -> str:
+    if maximum_omitted_area_m2 == FLOAT32_SLIVER_MAX_AREA_M2:
+        return FLOAT32_SLIVER_POLICY
+    if maximum_omitted_area_m2 == CURRENT_2KM_FLOAT32_SLIVER_MAX_AREA_M2:
+        return CURRENT_2KM_FLOAT32_SLIVER_POLICY
+    raise ValueError("unsupported Float32 road sliver omission budget")
 
 
 def _polygon_parts(geometry: Geometry) -> list[Polygon]:
@@ -171,6 +186,7 @@ def _triangulate_polygon_component(
 ) -> float:
     triangulated = constrained_delaunay_triangles(polygon)
     area_sum = 0.0
+    triangulated_area_sum = 0.0
     # Each component was first clipped to exactly one fixed terrain triangle.
     for face in get_parts(triangulated):
         if face.geom_type != "Polygon" or len(face.exterior.coords) != 4 or face.interiors:
@@ -178,8 +194,9 @@ def _triangulate_polygon_component(
         points = [(float(x), float(z)) for x, z in list(face.exterior.coords)[:-1]]
         # _signed_area already returns the shoelace area (including its 1/2).
         area = abs(_signed_area(points))
-        if not math.isfinite(area) or area <= 1e-10:
+        if not math.isfinite(area) or area <= 0.0:
             raise RoadGeometryError("constrained road triangulation returned a degenerate face")
+        triangulated_area_sum += area
         if _signed_area(points) > 0:
             points[1], points[2] = points[2], points[1]
         float32_points = [
@@ -209,9 +226,12 @@ def _triangulate_polygon_component(
         geometry["indices"].append(face_indices)
         geometry["terrainTriangles"].append([row, column, triangle_id])
         area_sum += area
-    if abs(area_sum - float(polygon.area)) > max(1e-7, float(polygon.area) * 1e-8):
+    # Check geometric tessellation before applying the separately bounded Float32
+    # sliver omission policy. Otherwise a valid sub-micro-area face that collapses
+    # after conversion is misreported as a constrained-triangulation failure.
+    if abs(triangulated_area_sum - float(polygon.area)) > max(1e-7, float(polygon.area) * 1e-8):
         raise RoadGeometryError(
-            f"road triangulation area {area_sum:.12g} does not match clipped "
+            f"road triangulation area {triangulated_area_sum:.12g} does not match clipped "
             f"surface area {polygon.area:.12g}"
         )
     return area_sum
@@ -227,6 +247,7 @@ def tessellate_display_polygons(
     depth_m: float,
     vertex_limit: int = 1_000_000,
     triangle_limit: int = 1_000_000,
+    maximum_collapsed_sliver_area_m2: float = FLOAT32_SLIVER_MAX_AREA_M2,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, float], dict[str, float | int]]:
     """Constrain each indexed surface face to one exact TerrainGrid sample plane."""
     if (
@@ -242,6 +263,8 @@ def tessellate_display_polygons(
         or width_m <= 0
         or not math.isfinite(depth_m)
         or depth_m <= 0
+        or not math.isfinite(maximum_collapsed_sliver_area_m2)
+        or maximum_collapsed_sliver_area_m2 <= 0
         or abs((columns - 1) * spacing_m - width_m) > 1e-8
         or abs((rows - 1) * spacing_m - depth_m) > 1e-8
     ):
@@ -303,9 +326,10 @@ def tessellate_display_polygons(
             )
         batches[group] = output
         areas[group] = sum(float(polygon.area) for polygon in polygons)
-    if collapsed_sliver_area > 1e-6:
+    if collapsed_sliver_area > maximum_collapsed_sliver_area_m2:
         raise RoadGeometryError(
-            "Float32-collapsed road slivers exceed the 1e-6 m2 omission limit "
+            "Float32-collapsed road slivers exceed the "
+            f"{maximum_collapsed_sliver_area_m2:g} m2 omission limit "
             f"({collapsed_sliver_area:.12g} m2)"
         )
     return (

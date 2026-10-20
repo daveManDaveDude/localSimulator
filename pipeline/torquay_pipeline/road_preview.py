@@ -34,6 +34,13 @@ NORTH_ARROW_TAIL_AXES = (0.965, 0.83)
 NORTH_LABEL_AXES = (0.965, 0.965)
 
 
+def profile_title(qa: dict[str, Any]) -> str:
+    """Return an accurate footprint label for the report's terrain profile."""
+    if qa.get("sceneProfile") == "current_2km":
+        return "2 km current_2km candidate AOI"
+    return "1 km historical candidate AOI"
+
+
 def _patch_for_polygon(polygon: Polygon) -> PathPatch:
     vertices: list[tuple[float, float]] = []
     codes: list[int] = []
@@ -141,8 +148,8 @@ def render_road_preview(
         arrowprops={"arrowstyle": "-|>", "color": "#182332", "lw": 1.8},
     )
     ax.set_title(
-        "TVW-011 · local OSM highway ribbons on verified EA DTM\n"
-        "1 km candidate AOI · estimated visual widths · vertical-road tags excluded",
+        "Local OSM highway ribbons on verified EA DTM\n"
+        f"{profile_title(qa)} · estimated visual widths · vertical-road tags excluded",
         fontsize=13,
         weight="bold",
     )

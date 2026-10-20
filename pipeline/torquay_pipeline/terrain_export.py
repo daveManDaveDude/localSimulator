@@ -32,6 +32,7 @@ from .terrain_sources import inspect_raster
 OUTPUT_SPACING_M = 2.0
 OUTPUT_COLUMNS = 501
 OUTPUT_ROWS = 501
+MAX_SOURCE_WINDOW_CELLS = 4_100_000
 RESAMPLING_ERROR_LIMIT_M = 0.25
 FLOAT32_ERROR_LIMIT_M = 1e-4
 PROBE_SEED = 20261017
@@ -107,7 +108,7 @@ def _sample_bilinear_mosaic(
     min_row = int(lower_rows.min())
     max_row = int(lower_rows.max()) + 1
     shape = (max_row - min_row + 1, max_column - min_column + 1)
-    if shape[0] <= 0 or shape[1] <= 0 or shape[0] * shape[1] > 4_000_000:
+    if shape[0] <= 0 or shape[1] <= 0 or shape[0] * shape[1] > MAX_SOURCE_WINDOW_CELLS:
         raise TerrainExportError(
             "requested source window is invalid or exceeds the safe memory limit"
         )
@@ -486,8 +487,13 @@ def _source_seam_probe_indexes(grid: ResampledGrid, raster_paths: list[Path]) ->
 
 def _load_wgs84_aoi_boundary(config: AoiConfig, geojson_path: Path | None = None) -> dict[str, Any]:
     """Read the generated geographic ring and verify it still matches this AOI."""
-    source_path = (
-        geojson_path or Path(__file__).resolve().parents[2] / "docs" / "aoi-selection.geojson"
+    source_path = geojson_path or (
+        Path(__file__).resolve().parents[2]
+        / (
+            "docs/milestones/artifacts/AOI-1km-selection/aoi-selection.geojson"
+            if config.profile == "historical_1km"
+            else "docs/aoi-selection.geojson"
+        )
     )
     try:
         source = json.loads(source_path.read_text(encoding="utf-8"))
@@ -571,6 +577,7 @@ def _manifest(
     sources: list[dict[str, Any]],
     source_manifest: dict[str, Any],
 ) -> dict[str, Any]:
+    rows, columns = grid.elevations_m.shape
     west, south, east, north = grid.bounds_m
     try:
         anchor_easting, anchor_northing, operation_info = transform_wgs84_to_bng(
@@ -640,7 +647,7 @@ def _manifest(
             + "; the pinned non-ballpark EPSG:1314 + EPSG:19916 operation is recorded above."
         ),
     }
-    return {
+    manifest = {
         "formatVersion": 1,
         "id": config.id,
         "name": config.name,
@@ -655,8 +662,8 @@ def _manifest(
         "extentM": {"width": east - west, "depth": north - south},
         "heightfield": {
             "path": "heightfield.f32",
-            "columns": OUTPUT_COLUMNS,
-            "rows": OUTPUT_ROWS,
+            "columns": columns,
+            "rows": rows,
             "spacingM": OUTPUT_SPACING_M,
             "rowOrder": "north-to-south",
             "byteOrder": "little-endian",
@@ -685,7 +692,11 @@ def _manifest(
             "resampling": "bilinear interpolation between source 1 m area-pixel centers",
             "fillPolicy": "none; every positive-weight source contributor must be valid",
             "qa": {
-                "reportPath": "../docs/milestones/artifacts/TVW-008-qa.json",
+                "reportPath": (
+                    "qa.json"
+                    if config.profile == "current_2km"
+                    else "../docs/milestones/artifacts/TVW-008-qa.json"
+                ),
                 "sampling": qa["sampling"],
                 "maximumObservedResamplingErrorM": qa["errorBudgets"][
                     "maximumObservedResamplingErrorM"
@@ -707,6 +718,11 @@ def _manifest(
             "coverageStatus": config.coverage_status,
         },
     }
+    # Older manifests without a profile remain the accepted historical 1 km
+    # package. New 2 km packages carry an explicit profile identity.
+    if config.profile == "current_2km":
+        manifest["sceneProfile"] = "current_2km"
+    return manifest
 
 
 def _render_preview(
@@ -766,7 +782,8 @@ def _render_preview(
     axis.legend(loc="lower left", framealpha=0.9, fontsize=8)
     axis.set_title(
         f"Environment Agency {EA_PRODUCT}\n"
-        f"501 × 501 vertices · 2 m · measured source elevations "
+        f"{grid.elevations_m.shape[1]} × {grid.elevations_m.shape[0]} vertices · "
+        f"{OUTPUT_SPACING_M:g} m · measured source elevations "
         f"{minimum:.2f}–{maximum:.2f} m"
     )
     figure.colorbar(
@@ -904,9 +921,13 @@ def build_terrain_package(
     qa_path: Path,
     preview_path: Path,
 ) -> dict[str, Any]:
-    """Generate and atomically publish a verified 1 km real-data terrain package."""
-    if config.width_m != 1000 or config.height_m != 1000:
-        raise TerrainExportError("TVW-008 requires the configured exact 1,000 m × 1,000 m AOI")
+    """Generate and atomically publish a profile-specific real-data terrain package."""
+    expected_size_m = 1000.0 if config.profile == "historical_1km" else 2000.0
+    if config.width_m != expected_size_m or config.height_m != expected_size_m:
+        raise TerrainExportError(
+            f"profile '{config.profile}' requires exactly "
+            f"{expected_size_m:,.0f} m × {expected_size_m:,.0f} m"
+        )
     if (
         config.selection_status != "selected_pending_coverage"
         or config.coverage_status != "not_checked"
@@ -920,17 +941,22 @@ def build_terrain_package(
     ):
         raise TerrainExportError("AOI bounds are not centered on the configured postcode centroid")
 
-    grid = resample_vertices(raster_paths, config.bbox_m)
+    columns = int(round(config.width_m / OUTPUT_SPACING_M)) + 1
+    rows = int(round(config.height_m / OUTPUT_SPACING_M)) + 1
+    grid = resample_vertices(
+        raster_paths,
+        config.bbox_m,
+        columns=columns,
+        rows=rows,
+        spacing_m=OUTPUT_SPACING_M,
+    )
     relative = grid.elevations_m - grid.origin_elevation_m
     if not np.isfinite(relative).all():
         raise TerrainExportError("relative terrain contains non-finite values")
     encoded = np.asarray(relative, dtype="<f4", order="C")
-    if (
-        encoded.shape != (OUTPUT_ROWS, OUTPUT_COLUMNS)
-        or encoded.nbytes != OUTPUT_ROWS * OUTPUT_COLUMNS * 4
-    ):
+    if encoded.shape != (rows, columns) or encoded.nbytes != rows * columns * 4:
         raise TerrainExportError(
-            "encoded output does not match the required 501 × 501 Float32 grid"
+            f"encoded output does not match the required {columns} × {rows} Float32 grid"
         )
     binary = encoded.tobytes(order="C")
     qa = _build_qa(grid, raster_paths, encoded)

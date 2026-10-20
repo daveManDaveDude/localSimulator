@@ -18,7 +18,10 @@ test('share build stays synthetic and reports geographic overview unavailable wi
   });
   page.on('request', (request) => {
     const url = new URL(request.url());
-    if (url.pathname.startsWith('/worlds/torquay-poc-001/'))
+    if (
+      url.pathname.startsWith('/worlds/torquay-poc-001/') ||
+      url.pathname.startsWith('/worlds/torquay-poc-001-2km/')
+    )
       realRequests.push(url.pathname);
     if (
       url.origin !== 'http://127.0.0.1:4204' &&

@@ -1,13 +1,12 @@
 import {
   formatRoadIssues,
-  MAX_ROAD_MANIFEST_BYTES,
-  MAX_ROAD_QA_BYTES,
-  MAX_ROADS_BYTES,
+  roadPackageLimits,
   validateRoadManifest,
   validateRoadPayload,
   type LoadedRoadPackage,
 } from '../geo/roadSchema';
 import type { RealTerrainSceneManifest } from '../geo/sceneSchema';
+import type { SceneReleaseIntegrity } from './sceneRelease';
 
 export type RoadLoadStage =
   | 'manifest URL'
@@ -42,7 +41,11 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function resolveManifestUrl(input: string | URL): URL {
+function resolveManifestUrl(
+  input: string | URL,
+  terrainManifest: RealTerrainSceneManifest,
+  releaseIntegrity?: SceneReleaseIntegrity,
+): URL {
   try {
     const value = input instanceof URL ? input.href : input;
     const base = typeof document === 'undefined' ? undefined : document.baseURI;
@@ -58,17 +61,24 @@ function resolveManifestUrl(input: string | URL): URL {
         'roads package must be served from the current local origin',
       );
     }
+    const expectedPath =
+      terrainManifest.sceneProfile === 'current_2km'
+        ? releaseIntegrity === undefined
+          ? '/worlds/torquay-poc-001-2km/roads/manifest.json'
+          : `/worlds/torquay-poc-001-2km/releases/${releaseIntegrity.releaseId}/roads/manifest.json`
+        : '/worlds/torquay-poc-001/roads/manifest.json';
     if (
-      url.pathname !== '/worlds/torquay-poc-001/roads/manifest.json' ||
+      url.pathname !== expectedPath ||
       url.username ||
       url.password ||
       url.search ||
       url.hash
     ) {
       throw new Error(
-        'only the fixed local Torquay roads package is supported',
+        `only the fixed ${terrainManifest.sceneProfile} local roads package is supported`,
       );
     }
+    releaseIntegrity?.assertAssetUrl(url, 'roads manifest');
     return url;
   } catch (error) {
     throw new RoadLoadError('manifest URL', errorMessage(error));
@@ -222,21 +232,30 @@ async function readAsset(
   byteLength: number,
   expectedSha256: string,
   kind: 'roads' | 'QA',
+  maximumBytes: number,
   signal?: AbortSignal,
+  releaseIntegrity?: SceneReleaseIntegrity,
 ): Promise<unknown> {
   const urlStage = kind === 'roads' ? 'roads URL' : 'QA URL';
   const requestStage = kind === 'roads' ? 'roads request' : 'QA request';
   const responseStage = kind === 'roads' ? 'roads response' : 'QA response';
   const checksumStage = kind === 'roads' ? 'roads checksum' : 'QA checksum';
-  const maximum = kind === 'roads' ? MAX_ROADS_BYTES : MAX_ROAD_QA_BYTES;
   const url = resolveAssetUrl(manifestUrl, path, urlStage);
+  releaseIntegrity?.assertAssetUrl(url, `roads ${kind.toLowerCase()}`);
   const bytes = await readBoundedResponse(
     fetcher,
     url,
     requestStage,
-    maximum,
+    maximumBytes,
     signal,
   );
+  if (releaseIntegrity) {
+    await releaseIntegrity.verifyAsset(
+      url,
+      bytes,
+      `roads ${kind.toLowerCase()}`,
+    );
+  }
   if (bytes.byteLength !== byteLength) {
     throw new RoadLoadError(
       responseStage,
@@ -256,15 +275,28 @@ export async function loadRoadPackage(
   terrainManifestSha256: string,
   fetcher: RoadFetch = browserFetch,
   signal?: AbortSignal,
+  releaseIntegrity?: SceneReleaseIntegrity,
 ): Promise<LoadedRoadPackage> {
-  const manifestUrl = resolveManifestUrl(manifestLocation);
+  const limits = roadPackageLimits(terrainManifest.sceneProfile);
+  const manifestUrl = resolveManifestUrl(
+    manifestLocation,
+    terrainManifest,
+    releaseIntegrity,
+  );
   const manifestBytes = await readBoundedResponse(
     fetcher,
     manifestUrl,
     'manifest request',
-    MAX_ROAD_MANIFEST_BYTES,
+    limits.manifestBytes,
     signal,
   );
+  if (releaseIntegrity) {
+    await releaseIntegrity.verifyAsset(
+      manifestUrl,
+      manifestBytes,
+      'roads manifest',
+    );
+  }
   const manifestSha256 = await sha256Hex(manifestBytes, 'manifest validation');
   const unknownManifest = await parseJson(manifestBytes, 'manifest response');
   const manifestResult = validateRoadManifest(unknownManifest, terrainManifest);
@@ -292,7 +324,9 @@ export async function loadRoadPackage(
       manifest.assets.roads.byteLength,
       manifest.assets.roads.sha256,
       'roads',
+      limits.payloadBytes,
       signal,
+      releaseIntegrity,
     ),
     readAsset(
       fetcher,
@@ -301,7 +335,9 @@ export async function loadRoadPackage(
       manifest.assets.qa.byteLength,
       manifest.assets.qa.sha256,
       'QA',
+      limits.qaBytes,
       signal,
+      releaseIntegrity,
     ),
   ]);
   const result = validateRoadPayload(roads, qa, manifest);

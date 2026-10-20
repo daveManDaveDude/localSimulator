@@ -29,9 +29,11 @@ from .config import AoiConfig, validate_stored_selection
 from .coordinates import pinned_transformer
 from .road_config import RoadConfig, load_road_config
 from .road_geometry import (
-    FLOAT32_SLIVER_POLICY,
+    CURRENT_2KM_FLOAT32_SLIVER_MAX_AREA_M2,
+    FLOAT32_SLIVER_MAX_AREA_M2,
     _polygon_parts,
     build_display_polygons,
+    float32_sliver_policy,
     tessellate_display_polygons,
 )
 from .road_preview import render_road_preview
@@ -49,6 +51,29 @@ ROAD_MAX_WAYS = 100_000
 ROAD_MAX_VERTICES = 1_000_000
 ROAD_MAX_TRIANGLES = 1_000_000
 ROAD_ASSETS = ("roads.json", "qa.json")
+
+
+def _road_limits(profile: str) -> dict[str, int]:
+    if profile == "current_2km":
+        return {
+            "manifest": 64 * 1024,
+            "qa": 8 * 1024 * 1024,
+            "payload": 128 * 1024 * 1024,
+            "ways": 200_000,
+            "vertices": 4_000_000,
+            "triangles": 4_000_000,
+        }
+    if profile == "historical_1km":
+        return {
+            "manifest": ROAD_MANIFEST_MAX_BYTES,
+            "qa": ROAD_QA_MAX_BYTES,
+            "payload": ROAD_PAYLOAD_MAX_BYTES,
+            "ways": ROAD_MAX_WAYS,
+            "vertices": ROAD_MAX_VERTICES,
+            "triangles": ROAD_MAX_TRIANGLES,
+        }
+    raise RoadExportError(f"unsupported road scene profile {profile!r}")
+
 
 OSM_ATTRIBUTION = "© OpenStreetMap contributors; extract provided by Geofabrik GmbH."
 OSM_LICENSE_URL = "https://www.openstreetmap.org/copyright"
@@ -479,9 +504,16 @@ def build_road_package(
     buildings_path: Path | None = None,
 ) -> dict[str, Any]:
     """Build, integrity-bind and atomically publish a local road package and reports."""
+    limits = _road_limits(aoi.profile)
+    max_sliver_area_m2 = (
+        CURRENT_2KM_FLOAT32_SLIVER_MAX_AREA_M2
+        if aoi.profile == "current_2km"
+        else FLOAT32_SLIVER_MAX_AREA_M2
+    )
+    sliver_policy = float32_sliver_policy(max_sliver_area_m2)
     try:
-        if len(imported.features) > ROAD_MAX_WAYS:
-            raise RoadExportError(f"road feature count exceeds {ROAD_MAX_WAYS:,} ways")
+        if len(imported.features) > limits["ways"]:
+            raise RoadExportError(f"road feature count exceeds {limits['ways']:,} ways")
         terrain = _terrain_manifest(terrain_package_path)
         terrain_identity = _terrain_identity(terrain_package_path, aoi)
         terrain_contract = _terrain_contract(terrain, terrain_identity)
@@ -497,8 +529,9 @@ def build_road_package(
             spacing_m=terrain_contract["spacingM"],
             width_m=terrain_contract["extentM"]["width"],
             depth_m=terrain_contract["extentM"]["depth"],
-            vertex_limit=ROAD_MAX_VERTICES,
-            triangle_limit=ROAD_MAX_TRIANGLES,
+            vertex_limit=limits["vertices"],
+            triangle_limit=limits["triangles"],
+            maximum_collapsed_sliver_area_m2=max_sliver_area_m2,
         )
     except BuildingExportError as exc:
         raise RoadExportError(f"validated terrain or AOI identity failed: {exc}") from exc
@@ -512,18 +545,19 @@ def build_road_package(
     road_payload = {
         "formatVersion": 1,
         "worldId": aoi.id,
+        **({"sceneProfile": "current_2km"} if aoi.profile == "current_2km" else {}),
         "features": package_features,
         "surfaceBatches": batches,
     }
     payload_bytes = _json_bytes(road_payload)
-    if len(payload_bytes) > ROAD_PAYLOAD_MAX_BYTES:
+    if len(payload_bytes) > limits["payload"]:
         raise RoadExportError(
             f"roads.json is {len(payload_bytes):,} bytes, above the "
-            f"{ROAD_PAYLOAD_MAX_BYTES:,}-byte limit"
+            f"{limits['payload']:,}-byte {aoi.profile} limit"
         )
     total_vertices = sum(len(batch["verticesXZ"]) for batch in batches.values())
     total_triangles = sum(len(batch["indices"]) for batch in batches.values())
-    if total_vertices > ROAD_MAX_VERTICES or total_triangles > ROAD_MAX_TRIANGLES:
+    if total_vertices > limits["vertices"] or total_triangles > limits["triangles"]:
         raise RoadExportError("combined road mesh exceeds its safe structural limits")
 
     feature_counts: dict[str, int] = {group: 0 for group in ("vehicular", "cycleway", "path")}
@@ -566,6 +600,7 @@ def build_road_package(
     qa = {
         "formatVersion": 1,
         "worldId": aoi.id,
+        **({"sceneProfile": "current_2km"} if aoi.profile == "current_2km" else {}),
         "status": "pass" if total_triangles > 0 else "fail",
         "selectionStatus": aoi.selection_status,
         "coverageStatus": aoi.coverage_status,
@@ -598,8 +633,8 @@ def build_road_package(
             "float32CollapsedSliverAreaM2": round(
                 float(mesh_numerics["float32CollapsedSliverAreaM2"]), 12
             ),
-            "maximumOmittedAreaM2": 1e-6,
-            "policy": FLOAT32_SLIVER_POLICY,
+            "maximumOmittedAreaM2": max_sliver_area_m2,
+            "policy": sliver_policy,
         },
         "longSourceSegmentsOver250m": long_segments,
         "landmarkContexts": _landmark_contexts(imported.features, aoi),
@@ -616,7 +651,7 @@ def build_road_package(
                 "constrained Delaunay inside each actual fixed terrain triangle"
             ),
             "surfaceOffsetM": config.surface_offset_m,
-            "float32SliverPolicy": FLOAT32_SLIVER_POLICY,
+            "float32SliverPolicy": sliver_policy,
         },
         "interpretation": (
             "Extracted and rendered mapped OSM highway ways are not a completeness measure. "
@@ -629,12 +664,13 @@ def build_road_package(
     preview_info["output"] = preview_path.name
     qa["preview"] = preview_info
     qa_bytes = _json_bytes(qa)
-    if len(qa_bytes) > ROAD_QA_MAX_BYTES:
-        raise RoadExportError("road qa.json exceeds the 2 MiB package limit")
+    if len(qa_bytes) > limits["qa"]:
+        raise RoadExportError(f"road qa.json exceeds the {limits['qa']:,}-byte package limit")
 
     manifest = {
         "formatVersion": 1,
         "worldId": aoi.id,
+        **({"sceneProfile": "current_2km"} if aoi.profile == "current_2km" else {}),
         "name": "Local OSM road ribbons on EA terrain (pending candidate AOI)",
         "packageType": "osm-road-ribbons",
         "sourceCrs": "EPSG:27700",
@@ -681,7 +717,7 @@ def build_road_package(
                 "constrained Delaunay per clipped triangle"
             ),
             "surfaceOffsetM": config.surface_offset_m,
-            "float32SliverPolicy": FLOAT32_SLIVER_POLICY,
+            "float32SliverPolicy": sliver_policy,
         },
         "generator": {
             "name": "torquay_pipeline.road_export",
@@ -690,12 +726,12 @@ def build_road_package(
             "geosVersion": shapely.geos_version_string,
         },
         "limits": {
-            "maxManifestBytes": ROAD_MANIFEST_MAX_BYTES,
-            "maxQaBytes": ROAD_QA_MAX_BYTES,
-            "maxPayloadBytes": ROAD_PAYLOAD_MAX_BYTES,
-            "maxWays": ROAD_MAX_WAYS,
-            "maxVertices": ROAD_MAX_VERTICES,
-            "maxTriangles": ROAD_MAX_TRIANGLES,
+            "maxManifestBytes": limits["manifest"],
+            "maxQaBytes": limits["qa"],
+            "maxPayloadBytes": limits["payload"],
+            "maxWays": limits["ways"],
+            "maxVertices": limits["vertices"],
+            "maxTriangles": limits["triangles"],
         },
         "counts": qa["counts"],
         "assets": {
@@ -721,8 +757,10 @@ def build_road_package(
         },
     }
     manifest_bytes = _json_bytes(manifest)
-    if len(manifest_bytes) > ROAD_MANIFEST_MAX_BYTES:
-        raise RoadExportError("road manifest exceeds the 64 KiB package limit")
+    if len(manifest_bytes) > limits["manifest"]:
+        raise RoadExportError(
+            f"road manifest exceeds the {limits['manifest']:,}-byte package limit"
+        )
 
     package_path.mkdir(parents=True, exist_ok=True)
     try:
@@ -760,6 +798,8 @@ def validate_road_package(
     source_manifest_path: Path,
     aoi_geojson_path: Path | None = None,
     road_config: RoadConfig | None = None,
+    buildings_path: Path | None = None,
+    preview_output_name: str | None = None,
 ) -> dict[str, Any]:
     """Validate bytes and deterministically re-derive the package from the bound source.
 
@@ -767,15 +807,26 @@ def validate_road_package(
     source of truth: a caller cannot make edited geometry or counts valid merely
     by refreshing the JSON checksums.
     """
+    limits = _road_limits(expected_aoi.profile)
     try:
+        if preview_output_name is not None and (
+            Path(preview_output_name).name != preview_output_name
+            or preview_output_name in {"", ".", ".."}
+        ):
+            raise RoadExportError("preview_output_name must be a safe filename")
         manifest_bytes = (package_path / "manifest.json").read_bytes()
-        if len(manifest_bytes) > ROAD_MANIFEST_MAX_BYTES:
-            raise RoadExportError("manifest exceeds the 64 KiB limit")
+        if len(manifest_bytes) > limits["manifest"]:
+            raise RoadExportError(f"manifest exceeds the {limits['manifest']:,}-byte limit")
         manifest = json.loads(manifest_bytes)
         if not isinstance(manifest, dict):
             raise RoadExportError("manifest must be a JSON object")
         if manifest.get("formatVersion") != 1 or manifest.get("worldId") != expected_aoi.id:
             raise RoadExportError("manifest formatVersion/worldId is unsupported")
+        if expected_aoi.profile == "current_2km":
+            if manifest.get("sceneProfile") != "current_2km":
+                raise RoadExportError("manifest.sceneProfile must be current_2km")
+        elif manifest.get("sceneProfile") not in (None, "historical_1km"):
+            raise RoadExportError("historical road package has an incompatible sceneProfile")
         if manifest.get("packageType") != "osm-road-ribbons":
             raise RoadExportError("manifest packageType must be osm-road-ribbons")
         if (
@@ -812,7 +863,7 @@ def validate_road_package(
             raise RoadExportError(
                 "manifest OSM source identity differs from the verified local PBF"
             )
-        for asset_name, maximum in (("roads", ROAD_PAYLOAD_MAX_BYTES), ("qa", ROAD_QA_MAX_BYTES)):
+        for asset_name, maximum in (("roads", limits["payload"]), ("qa", limits["qa"])):
             descriptor = manifest.get("assets", {}).get(asset_name)
             if not isinstance(descriptor, dict) or descriptor.get("path") != f"{asset_name}.json":
                 raise RoadExportError(f"manifest assets.{asset_name} path is unsafe or missing")
@@ -838,8 +889,10 @@ def validate_road_package(
         batches = payload.get("surfaceBatches")
         if not isinstance(features, list) or not isinstance(batches, dict):
             raise RoadExportError("roads.json feature or surface batch collections are invalid")
-        if len(features) > ROAD_MAX_WAYS:
-            raise RoadExportError("roads.json feature count exceeds the 100,000 way limit")
+        if len(features) > limits["ways"]:
+            raise RoadExportError(
+                f"roads.json feature count exceeds the {limits['ways']:,} way limit"
+            )
         if road_config is None:
             config_path = Path(__file__).resolve().parents[2] / "config" / "roads.torquay.json"
             road_config, _root, _raw_config = load_road_config(config_path)
@@ -848,7 +901,9 @@ def validate_road_package(
             temporary = Path(temporary_name)
             expected_package = temporary / "package"
             expected_qa = temporary / "qa.json"
-            expected_preview = temporary / Path(road_config.preview_path).name
+            expected_preview = temporary / (
+                preview_output_name or Path(road_config.preview_path).name
+            )
             expected_intermediate = temporary / "intermediate.json"
             geojson_path = aoi_geojson_path
             if geojson_path is None:
@@ -880,6 +935,7 @@ def validate_road_package(
                 expected_qa,
                 expected_preview,
                 expected_intermediate,
+                buildings_path,
             )
             for filename in ("manifest.json", "roads.json", "qa.json"):
                 if (package_path / filename).read_bytes() != (

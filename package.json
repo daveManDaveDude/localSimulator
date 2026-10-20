@@ -25,6 +25,7 @@
     "test:e2e:tvw015:share": "npm run build:share && playwright test --config=playwright.tvw015-share.config.ts",
     "test:e2e:overview:real": "npm run build && playwright test --config=playwright.overview-real.config.ts",
     "test:e2e:overview:share": "npm run build:share && playwright test --config=playwright.overview-share.config.ts",
+    "test:e2e:torquay2km:real": "npm run build && playwright test --config=playwright.torquay2km-real.config.ts",
     "benchmark": "node scripts/benchmark.mjs"
   },
   "dependencies": {

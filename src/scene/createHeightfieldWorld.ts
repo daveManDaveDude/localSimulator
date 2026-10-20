@@ -31,6 +31,7 @@ export function createHeightfieldWorld(loaded: LoadedWorld): HeightfieldWorld {
   const { manifest, heights } = loaded;
   const { columns, rows, spacingM } = manifest.heightfield;
   const isReal = manifest.worldType === 'real';
+  const isCurrent2km = isReal && manifest.sceneProfile === 'current_2km';
   const grid = createTerrainGrid({
     columns,
     rows,
@@ -50,14 +51,18 @@ export function createHeightfieldWorld(loaded: LoadedWorld): HeightfieldWorld {
 
     const heightAt = (x: number, z: number): number =>
       grid.sampleHeight(x, z) ?? 0;
-    const guideSpacing = isReal ? 100 : spacingM;
-    const guideScale = isReal ? 12 : 1;
+    const guideSpacing = isCurrent2km ? 200 : isReal ? 100 : spacingM;
+    const guideScale = isCurrent2km ? 24 : isReal ? 12 : 1;
     gridAndCompass.add(
       createDrapedGrid(grid.widthM, grid.depthM, guideSpacing, heightAt),
-      ...createWorldAxes(heightAt, isReal ? 80 : 14),
+      ...createWorldAxes(heightAt, isCurrent2km ? 160 : isReal ? 80 : 14),
       createNorthArrow(
         heightAt,
-        isReal ? { x: -430, z: -420 } : { x: -5, z: 0 },
+        isCurrent2km
+          ? { x: -900, z: -900 }
+          : isReal
+            ? { x: -430, z: -420 }
+            : { x: -5, z: 0 },
         guideScale,
       ),
     );
@@ -84,9 +89,11 @@ export function createHeightfieldWorld(loaded: LoadedWorld): HeightfieldWorld {
         minZ: -grid.depthM / 2,
         maxZ: grid.depthM / 2,
       },
-      spawnPosition: isReal
-        ? { x: 0, y: maximumHeight + 120, z: 360 }
-        : { x: 0, y: 9, z: 15 },
+      spawnPosition: isCurrent2km
+        ? { x: 0, y: maximumHeight + 120, z: 400 }
+        : isReal
+          ? { x: 0, y: maximumHeight + 120, z: 360 }
+          : { x: 0, y: 9, z: 15 },
       spawnLookAt: isReal ? { x: 0, y: 0, z: 0 } : { x: 0, y: 1, z: -6 },
       isReal,
       verticalReference: isReal
@@ -102,7 +109,7 @@ export function createHeightfieldWorld(loaded: LoadedWorld): HeightfieldWorld {
             licenceUrl: realProvenance.licenceUrl,
           }
         : {}),
-      cameraFar: isReal ? 2200 : 180,
+      cameraFar: isCurrent2km ? 4400 : isReal ? 2200 : 180,
     };
   } catch (error) {
     disposeSceneResources(group);

@@ -6,9 +6,45 @@ export const MAX_ROADS_BYTES = 32 * 1024 * 1024;
 export const MAX_ROAD_WAYS = 100_000;
 export const MAX_ROAD_VERTICES = 1_000_000;
 export const MAX_ROAD_TRIANGLES = 1_000_000;
+export const CURRENT_2KM_ROAD_LIMITS = {
+  manifestBytes: 64 * 1024,
+  qaBytes: 8 * 1024 * 1024,
+  payloadBytes: 128 * 1024 * 1024,
+  ways: 200_000,
+  vertices: 4_000_000,
+  triangles: 4_000_000,
+} as const;
+
+export interface RoadPackageLimits {
+  manifestBytes: number;
+  qaBytes: number;
+  payloadBytes: number;
+  ways: number;
+  vertices: number;
+  triangles: number;
+}
+
+export function roadPackageLimits(
+  profile: RealTerrainSceneManifest['sceneProfile'],
+): RoadPackageLimits {
+  return profile === 'current_2km'
+    ? CURRENT_2KM_ROAD_LIMITS
+    : {
+        manifestBytes: MAX_ROAD_MANIFEST_BYTES,
+        qaBytes: MAX_ROAD_QA_BYTES,
+        payloadBytes: MAX_ROADS_BYTES,
+        ways: MAX_ROAD_WAYS,
+        vertices: MAX_ROAD_VERTICES,
+        triangles: MAX_ROAD_TRIANGLES,
+      };
+}
 export const ROAD_SURFACE_OFFSET_M = 0.05;
+export const ROAD_FLOAT32_SLIVER_MAX_AREA_M2 = 1e-6;
+export const CURRENT_2KM_ROAD_FLOAT32_SLIVER_MAX_AREA_M2 = 2e-5;
 export const ROAD_FLOAT32_SLIVER_POLICY =
   'Cull triangles only when fewer than three distinct [x,z] coordinates remain after Float32 conversion; report the count and omitted area, bounded to 1e-6 m2.';
+export const CURRENT_2KM_ROAD_FLOAT32_SLIVER_POLICY =
+  'Cull triangles only when fewer than three distinct [x,z] coordinates remain after Float32 conversion; report the count and omitted area, bounded to 2e-5 m2 for the expanded current_2km network.';
 export const ROAD_BNG_TO_WGS84_DEFINITION =
   'proj=pipeline step inv proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy step proj=push v_3 step proj=cart ellps=airy step proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=WGS84 step proj=pop v_3 step proj=unitconvert xy_in=rad xy_out=deg';
 export const ROAD_COORDINATE_AXIS_ORDER =
@@ -83,6 +119,7 @@ export type RoadDisplayGroup = (typeof ROAD_GROUPS)[number];
 export interface RoadPackageManifest {
   formatVersion: 1;
   worldId: string;
+  sceneProfile?: 'current_2km';
   name: string;
   packageType: 'osm-road-ribbons';
   sourceCrs: 'EPSG:27700';
@@ -104,6 +141,7 @@ export interface RoadPackageManifest {
     coverageStatus: 'not_checked';
   };
   terrainIdentity: {
+    sceneProfile?: 'current_2km';
     worldId: string;
     origin: { eastingM: number; northingM: number; elevationM: number };
     heightfieldPath: string;
@@ -286,7 +324,7 @@ export interface RoadQaSummary {
   meshNumerics: {
     float32CollapsedSliverTriangleCount: number;
     float32CollapsedSliverAreaM2: number;
-    maximumOmittedAreaM2: 1e-6;
+    maximumOmittedAreaM2: number;
     policy: string;
   };
   coordinateOperation: RoadPackageManifest['coordinateOperation'];
@@ -601,6 +639,7 @@ export function validateRoadManifest(
   terrain: RealTerrainSceneManifest,
 ): RoadValidationResult<RoadPackageManifest> {
   const issues: RoadValidationIssue[] = [];
+  const limits = roadPackageLimits(terrain.sceneProfile);
   if (!isRecord(input)) {
     return {
       ok: false,
@@ -612,6 +651,19 @@ export function validateRoadManifest(
       issues,
       'formatVersion/worldId',
       'must identify v1 torquay-poc-001 roads',
+    );
+  }
+  if (
+    (terrain.sceneProfile === 'current_2km' &&
+      input.sceneProfile !== 'current_2km') ||
+    (terrain.sceneProfile === 'historical_1km' &&
+      input.sceneProfile !== undefined &&
+      input.sceneProfile !== 'historical_1km')
+  ) {
+    addIssue(
+      issues,
+      'sceneProfile',
+      'must match the loaded terrain profile; legacy omission is historical_1km only',
     );
   }
   if (input.packageType !== 'osm-road-ribbons')
@@ -678,6 +730,10 @@ export function validateRoadManifest(
   } else {
     const identity = input.terrainIdentity;
     if (
+      (terrain.sceneProfile === 'current_2km' &&
+        identity.sceneProfile !== 'current_2km') ||
+      (terrain.sceneProfile === 'historical_1km' &&
+        identity.sceneProfile !== undefined) ||
       identity.worldId !== terrain.id ||
       !isRecord(identity.origin) ||
       !equalNumber(identity.origin.eastingM, terrain.origin.eastingM) ||
@@ -741,6 +797,10 @@ export function validateRoadManifest(
     );
   } else {
     const policy = input.policies;
+    const expectedSliverPolicy =
+      terrain.sceneProfile === 'current_2km'
+        ? CURRENT_2KM_ROAD_FLOAT32_SLIVER_POLICY
+        : ROAD_FLOAT32_SLIVER_POLICY;
     const configuredWidths = isRecord(policy.fullWidthsM)
       ? policy.fullWidthsM
       : undefined;
@@ -757,7 +817,7 @@ export function validateRoadManifest(
       !equalNumber(policy.coordinateQuantizationM, 0.001) ||
       !equalNumber(policy.minimumRibbonAreaM2, 0.01) ||
       !equalNumber(policy.surfaceOffsetM, ROAD_SURFACE_OFFSET_M) ||
-      policy.float32SliverPolicy !== ROAD_FLOAT32_SLIVER_POLICY ||
+      policy.float32SliverPolicy !== expectedSliverPolicy ||
       !widthsMatch ||
       !sameJson(policy.pathClasses, [...ROAD_PATH_CLASSES].sort()) ||
       !sameStringRecord(policy.groundAssumption, ROAD_GROUND_TAG_POLICY) ||
@@ -786,12 +846,12 @@ export function validateRoadManifest(
   }
   if (
     !isRecord(input.limits) ||
-    input.limits.maxManifestBytes !== MAX_ROAD_MANIFEST_BYTES ||
-    input.limits.maxQaBytes !== MAX_ROAD_QA_BYTES ||
-    input.limits.maxPayloadBytes !== MAX_ROADS_BYTES ||
-    input.limits.maxWays !== MAX_ROAD_WAYS ||
-    input.limits.maxVertices !== MAX_ROAD_VERTICES ||
-    input.limits.maxTriangles !== MAX_ROAD_TRIANGLES
+    input.limits.maxManifestBytes !== limits.manifestBytes ||
+    input.limits.maxQaBytes !== limits.qaBytes ||
+    input.limits.maxPayloadBytes !== limits.payloadBytes ||
+    input.limits.maxWays !== limits.ways ||
+    input.limits.maxVertices !== limits.vertices ||
+    input.limits.maxTriangles !== limits.triangles
   ) {
     addIssue(
       issues,
@@ -840,8 +900,8 @@ export function validateRoadManifest(
     addIssue(issues, 'assets', 'must integrity-bind both local JSON assets');
   } else {
     for (const [name, limit] of [
-      ['roads', MAX_ROADS_BYTES],
-      ['qa', MAX_ROAD_QA_BYTES],
+      ['roads', limits.payloadBytes],
+      ['qa', limits.qaBytes],
     ] as const) {
       const asset = input.assets[name];
       if (
@@ -1033,10 +1093,14 @@ export function validateRoadPayload(
   manifest: RoadPackageManifest,
 ): RoadValidationResult<LoadedRoadPackage> {
   const issues: RoadValidationIssue[] = [];
+  const limits = roadPackageLimits(
+    manifest.sceneProfile === 'current_2km' ? 'current_2km' : 'historical_1km',
+  );
   if (
     !isRecord(input) ||
     input.formatVersion !== 1 ||
     input.worldId !== manifest.worldId ||
+    input.sceneProfile !== manifest.sceneProfile ||
     !Array.isArray(input.features) ||
     !isRecord(input.surfaceBatches)
   ) {
@@ -1058,6 +1122,14 @@ export function validateRoadPayload(
     };
   const qa = qaInput;
   const manifestCounts = isRecord(manifest.counts) ? manifest.counts : null;
+  const maximumOmittedAreaM2 =
+    manifest.sceneProfile === 'current_2km'
+      ? CURRENT_2KM_ROAD_FLOAT32_SLIVER_MAX_AREA_M2
+      : ROAD_FLOAT32_SLIVER_MAX_AREA_M2;
+  const expectedSliverPolicy =
+    manifest.sceneProfile === 'current_2km'
+      ? CURRENT_2KM_ROAD_FLOAT32_SLIVER_POLICY
+      : ROAD_FLOAT32_SLIVER_POLICY;
   if (!manifestCounts)
     addIssue(
       issues,
@@ -1067,6 +1139,7 @@ export function validateRoadPayload(
   if (
     qa.formatVersion !== 1 ||
     qa.worldId !== manifest.worldId ||
+    qa.sceneProfile !== manifest.sceneProfile ||
     qa.status !== 'pass' ||
     qa.selectionStatus !== 'selected_pending_coverage' ||
     qa.coverageStatus !== 'not_checked'
@@ -1097,11 +1170,11 @@ export function validateRoadPayload(
       manifestCounts?.float32CollapsedSliverTriangleCount ||
     !isFiniteNumber(qa.meshNumerics.float32CollapsedSliverAreaM2) ||
     qa.meshNumerics.float32CollapsedSliverAreaM2 < 0 ||
-    qa.meshNumerics.float32CollapsedSliverAreaM2 > 1e-6 ||
-    qa.meshNumerics.maximumOmittedAreaM2 !== 1e-6 ||
-    qa.meshNumerics.policy !== ROAD_FLOAT32_SLIVER_POLICY ||
+    qa.meshNumerics.float32CollapsedSliverAreaM2 > maximumOmittedAreaM2 ||
+    qa.meshNumerics.maximumOmittedAreaM2 !== maximumOmittedAreaM2 ||
+    qa.meshNumerics.policy !== expectedSliverPolicy ||
     !isRecord(qa.surfacePolicy) ||
-    qa.surfacePolicy.float32SliverPolicy !== ROAD_FLOAT32_SLIVER_POLICY
+    qa.surfacePolicy.float32SliverPolicy !== expectedSliverPolicy
   ) {
     addIssue(
       issues,
@@ -1172,7 +1245,9 @@ export function validateRoadPayload(
     path: 0,
   };
   let partCount = 0;
-  input.features.forEach((feature, index) => {
+  if (input.features.length > limits.ways)
+    addIssue(issues, 'roads.features', `exceeds the ${limits.ways} way limit`);
+  input.features.slice(0, limits.ways).forEach((feature, index) => {
     const parsed = validateFeature(feature, index, manifest, issues);
     if (parsed === undefined) return;
     if (ids.has(parsed.id))
@@ -1186,8 +1261,6 @@ export function validateRoadPayload(
     partCount += parsed.centerlinePartsXZ.length;
     features.push(parsed);
   });
-  if (features.length > MAX_ROAD_WAYS)
-    addIssue(issues, 'roads.features', 'exceeds the maximum source-way count');
 
   const batches = {} as Record<RoadDisplayGroup, RoadSurfaceBatch>;
   let totalVertices = 0;
@@ -1383,7 +1456,7 @@ export function validateRoadPayload(
       if (overlapFound) break;
     }
   }
-  if (totalVertices > MAX_ROAD_VERTICES || totalTriangles > MAX_ROAD_TRIANGLES)
+  if (totalVertices > limits.vertices || totalTriangles > limits.triangles)
     addIssue(issues, 'roads.surfaceBatches', 'exceeds safe render limits');
   const counts = isRecord(qa.counts) ? qa.counts : {};
   if (

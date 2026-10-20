@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { loadRoadPackage, type RoadFetch } from '../../src/app/roadLoader';
-import { MAX_ROAD_MANIFEST_BYTES } from '../../src/geo/roadSchema';
+import {
+  CURRENT_2KM_ROAD_FLOAT32_SLIVER_POLICY,
+  MAX_ROAD_MANIFEST_BYTES,
+  ROAD_FLOAT32_SLIVER_POLICY,
+  roadPackageLimits,
+  validateRoadManifest,
+} from '../../src/geo/roadSchema';
 import { createRoadBundle, type RoadBundle } from './roadFixtures';
+import { createCurrent2kmRealManifest } from './fixtures';
 
 const manifestUrl = new URL(
   'https://local.test/worlds/torquay-poc-001/roads/manifest.json',
@@ -104,6 +111,36 @@ function mutableBatch(
 }
 
 describe('loadRoadPackage', () => {
+  it('validates a profile-specific Float32 sliver budget without changing the historical policy', async () => {
+    const bundle = await createRoadBundle();
+    const manifest = structuredClone(bundle.manifest) as unknown as Record<
+      string,
+      unknown
+    >;
+    const policies = manifest['policies'] as Record<string, unknown>;
+    manifest['sceneProfile'] = 'current_2km';
+    manifest['limits'] = roadPackageLimits('current_2km');
+    policies['float32SliverPolicy'] = CURRENT_2KM_ROAD_FLOAT32_SLIVER_POLICY;
+    const terrain = createCurrent2kmRealManifest();
+    const current2km = validateRoadManifest(manifest, terrain);
+    const currentPolicyIssues = current2km.ok
+      ? []
+      : current2km.issues.filter((issue) => issue.path === 'policies');
+    expect(currentPolicyIssues).toEqual([]);
+
+    policies['float32SliverPolicy'] = ROAD_FLOAT32_SLIVER_POLICY;
+    const historicalPolicyOnExpandedProfile = validateRoadManifest(
+      manifest,
+      terrain,
+    );
+    const mismatchedPolicyIssues = historicalPolicyOnExpandedProfile.ok
+      ? []
+      : historicalPolicyOnExpandedProfile.issues.filter(
+          (issue) => issue.path === 'policies',
+        );
+    expect(mismatchedPolicyIssues.length).toBeGreaterThan(0);
+  });
+
   it('loads the same-origin fixture only after verifying terrain and all asset bytes', async () => {
     const bundle = await createRoadBundle();
     const { fetcher, requests } = createFetcher(bundle);

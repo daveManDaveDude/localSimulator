@@ -108,6 +108,14 @@ const EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84: readonly Wgs84Coordinate[] = [
   [-3.5432034396837033, 50.48225468056402],
   [-3.542910651853897, 50.47326489870257],
 ];
+const EXPECTED_TQ1_4HN_AOI_BOUNDARY_2KM_WGS84: readonly Wgs84Coordinate[] = [
+  [-3.5498069791321853, 50.46867640263527],
+  [-3.5216360951366497, 50.4690482443],
+  [-3.5222136603237235, 50.48702798479993],
+  [-3.5503952248835833, 50.48665590689169],
+  [-3.5498069791321853, 50.46867640263527],
+];
+export type RealSceneProfile = 'historical_1km' | 'current_2km';
 
 const PINNED_BNG_OPERATION_DEFINITION = [
   'proj=pipeline',
@@ -123,7 +131,12 @@ const PINNED_BNG_OPERATION_DEFINITION = [
 function validateRealBoundaryWgs84(
   value: unknown,
   issues: ManifestValidationIssue[],
+  profile: RealSceneProfile,
 ): RealTerrainBoundaryWgs84 | undefined {
+  const expectedRing =
+    profile === 'current_2km'
+      ? EXPECTED_TQ1_4HN_AOI_BOUNDARY_2KM_WGS84
+      : EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84;
   const path = 'aoi.boundaryWgs84';
   if (!isRecord(value)) {
     issues.push({
@@ -149,10 +162,7 @@ function validateRealBoundaryWgs84(
   }
 
   const ringValue = value.ring;
-  if (
-    !Array.isArray(ringValue) ||
-    ringValue.length !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84.length
-  ) {
+  if (!Array.isArray(ringValue) || ringValue.length !== expectedRing.length) {
     issues.push({
       path: `${path}.ring`,
       message: 'must contain the four candidate corners and a closing position',
@@ -196,10 +206,7 @@ function validateRealBoundaryWgs84(
     parsedRing.push([longitude, latitude]);
   });
 
-  if (
-    !validRing ||
-    parsedRing.length !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84.length
-  ) {
+  if (!validRing || parsedRing.length !== expectedRing.length) {
     return undefined;
   }
   const first = parsedRing[0]!;
@@ -214,8 +221,8 @@ function validateRealBoundaryWgs84(
   if (
     parsedRing.some(
       (position, index) =>
-        position[0] !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84[index]![0] ||
-        position[1] !== EXPECTED_TQ1_4HN_AOI_BOUNDARY_WGS84[index]![1],
+        position[0] !== expectedRing[index]![0] ||
+        position[1] !== expectedRing[index]![1],
     )
   ) {
     issues.push({
@@ -417,6 +424,7 @@ export interface RealTerrainSceneManifest {
   id: string;
   name: string;
   worldType: 'real';
+  sceneProfile: RealSceneProfile;
   sourceCrs: 'EPSG:27700';
   axisConvention: typeof AXIS_CONVENTION;
   origin: {
@@ -1326,6 +1334,34 @@ function validateRealSceneManifest(
   const issues: ManifestValidationIssue[] = syntheticBase.ok
     ? []
     : [...syntheticBase.issues];
+  const profileValue = input.sceneProfile;
+  let sceneProfile: RealSceneProfile = 'historical_1km';
+  if (profileValue === undefined) {
+    // Existing 1 km package predates explicit scene profiles.
+    sceneProfile = 'historical_1km';
+  } else if (
+    profileValue === 'historical_1km' ||
+    profileValue === 'current_2km'
+  ) {
+    sceneProfile = profileValue;
+  } else {
+    issues.push({
+      path: 'sceneProfile',
+      message: 'must be current_2km or historical_1km',
+    });
+  }
+  const expectedSizeM = sceneProfile === 'current_2km' ? 2000 : 1000;
+  const expectedDimension = expectedSizeM / 2 + 1;
+  const expectedBounds =
+    sceneProfile === 'current_2km'
+      ? [
+          290108.9018176432, 64353.48350844931, 292108.9018176432,
+          66353.48350844931,
+        ]
+      : [
+          290608.9018176432, 64853.48350844931, 291608.9018176432,
+          65853.48350844931,
+        ];
   if (input.worldType !== 'real') {
     issues.push({
       path: 'worldType',
@@ -1674,10 +1710,6 @@ function validateRealSceneManifest(
       boundsM = bounds as [number, number, number, number];
     }
     if (boundsM) {
-      const expectedBounds = [
-        290608.9018176432, 64853.48350844931, 291608.9018176432,
-        65853.48350844931,
-      ];
       if (
         boundsM.some(
           (value, index) => !extentMatchesGrid(value, expectedBounds[index]!),
@@ -1685,7 +1717,7 @@ function validateRealSceneManifest(
       ) {
         issues.push({
           path: 'aoi.boundsM',
-          message: 'must match the reviewed 1 km TQ1 4HN AOI bounds',
+          message: `must match the ${expectedSizeM / 1000} km TQ1 4HN ${sceneProfile} bounds`,
         });
       }
     }
@@ -1707,39 +1739,38 @@ function validateRealSceneManifest(
     const extentDepthM = syntheticBase.ok
       ? syntheticBase.manifest.extentM.depth
       : undefined;
-    if (extentWidthM !== undefined && extentWidthM !== 1000) {
+    if (extentWidthM !== undefined && extentWidthM !== expectedSizeM) {
       issues.push({
         path: 'extentM.width',
-        message: 'must match the reviewed 1,000 m AOI',
+        message: `must match the reviewed ${expectedSizeM.toLocaleString()} m AOI`,
       });
     }
-    if (extentDepthM !== undefined && extentDepthM !== 1000) {
+    if (extentDepthM !== undefined && extentDepthM !== expectedSizeM) {
       issues.push({
         path: 'extentM.depth',
-        message: 'must match the reviewed 1,000 m AOI',
+        message: `must match the reviewed ${expectedSizeM.toLocaleString()} m AOI`,
       });
     }
     if (
       syntheticBase.ok &&
-      (syntheticBase.manifest.heightfield.columns !== 501 ||
-        syntheticBase.manifest.heightfield.rows !== 501 ||
+      (syntheticBase.manifest.heightfield.columns !== expectedDimension ||
+        syntheticBase.manifest.heightfield.rows !== expectedDimension ||
         syntheticBase.manifest.heightfield.spacingM !== 2)
     ) {
       issues.push({
         path: 'heightfield',
-        message:
-          'real terrain must use the reviewed 501 × 501 grid at 2 m spacing',
+        message: `real terrain must use the reviewed ${expectedDimension} × ${expectedDimension} grid at 2 m spacing for ${sceneProfile}`,
       });
     }
-    if (widthM !== undefined && widthM !== 1000)
+    if (widthM !== undefined && widthM !== expectedSizeM)
       issues.push({
         path: 'aoi.widthM',
-        message: 'must match the reviewed 1,000 m AOI',
+        message: `must match the reviewed ${expectedSizeM.toLocaleString()} m AOI`,
       });
-    if (heightM !== undefined && heightM !== 1000)
+    if (heightM !== undefined && heightM !== expectedSizeM)
       issues.push({
         path: 'aoi.heightM',
-        message: 'must match the reviewed 1,000 m AOI',
+        message: `must match the reviewed ${expectedSizeM.toLocaleString()} m AOI`,
       });
     let centerBngM: [number, number] | undefined;
     const centerValue = aoiInput.centerBngM;
@@ -1773,6 +1804,7 @@ function validateRealSceneManifest(
     const boundaryWgs84 = validateRealBoundaryWgs84(
       aoiInput.boundaryWgs84,
       issues,
+      sceneProfile,
     );
 
     let eastingSpan: number | undefined;
@@ -1925,19 +1957,19 @@ function validateRealSceneManifest(
     }
     if (
       boundsM &&
-      eastingSpan === 1000 &&
-      northingSpan === 1000 &&
+      eastingSpan === expectedSizeM &&
+      northingSpan === expectedSizeM &&
       centerBngM &&
       anchorWgs84 &&
       boundaryWgs84 &&
-      extentWidthM === 1000 &&
-      extentDepthM === 1000 &&
+      extentWidthM === expectedSizeM &&
+      extentDepthM === expectedSizeM &&
       syntheticBase.ok &&
-      syntheticBase.manifest.heightfield.columns === 501 &&
-      syntheticBase.manifest.heightfield.rows === 501 &&
+      syntheticBase.manifest.heightfield.columns === expectedDimension &&
+      syntheticBase.manifest.heightfield.rows === expectedDimension &&
       syntheticBase.manifest.heightfield.spacingM === 2 &&
-      widthM === 1000 &&
-      heightM === 1000 &&
+      widthM === expectedSizeM &&
+      heightM === expectedSizeM &&
       aoiInput.crs === 'EPSG:27700' &&
       aoiInput.selectionStatus === 'selected_pending_coverage' &&
       aoiInput.coverageStatus === 'not_checked'
@@ -1975,6 +2007,7 @@ function validateRealSceneManifest(
     manifest: {
       ...syntheticBase.manifest,
       worldType: 'real',
+      sceneProfile,
       sourceCrs: 'EPSG:27700',
       heightfield: realHeightfield,
       provenance,

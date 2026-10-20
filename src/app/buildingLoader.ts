@@ -1,13 +1,12 @@
 import {
   formatBuildingIssues,
-  MAX_BUILDING_MANIFEST_BYTES,
-  MAX_BUILDING_QA_BYTES,
-  MAX_BUILDINGS_BYTES,
+  buildingPackageLimits,
   validateBuildingPackageManifest,
   validateBuildingPayload,
   type LoadedBuildingPackage,
 } from '../geo/buildingSchema';
 import type { RealTerrainSceneManifest } from '../geo/sceneSchema';
+import type { SceneReleaseIntegrity } from './sceneRelease';
 
 export type BuildingLoadStage =
   | 'manifest URL'
@@ -225,6 +224,7 @@ async function readVerifiedJson(
   asset: 'buildings' | 'QA',
   maximumBytes: number,
   signal?: AbortSignal,
+  releaseIntegrity?: SceneReleaseIntegrity,
 ): Promise<unknown> {
   const urlStage = asset === 'buildings' ? 'buildings URL' : 'QA URL';
   const requestStage =
@@ -234,6 +234,7 @@ async function readVerifiedJson(
   const checksumStage =
     asset === 'buildings' ? 'buildings checksum' : 'QA checksum';
   const url = resolveAssetUrl(manifestUrl, path, urlStage);
+  releaseIntegrity?.assertAssetUrl(url, `building ${asset.toLowerCase()}`);
   const bytes = await fetchJsonBytes(
     fetcher,
     url,
@@ -241,6 +242,13 @@ async function readVerifiedJson(
     maximumBytes,
     signal,
   );
+  if (releaseIntegrity) {
+    await releaseIntegrity.verifyAsset(
+      url,
+      bytes,
+      `building ${asset.toLowerCase()}`,
+    );
+  }
   if (bytes.byteLength !== byteLength) {
     throw new BuildingLoadError(
       responseStage,
@@ -263,26 +271,38 @@ export async function loadBuildingPackage(
   terrainManifest: RealTerrainSceneManifest,
   fetcher: BuildingFetch = browserFetch,
   signal?: AbortSignal,
+  releaseIntegrity?: SceneReleaseIntegrity,
 ): Promise<LoadedBuildingPackage> {
+  const current2km = terrainManifest.sceneProfile === 'current_2km';
   const manifestUrl = resolveManifestUrl(manifestLocation);
-  if (
-    !manifestUrl.pathname.endsWith(
-      '/worlds/torquay-poc-001/buildings/manifest.json',
-    )
-  ) {
+  const expectedPath = current2km
+    ? releaseIntegrity === undefined
+      ? '/worlds/torquay-poc-001-2km/buildings/manifest.json'
+      : `/worlds/torquay-poc-001-2km/releases/${releaseIntegrity.releaseId}/buildings/manifest.json`
+    : '/worlds/torquay-poc-001/buildings/manifest.json';
+  if (manifestUrl.pathname !== expectedPath) {
     throw new BuildingLoadError(
       'manifest URL',
-      'only the fixed Torquay local buildings package is supported',
+      `only the fixed ${current2km ? 'current_2km' : 'historical_1km'} buildings package is supported`,
     );
   }
+  releaseIntegrity?.assertAssetUrl(manifestUrl, 'building manifest');
+  const limits = buildingPackageLimits(terrainManifest.sceneProfile);
   const manifestBytes = await fetchJsonBytes(
     fetcher,
     manifestUrl,
     'manifest request',
-    MAX_BUILDING_MANIFEST_BYTES,
+    limits.manifestBytes,
     signal,
   );
   const manifestSha256 = await sha256Hex(manifestBytes);
+  if (releaseIntegrity) {
+    await releaseIntegrity.verifyAsset(
+      manifestUrl,
+      manifestBytes,
+      'building manifest',
+    );
+  }
   const unknownManifest = await parseJson(manifestBytes, 'manifest response');
   const manifestResult = validateBuildingPackageManifest(
     unknownManifest,
@@ -303,8 +323,9 @@ export async function loadBuildingPackage(
       manifest.buildings.byteLength,
       manifest.buildings.sha256,
       'buildings',
-      MAX_BUILDINGS_BYTES,
+      limits.payloadBytes,
       signal,
+      releaseIntegrity,
     ),
     readVerifiedJson(
       fetcher,
@@ -313,8 +334,9 @@ export async function loadBuildingPackage(
       manifest.qaReport.byteLength,
       manifest.qaReport.sha256,
       'QA',
-      MAX_BUILDING_QA_BYTES,
+      limits.qaBytes,
       signal,
+      releaseIntegrity,
     ),
   ]);
   const payloadResult = validateBuildingPayload(payload, qa, manifest);

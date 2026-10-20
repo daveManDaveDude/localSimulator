@@ -179,12 +179,12 @@ test('share build gives a recoverable message when local EA assets are absent', 
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
   page.on('request', (request) => {
-    if (request.url().endsWith('/worlds/torquay-poc-001/manifest.json')) {
+    if (request.url().endsWith('/worlds/torquay-poc-001-2km/manifest.json')) {
       manifestRequests.push(request.url());
     }
   });
   page.on('response', (response) => {
-    if (response.url().endsWith('/worlds/torquay-poc-001/manifest.json')) {
+    if (response.url().endsWith('/worlds/torquay-poc-001-2km/manifest.json')) {
       manifestResponses.push({
         status: response.status(),
         contentType: response.headers()['content-type'] ?? '',

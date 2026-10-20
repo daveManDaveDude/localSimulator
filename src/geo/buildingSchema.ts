@@ -8,6 +8,13 @@ export const MAX_BUILDING_COORDINATES = 2_000_000;
 export const MAX_BUILDINGS_BYTES = 16 * 1024 * 1024;
 export const MAX_BUILDING_QA_BYTES = 2 * 1024 * 1024;
 export const MAX_BUILDING_MANIFEST_BYTES = 256 * 1024;
+export const CURRENT_2KM_BUILDING_LIMITS = {
+  manifestBytes: 256 * 1024,
+  qaBytes: 8 * 1024 * 1024,
+  payloadBytes: 64 * 1024 * 1024,
+  features: 20_000,
+  coordinates: 8_000_000,
+} as const;
 export const WALL_BASE_BURIAL_M = 0.02;
 
 export type BuildingHeightMethod =
@@ -64,6 +71,7 @@ export interface BuildingFeature {
 export interface BuildingPackageManifest {
   formatVersion: 1;
   worldId: string;
+  sceneProfile?: 'current_2km';
   name: string;
   sourceCrs: 'EPSG:27700';
   axisConvention: '+X east, +Y up, -Z north';
@@ -78,6 +86,7 @@ export interface BuildingPackageManifest {
     coverageStatus: 'not_checked';
   };
   terrainIdentity: {
+    sceneProfile?: 'current_2km';
     worldId: string;
     origin: { eastingM: number; northingM: number; elevationM: number };
     heightfieldPath: string;
@@ -154,6 +163,28 @@ export interface BuildingPackageManifest {
     count: number;
   };
   qaReport: { path: 'qa.json'; byteLength: number; sha256: string };
+}
+
+export interface BuildingPackageLimits {
+  manifestBytes: number;
+  qaBytes: number;
+  payloadBytes: number;
+  features: number;
+  coordinates: number;
+}
+
+export function buildingPackageLimits(
+  profile: RealTerrainSceneManifest['sceneProfile'],
+): BuildingPackageLimits {
+  return profile === 'current_2km'
+    ? CURRENT_2KM_BUILDING_LIMITS
+    : {
+        manifestBytes: MAX_BUILDING_MANIFEST_BYTES,
+        qaBytes: MAX_BUILDING_QA_BYTES,
+        payloadBytes: MAX_BUILDINGS_BYTES,
+        features: MAX_BUILDING_FEATURES,
+        coordinates: MAX_BUILDING_COORDINATES,
+      };
 }
 
 export interface BuildingQaSummary {
@@ -666,6 +697,7 @@ function parseRing(
   exterior: boolean,
   issues: BuildingValidationIssue[],
   counter: { coordinates: number },
+  maximumCoordinates: number,
 ): XzPosition[] | undefined {
   if (!Array.isArray(value) || value.length < 4) {
     addIssue(
@@ -693,11 +725,11 @@ function parseRing(
     }
     ring.push([point[0], point[1]]);
     counter.coordinates += 1;
-    if (counter.coordinates > MAX_BUILDING_COORDINATES) {
+    if (counter.coordinates > maximumCoordinates) {
       addIssue(
         issues,
         path,
-        `exceeds the ${MAX_BUILDING_COORDINATES} coordinate safety limit`,
+        `exceeds the ${maximumCoordinates} coordinate safety limit`,
       );
       return undefined;
     }
@@ -748,6 +780,7 @@ function validateManifest(
   terrain: RealTerrainSceneManifest,
 ): BuildingValidationResult<BuildingPackageManifest> {
   const issues: BuildingValidationIssue[] = [];
+  const limits = buildingPackageLimits(terrain.sceneProfile);
   if (!isRecord(input)) {
     return {
       ok: false,
@@ -770,6 +803,19 @@ function validateManifest(
       issues,
       'worldId',
       'must match the currently loaded Torquay terrain',
+    );
+  }
+  if (
+    (terrain.sceneProfile === 'current_2km' &&
+      input.sceneProfile !== 'current_2km') ||
+    (terrain.sceneProfile === 'historical_1km' &&
+      input.sceneProfile !== undefined &&
+      input.sceneProfile !== 'historical_1km')
+  ) {
+    addIssue(
+      issues,
+      'sceneProfile',
+      'must match the validated terrain profile; legacy omission is historical_1km only',
     );
   }
   if (!nonempty(input.name)) addIssue(issues, 'name', 'must be non-empty');
@@ -916,6 +962,18 @@ function validateManifest(
       'must bind this package to the validated terrain',
     );
   } else {
+    if (
+      (terrain.sceneProfile === 'current_2km' &&
+        terrainIdentity.sceneProfile !== 'current_2km') ||
+      (terrain.sceneProfile === 'historical_1km' &&
+        terrainIdentity.sceneProfile !== undefined)
+    ) {
+      addIssue(
+        issues,
+        'terrainIdentity.sceneProfile',
+        'must match the terrain scene profile',
+      );
+    }
     const origin = terrainIdentity.origin;
     if (!isRecord(origin)) {
       addIssue(
@@ -1312,12 +1370,12 @@ function validateManifest(
       addIssue(issues, 'buildings.path', 'must be a safe local relative path');
     if (
       !isPositiveInteger(buildingDescriptor.byteLength) ||
-      buildingDescriptor.byteLength > MAX_BUILDINGS_BYTES
+      buildingDescriptor.byteLength > limits.payloadBytes
     ) {
       addIssue(
         issues,
         'buildings.byteLength',
-        `must be from 1 to ${MAX_BUILDINGS_BYTES} bytes`,
+        `must be from 1 to ${limits.payloadBytes} bytes`,
       );
     }
     if (!isHash(buildingDescriptor.sha256))
@@ -1328,12 +1386,12 @@ function validateManifest(
       );
     if (
       !isPositiveInteger(buildingDescriptor.count) ||
-      buildingDescriptor.count > MAX_BUILDING_FEATURES
+      buildingDescriptor.count > limits.features
     ) {
       addIssue(
         issues,
         'buildings.count',
-        `must be from 1 to ${MAX_BUILDING_FEATURES}`,
+        `must be from 1 to ${limits.features}`,
       );
     }
   }
@@ -1348,12 +1406,12 @@ function validateManifest(
     }
     if (
       !isPositiveInteger(qaDescriptor.byteLength) ||
-      qaDescriptor.byteLength > MAX_BUILDING_QA_BYTES
+      qaDescriptor.byteLength > limits.qaBytes
     ) {
       addIssue(
         issues,
         'qaReport.byteLength',
-        `must be from 1 to ${MAX_BUILDING_QA_BYTES} bytes`,
+        `must be from 1 to ${limits.qaBytes} bytes`,
       );
     }
     if (!isHash(qaDescriptor.sha256))
@@ -1438,6 +1496,9 @@ function parseFeature(
   }
   const polygons: BuildingPolygon[] = [];
   let area = 0;
+  const maximumCoordinates = buildingPackageLimits(
+    manifest.sceneProfile === 'current_2km' ? 'current_2km' : 'historical_1km',
+  ).coordinates;
   if (isRecord(geometryInput) && Array.isArray(geometryInput.polygons)) {
     geometryInput.polygons.forEach((polygonInput, polygonIndex) => {
       const polygonPath = `${path}.geometry.polygons[${polygonIndex}]`;
@@ -1452,6 +1513,7 @@ function parseFeature(
         true,
         issues,
         coordinateCounter,
+        maximumCoordinates,
       );
       const holesInput = polygonInput.interiorRingsXZ;
       if (!Array.isArray(holesInput)) {
@@ -1471,6 +1533,7 @@ function parseFeature(
           false,
           issues,
           coordinateCounter,
+          maximumCoordinates,
         );
         if (hole) holes.push(hole);
         else featureValid = false;
@@ -1640,6 +1703,9 @@ function validatePayloadAndQa(
   manifest: BuildingPackageManifest,
 ): BuildingValidationResult<LoadedBuildingPackage> {
   const issues: BuildingValidationIssue[] = [];
+  const limits = buildingPackageLimits(
+    manifest.sceneProfile === 'current_2km' ? 'current_2km' : 'historical_1km',
+  );
   if (!isRecord(payloadInput)) {
     return {
       ok: false,
@@ -1681,11 +1747,11 @@ function validatePayloadAndQa(
       'buildings.json.buildings',
       'feature count does not match manifest',
     );
-  if (inputFeatures.length > MAX_BUILDING_FEATURES)
+  if (inputFeatures.length > limits.features)
     addIssue(
       issues,
       'buildings.json.buildings',
-      `exceeds the ${MAX_BUILDING_FEATURES} feature safety limit`,
+      `exceeds the ${limits.features} feature safety limit`,
     );
   const seenIds = new Set<string>();
   const seenGeometry = new Set<string>();
@@ -1693,7 +1759,7 @@ function validatePayloadAndQa(
   const features: BuildingFeature[] = [];
   for (
     let index = 0;
-    index < Math.min(inputFeatures.length, MAX_BUILDING_FEATURES);
+    index < Math.min(inputFeatures.length, limits.features);
     index += 1
   ) {
     const feature = parseFeature(

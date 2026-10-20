@@ -12,6 +12,8 @@ data/raw/
 data/intermediate/
 data/generated/
 public/worlds/torquay-poc-001/
+public/worlds/torquay-poc-001-2km/
+/.torquay-poc-001-2km.stage-*
 
 # Local environment and editor files
 .venv/

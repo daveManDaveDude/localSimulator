@@ -13,6 +13,10 @@ import type { FlightBounds, Vec3Like } from '../camera/movement';
 import { loadWorld } from './worldLoader';
 import { loadBuildingPackage } from './buildingLoader';
 import { loadRoadPackage } from './roadLoader';
+import {
+  loadCurrent2kmRelease,
+  type SceneReleaseIntegrity,
+} from './sceneRelease';
 import type { RealTerrainSceneManifest } from '../geo/sceneSchema';
 import type { TerrainGrid } from '../geo/terrainGrid';
 import type { LoadedRoadPackage } from '../geo/roadSchema';
@@ -33,12 +37,16 @@ import {
   createOverviewController,
   type OverviewContext,
 } from './createOverview';
+import {
+  CURRENT_2KM_SCENE,
+  HISTORICAL_1KM_SCENE,
+  realSceneProfileForRoute,
+  realSceneProfileForTerrain,
+  current2kmSceneForRelease,
+  type RealSceneProfileConfig,
+} from './realSceneProfiles';
 
 const TERRAIN_MANIFEST_URL = '/worlds/synthetic-terrain-demo/manifest.json';
-const REAL_TERRAIN_MANIFEST_URL = '/worlds/torquay-poc-001/manifest.json';
-const REAL_BUILDINGS_MANIFEST_URL =
-  '/worlds/torquay-poc-001/buildings/manifest.json';
-const REAL_ROADS_MANIFEST_URL = '/worlds/torquay-poc-001/roads/manifest.json';
 
 type GroundSampler = (x: number, z: number) => number | null;
 
@@ -77,7 +85,8 @@ export function createApp(container: HTMLElement): AppHandle {
     'world',
   );
   const m0Mode = requestedWorld === 'm0';
-  const initialRealMode = requestedWorld === 'torquay-poc-001';
+  const initialRealProfile = realSceneProfileForRoute(requestedWorld);
+  const initialRealMode = initialRealProfile !== undefined;
   const initialBuildingsMode =
     initialRealMode &&
     new URLSearchParams(window.location.search).get('buildings') === '1';
@@ -85,7 +94,7 @@ export function createApp(container: HTMLElement): AppHandle {
     initialRealMode &&
     new URLSearchParams(window.location.search).get('roads') === '1';
   container.innerHTML = `
-    <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-load-state="loading" data-renderer-ready="false">
+    <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-scene-profile="${initialRealProfile?.profile ?? ''}" data-load-state="loading" data-renderer-ready="false">
       <canvas class="viewer-canvas" aria-label="Terrain navigation world"></canvas>
       <div class="viewer-ui">
         <div class="viewer-topline">
@@ -94,10 +103,11 @@ export function createApp(container: HTMLElement): AppHandle {
         </div>
         <nav class="world-selector" aria-label="Choose a local world">
           <button type="button" data-testid="world-select-synthetic" aria-pressed="${!m0Mode && !initialRealMode}">Synthetic terrain</button>
-          <button type="button" data-testid="world-select-real" aria-pressed="${initialRealMode}">EA terrain</button>
-          <a href="?world=torquay-poc-001&amp;buildings=1" data-testid="world-select-buildings">EA terrain + OSM buildings</a>
-          <a href="?world=torquay-poc-001&amp;roads=1" data-testid="world-select-roads">EA terrain + OSM roads</a>
-          <a href="?world=torquay-poc-001&amp;buildings=1&amp;roads=1" data-testid="world-select-all-layers">EA terrain + buildings + roads</a>
+          <button type="button" data-testid="world-select-real" aria-pressed="${initialRealMode && initialRealProfile?.profile === 'current_2km'}">EA terrain · 2 km candidate</button>
+          <a href="${CURRENT_2KM_SCENE.route.replaceAll('&', '&amp;')}" data-testid="world-select-all-layers">Current 2 km candidate · terrain + buildings + roads</a>
+          <a href="?world=torquay-poc-001-2km&amp;buildings=1" data-testid="world-select-buildings">Current 2 km candidate · terrain + buildings</a>
+          <a href="?world=torquay-poc-001-2km&amp;roads=1" data-testid="world-select-roads">Current 2 km candidate · terrain + roads</a>
+          <a href="?world=torquay-poc-001&amp;buildings=1&amp;roads=1" data-testid="world-select-historical-1km">Historical 1 km package · terrain + buildings + roads</a>
           <a href="?world=m0" data-testid="world-select-m0">M0 synthetic demo</a>
           <button type="button" data-testid="overview-toggle" aria-controls="geographic-overview" aria-expanded="false">Open overview</button>
         </nav>
@@ -120,7 +130,7 @@ export function createApp(container: HTMLElement): AppHandle {
               <button type="button" data-testid="help-toggle" aria-controls="controls-help" aria-expanded="false">Show controls</button>
             </div>
           </div>
-          <p class="real-package-caveat" data-testid="real-package-extent-notice"${initialRealMode ? '' : ' hidden'}>The visible EA terrain and any optional OSM buildings or roads use the retained earlier 1 km browser packages. The 2 km candidate is pending and is not rendered by these packages.</p>
+          <p class="real-package-caveat" data-testid="real-package-extent-notice"${initialRealMode ? '' : ' hidden'}>${initialRealProfile?.profile === 'historical_1km' ? 'Historical 1 km package. The current 2 km candidate remains pending; mapped counts do not establish completeness.' : 'Current 2 km candidate · AOI selection remains pending and coverage is not checked. Mapped feature counts do not establish completeness.'}</p>
           <dl>
             <div><dt>World</dt><dd data-testid="world-type" data-world-id="">Loading synthetic terrain…</dd></div>
             <div><dt>Source mode</dt><dd data-testid="world-source-mode">HEIGHTFIELD</dd></div>
@@ -212,7 +222,7 @@ export function createApp(container: HTMLElement): AppHandle {
         <section class="start-card" aria-labelledby="page-title">
           <p class="eyebrow">LOCAL BROWSER PROOF OF CONCEPT</p>
           <h1 id="page-title">Torquay <span>Virtual World</span></h1>
-          <p class="welcome-copy" data-testid="welcome-copy">${m0Mode ? 'M0 ANALYTIC DEMO · fictional slope and blocks; no Torquay measurements or map data are used.' : initialRealMode ? 'REAL EA LIDAR · local 2 m heightfield from the retained earlier 1 km browser package. The 2 km candidate is pending and is not rendered here.' : 'SYNTHETIC HEIGHTFIELD · fictional slope, hill, and ridge loaded from a local Float32 fixture; no Torquay measurements or map data are used.'}</p>
+          <p class="welcome-copy" data-testid="welcome-copy">${m0Mode ? 'M0 ANALYTIC DEMO · fictional slope and blocks; no Torquay measurements or map data are used.' : initialRealMode ? (initialRealProfile?.profile === 'current_2km' ? 'REAL EA LIDAR · 2 km pending candidate terrain with dated local OSM building and road packages. Coverage remains not checked; mapped counts do not establish completeness.' : 'REAL EA LIDAR · historical 1 km browser package. The current 2 km candidate remains pending.') : 'SYNTHETIC HEIGHTFIELD · fictional slope, hill, and ridge loaded from a local Float32 fixture; no Torquay measurements or map data are used.'}</p>
           <button class="start-button" type="button" data-testid="start-button"${m0Mode ? '' : ' disabled'}>Start exploring</button>
           <div class="control-hints" aria-label="Free-flight controls">
             <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Move forward / back and strafe</span></p>
@@ -231,6 +241,9 @@ export function createApp(container: HTMLElement): AppHandle {
   const startButton =
     container.querySelector<HTMLButtonElement>('.start-button');
   const status = container.querySelector<HTMLElement>('.flight-status');
+  const welcomeCopy = container.querySelector<HTMLElement>(
+    '[data-testid="welcome-copy"]',
+  );
   const realPackageExtentNotice = container.querySelector<HTMLElement>(
     '[data-testid="real-package-extent-notice"]',
   );
@@ -427,6 +440,7 @@ export function createApp(container: HTMLElement): AppHandle {
     !canvas ||
     !startButton ||
     !status ||
+    !welcomeCopy ||
     !realPackageExtentNotice ||
     !provenanceBadge ||
     !syntheticWorldButton ||
@@ -533,6 +547,7 @@ export function createApp(container: HTMLElement): AppHandle {
   let currentTerrainGrid: TerrainGrid | undefined;
   let currentTerrainManifest: RealTerrainSceneManifest | undefined;
   let currentTerrainManifestSha256: string | undefined;
+  let currentSceneRelease: SceneReleaseIntegrity | undefined;
   let currentBuildingGroup: Group | undefined;
   let currentRoadGroup: Group | undefined;
   let currentRoadMarker: Group | undefined;
@@ -555,6 +570,8 @@ export function createApp(container: HTMLElement): AppHandle {
   let selectedWorldMode: 'synthetic' | 'real' = initialRealMode
     ? 'real'
     : 'synthetic';
+  let selectedRealProfile: RealSceneProfileConfig =
+    initialRealProfile ?? HISTORICAL_1KM_SCENE;
   let currentWorldGroup: Scene['children'][number] | undefined;
   let resizeRenderer: () => void = () => undefined;
 
@@ -587,7 +604,25 @@ export function createApp(container: HTMLElement): AppHandle {
 
   const setWorldSelection = (mode: 'synthetic' | 'real' | 'm0'): void => {
     shell.dataset.worldMode = mode;
+    shell.dataset.sceneProfile =
+      mode === 'real' ? selectedRealProfile.profile : '';
     realPackageExtentNotice.hidden = mode !== 'real';
+    if (mode === 'real') {
+      realPackageExtentNotice.textContent =
+        selectedRealProfile.profile === 'current_2km'
+          ? 'Current 2 km candidate · AOI selection remains pending and coverage is not checked. Mapped feature counts do not establish completeness.'
+          : 'Historical 1 km package. The current 2 km candidate remains pending; mapped counts do not establish completeness.';
+      welcomeCopy.textContent =
+        selectedRealProfile.profile === 'current_2km'
+          ? 'REAL EA LIDAR · current 2 km candidate terrain with dated local OSM layers. Coverage remains not checked; mapped counts do not establish completeness.'
+          : 'REAL EA LIDAR · retained historical 1 km terrain and optional OSM layers. The current 2 km candidate remains pending.';
+    } else if (mode === 'synthetic') {
+      welcomeCopy.textContent =
+        'SYNTHETIC HEIGHTFIELD · fictional slope, hill, and ridge loaded from a local Float32 fixture; no Torquay measurements or map data are used.';
+    } else {
+      welcomeCopy.textContent =
+        'M0 ANALYTIC DEMO · fictional slope and blocks; no Torquay measurements or map data are used.';
+    }
     syntheticWorldButton.setAttribute(
       'aria-pressed',
       String(mode === 'synthetic'),
@@ -612,10 +647,23 @@ export function createApp(container: HTMLElement): AppHandle {
     currentTerrainGrid = undefined;
     currentTerrainManifest = undefined;
     currentTerrainManifestSha256 = undefined;
+    currentSceneRelease = undefined;
     buildingControls.hidden = true;
     roadControls.hidden = true;
     hasLoadedWorld = false;
     overview.setContext();
+  };
+
+  const activeProfileForTerrain = (): RealSceneProfileConfig => {
+    if (
+      currentTerrainManifest?.sceneProfile === 'current_2km' &&
+      currentSceneRelease !== undefined
+    ) {
+      return current2kmSceneForRelease(currentSceneRelease);
+    }
+    return realSceneProfileForTerrain(
+      currentTerrainManifest?.sceneProfile ?? 'historical_1km',
+    );
   };
 
   const clearRoadLayer = (): void => {
@@ -715,7 +763,7 @@ export function createApp(container: HTMLElement): AppHandle {
   const setBuildingRoute = (enabled: boolean): void => {
     const url = new URL(window.location.href);
     if (enabled) {
-      url.searchParams.set('world', 'torquay-poc-001');
+      url.searchParams.set('world', selectedRealProfile.worldQuery);
       url.searchParams.set('buildings', '1');
     } else {
       url.searchParams.delete('buildings');
@@ -725,7 +773,7 @@ export function createApp(container: HTMLElement): AppHandle {
 
   const setRoadRoute = (enabled: boolean): void => {
     const url = new URL(window.location.href);
-    url.searchParams.set('world', 'torquay-poc-001');
+    url.searchParams.set('world', selectedRealProfile.worldQuery);
     if (enabled) url.searchParams.set('roads', '1');
     else url.searchParams.delete('roads');
     window.history.pushState({}, '', url);
@@ -816,11 +864,12 @@ export function createApp(container: HTMLElement): AppHandle {
     roadError.hidden = true;
     try {
       const packageData = await loadRoadPackage(
-        REAL_ROADS_MANIFEST_URL,
+        activeProfileForTerrain().roadsManifestUrl,
         currentTerrainManifest,
         currentTerrainManifestSha256,
         undefined,
         abortController.signal,
+        currentSceneRelease,
       );
       if (
         disposed ||
@@ -883,7 +932,11 @@ export function createApp(container: HTMLElement): AppHandle {
         return;
       }
       const detail = error instanceof Error ? error.message : String(error);
-      roadError.textContent = `${detail} From the pipeline folder run .\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-roads. Terrain and any loaded buildings remain available.`;
+      const publisherCommand =
+        selectedRealProfile.profile === 'current_2km'
+          ? '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli build-scene --profile current_2km'
+          : '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-roads';
+      roadError.textContent = `${detail} From the pipeline folder run ${publisherCommand}. Terrain and any loaded buildings remain available.`;
       roadError.hidden = false;
       roadStatus.dataset.state = 'error';
       roadLabels.clear();
@@ -984,10 +1037,11 @@ export function createApp(container: HTMLElement): AppHandle {
     buildingError.hidden = true;
     try {
       const packageData = await loadBuildingPackage(
-        REAL_BUILDINGS_MANIFEST_URL,
+        activeProfileForTerrain().buildingsManifestUrl,
         currentTerrainManifest,
         undefined,
         abortController.signal,
+        currentSceneRelease,
       );
       if (
         disposed ||
@@ -1050,8 +1104,11 @@ export function createApp(container: HTMLElement): AppHandle {
         return;
       }
       const detail = error instanceof Error ? error.message : String(error);
-      const publishCommand =
-        'From the pipeline folder run .\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-buildings.';
+      const publisherCommand =
+        selectedRealProfile.profile === 'current_2km'
+          ? '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli build-scene --profile current_2km'
+          : '.\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli publish-buildings';
+      const publishCommand = `From the pipeline folder run ${publisherCommand}.`;
       buildingErrorMessage.textContent = `${detail} ${publishCommand} The terrain remains available; no buildings are shown.`;
       buildingError.hidden = false;
       shell.dataset.buildingState = 'error';
@@ -1304,7 +1361,7 @@ export function createApp(container: HTMLElement): AppHandle {
     const detail = error instanceof Error ? error.message : String(error);
     errorMessage.textContent =
       selectedWorldMode === 'real'
-        ? `${detail} To build the local package, restore the EA sources from docs/data-sources.md, then run .\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli build-terrain from the pipeline folder. Synthetic terrain remains available.`
+        ? `${detail} For the current 2 km candidate, restore sources from docs/data-sources.md, run .\\.venv\\Scripts\\python.exe -m torquay_pipeline.cli build-scene --profile current_2km, then publish the validated stage with publish-scene --profile current_2km --validated-stage <stage-path>. Historical terrain uses build-terrain. Synthetic terrain remains available.`
         : detail;
     errorPanel.hidden = false;
     loadingState.hidden = true;
@@ -1319,7 +1376,17 @@ export function createApp(container: HTMLElement): AppHandle {
     hasLoadedWorld = false;
   };
 
-  const startWorldLoad = async (mode: 'synthetic' | 'real'): Promise<void> => {
+  const startWorldLoad = async (
+    mode: 'synthetic' | 'real',
+    realProfile?: RealSceneProfileConfig,
+  ): Promise<void> => {
+    if (mode === 'real') {
+      if (realProfile) selectedRealProfile = realProfile;
+      else if (selectedRealProfile.profile === 'current_2km') {
+        // Retry from the fixed profile root; never retain a prior release URL.
+        selectedRealProfile = CURRENT_2KM_SCENE;
+      }
+    }
     selectedWorldMode = mode;
     resizeRenderer();
     clearCurrentWorld();
@@ -1332,8 +1399,6 @@ export function createApp(container: HTMLElement): AppHandle {
     shell.dataset.loadState = 'loading';
     errorPanel.hidden = true;
     loadingState.hidden = false;
-    const manifestUrl =
-      mode === 'real' ? REAL_TERRAIN_MANIFEST_URL : TERRAIN_MANIFEST_URL;
     const worldLabel =
       mode === 'real'
         ? 'local Environment Agency DTM'
@@ -1343,10 +1408,32 @@ export function createApp(container: HTMLElement): AppHandle {
     setWorldSelection(mode);
     startButton.disabled = true;
     try {
+      let releaseIntegrity: SceneReleaseIntegrity | undefined;
+      if (mode === 'real' && selectedRealProfile.profile === 'current_2km') {
+        releaseIntegrity = await loadCurrent2kmRelease(
+          '/worlds/torquay-poc-001-2km/ready.json',
+          undefined,
+          abortController.signal,
+        );
+        if (
+          disposed ||
+          attempt !== loadAttempt ||
+          abortController.signal.aborted
+        ) {
+          return;
+        }
+        currentSceneRelease = releaseIntegrity;
+        selectedRealProfile = current2kmSceneForRelease(releaseIntegrity);
+      }
+      const manifestUrl =
+        mode === 'real'
+          ? selectedRealProfile.terrainManifestUrl
+          : TERRAIN_MANIFEST_URL;
       const loaded = await loadWorld(
         manifestUrl,
         undefined,
         abortController.signal,
+        releaseIntegrity,
       );
       if (
         disposed ||
@@ -1358,6 +1445,15 @@ export function createApp(container: HTMLElement): AppHandle {
       if ((mode === 'real') !== (loaded.manifest.worldType === 'real')) {
         throw new Error(
           `manifest validation: ${manifestUrl} declared an unexpected world type`,
+        );
+      }
+      if (
+        mode === 'real' &&
+        loaded.manifest.worldType === 'real' &&
+        loaded.manifest.sceneProfile !== selectedRealProfile.profile
+      ) {
+        throw new Error(
+          `manifest validation: expected ${selectedRealProfile.profile} but received ${loaded.manifest.sceneProfile}`,
         );
       }
       let world: HeightfieldWorld;
@@ -1450,7 +1546,9 @@ export function createApp(container: HTMLElement): AppHandle {
     if (mode === 'm0') {
       url.searchParams.set('world', 'm0');
     } else if (mode === 'real') {
-      url.searchParams.set('world', 'torquay-poc-001');
+      url.searchParams.set('world', selectedRealProfile.worldQuery);
+      if (buildingsRequested) url.searchParams.set('buildings', '1');
+      if (roadsRequested) url.searchParams.set('roads', '1');
     } else {
       url.searchParams.delete('world');
     }
@@ -1459,16 +1557,22 @@ export function createApp(container: HTMLElement): AppHandle {
   const chooseWorld = (
     mode: 'synthetic' | 'real' | 'm0',
     updateRoute = true,
+    realProfile?: RealSceneProfileConfig,
+    includeOptionalLayers = false,
   ): void => {
-    buildingsRequested = false;
-    roadsRequested = false;
+    buildingsRequested = mode === 'real' && includeOptionalLayers;
+    roadsRequested = mode === 'real' && includeOptionalLayers;
+    if (mode === 'real') selectedRealProfile = realProfile ?? CURRENT_2KM_SCENE;
     if (updateRoute) updateBrowserRoute(mode);
     if (mode === 'm0') {
       selectedWorldMode = 'synthetic';
       startM0World();
       return;
     }
-    void startWorldLoad(mode);
+    void startWorldLoad(
+      mode,
+      mode === 'real' ? selectedRealProfile : undefined,
+    );
   };
 
   const requestLockFromCanvas = (): void => {
@@ -1519,7 +1623,8 @@ export function createApp(container: HTMLElement): AppHandle {
 
   startButton.addEventListener('click', requestLockFromButton);
   const selectSyntheticWorld = (): void => chooseWorld('synthetic');
-  const selectRealWorld = (): void => chooseWorld('real');
+  const selectRealWorld = (): void =>
+    chooseWorld('real', true, CURRENT_2KM_SCENE, true);
   syntheticWorldButton.addEventListener('click', selectSyntheticWorld);
   realWorldButton.addEventListener('click', selectRealWorld);
   recoverSyntheticButton.addEventListener('click', selectSyntheticWorld);
@@ -1543,17 +1648,16 @@ export function createApp(container: HTMLElement): AppHandle {
   const handlePopState = (): void => {
     const route = new URLSearchParams(window.location.search);
     const routeWorld = route.get('world');
+    const routeProfile = realSceneProfileForRoute(routeWorld);
     buildingsRequested =
-      routeWorld === 'torquay-poc-001' && route.get('buildings') === '1';
-    roadsRequested =
-      routeWorld === 'torquay-poc-001' && route.get('roads') === '1';
+      routeProfile !== undefined && route.get('buildings') === '1';
+    roadsRequested = routeProfile !== undefined && route.get('roads') === '1';
     if (routeWorld === 'm0') {
       selectedWorldMode = 'synthetic';
       startM0World();
     } else {
-      void startWorldLoad(
-        routeWorld === 'torquay-poc-001' ? 'real' : 'synthetic',
-      );
+      if (routeProfile) selectedRealProfile = routeProfile;
+      void startWorldLoad(routeProfile ? 'real' : 'synthetic', routeProfile);
     }
   };
   window.addEventListener('popstate', handlePopState);
@@ -1727,7 +1831,10 @@ export function createApp(container: HTMLElement): AppHandle {
     terrainActions.hidden = true;
     startM0World();
   } else {
-    void startWorldLoad(initialRealMode ? 'real' : 'synthetic');
+    void startWorldLoad(
+      initialRealMode ? 'real' : 'synthetic',
+      initialRealProfile,
+    );
   }
 
   return {

@@ -4,6 +4,7 @@ import {
   validateSceneManifest,
 } from '../../src/geo/sceneSchema';
 import {
+  createCurrent2kmRealManifest,
   createRealManifest,
   createValidManifest,
   readSyntheticFixtureManifest,
@@ -266,6 +267,44 @@ describe('validateSceneManifest', () => {
         });
       }
     }
+  });
+
+  it('accepts the explicit 1001 by 1001 current 2 km terrain profile', () => {
+    const result = validateSceneManifest(createCurrent2kmRealManifest());
+    expect(result.ok).toBe(true);
+    if (result.ok && result.manifest.worldType === 'real') {
+      expect(result.manifest.sceneProfile).toBe('current_2km');
+      expect(result.manifest.extentM).toEqual({ width: 2000, depth: 2000 });
+      expect(result.manifest.heightfield).toMatchObject({
+        columns: 1001,
+        rows: 1001,
+        spacingM: 2,
+        byteLength: 4_008_004,
+      });
+    }
+  });
+
+  it.each([
+    ['old boundary', 'aoi.boundaryWgs84.ring[1][0]', -3.528823875124863],
+    ['old extent', 'extentM.width', 1000],
+    ['old grid', 'heightfield.columns', 501],
+  ])('rejects current_2km profile mixed with %s', (_label, path, value) => {
+    const input = structuredClone(
+      createCurrent2kmRealManifest(),
+    ) as unknown as TestRecord;
+    const segments = path.replaceAll('[', '.').replaceAll(']', '').split('.');
+    let current: unknown = input;
+    for (const segment of segments.slice(0, -1)) {
+      if (Array.isArray(current)) current = current[Number(segment)];
+      else if (isTestRecord(current)) current = current[segment];
+      else throw new Error(`Missing test path ${segment}`);
+    }
+    const finalSegment = segments.at(-1)!;
+    if (Array.isArray(current)) current[Number(finalSegment)] = value;
+    else if (isTestRecord(current)) current[finalSegment] = value;
+    else throw new Error(`Missing test path ${finalSegment}`);
+    const result = validateSceneManifest(input);
+    expect(result.ok).toBe(false);
   });
 
   it('accepts whitespace-normalized full pinned coordinate-operation metadata', () => {

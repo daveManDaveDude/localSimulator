@@ -7,7 +7,7 @@ from pathlib import Path
 
 import osmium
 import pytest
-from shapely.geometry import Polygon, box
+from shapely.geometry import MultiPolygon, Polygon, box
 
 from torquay_pipeline.building_sources import inspect_building_source
 from torquay_pipeline.config import load_aoi_config
@@ -15,11 +15,16 @@ from torquay_pipeline.coordinates import transform_bng_to_wgs84
 from torquay_pipeline.road_config import RoadConfigError, load_road_config, parse_road_config
 from torquay_pipeline.road_export import RoadExportError, build_road_package, validate_road_package
 from torquay_pipeline.road_geometry import (
+    RoadGeometryError,
     _triangulate_polygon_component,
     build_display_polygons,
     tessellate_display_polygons,
 )
-from torquay_pipeline.road_preview import NORTH_ARROW_TAIL_AXES, NORTH_ARROW_TIP_AXES
+from torquay_pipeline.road_preview import (
+    NORTH_ARROW_TAIL_AXES,
+    NORTH_ARROW_TIP_AXES,
+    profile_title,
+)
 from torquay_pipeline.roads import ground_skip_reason, import_osm_roads
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -29,6 +34,11 @@ def test_road_preview_north_arrow_points_up_for_negative_z_north():
     # Matplotlib axes fractions increase upward even though the plotted Z data
     # limits are inverted so negative Z is north.
     assert NORTH_ARROW_TIP_AXES[1] > NORTH_ARROW_TAIL_AXES[1]
+
+
+def test_road_preview_titles_current_and_historical_footprints_truthfully():
+    assert profile_title({"sceneProfile": "current_2km"}) == "2 km current_2km candidate AOI"
+    assert profile_title({}) == "1 km historical candidate AOI"
 
 
 def _write_osm_pbf(
@@ -267,6 +277,72 @@ def test_tessellation_audits_and_omits_sub_float32_sliver_faces():
     assert 0 < output["_float32CollapsedSliverAreaM2"] < 1e-6
 
 
+def test_tessellation_checks_geometric_area_before_bounded_float32_sliver_omission():
+    # At this local coordinate magnitude the last point rounds onto the second
+    # after Float32 conversion. The geometric face is valid and below the global
+    # 1e-6 m2 omission budget, so it is audited rather than treated as a broken
+    # constrained triangulation.
+    polygon = Polygon(
+        [
+            (320.0, -354.0),
+            (320.1, -354.0),
+            (320.1, -354.00001),
+            (320.0, -354.0),
+        ]
+    )
+    output = {
+        "verticesXZ": [],
+        "indices": [],
+        "terrainTriangles": [],
+        "_vertexLookup": {},
+        "_float32CollapsedSliverTriangleCount": 0,
+        "_float32CollapsedSliverAreaM2": 0.0,
+    }
+    _triangulate_polygon_component(polygon, 72, 410, 1, output)
+    assert output["indices"] == []
+    assert output["_float32CollapsedSliverTriangleCount"] == 1
+    assert output["_float32CollapsedSliverAreaM2"] == pytest.approx(polygon.area)
+
+
+def test_expanded_profile_has_explicit_bounded_float32_sliver_budget():
+    polygons = []
+    for offset in range(3):
+        x = 320.0 + 10 * offset
+        z = -354.0 - 10 * offset
+        polygons.append(
+            Polygon(
+                [
+                    (x, z),
+                    (x + 0.1, z),
+                    (x + 0.1, z - 0.00001),
+                    (x, z),
+                ]
+            )
+        )
+    geometry = MultiPolygon(polygons)
+    common = {
+        "vehicular": geometry,
+        "cycleway": Polygon(),
+        "path": Polygon(),
+    }
+    kwargs = {
+        "columns": 1001,
+        "rows": 1001,
+        "spacing_m": 2.0,
+        "width_m": 2000.0,
+        "depth_m": 2000.0,
+    }
+    with pytest.raises(RoadGeometryError, match="1e-06 m2 omission limit"):
+        tessellate_display_polygons(common, **kwargs)
+    _batches, _areas, mesh_numerics = tessellate_display_polygons(
+        common,
+        **kwargs,
+        maximum_collapsed_sliver_area_m2=2e-5,
+    )
+    assert mesh_numerics["float32CollapsedSliverTriangleCount"] == 3
+    assert mesh_numerics["float32CollapsedSliverAreaM2"] == pytest.approx(1.5e-6)
+
+
 def test_package_validation_rederives_source_geometry_after_hashes_are_refreshed(
     tmp_path, monkeypatch
 ):
@@ -382,8 +458,35 @@ def test_package_validation_rederives_source_geometry_after_hashes_are_refreshed
     )
     package = tmp_path / "package"
     external_qa = tmp_path / "external-qa.json"
-    preview = tmp_path / Path(config.preview_path).name
+    preview = tmp_path / "roads-preview.png"
     intermediate = tmp_path / "intermediate.json"
+    buildings_path = tmp_path / "current-buildings.json"
+    buildings_path.write_text(
+        json.dumps(
+            {
+                "buildings": [
+                    {
+                        "id": "way/fixture-building",
+                        "geometry": {
+                            "polygons": [
+                                {
+                                    "exteriorXZ": [
+                                        [-2.0, -2.0],
+                                        [2.0, -2.0],
+                                        [2.0, 2.0],
+                                        [-2.0, 2.0],
+                                        [-2.0, -2.0],
+                                    ],
+                                    "interiorRingsXZ": [],
+                                }
+                            ]
+                        },
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
     imported = import_osm_roads(source, source_manifest_path, aoi, config)
     build_road_package(
         imported,
@@ -397,6 +500,7 @@ def test_package_validation_rederives_source_geometry_after_hashes_are_refreshed
         external_qa,
         preview,
         intermediate,
+        buildings_path,
     )
     manifest_data = json.loads((package / "manifest.json").read_text(encoding="utf-8"))
     roads_data = json.loads((package / "roads.json").read_text(encoding="utf-8"))
@@ -421,8 +525,17 @@ def test_package_validation_rederives_source_geometry_after_hashes_are_refreshed
         "source_manifest_path": source_manifest_path,
         "aoi_geojson_path": geojson_path,
         "road_config": config,
+        "buildings_path": buildings_path,
+        "preview_output_name": preview.name,
     }
-    assert validate_road_package(package, **kwargs)["featureCount"] == 1
+    validation = validate_road_package(package, **kwargs)
+    assert validation["featureCount"] == 1
+    assert (
+        json.loads((package / "qa.json").read_text(encoding="utf-8"))["buildingSourceConflicts"][
+            "intersectingPairs"
+        ]
+        > 0
+    )
 
     roads_path = package / "roads.json"
     manifest_path = package / "manifest.json"

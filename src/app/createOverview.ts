@@ -187,6 +187,24 @@ export function createOverviewController(
       );
       return;
     }
+    if (context.terrain.sceneProfile === 'current_2km') {
+      request?.abort();
+      request = undefined;
+      attempt += 1;
+      removeMap();
+      loaded = undefined;
+      loadedTerrainSha = undefined;
+      elements.osmAttribution.hidden = true;
+      elements.layerStatus.textContent =
+        'The current 2 km scene has no geographic overview package.';
+      elements.disclaimer.textContent =
+        'Overview unavailable for the current 2 km candidate. No 1 km overview is mixed into this scene; AOI selection remains pending and coverage is not checked.';
+      setState(
+        'unavailable',
+        'Geographic overview is unavailable for the current 2 km scene.',
+      );
+      return;
+    }
     if (
       loadedTerrainSha &&
       loadedTerrainSha !== context.terrainManifestSha256

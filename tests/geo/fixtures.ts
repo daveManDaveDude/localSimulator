@@ -86,6 +86,7 @@ export function createRealManifest(
     id: 'torquay-poc-001',
     name: 'TQ1 4HN candidate area of interest',
     worldType: 'real',
+    sceneProfile: 'historical_1km',
     sourceCrs: 'EPSG:27700',
     axisConvention: '+X east, +Y up, -Z north',
     origin: {
@@ -213,6 +214,45 @@ export function createRealManifest(
       },
       selectionStatus: 'selected_pending_coverage',
       coverageStatus: 'not_checked',
+    },
+  };
+}
+
+export function createCurrent2kmRealManifest(
+  heightfieldSha256 = 'f'.repeat(64),
+): RealTerrainSceneManifest {
+  const manifest = structuredClone(
+    createRealManifest(heightfieldSha256),
+  ) as RealTerrainSceneManifest;
+  return {
+    ...manifest,
+    sceneProfile: 'current_2km',
+    name: 'TQ1 4HN current 2 km candidate area of interest',
+    extentM: { width: 2000, depth: 2000 },
+    heightfield: {
+      ...manifest.heightfield,
+      columns: 1001,
+      rows: 1001,
+      byteLength: 4_008_004,
+    },
+    aoi: {
+      ...manifest.aoi,
+      boundsM: [
+        290108.9018176432, 64353.48350844931, 292108.9018176432,
+        66353.48350844931,
+      ],
+      widthM: 2000,
+      heightM: 2000,
+      boundaryWgs84: {
+        ...manifest.aoi.boundaryWgs84,
+        ring: [
+          [-3.5498069791321853, 50.46867640263527],
+          [-3.5216360951366497, 50.4690482443],
+          [-3.5222136603237235, 50.48702798479993],
+          [-3.5503952248835833, 50.48665590689169],
+          [-3.5498069791321853, 50.46867640263527],
+        ],
+      },
     },
   };
 }

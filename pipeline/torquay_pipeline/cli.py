@@ -76,6 +76,13 @@ from .road_geometry import DISPLAY_GROUPS
 from .road_preview import render_road_preview
 from .road_publish import RoadPublishError, publish_road_package
 from .roads import RoadImportError, import_osm_roads
+from .scene_build import (
+    SceneBuildError,
+    build_scene_package,
+    validate_scene_package,
+    validate_scene_root,
+)
+from .scene_release import SceneReleaseError, publish_scene_release
 from .terrain_coverage import (
     DEFAULT_MISSING_THRESHOLD,
     CoverageResult,
@@ -151,6 +158,59 @@ def _parser() -> argparse.ArgumentParser:
                 "--preview",
                 type=Path,
                 default=Path("../docs/milestones/screenshots/TVW-008-terrain-preview.png"),
+            )
+    for name in ("build-scene", "validate-scene", "publish-scene"):
+        command = commands.add_parser(
+            name,
+            help=(
+                f"{name.replace('-', ' ')} the isolated current 2 km terrain/buildings/roads scene"
+            ),
+        )
+        command.add_argument(
+            "--profile",
+            choices=("current_2km",),
+            default="current_2km",
+            help="fixed current_2km profile; historical 1 km uses its existing commands",
+        )
+        command.add_argument("--aoi-config", type=Path, default=Path("../config/aoi.torquay.json"))
+        command.add_argument(
+            "--source-manifest", type=Path, default=Path("../data/source-manifest.json")
+        )
+        command.add_argument("--source-dir", type=Path, default=Path("../data/raw/ea_dtm"))
+        command.add_argument(
+            "--source", type=Path, default=Path("../data/raw/osm/devon-261016.osm.pbf")
+        )
+        command.add_argument(
+            "--buildings-config", type=Path, default=Path("../config/buildings.torquay-2km.json")
+        )
+        command.add_argument(
+            "--roads-config", type=Path, default=Path("../config/roads.torquay-2km.json")
+        )
+        if name == "build-scene":
+            command.add_argument(
+                "--output-dir",
+                type=Path,
+                default=Path("../public/worlds/torquay-poc-001-2km"),
+                help="local release root whose ready.json pointer activates the package",
+            )
+        elif name == "validate-scene":
+            command.add_argument(
+                "--package-dir",
+                type=Path,
+                default=Path("../public/worlds/torquay-poc-001-2km"),
+            )
+        else:
+            command.add_argument(
+                "--validated-stage",
+                type=Path,
+                required=True,
+                help="previously generated .torquay-poc-001-2km.stage-* directory",
+            )
+            command.add_argument(
+                "--package-root",
+                type=Path,
+                default=Path("../public/worlds/torquay-poc-001-2km"),
+                help="fixed local release root with the active ready.json pointer",
             )
     capture_command = commands.add_parser(
         "capture-resolution-index",
@@ -859,6 +919,33 @@ def main(argv: Sequence[str] | None = None) -> int:
             "publish-roads",
         }:
             return _road_command(args)
+        if args.command in {"build-scene", "validate-scene", "publish-scene"}:
+            common = {
+                "aoi_config_path": args.aoi_config.resolve(),
+                "source_manifest_path": args.source_manifest.resolve(),
+                "source_dir": args.source_dir.resolve(),
+                "source_path": args.source.resolve(),
+                "buildings_config_path": args.buildings_config.resolve(),
+                "roads_config_path": args.roads_config.resolve(),
+                "project_root": PROJECT_ROOT,
+            }
+            if args.command == "build-scene":
+                result = build_scene_package(output_dir=args.output_dir.resolve(), **common)
+            elif args.command == "publish-scene":
+                result = publish_scene_release(
+                    args.validated_stage.resolve(),
+                    args.package_root.resolve(),
+                    project_root=PROJECT_ROOT,
+                    validator=lambda package: validate_scene_package(package, **common),
+                    # The CLI argument is intentionally an already validated
+                    # owned stage. The immutable copied release is still fully
+                    # validated before ready.json can be activated.
+                    stage_already_validated=True,
+                )
+            else:
+                result = validate_scene_root(args.package_dir.resolve(), **common)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
         if args.command in {"build-overview", "validate-overview", "publish-overview"}:
             return _overview_command(args)
         if args.command == "assess-resolution-index":
@@ -995,6 +1082,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         TerrainCoverageError,
         TerrainSourceError,
         TerrainExportError,
+        SceneBuildError,
+        SceneReleaseError,
         ValueError,
         OSError,
         RuntimeError,

@@ -5,6 +5,7 @@ import {
   type RealTerrainSceneManifest,
   type SyntheticSceneManifest,
 } from '../geo/sceneSchema';
+import type { SceneReleaseIntegrity } from './sceneRelease';
 
 export type WorldLoadStage =
   | 'manifest URL'
@@ -140,8 +141,10 @@ export async function loadWorld(
   manifestLocation: string | URL,
   fetcher: WorldFetch = browserFetch,
   signal?: AbortSignal,
+  releaseIntegrity?: SceneReleaseIntegrity,
 ): Promise<LoadedWorld> {
   const manifestUrl = resolveManifestUrl(manifestLocation);
+  releaseIntegrity?.assertAssetUrl(manifestUrl, 'terrain manifest');
   const manifestResponse = await fetchResponse(
     fetcher,
     manifestUrl,
@@ -156,6 +159,13 @@ export async function loadWorld(
     throw new WorldLoadError(
       'manifest response',
       `could not read response bytes: ${messageFrom(error)}`,
+    );
+  }
+  if (releaseIntegrity) {
+    await releaseIntegrity.verifyAsset(
+      manifestUrl,
+      manifestBytes,
+      'terrain manifest',
     );
   }
   let unknownManifest: unknown;
@@ -182,6 +192,7 @@ export async function loadWorld(
     manifestUrl,
     validation.manifest.heightfield.path,
   );
+  releaseIntegrity?.assertAssetUrl(heightfieldUrl, 'terrain heightfield');
   const heightfieldResponse = await fetchResponse(
     fetcher,
     heightfieldUrl,
@@ -196,6 +207,13 @@ export async function loadWorld(
     throw new WorldLoadError(
       'heightfield response',
       `could not read response bytes: ${messageFrom(error)}`,
+    );
+  }
+  if (releaseIntegrity) {
+    await releaseIntegrity.verifyAsset(
+      heightfieldUrl,
+      bytes,
+      'terrain heightfield',
     );
   }
 

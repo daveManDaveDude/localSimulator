@@ -14,17 +14,21 @@ export default defineConfig(({ mode }) => {
     plugins: shareableBuild
       ? [
           {
-            name: 'copy-public-assets-without-local-ea-terrain',
+            name: 'copy-public-assets-without-local-real-worlds',
             closeBundle() {
-              const localTerrain = resolve('public/worlds/torquay-poc-001');
+              const localWorlds = [
+                resolve('public/worlds/torquay-poc-001'),
+                resolve('public/worlds/torquay-poc-001-2km'),
+              ];
               cpSync(resolve('public'), resolve('dist'), {
                 recursive: true,
                 force: true,
                 filter: (source) => {
                   const candidate = resolve(source);
-                  return (
-                    candidate !== localTerrain &&
-                    !candidate.startsWith(`${localTerrain}${sep}`)
+                  return !localWorlds.some(
+                    (localWorld) =>
+                      candidate === localWorld ||
+                      candidate.startsWith(`${localWorld}${sep}`),
                   );
                 },
               });

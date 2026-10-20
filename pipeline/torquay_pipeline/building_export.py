@@ -210,6 +210,17 @@ def _terrain_identity(path: Path, expected_aoi: AoiConfig) -> dict[str, Any]:
         raise BuildingExportError(
             "terrain manifest AOI bounds differ from the configured building AOI"
         )
+    expected_size = expected_aoi.width_m
+    expected_dimension = int(expected_size / 2.0) + 1
+    expected_profile = expected_aoi.profile
+    manifest_profile = terrain.get("sceneProfile")
+    if expected_profile == "current_2km":
+        if manifest_profile != "current_2km":
+            raise BuildingExportError(
+                "terrain manifest must explicitly identify the current_2km scene profile"
+            )
+    elif manifest_profile not in (None, "historical_1km"):
+        raise BuildingExportError("historical AOI requires the historical_1km terrain profile")
     columns = heightfield.get("columns")
     rows = heightfield.get("rows")
     if (
@@ -217,11 +228,11 @@ def _terrain_identity(path: Path, expected_aoi: AoiConfig) -> dict[str, Any]:
         or not isinstance(columns, int)
         or isinstance(rows, bool)
         or not isinstance(rows, int)
-        or columns != 501
-        or rows != 501
+        or columns != expected_dimension
+        or rows != expected_dimension
     ):
         raise BuildingExportError(
-            "local terrain grid dimensions do not match the 1,000 m project AOI"
+            f"local terrain grid dimensions do not match the {expected_size:,.0f} m project AOI"
         )
     if expected_byte_length != rows * columns * 4:
         raise BuildingExportError(
@@ -257,8 +268,9 @@ def _terrain_identity(path: Path, expected_aoi: AoiConfig) -> dict[str, Any]:
         "heightfieldPath": "heightfield.f32",
         "heightfieldSha256": actual_hash,
         "heightfieldByteLength": len(binary_bytes),
-        "heightfieldDimensions": [501, 501],
+        "heightfieldDimensions": [expected_dimension, expected_dimension],
         "verticalReference": vertical_reference,
+        **({"sceneProfile": "current_2km"} if expected_profile == "current_2km" else {}),
     }
 
 
@@ -448,7 +460,9 @@ def _validate_height(feature: dict[str, Any], index: int, policy: dict[str, Any]
     return expected
 
 
-def _validate_feature_geometry(feature: dict[str, Any], index: int) -> None:
+def _validate_feature_geometry(
+    feature: dict[str, Any], index: int, *, half_extent_m: float = 500.0
+) -> None:
     geometry = _required_mapping(feature.get("geometry"), f"buildings[{index}].geometry")
     components = geometry.get("polygons")
     if geometry.get("type") != "MultiPolygon" or not isinstance(components, list) or not components:
@@ -474,8 +488,10 @@ def _validate_feature_geometry(feature: dict[str, Any], index: int) -> None:
                     raise BuildingExportError(f"{point_field} must contain local XZ coordinates")
                 x = _finite_number(point[0], f"{point_field}[0]")
                 z = _finite_number(point[1], f"{point_field}[1]")
-                if abs(x) > 500.001 or abs(z) > 500.001:
-                    raise BuildingExportError(f"{point_field} is outside the 1,000 m AOI bounds")
+                if abs(x) > half_extent_m + 0.001 or abs(z) > half_extent_m + 0.001:
+                    raise BuildingExportError(
+                        f"{point_field} is outside the {half_extent_m * 2:,.0f} m AOI bounds"
+                    )
                 validated_points.append([x, z])
             if validated_points[0] != validated_points[-1]:
                 raise BuildingExportError(f"{field} must be closed")
@@ -582,6 +598,7 @@ def build_building_package(
     package_manifest = {
         "formatVersion": 1,
         "worldId": aoi_config.id,
+        **({"sceneProfile": "current_2km"} if aoi_config.profile == "current_2km" else {}),
         "name": "Torquay candidate OSM building footprint package",
         "sourceCrs": "EPSG:27700",
         "axisConvention": "+X east, +Y up, -Z north",
@@ -714,6 +731,11 @@ def validate_building_package(
         raise BuildingExportError("manifest.formatVersion must be integer 1")
     if manifest.get("worldId") != expected_aoi.id:
         raise BuildingExportError("manifest.worldId does not match the configured AOI")
+    if expected_aoi.profile == "current_2km":
+        if manifest.get("sceneProfile") != "current_2km":
+            raise BuildingExportError("manifest.sceneProfile must be current_2km")
+    elif manifest.get("sceneProfile") not in (None, "historical_1km"):
+        raise BuildingExportError("historical building package has an incompatible sceneProfile")
     expected_buildings = _required_mapping(manifest.get("buildings"), "manifest.buildings")
     byte_length = expected_buildings.get("byteLength")
     if (
@@ -1132,7 +1154,7 @@ def validate_building_package(
         if source.get("timestamp") is not None and not isinstance(source.get("timestamp"), str):
             raise BuildingExportError(f"buildings[{index}].source.timestamp must be text or null")
         resolved_heights.append(_validate_height(feature, index, height_policy))
-        _validate_feature_geometry(feature, index)
+        _validate_feature_geometry(feature, index, half_extent_m=expected_aoi.width_m / 2.0)
         if not isinstance(feature.get("clippedToAoi"), bool):
             raise BuildingExportError(f"buildings[{index}].clippedToAoi must be boolean")
         flags = feature.get("qualityFlags")
