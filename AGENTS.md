@@ -4,6 +4,8 @@ TVW-004 through TVW-015 are complete and independently reviewed; the M8 street-l
 
 ## Working protocol
 
+The user separately authorized the focused 2 km terrain/buildings/roads fly-through described in `docs/milestones/Torquay-2km-viewer-spec.md` on 2026-10-20. This is not TVW-016 and does not authorize later work; keep the candidate pending and preserve the historical 1 km package.
+
 1. Work on **one milestone and one focused issue** at a time. M0, M1 and TVW-008/M3 are complete and independently reviewed. TVW-008 preserved the pending overall AOI status and synthetic worlds. TVW-009/M4 import, height policy and QA, TVW-010 browser building rendering, TVW-011 optional road rendering, TVW-012 independent map comparison, TVW-013 ground-following walk mode, TVW-014 clean-clone smoke, source-regeneration evidence and profiling, TVW-015 optional street-name labels, and the M8 overview/minimap issue passed independent review. The combined M5, M6, M7, TVW-015, and M8 overview/minimap issue gates are complete. TVW-016 and later remain unauthorized.
 2. Start with an implementation plan, concrete files touched, tests and proof of completion.
 3. Keep geographic calculations in tested Python modules and typed, documented asset contracts. No ad-hoc coordinate transforms scattered across React/Three.js render logic.
