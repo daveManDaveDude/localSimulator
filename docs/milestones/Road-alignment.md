@@ -1,6 +1,6 @@
 # Road-alignment investigation
 
-Status: focused fix round 1 implementation complete; pending independent Sol re-review. This is not TVW-016 and has not been accepted. The AOI remains `selected_pending_coverage` / `not_checked`. No renderer, source, GIS, package, UI, coordinate-transform, width, or terrain correction is recommended by these diagnostics.
+Status: focused diagnostic complete; independently reviewed and coordinator-accepted on 21 October 2026 after Sol 6.1 review of fix commit `5f47b46`. This is not TVW-016. The AOI remains `selected_pending_coverage` / `not_checked`. No renderer, source, GIS, package, UI, coordinate-transform, width, or terrain correction is recommended by these diagnostics.
 
 ## Finding
 
@@ -115,4 +115,4 @@ A before/after SHA-256 comparison checked all 8,245 baseline files (1,393,463,90
 
 The source snapshot is dated 16 October 2026. Widths are configured visual estimates; raw `width`/`lanes` tags were not applied. The preferred coordinate grid is unavailable and the stated operation accuracy is 2 m. Terrain data does not encode known road engineering or surveyed edges. OS OpenMap symbols are generalized. The six camera targets use named package centerlines and terrain; exact screenshot segment/camera correspondence remains unknown. None of these results changes the pending AOI status or proves complete feature coverage.
 
-No correction is demonstrated. The next step is independent Sol review of this focused fix round and its refreshed hash-bound evidence. A renderer or GIS change would require a separate narrow specification based on stronger source evidence.
+No road correction is demonstrated. Sol independently verified the camera datum and published-mesh footprint fixes, all six regenerated captures, hashes, independent controls, and preservation boundaries. A renderer or GIS change would require a separate narrow specification based on stronger source evidence. TVW-016 and later remain unauthorized.
