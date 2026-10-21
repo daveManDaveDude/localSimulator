@@ -1,0 +1,251 @@
+{
+  "formatVersion": 1,
+  "status": "pass",
+  "probeSeed": 20261017,
+  "sampling": "bilinear between source 1 m area-pixel centers; no extrapolation or filling",
+  "outputGrid": {
+    "columns": 1001,
+    "rows": 1001,
+    "vertexCount": 1002001,
+    "spacingM": 2.0,
+    "boundsM": [
+      290108.9018176432,
+      64353.48350844931,
+      292108.9018176432,
+      66353.48350844931
+    ],
+    "rowOrder": "north-to-south"
+  },
+  "originElevationM": 47.59241548392676,
+  "sourceBilinearElevationRangeM": [
+    12.31911445141373,
+    104.29609664934549
+  ],
+  "relativeFloat32RangeM": [
+    -35.27330017089844,
+    56.70368194580078
+  ],
+  "errorBudgets": {
+    "resamplingTargetM": 0.25,
+    "maximumObservedResamplingErrorM": 2.842170943040401e-14,
+    "float32QuantizationLimitM": 0.0001,
+    "maximumObservedFloat32QuantizationErrorM": 1.8043943441625743e-06,
+    "errorTypesMeasuredSeparately": true
+  },
+  "probes": [
+    {
+      "label": "north_west_corner",
+      "row": 0,
+      "column": 0,
+      "eastingM": 290108.9018176432,
+      "northingM": 66353.48350844931,
+      "independentBilinearElevationM": 71.80178351118971,
+      "exportedBilinearElevationM": 71.80178351118971,
+      "relativeFloat32M": 24.209367752075195,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 2.751877588025309e-07
+    },
+    {
+      "label": "north_east_corner",
+      "row": 0,
+      "column": 1000,
+      "eastingM": 292108.9018176432,
+      "northingM": 66353.48350844931,
+      "independentBilinearElevationM": 80.9868116704755,
+      "exportedBilinearElevationM": 80.98681167047549,
+      "relativeFloat32M": 33.3943977355957,
+      "resamplingErrorM": 1.4210854715202004e-14,
+      "float32QuantizationErrorM": 1.549046956483835e-06
+    },
+    {
+      "label": "south_west_corner",
+      "row": 1000,
+      "column": 0,
+      "eastingM": 290108.9018176432,
+      "northingM": 64353.48350844931,
+      "independentBilinearElevationM": 19.049786978164448,
+      "exportedBilinearElevationM": 19.04978697816445,
+      "relativeFloat32M": -28.54262924194336,
+      "resamplingErrorM": 3.552713678800501e-15,
+      "float32QuantizationErrorM": 7.361810503425659e-07
+    },
+    {
+      "label": "south_east_corner",
+      "row": 1000,
+      "column": 1000,
+      "eastingM": 292108.9018176432,
+      "northingM": 64353.48350844931,
+      "independentBilinearElevationM": 88.32643487270785,
+      "exportedBilinearElevationM": 88.32643487270785,
+      "relativeFloat32M": 40.7340202331543,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 8.443732042451302e-07
+    },
+    {
+      "label": "center",
+      "row": 500,
+      "column": 500,
+      "eastingM": 291108.9018176432,
+      "northingM": 65353.48350844931,
+      "independentBilinearElevationM": 47.59241548392676,
+      "exportedBilinearElevationM": 47.59241548392676,
+      "relativeFloat32M": 0.0,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 0.0
+    },
+    {
+      "label": "source_seam_1_north",
+      "row": 676,
+      "column": 500,
+      "eastingM": 291108.9018176432,
+      "northingM": 65001.48350844931,
+      "independentBilinearElevationM": 29.856442263866924,
+      "exportedBilinearElevationM": 29.856442263866928,
+      "relativeFloat32M": -17.735973358154297,
+      "resamplingErrorM": 3.552713678800501e-15,
+      "float32QuantizationErrorM": 1.380944638640358e-07
+    },
+    {
+      "label": "source_seam_1_south",
+      "row": 677,
+      "column": 500,
+      "eastingM": 291108.9018176432,
+      "northingM": 64999.48350844931,
+      "independentBilinearElevationM": 29.886587092030297,
+      "exportedBilinearElevationM": 29.886587092030293,
+      "relativeFloat32M": -17.705827713012695,
+      "resamplingErrorM": 3.552713678800501e-15,
+      "float32QuantizationErrorM": 6.788837652038637e-07
+    },
+    {
+      "label": "seeded_1",
+      "row": 293,
+      "column": 824,
+      "eastingM": 291756.9018176432,
+      "northingM": 65767.48350844931,
+      "independentBilinearElevationM": 81.55556134068976,
+      "exportedBilinearElevationM": 81.55556134068976,
+      "relativeFloat32M": 33.9631462097168,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 3.529537906388214e-07
+    },
+    {
+      "label": "seeded_2",
+      "row": 31,
+      "column": 775,
+      "eastingM": 291658.9018176432,
+      "northingM": 66291.48350844931,
+      "independentBilinearElevationM": 85.38336826937616,
+      "exportedBilinearElevationM": 85.38336826937613,
+      "relativeFloat32M": 37.79095458984375,
+      "resamplingErrorM": 2.842170943040401e-14,
+      "float32QuantizationErrorM": 1.8043943441625743e-06
+    },
+    {
+      "label": "seeded_3",
+      "row": 458,
+      "column": 663,
+      "eastingM": 291434.9018176432,
+      "northingM": 65437.48350844931,
+      "independentBilinearElevationM": 65.91418363977762,
+      "exportedBilinearElevationM": 65.9141836397776,
+      "relativeFloat32M": 18.321767807006836,
+      "resamplingErrorM": 1.4210854715202004e-14,
+      "float32QuantizationErrorM": 3.4884402566603967e-07
+    },
+    {
+      "label": "seeded_4",
+      "row": 191,
+      "column": 413,
+      "eastingM": 290934.9018176432,
+      "northingM": 65971.48350844931,
+      "independentBilinearElevationM": 84.7041787877143,
+      "exportedBilinearElevationM": 84.7041787877143,
+      "relativeFloat32M": 37.11176300048828,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 3.0329925948535674e-07
+    },
+    {
+      "label": "seeded_5",
+      "row": 695,
+      "column": 11,
+      "eastingM": 290130.9018176432,
+      "northingM": 64963.48350844931,
+      "independentBilinearElevationM": 65.22287531556405,
+      "exportedBilinearElevationM": 65.22287531556405,
+      "relativeFloat32M": 17.630460739135742,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 9.07498446167665e-07
+    },
+    {
+      "label": "seeded_6",
+      "row": 127,
+      "column": 314,
+      "eastingM": 290736.9018176432,
+      "northingM": 66099.48350844931,
+      "independentBilinearElevationM": 72.46337094815942,
+      "exportedBilinearElevationM": 72.46337094815944,
+      "relativeFloat32M": 24.870954513549805,
+      "resamplingErrorM": 1.4210854715202004e-14,
+      "float32QuantizationErrorM": 9.506828604344264e-07
+    },
+    {
+      "label": "seeded_7",
+      "row": 507,
+      "column": 534,
+      "eastingM": 291176.9018176432,
+      "northingM": 65339.48350844931,
+      "independentBilinearElevationM": 45.17791860644243,
+      "exportedBilinearElevationM": 45.17791860644243,
+      "relativeFloat32M": -2.414496898651123,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 2.1166798092053796e-08
+    },
+    {
+      "label": "seeded_8",
+      "row": 934,
+      "column": 627,
+      "eastingM": 291362.9018176432,
+      "northingM": 64485.48350844931,
+      "independentBilinearElevationM": 34.67361606867254,
+      "exportedBilinearElevationM": 34.67361606867254,
+      "relativeFloat32M": -12.91879940032959,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 1.4924630420409812e-08
+    },
+    {
+      "label": "seeded_9",
+      "row": 830,
+      "column": 841,
+      "eastingM": 291790.9018176432,
+      "northingM": 64693.48350844931,
+      "independentBilinearElevationM": 58.76107974185209,
+      "exportedBilinearElevationM": 58.76107974185209,
+      "relativeFloat32M": 11.16866397857666,
+      "resamplingErrorM": 0.0,
+      "float32QuantizationErrorM": 2.7934867574685995e-07
+    },
+    {
+      "label": "seeded_10",
+      "row": 548,
+      "column": 402,
+      "eastingM": 290912.9018176432,
+      "northingM": 65257.48350844931,
+      "independentBilinearElevationM": 63.15462286311413,
+      "exportedBilinearElevationM": 63.154622863114135,
+      "relativeFloat32M": 15.562207221984863,
+      "resamplingErrorM": 7.105427357601002e-15,
+      "float32QuantizationErrorM": 1.5720250701178884e-07
+    }
+  ],
+  "allRequiredBilinearContributorsValid": true,
+  "nodataFilled": false,
+  "extrapolationUsed": false,
+  "aoiCoverageGate": {
+    "selectionStatus": "selected_pending_coverage",
+    "overallCoverageStatus": "not_checked",
+    "measuredEaDtmCoverageWasRevalidated": true,
+    "m2Complete": false,
+    "note": "EA DTM support was revalidated for every output contributor; OSM/OS feature checks remain pending."
+  }
+}

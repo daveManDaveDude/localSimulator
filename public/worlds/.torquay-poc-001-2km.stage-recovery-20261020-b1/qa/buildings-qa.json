@@ -1,0 +1,427 @@
+{
+  "formatVersion": 1,
+  "aoiId": "torquay-poc-001",
+  "selectionStatus": "selected_pending_coverage",
+  "coverageStatus": "not_checked",
+  "source": {
+    "filename": "devon-261016.osm.pbf",
+    "size_bytes": 58254938,
+    "sha256": "52942b39636e1cb002e5d78a004668996cb469ee9c9e9b9b93049c66b9ac2cd5",
+    "md5": "c9c2018b331d8affd6b7be6464444bc5",
+    "pbf_header": {
+      "format": "PBF",
+      "generator": "osmium/1.16.0",
+      "replication_timestamp": "2026-10-16T20:21:21Z",
+      "replication_sequence_number": "4932",
+      "bounds_wgs84_lon_lat": [
+        -4.752335,
+        50.11104,
+        -2.881604,
+        51.30895
+      ]
+    }
+  },
+  "coordinateOperation": {
+    "wgs84ToBng": {
+      "name": "EPSG:1314 + EPSG:19916",
+      "description": "Inverse of OSGB36 to WGS 84 (6) + British National Grid (with axis order normalized for visualization)",
+      "definition": "proj=pipeline step proj=unitconvert xy_in=deg xy_out=rad step proj=push v_3 step proj=cart ellps=WGS84 step inv proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=airy step proj=pop v_3 step proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy",
+      "reported_accuracy_m": 2.0,
+      "accuracy_m": 2.0,
+      "grid_status": "selected EPSG:1314 + EPSG:19916 operation uses no grid files",
+      "uses_grids": false,
+      "grids": [],
+      "best_available": false,
+      "preferred_missing_operations": [
+        {
+          "name": "Inverse of OSGB36 to WGS 84 (9) + British National Grid",
+          "reported_accuracy_m": 1.0,
+          "grids": [
+            {
+              "short_name": "uk_os_OSTN15_NTv2_OSGBtoETRS.tif",
+              "full_name": "",
+              "available": false,
+              "url": "https://cdn.proj.org/uk_os_OSTN15_NTv2_OSGBtoETRS.tif"
+            }
+          ]
+        }
+      ]
+    },
+    "bngToWgs84": {
+      "name": "EPSG:1314 + EPSG:19916",
+      "description": "Inverse of British National Grid + OSGB36 to WGS 84 (6) (with axis order normalized for visualization)",
+      "definition": "proj=pipeline step inv proj=tmerc lat_0=49 lon_0=-2 k=0.9996012717 x_0=400000 y_0=-100000 ellps=airy step proj=push v_3 step proj=cart ellps=airy step proj=helmert x=446.448 y=-125.157 z=542.06 rx=0.15 ry=0.247 rz=0.842 s=-20.489 convention=position_vector step inv proj=cart ellps=WGS84 step proj=pop v_3 step proj=unitconvert xy_in=rad xy_out=deg",
+      "reported_accuracy_m": 2.0,
+      "accuracy_m": 2.0,
+      "grid_status": "selected EPSG:1314 + EPSG:19916 operation uses no grid files",
+      "uses_grids": false,
+      "grids": [],
+      "best_available": false,
+      "preferred_missing_operations": [
+        {
+          "name": "Inverse of British National Grid + OSGB36 to WGS 84 (9)",
+          "reported_accuracy_m": 1.0,
+          "grids": [
+            {
+              "short_name": "uk_os_OSTN15_NTv2_OSGBtoETRS.tif",
+              "full_name": "",
+              "available": false,
+              "url": "https://cdn.proj.org/uk_os_OSTN15_NTv2_OSGBtoETRS.tif"
+            }
+          ]
+        }
+      ]
+    },
+    "axisOrder": "longitude-latitude for geographic input; easting-northing for BNG"
+  },
+  "acquisitionBufferM": 50.0,
+  "minimumClippedAreaM2": 1.0,
+  "heightPolicy": {
+    "version": 1,
+    "levelsToMetres": 3.0,
+    "defaultHeightM": 8.0,
+    "minimumHeightM": 1.0,
+    "maximumHeightM": 150.0,
+    "precedence": [
+      "height",
+      "building:levels",
+      "configured_default"
+    ],
+    "taggedHeightConfidence": "tagged_but_unverified",
+    "defaultConfidence": "visual_default_estimate"
+  },
+  "geometryPolicy": {
+    "version": 1,
+    "acquisitionBufferM": 50.0,
+    "minimumClippedAreaM2": 1.0,
+    "coordinateQuantizationM": 0.001,
+    "exteriorWinding": "counter-clockwise in local XZ coordinates",
+    "interiorWinding": "clockwise in local XZ coordinates",
+    "invalidGeometryPolicy": "reject without automatic repair",
+    "duplicatePolicy": "prefer relation then stable identity; collapse exact canonical geometry",
+    "nearOverlapPolicy": "report; do not merge"
+  },
+  "counts": {
+    "building_ways_tagged": 375424,
+    "building_no_ways": 17,
+    "building_part_only_ways": 2129,
+    "building_relations_tagged": 385,
+    "building_no_relations": 0,
+    "building_part_only_relations": 10,
+    "area_callbacks": 509876,
+    "building_areas_assembled": 375804,
+    "building_relation_areas_assembled": 380,
+    "building_no_areas": 17,
+    "building_part_only_areas": 2139,
+    "candidate_areas_in_geographic_filter": 4039,
+    "area_geometry_errors": 0,
+    "excluded_building_no": 17,
+    "excluded_building_part_only": 2139,
+    "relation_member_ways_suppressed": 0,
+    "outside_acquisition_buffer": 129,
+    "outside_aoi": 295,
+    "invalid_geometry": 0,
+    "below_minimum_area": 2,
+    "relation_area_assembly_failures": 0,
+    "building_relations_skipped_non_area_type": 5,
+    "clipped_building_features": 3613,
+    "exported_buildings": 3613,
+    "exact_geometry_duplicates_suppressed": 0,
+    "exported_components": 3616,
+    "exported_holes": 0
+  },
+  "quality": {
+    "rejectedGeometryCount": 0,
+    "candidateGeometryRejectionCount": 0,
+    "rejectedGeometrySamples": [],
+    "relationAreaAssemblyFailures": 0,
+    "unsupportedBuildingRelations": [
+      {
+        "osmRelationId": 7660489,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 4,
+        "memberWayEvidence": [
+          {
+            "wayId": 533264603,
+            "role": "part",
+            "nodeCountWithLocation": 12,
+            "boundsWgs84": [
+              -3.3974543,
+              50.7549978,
+              -3.3967888,
+              50.7552908
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 533264604,
+            "role": "part",
+            "nodeCountWithLocation": 19,
+            "boundsWgs84": [
+              -3.3984237,
+              50.7550501,
+              -3.3972173,
+              50.7556855
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 533264605,
+            "role": "part",
+            "nodeCountWithLocation": 22,
+            "boundsWgs84": [
+              -3.399067,
+              50.7552542,
+              -3.3983049,
+              50.7557943
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 369356671,
+            "role": "outline",
+            "nodeCountWithLocation": 48,
+            "boundsWgs84": [
+              -3.399067,
+              50.754983,
+              -3.3967888,
+              50.7557943
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 7726123,
+        "relationType": "site",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 2,
+        "memberWayEvidence": [
+          {
+            "wayId": 539895459,
+            "role": "outer",
+            "nodeCountWithLocation": 60,
+            "boundsWgs84": [
+              -3.8621984,
+              50.3859435,
+              -3.860814,
+              50.386615
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 241248122,
+            "role": "inner",
+            "nodeCountWithLocation": 28,
+            "boundsWgs84": [
+              -3.8620274,
+              50.3863267,
+              -3.8613568,
+              50.3865248
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 9226944,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 3,
+        "memberWayEvidence": [
+          {
+            "wayId": 664045176,
+            "role": "outline",
+            "nodeCountWithLocation": 11,
+            "boundsWgs84": [
+              -3.4532304,
+              50.7999865,
+              -3.4530665,
+              50.8000998
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 664044780,
+            "role": "part",
+            "nodeCountWithLocation": 12,
+            "boundsWgs84": [
+              -3.4532141,
+              50.8000423,
+              -3.4531912,
+              50.8000568
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 664045163,
+            "role": "part",
+            "nodeCountWithLocation": 9,
+            "boundsWgs84": [
+              -3.4532304,
+              50.8000324,
+              -3.4531763,
+              50.8000651
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 9233555,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 2,
+        "memberWayEvidence": [
+          {
+            "wayId": 664541226,
+            "role": "part",
+            "nodeCountWithLocation": 6,
+            "boundsWgs84": [
+              -3.4400095,
+              50.7608042,
+              -3.4398948,
+              50.7608963
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 517385877,
+            "role": "outline",
+            "nodeCountWithLocation": 7,
+            "boundsWgs84": [
+              -3.4400242,
+              50.7607973,
+              -3.4398003,
+              50.7609652
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      },
+      {
+        "osmRelationId": 9301051,
+        "relationType": "building",
+        "reason": "tagged building relation type is not an area-assembly type; it was intentionally excluded from multipolygon area-failure counts",
+        "memberCount": 3,
+        "memberWayEvidence": [
+          {
+            "wayId": 668590612,
+            "role": "outline",
+            "nodeCountWithLocation": 15,
+            "boundsWgs84": [
+              -3.4618147,
+              50.74283,
+              -3.4613875,
+              50.7430408
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 301573764,
+            "role": "part",
+            "nodeCountWithLocation": 9,
+            "boundsWgs84": [
+              -3.4616058,
+              50.74283,
+              -3.4613875,
+              50.7430408
+            ],
+            "intersectsAcquisitionEnvelope": false
+          },
+          {
+            "wayId": 301573763,
+            "role": "part",
+            "nodeCountWithLocation": 9,
+            "boundsWgs84": [
+              -3.4618147,
+              50.742858,
+              -3.4615933,
+              50.7430276
+            ],
+            "intersectsAcquisitionEnvelope": false
+          }
+        ],
+        "locationEvidenceNote": "Available member way bounds are evidence only, not a building footprint."
+      }
+    ],
+    "unsupportedBuildingRelationLocationEvidence": "Member way bounds are reported when available; they do not assert a footprint.",
+    "areaGeometryErrorScope": "libosmium WKB creation errors are observed across the entire Devon source; when no geometry is returned their AOI location cannot be established.",
+    "exactDuplicateConflicts": [],
+    "nearOverlapCount": 0,
+    "nearOverlapSamples": [],
+    "heightMethodCounts": {
+      "estimated_default": 3582,
+      "estimated_levels": 31
+    },
+    "heightClampCounts": {},
+    "taggedHeightsAreUnverified": true
+  },
+  "mapComparisonCandidates": [
+    {
+      "group": "NE",
+      "osmFeatureId": "osm:way:198603065",
+      "footprintAreaM2": 2391.584,
+      "representativePointWgs84LonLat": [
+        -3.5317643749222425,
+        50.4843744763795
+      ],
+      "placementCheckOnly": true,
+      "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
+    },
+    {
+      "group": "NW",
+      "osmFeatureId": "osm:way:193285347",
+      "footprintAreaM2": 7377.873,
+      "representativePointWgs84LonLat": [
+        -3.5430224321703307,
+        50.48049131991108
+      ],
+      "placementCheckOnly": true,
+      "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
+    },
+    {
+      "group": "SE",
+      "osmFeatureId": "osm:way:79305584",
+      "footprintAreaM2": 6480.359,
+      "representativePointWgs84LonLat": [
+        -3.5232537517063762,
+        50.47576589330986
+      ],
+      "placementCheckOnly": true,
+      "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
+    },
+    {
+      "group": "SW",
+      "osmFeatureId": "osm:way:181620525",
+      "footprintAreaM2": 2751.274,
+      "representativePointWgs84LonLat": [
+        -3.5417691183482414,
+        50.475127986993755
+      ],
+      "placementCheckOnly": true,
+      "note": "Candidate for a manual map placement check; not evidence of OSM completeness."
+    }
+  ],
+  "summary": {
+    "aoiAreaM2": 4000000.0,
+    "buildingFootprintAreaM2": 736801.453,
+    "footprintAreaPerAoiKm2": 0.736801,
+    "densityInterpretation": "Mapped OSM coverage only; this is not a completeness estimate.",
+    "minimumHeightM": 3.0,
+    "maximumHeightM": 18.0,
+    "meanHeightM": 7.984
+  },
+  "package": {
+    "worldId": "torquay-poc-001",
+    "manifestPath": "manifest.json",
+    "buildingsPath": "buildings.json",
+    "buildingsByteLength": 6015566,
+    "buildingsSha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+  }
+}

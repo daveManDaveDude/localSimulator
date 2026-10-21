@@ -1,0 +1,131 @@
+{
+  "formatVersion": 1,
+  "sceneProfile": "current_2km",
+  "worldId": "torquay-poc-001",
+  "aoi": {
+    "boundsM": [
+      290108.9018176432,
+      64353.48350844931,
+      292108.9018176432,
+      66353.48350844931
+    ],
+    "selectionStatus": "selected_pending_coverage",
+    "coverageStatus": "not_checked",
+    "m2Complete": false
+  },
+  "terrain": {
+    "columns": 1001,
+    "rows": 1001,
+    "spacingM": 2.0,
+    "origin": {
+      "eastingM": 291108.9018176432,
+      "northingM": 65353.48350844931,
+      "elevationM": 47.59241548392676
+    },
+    "manifestSha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+  },
+  "buildings": {
+    "featureCount": 3613,
+    "manifestSha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+  },
+  "roads": {
+    "wayCount": 1044,
+    "manifestSha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+  },
+  "outerAnnulus": {
+    "definition": "local XZ outside former 1 km square and inside current 2 km square",
+    "historicalHalfExtentM": 500.0,
+    "currentHalfExtentM": 1000.0,
+    "buildingFeatureCount": 2674,
+    "buildingFeatureIdsSample": [
+      "osm:way:1026809669",
+      "osm:way:1026809670",
+      "osm:way:1101837569",
+      "osm:way:1145175534",
+      "osm:way:1147750136",
+      "osm:way:1148663100",
+      "osm:way:1338740946",
+      "osm:way:1338740947",
+      "osm:way:1338740948",
+      "osm:way:1344642355",
+      "osm:way:1366190073",
+      "osm:way:1366190074",
+      "osm:way:1366190075",
+      "osm:way:1366190076",
+      "osm:way:1366190077",
+      "osm:way:1366190078",
+      "osm:way:1366190079",
+      "osm:way:1465749232",
+      "osm:way:1465749233",
+      "osm:way:1465749234"
+    ],
+    "roadWayCount": 895,
+    "roadWayIdsSample": [
+      "way/101250218",
+      "way/104398357",
+      "way/1069535883",
+      "way/1101837570",
+      "way/1101837571",
+      "way/1104202382",
+      "way/1104202385",
+      "way/1104203038",
+      "way/1104203046",
+      "way/1104203047",
+      "way/1104203053",
+      "way/1104203054",
+      "way/1104203059",
+      "way/1144363662",
+      "way/1144364008",
+      "way/1148663101",
+      "way/1148663102",
+      "way/1148663103",
+      "way/1163732766",
+      "way/1174955000"
+    ]
+  },
+  "packageHashes": {
+    "terrain": {
+      "manifest.json": {
+        "byteLength": 7835,
+        "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+      },
+      "heightfield.f32": {
+        "byteLength": 4008004,
+        "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+      },
+      "qa.json": {
+        "byteLength": 8326,
+        "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+      }
+    },
+    "buildings": {
+      "manifest.json": {
+        "byteLength": 7240,
+        "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+      },
+      "buildings.json": {
+        "byteLength": 6015566,
+        "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+      },
+      "qa.json": {
+        "byteLength": 14484,
+        "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+      }
+    },
+    "roads": {
+      "manifest.json": {
+        "byteLength": 10832,
+        "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+      },
+      "roads.json": {
+        "byteLength": 87338409,
+        "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+      },
+      "qa.json": {
+        "byteLength": 11911,
+        "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+      }
+    }
+  },
+  "interpretation": "Mapped counts are observations of this dated source, not completeness evidence."
+}
