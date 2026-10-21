@@ -1,0 +1,655 @@
+{
+  "title": "Road-alignment current 2km",
+  "route": "/",
+  "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "sceneProfile": "current_2km",
+  "pointerLockVerifiedBeforeCaptures": true,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "allRequestsLocal": true,
+  "requestedReleaseAssets": [
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/inventory.json",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/manifest.json",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/qa.json",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+    "http://127.0.0.1:4212/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/qa.json"
+  ],
+  "evidence": [
+    {
+      "contextId": "pennys-teignmouth-steep",
+      "screenshot": "docs/milestones/screenshots/Road-alignment/pennys-teignmouth-steep-overhead.png",
+      "screenshotSha256": "77e5213ec1288a8606a6a159bd36f222c44a1306efd761b310f0b412ecc22160",
+      "view": "overhead",
+      "selectedWayId": 78455388,
+      "selectedWayName": "Pennys Hill",
+      "candidateSourceNames": [
+        "Pennys Hill",
+        "Teignmouth Road"
+      ],
+      "visibleSourceNames": [
+        "Teignmouth Road",
+        "Pennys Hill"
+      ],
+      "visibleRoadLabels": [
+        {
+          "name": "Teignmouth Road",
+          "key": "24806641:0",
+          "wayId": 24806641,
+          "distanceM": 162.3293
+        },
+        {
+          "name": "Pennys Hill",
+          "key": "78455388:0",
+          "wayId": 78455388,
+          "distanceM": 166.1899
+        }
+      ],
+      "candidateRoadLabels": [
+        {
+          "name": "Pennys Hill",
+          "key": "78455388:0",
+          "wayId": 78455388,
+          "distanceM": 166.1899
+        }
+      ],
+      "candidateLabelNote": "At least one visible DOM label belongs to a candidate context way; its name is checked against the current package source tags.",
+      "candidateAnchorLocalXZ": [
+        -244.518,
+        -58.794
+      ],
+      "centerlineTargetLocalXZ": [
+        -244.51805799394438,
+        -58.79447242087362
+      ],
+      "centerlineTargetBngEN": [
+        290864.38375964924,
+        65412.27798087018
+      ],
+      "distanceFromCandidateAnchorM": 0.0004759672041405411,
+      "centerlineTangentLocalXZ": [
+        0.9925492124505331,
+        -0.12184441252608443
+      ],
+      "poseDerivation": "nearest projected point on the named current-release package centerline; low-oblique camera is offset opposite its local tangent; bearing follows tangent",
+      "camera": {
+        "x": -244.518058,
+        "y": 156.847334,
+        "z": -58.794472,
+        "bearing": 83,
+        "pitch": -82
+      },
+      "sampledGroundLocalM": -0.7451,
+      "sampledGroundOrthometricM": 46.8473,
+      "eyeHeightAboveSampledTerrainM": 110.000034,
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "sceneProfile": "current_2km",
+      "roadManifestSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 960,
+        "devicePixelRatio": 1.5
+      },
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 960,
+          "width": 1440,
+          "height": 960
+        }
+      }
+    },
+    {
+      "contextId": "pennys-teignmouth-steep",
+      "screenshot": "docs/milestones/screenshots/Road-alignment/pennys-teignmouth-steep-low-oblique.png",
+      "screenshotSha256": "5857111388a5aa3ac296e838d80f1dffd92a1643928697ffc4e4a6e35ea4a4b6",
+      "view": "low-oblique",
+      "selectedWayId": 78455388,
+      "selectedWayName": "Pennys Hill",
+      "candidateSourceNames": [
+        "Pennys Hill",
+        "Teignmouth Road"
+      ],
+      "visibleSourceNames": [
+        "Pennys Hill",
+        "Teignmouth Road",
+        "Wright's Lane",
+        "Chatto Way",
+        "Haslam Road",
+        "Dower Road",
+        "Third Avenue"
+      ],
+      "visibleRoadLabels": [
+        {
+          "name": "Pennys Hill",
+          "key": "78455388:0",
+          "wayId": 78455388,
+          "distanceM": 111.2032
+        },
+        {
+          "name": "Teignmouth Road",
+          "key": "78455395:0",
+          "wayId": 78455395,
+          "distanceM": 143.4438
+        },
+        {
+          "name": "Wright's Lane",
+          "key": "30982855:0",
+          "wayId": 30982855,
+          "distanceM": 304.9232
+        },
+        {
+          "name": "Chatto Way",
+          "key": "94783382:0",
+          "wayId": 94783382,
+          "distanceM": 320.5931
+        },
+        {
+          "name": "Haslam Road",
+          "key": "30982856:0",
+          "wayId": 30982856,
+          "distanceM": 360.724
+        },
+        {
+          "name": "Dower Road",
+          "key": "30982873:0",
+          "wayId": 30982873,
+          "distanceM": 445.2569
+        },
+        {
+          "name": "Third Avenue",
+          "key": "30982870:0",
+          "wayId": 30982870,
+          "distanceM": 472.9296
+        }
+      ],
+      "candidateRoadLabels": [
+        {
+          "name": "Pennys Hill",
+          "key": "78455388:0",
+          "wayId": 78455388,
+          "distanceM": 111.2032
+        },
+        {
+          "name": "Teignmouth Road",
+          "key": "78455395:0",
+          "wayId": 78455395,
+          "distanceM": 143.4438
+        }
+      ],
+      "candidateLabelNote": "At least one visible DOM label belongs to a candidate context way; its name is checked against the current package source tags.",
+      "candidateAnchorLocalXZ": [
+        -244.518,
+        -58.794
+      ],
+      "centerlineTargetLocalXZ": [
+        -244.51805799394438,
+        -58.79447242087362
+      ],
+      "centerlineTargetBngEN": [
+        290864.38375964924,
+        65412.27798087018
+      ],
+      "distanceFromCandidateAnchorM": 0.0004759672041405411,
+      "centerlineTangentLocalXZ": [
+        0.9925492124505331,
+        -0.12184441252608443
+      ],
+      "poseDerivation": "nearest projected point on the named current-release package centerline; low-oblique camera is offset opposite its local tangent; bearing follows tangent",
+      "camera": {
+        "x": -289.182773,
+        "y": 65.896571,
+        "z": -53.311474,
+        "bearing": 83,
+        "pitch": -24
+      },
+      "sampledGroundLocalM": 3.3042,
+      "sampledGroundOrthometricM": 50.8966,
+      "eyeHeightAboveSampledTerrainM": 14.999970999999995,
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "sceneProfile": "current_2km",
+      "roadManifestSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 960,
+        "devicePixelRatio": 1.5
+      },
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 960,
+          "width": 1440,
+          "height": 960
+        }
+      }
+    },
+    {
+      "contextId": "cricketfield-teignmouth-junction",
+      "screenshot": "docs/milestones/screenshots/Road-alignment/cricketfield-teignmouth-junction-overhead.png",
+      "screenshotSha256": "0b9a70f1e2f2b813c2a54b3eb28cca2e2f514b6e0dbeb8e3ddbccf643d21f1d2",
+      "view": "overhead",
+      "selectedWayId": 24806641,
+      "selectedWayName": "Teignmouth Road",
+      "candidateSourceNames": [
+        "Cricketfield Road",
+        "Teignmouth Road"
+      ],
+      "visibleSourceNames": [
+        "Cricketfield Road",
+        "Teignmouth Road"
+      ],
+      "visibleRoadLabels": [
+        {
+          "name": "Cricketfield Road",
+          "key": "686711262:0",
+          "wayId": 686711262,
+          "distanceM": 157.7614
+        },
+        {
+          "name": "Teignmouth Road",
+          "key": "24806641:0",
+          "wayId": 24806641,
+          "distanceM": 159.6696
+        }
+      ],
+      "candidateRoadLabels": [
+        {
+          "name": "Cricketfield Road",
+          "key": "686711262:0",
+          "wayId": 686711262,
+          "distanceM": 157.7614
+        },
+        {
+          "name": "Teignmouth Road",
+          "key": "24806641:0",
+          "wayId": 24806641,
+          "distanceM": 159.6696
+        }
+      ],
+      "candidateLabelNote": "At least one visible DOM label belongs to a candidate context way; its name is checked against the current package source tags.",
+      "candidateAnchorLocalXZ": [
+        -307.96,
+        -28.828
+      ],
+      "centerlineTargetLocalXZ": [
+        -307.96,
+        -28.828
+      ],
+      "centerlineTargetBngEN": [
+        290800.9418176432,
+        65382.31150844931
+      ],
+      "distanceFromCandidateAnchorM": 0,
+      "centerlineTangentLocalXZ": [
+        0.8148199118059596,
+        -0.5797141634672456
+      ],
+      "poseDerivation": "nearest projected point on the named current-release package centerline; low-oblique camera is offset opposite its local tangent; bearing follows tangent",
+      "camera": {
+        "x": -307.96,
+        "y": 160.948817,
+        "z": -28.828,
+        "bearing": 54.6,
+        "pitch": -82
+      },
+      "sampledGroundLocalM": 3.3564,
+      "sampledGroundOrthometricM": 50.9488,
+      "eyeHeightAboveSampledTerrainM": 110.00001699999999,
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "sceneProfile": "current_2km",
+      "roadManifestSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 960,
+        "devicePixelRatio": 1.5
+      },
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 960,
+          "width": 1440,
+          "height": 960
+        }
+      }
+    },
+    {
+      "contextId": "cricketfield-teignmouth-junction",
+      "screenshot": "docs/milestones/screenshots/Road-alignment/cricketfield-teignmouth-junction-low-oblique.png",
+      "screenshotSha256": "e41a244de1e7d060f40971a6643fa8e4b9db64852cb164d5ed688f4adb8f93e6",
+      "view": "low-oblique",
+      "selectedWayId": 24806641,
+      "selectedWayName": "Teignmouth Road",
+      "candidateSourceNames": [
+        "Cricketfield Road",
+        "Teignmouth Road"
+      ],
+      "visibleSourceNames": [
+        "Teignmouth Road",
+        "Pennys Hill",
+        "Lower Audley Road",
+        "Higher Audley Avenue"
+      ],
+      "visibleRoadLabels": [
+        {
+          "name": "Teignmouth Road",
+          "key": "24806641:0",
+          "wayId": 24806641,
+          "distanceM": 92.8751
+        },
+        {
+          "name": "Pennys Hill",
+          "key": "78455388:0",
+          "wayId": 78455388,
+          "distanceM": 169.6622
+        },
+        {
+          "name": "Lower Audley Road",
+          "key": "34074001:0",
+          "wayId": 34074001,
+          "distanceM": 209.4933
+        },
+        {
+          "name": "Higher Audley Avenue",
+          "key": "34074002:0",
+          "wayId": 34074002,
+          "distanceM": 344.0927
+        }
+      ],
+      "candidateRoadLabels": [
+        {
+          "name": "Teignmouth Road",
+          "key": "24806641:0",
+          "wayId": 24806641,
+          "distanceM": 92.8751
+        }
+      ],
+      "candidateLabelNote": "At least one visible DOM label belongs to a candidate context way; its name is checked against the current package source tags.",
+      "candidateAnchorLocalXZ": [
+        -307.96,
+        -28.828
+      ],
+      "centerlineTargetLocalXZ": [
+        -307.96,
+        -28.828
+      ],
+      "centerlineTargetBngEN": [
+        290800.9418176432,
+        65382.31150844931
+      ],
+      "distanceFromCandidateAnchorM": 0,
+      "centerlineTangentLocalXZ": [
+        0.8148199118059596,
+        -0.5797141634672456
+      ],
+      "poseDerivation": "nearest projected point on the named current-release package centerline; low-oblique camera is offset opposite its local tangent; bearing follows tangent",
+      "camera": {
+        "x": -344.626896,
+        "y": 68.74274,
+        "z": -2.740863,
+        "bearing": 54.6,
+        "pitch": -24
+      },
+      "sampledGroundLocalM": 6.1503,
+      "sampledGroundOrthometricM": 53.7427,
+      "eyeHeightAboveSampledTerrainM": 15.000039999999998,
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "sceneProfile": "current_2km",
+      "roadManifestSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 960,
+        "devicePixelRatio": 1.5
+      },
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 960,
+          "width": 1440,
+          "height": 960
+        }
+      }
+    },
+    {
+      "contextId": "arthington-control",
+      "screenshot": "docs/milestones/screenshots/Road-alignment/arthington-control-overhead.png",
+      "screenshotSha256": "4dfd021844fb6560e9bf509087e0618b9fc34c8a6c52bd2221e75a76d86ed7b0",
+      "view": "overhead",
+      "selectedWayId": 30482119,
+      "selectedWayName": "Arthington",
+      "candidateSourceNames": [
+        "Arthington"
+      ],
+      "visibleSourceNames": [
+        "Arthington",
+        "Oaklawn Terrace",
+        "Parkhurst Road"
+      ],
+      "visibleRoadLabels": [
+        {
+          "name": "Arthington",
+          "key": "30482119:0",
+          "wayId": 30482119,
+          "distanceM": 157.3422
+        },
+        {
+          "name": "Oaklawn Terrace",
+          "key": "30482112:0",
+          "wayId": 30482112,
+          "distanceM": 190.4002
+        },
+        {
+          "name": "Parkhurst Road",
+          "key": "30482113:0",
+          "wayId": 30482113,
+          "distanceM": 199.7367
+        }
+      ],
+      "candidateRoadLabels": [
+        {
+          "name": "Arthington",
+          "key": "30482119:0",
+          "wayId": 30482119,
+          "distanceM": 157.3422
+        }
+      ],
+      "candidateLabelNote": "At least one visible DOM label belongs to a candidate context way; its name is checked against the current package source tags.",
+      "candidateAnchorLocalXZ": [
+        -511.744,
+        207.096
+      ],
+      "centerlineTargetLocalXZ": [
+        -511.89415001017943,
+        207.42127758922803
+      ],
+      "centerlineTargetBngEN": [
+        290597.007667633,
+        65146.06223086008
+      ],
+      "distanceFromCandidateAnchorM": 0.35826042987032325,
+      "centerlineTangentLocalXZ": [
+        0.9079361327896411,
+        0.4191085524956405
+      ],
+      "poseDerivation": "nearest projected point on the named current-release package centerline; low-oblique camera is offset opposite its local tangent; bearing follows tangent",
+      "camera": {
+        "x": -511.89415,
+        "y": 184.666508,
+        "z": 207.421278,
+        "bearing": 114.8,
+        "pitch": -82
+      },
+      "sampledGroundLocalM": 27.0741,
+      "sampledGroundOrthometricM": 74.6665,
+      "eyeHeightAboveSampledTerrainM": 110.000008,
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "sceneProfile": "current_2km",
+      "roadManifestSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 960,
+        "devicePixelRatio": 1.5
+      },
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 960,
+          "width": 1440,
+          "height": 960
+        }
+      }
+    },
+    {
+      "contextId": "arthington-control",
+      "screenshot": "docs/milestones/screenshots/Road-alignment/arthington-control-low-oblique.png",
+      "screenshotSha256": "0cad91146f09f7e230833d7540bb6628444bc8cf5083c4a56c168051dd399675",
+      "view": "low-oblique",
+      "selectedWayId": 30482119,
+      "selectedWayName": "Arthington",
+      "candidateSourceNames": [
+        "Arthington"
+      ],
+      "visibleSourceNames": [
+        "Chapel Court",
+        "Ebdon Way",
+        "Teignmouth Road",
+        "Snowberry Close",
+        "Oakhill Road",
+        "Clarendon Close",
+        "Maxwell Court",
+        "Avoca Avenue",
+        "Parkfield Road",
+        "Mckay Avenue"
+      ],
+      "visibleRoadLabels": [
+        {
+          "name": "Chapel Court",
+          "key": "30482108:0",
+          "wayId": 30482108,
+          "distanceM": 207.3716
+        },
+        {
+          "name": "Ebdon Way",
+          "key": "61295358:0",
+          "wayId": 61295358,
+          "distanceM": 322.0099
+        },
+        {
+          "name": "Teignmouth Road",
+          "key": "30480035:0",
+          "wayId": 30480035,
+          "distanceM": 323.6335
+        },
+        {
+          "name": "Snowberry Close",
+          "key": "30480999:0",
+          "wayId": 30480999,
+          "distanceM": 329.7837
+        },
+        {
+          "name": "Oakhill Road",
+          "key": "362971229:0",
+          "wayId": 362971229,
+          "distanceM": 365.1515
+        },
+        {
+          "name": "Clarendon Close",
+          "key": "30481430:0",
+          "wayId": 30481430,
+          "distanceM": 423.9275
+        },
+        {
+          "name": "Maxwell Court",
+          "key": "30480040:0",
+          "wayId": 30480040,
+          "distanceM": 442.5861
+        },
+        {
+          "name": "Avoca Avenue",
+          "key": "30481433:0",
+          "wayId": 30481433,
+          "distanceM": 443.1872
+        },
+        {
+          "name": "Parkfield Road",
+          "key": "30480989:0",
+          "wayId": 30480989,
+          "distanceM": 452.4396
+        },
+        {
+          "name": "Mckay Avenue",
+          "key": "30480036:0",
+          "wayId": 30480036,
+          "distanceM": 466.6158
+        }
+      ],
+      "candidateRoadLabels": [],
+      "candidateLabelNote": "No label for a candidate context way was rendered in this frame; the visible list is retained, and no placement cause is inferred.",
+      "candidateAnchorLocalXZ": [
+        -511.744,
+        207.096
+      ],
+      "centerlineTargetLocalXZ": [
+        -511.89415001017943,
+        207.42127758922803
+      ],
+      "centerlineTargetBngEN": [
+        290597.007667633,
+        65146.06223086008
+      ],
+      "distanceFromCandidateAnchorM": 0.35826042987032325,
+      "centerlineTangentLocalXZ": [
+        0.9079361327896411,
+        0.4191085524956405
+      ],
+      "poseDerivation": "nearest projected point on the named current-release package centerline; low-oblique camera is offset opposite its local tangent; bearing follows tangent",
+      "camera": {
+        "x": -552.751276,
+        "y": 91.08819,
+        "z": 188.561393,
+        "bearing": 114.8,
+        "pitch": -24
+      },
+      "sampledGroundLocalM": 28.4958,
+      "sampledGroundOrthometricM": 76.0882,
+      "eyeHeightAboveSampledTerrainM": 14.999989999999997,
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "sceneProfile": "current_2km",
+      "roadManifestSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 960,
+        "devicePixelRatio": 1.5
+      },
+      "runtime": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "canvas": {
+          "cssWidth": 1440,
+          "cssHeight": 960,
+          "width": 1440,
+          "height": 960
+        }
+      }
+    }
+  ]
+}

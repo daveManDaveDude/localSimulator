@@ -1,0 +1,143 @@
+{
+  "files": [
+    {
+      "byteLength": 970,
+      "path": "config/aoi.torquay.json",
+      "sha256": "205aa50e58e807e0f54f7f74d9f546052da6fca627ae9c3411ec4af334a2a6e5"
+    },
+    {
+      "byteLength": 1278,
+      "path": "config/roads.torquay.json",
+      "sha256": "ce96f7cd7da42773d4278d54c9c8ef9ccd57f7db7a6ac3d164338567298ccf6d"
+    },
+    {
+      "byteLength": 6058,
+      "path": "data/comparison-source-manifest.json",
+      "sha256": "79a42273d0182546002d782cbf99a3a877ccad4920f95c69f430aa674d40c660"
+    },
+    {
+      "byteLength": 349405146,
+      "path": "data/raw/comparison/os_openmap_local/openmaplocal-2026-04-sx-geotiff.zip",
+      "sha256": "d9a01900c4dd5c26af50d6aed79f419a1957acf4167aedef97bb905ffcdff853"
+    },
+    {
+      "byteLength": 2620996,
+      "path": "data/raw/comparison/os_openmap_local/selected-members/SX96NW.tif",
+      "sha256": "fec960fdb94a2e2cc3cdcfa201c35c6070871ae7c86b6c80617bad550799ae1a"
+    },
+    {
+      "byteLength": 2248452,
+      "path": "data/raw/comparison/os_openmap_local/selected-members/SX96SW.tif",
+      "sha256": "546c7a7c60b8c372c35dfd7ad21ddbbd71437ba45966235f6a09264352181838"
+    },
+    {
+      "byteLength": 190,
+      "path": "data/raw/comparison/os_openmap_local/selected-members/licence.txt",
+      "sha256": "65f3f555aa3e42e93b4db24a29ad277beefd12bc4871076d558c1cc41a6b216d"
+    },
+    {
+      "byteLength": 1488,
+      "path": "data/raw/comparison/os_openmap_local/selected-members/readme.txt",
+      "sha256": "d32d1cd25d883ec2321c5af824d93b10fa4e4feda7ebf9177d2e10bbd181a17c"
+    },
+    {
+      "byteLength": 69538064,
+      "path": "data/raw/ea_dtm/SX96nw/SX96nw_DTM_1m.tif",
+      "sha256": "665441c4022f06044e17b501e6e1fe4bf3a2c25f87a7f2fea91c01c1054ba8e1"
+    },
+    {
+      "byteLength": 20545,
+      "path": "data/raw/ea_dtm/SX96nw/SX96nw_DTM_1m.tif.xml",
+      "sha256": "4e24fa849e7b2a50a1446122de00fc30c29571248fa8bb0110a7f3283c9fb500"
+    },
+    {
+      "byteLength": 57969482,
+      "path": "data/raw/ea_dtm/SX96sw/SX96sw_DTM_1m.tif",
+      "sha256": "8438a544a9f4b4c675d72fd16824d5b75802899e7291edb585e98334da53211f"
+    },
+    {
+      "byteLength": 20545,
+      "path": "data/raw/ea_dtm/SX96sw/SX96sw_DTM_1m.tif.xml",
+      "sha256": "6122fd3fe59b6b64b57a0273dc926f29387736ee070886fe353ad7993e658d33"
+    },
+    {
+      "byteLength": 58254938,
+      "path": "data/raw/osm/devon-261016.osm.pbf",
+      "sha256": "52942b39636e1cb002e5d78a004668996cb469ee9c9e9b9b93049c66b9ac2cd5"
+    },
+    {
+      "byteLength": 55,
+      "path": "data/raw/osm/devon-261016.osm.pbf.md5",
+      "sha256": "fac0306ef585aa738a0b9e808e4f84d4a61a8c75ef2e584038937381ab6884ec"
+    },
+    {
+      "byteLength": 9493,
+      "path": "data/source-manifest.json",
+      "sha256": "e2a5237d99fd8b0b0dd0174430ba18b58f2d778f498275c609c24bed5c3ccf8c"
+    },
+    {
+      "byteLength": 375,
+      "path": "public/worlds/torquay-poc-001-2km/ready.json",
+      "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4"
+    },
+    {
+      "byteLength": 6015566,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+      "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+    },
+    {
+      "byteLength": 7240,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/manifest.json",
+      "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+    },
+    {
+      "byteLength": 14484,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/qa.json",
+      "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+    },
+    {
+      "byteLength": 4008004,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+      "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+    },
+    {
+      "byteLength": 1399,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/inventory.json",
+      "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0"
+    },
+    {
+      "byteLength": 7835,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+      "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+    },
+    {
+      "byteLength": 8326,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/qa.json",
+      "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+    },
+    {
+      "byteLength": 10832,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+      "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+    },
+    {
+      "byteLength": 11911,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/qa.json",
+      "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+    },
+    {
+      "byteLength": 87338409,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+      "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+    },
+    {
+      "byteLength": 3779,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/scene-qa.json",
+      "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+    }
+  ],
+  "inventorySha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+  "readySha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+  "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "sha256": "8a8f17e86a9e6dc2772ca5dff1fce217f49afd35ade3e0dedde91cba329e2b5f"
+}
