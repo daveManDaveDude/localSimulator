@@ -31833,6 +31833,7 @@
     "terrainHeightfieldSha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
   },
   "source": {
+    "bestAvailableOperation": false,
     "coordinateOperation": {
       "accuracy_m": 2.0,
       "best_available": false,
@@ -31858,12 +31859,24 @@
       "reported_accuracy_m": 2.0,
       "uses_grids": false
     },
-    "coordinateOperationCaveat": null,
+    "coordinateOperationCaveat": "The selected operation is not best available; unavailable: uk_os_OSTN15_NTv2_OSGBtoETRS.tif.",
     "pbfPath": "data/raw/osm/devon-261016.osm.pbf",
     "pbfSha256": "52942b39636e1cb002e5d78a004668996cb469ee9c9e9b9b93049c66b9ac2cd5",
-    "preferredMissingGridNames": null,
+    "preferredMissingGridNames": [
+      "uk_os_OSTN15_NTv2_OSGBtoETRS.tif"
+    ],
+    "preferredMissingOperations": [
+      {
+        "missingGridNames": [
+          "uk_os_OSTN15_NTv2_OSGBtoETRS.tif"
+        ],
+        "name": "Inverse of OSGB36 to WGS 84 (9) + British National Grid",
+        "reportedAccuracyM": 1.0
+      }
+    ],
     "replicationTimestamp": "2026-10-16T20:21:21Z",
-    "reportedAccuracyM": null,
+    "reportedAccuracyM": 2.0,
+    "selectedOperationGridStatus": "selected EPSG:1314 + EPSG:19916 operation uses no grid files",
     "sourceCoordinatesCompared": [
       {
         "coordinateOperation": "pinned_transformer(4326, 27700), always x/y order",
@@ -34531,6 +34544,7 @@
     "aoiAreaM2": 4000000.0,
     "candidateWindowSummaries": [
       {
+        "areaUnits": "square metres in the package-local horizontal X/Z plane",
         "candidateWayIds": [
           78455388,
           78455395
@@ -34547,33 +34561,58 @@
           "minimumX": -344.51800000000003,
           "minimumZ": -158.79399999999998
         },
+        "footprintComparisonSemantics": {
+          "float32AndSliverCaveat": "The comparison reconstructs numeric X/Z triangles from roads.json; render-time Float32 conversion and tiny clipped boundary slivers may affect area at sub-millimetre scales. No threshold is applied.",
+          "publishedTriangleAreaSumM2": "Sum of each indexed roads.json triangle's clipped area; overlap is counted once per triangle before union.",
+          "publishedUnionAreaM2": "Area of the union of the clipped indexed roads.json triangles across display groups.",
+          "sourceGroupUnionAreaM2": "Source-derived per-way ribbon union before display-group priority partitioning.",
+          "sourcePriorityVisibleAreaM2": "Source-derived per-group visible area after priority partitioning.",
+          "sourcePublishedSymmetricDifferenceAreaM2": "Area present in exactly one of the source-visible geometry and the published indexed-triangle union.",
+          "sourceVisibleAreaM2": "Area of the AOI-clipped source-derived visible group polygons after vehicular > cycleway > path priority partitioning, unioned across groups."
+        },
         "groupUnionAndPriorityAreas": {
           "cycleway": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 0,
-            "groupUnionAreaM2": 0.0,
-            "priorityPartitionedVisibleAreaM2": 0.0,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 0.0,
-            "reconstructedMinusPublishedAreaM2": 0.0
+            "publishedIntersectingTriangleCount": 0,
+            "publishedTriangleAreaSumM2": 0.0,
+            "publishedTriangleAreaSumMinusUnionAreaM2": 0.0,
+            "publishedUnionAreaM2": 0.0,
+            "sourceGroupUnionAreaM2": 0.0,
+            "sourcePriorityVisibleAreaM2": 0.0,
+            "sourcePriorityVisiblePolygonAreaM2": 0.0,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": 0.0,
+            "sourceVisibleAreaM2": 0.0
           },
           "path": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 433.2931070296233,
-            "groupUnionAreaM2": 432.197905293199,
-            "priorityPartitionedVisibleAreaM2": 423.001581031186,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 423.0015810311861,
-            "reconstructedMinusPublishedAreaM2": -1.1368683772161603e-13
+            "publishedIntersectingTriangleCount": 752,
+            "publishedTriangleAreaSumM2": 423.0015810311863,
+            "publishedTriangleAreaSumMinusUnionAreaM2": 3.979039320256561e-13,
+            "publishedUnionAreaM2": 423.0015810311859,
+            "sourceGroupUnionAreaM2": 432.197905293199,
+            "sourcePriorityVisibleAreaM2": 423.001581031186,
+            "sourcePriorityVisiblePolygonAreaM2": 423.0015810311861,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": -1.1368683772161603e-13,
+            "sourceVisibleAreaM2": 423.0015810311861
           },
           "vehicular": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 3550.32380567682,
-            "groupUnionAreaM2": 3457.0528211469273,
-            "priorityPartitionedVisibleAreaM2": 3457.0528211469273,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 3457.052821146932,
-            "reconstructedMinusPublishedAreaM2": -4.547473508864641e-12
+            "publishedIntersectingTriangleCount": 2888,
+            "publishedTriangleAreaSumM2": 3457.0528211469286,
+            "publishedTriangleAreaSumMinusUnionAreaM2": -6.366462912410498e-12,
+            "publishedUnionAreaM2": 3457.052821146935,
+            "sourceGroupUnionAreaM2": 3457.0528211469273,
+            "sourcePriorityVisibleAreaM2": 3457.0528211469273,
+            "sourcePriorityVisiblePolygonAreaM2": 3457.052821146932,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": -4.547473508864641e-12,
+            "sourceVisibleAreaM2": 3457.052821146932
           }
         },
         "id": "pennys-teignmouth-steep",
+        "meshFootprintInterpretation": "Published triangles were reconstructed from surfaceBatches verticesXZ and indices, clipped to this registered local window, and unioned. The source comparison uses AOI-clipped group unions partitioned by the vehicular > cycleway > path priority. This window is not a screenshot camera match. Triangle area sums count overlaps before union; tiny slivers and Float32 renderer quantization can affect boundary-area comparisons.",
         "namedCandidateWays": {
           "eligiblePerWayBufferSumBeforeUnionM2": 1783.5733332163231,
           "intersectingWayCount": 2,
@@ -34614,13 +34653,22 @@
           "minimumAreaExcludedBufferSumM2": 0,
           "sumOfPerWayClippedBufferAreasBeforeUnionM2": 3983.616912706443
         },
-        "publishedPriorityVisibleAreaM2": 3880.054402178118,
+        "publishedTriangleAreaSumM2": 3880.0544021781147,
+        "publishedUnionAreaM2": 3880.0544021781134,
         "reconstructedPriorityVisibleAreaM2": 3880.0544021781134,
+        "sourcePublishedFootprintComparison": {
+          "publishedTriangleAreaSumM2": 3880.0544021781147,
+          "publishedTriangleAreaSumMinusUnionAreaM2": 1.3642420526593924e-12,
+          "publishedUnionAreaM2": 3880.0544021781134,
+          "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+          "sourceVisibleAreaM2": 3880.054402178115
+        },
         "title": "Pennys Hill / Teignmouth Road · steep candidate",
         "windowAreaM2": 40000.00000000001,
         "windowInterpretation": "Registered comparison-panel candidate window; this bounds local surface area only and does not establish a match to the user screenshot camera."
       },
       {
+        "areaUnits": "square metres in the package-local horizontal X/Z plane",
         "candidateWayIds": [
           23595196,
           686711262,
@@ -34640,33 +34688,58 @@
           "minimumX": -407.96,
           "minimumZ": -128.828
         },
+        "footprintComparisonSemantics": {
+          "float32AndSliverCaveat": "The comparison reconstructs numeric X/Z triangles from roads.json; render-time Float32 conversion and tiny clipped boundary slivers may affect area at sub-millimetre scales. No threshold is applied.",
+          "publishedTriangleAreaSumM2": "Sum of each indexed roads.json triangle's clipped area; overlap is counted once per triangle before union.",
+          "publishedUnionAreaM2": "Area of the union of the clipped indexed roads.json triangles across display groups.",
+          "sourceGroupUnionAreaM2": "Source-derived per-way ribbon union before display-group priority partitioning.",
+          "sourcePriorityVisibleAreaM2": "Source-derived per-group visible area after priority partitioning.",
+          "sourcePublishedSymmetricDifferenceAreaM2": "Area present in exactly one of the source-visible geometry and the published indexed-triangle union.",
+          "sourceVisibleAreaM2": "Area of the AOI-clipped source-derived visible group polygons after vehicular > cycleway > path priority partitioning, unioned across groups."
+        },
         "groupUnionAndPriorityAreas": {
           "cycleway": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 0,
-            "groupUnionAreaM2": 0.0,
-            "priorityPartitionedVisibleAreaM2": 0.0,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 0.0,
-            "reconstructedMinusPublishedAreaM2": 0.0
+            "publishedIntersectingTriangleCount": 0,
+            "publishedTriangleAreaSumM2": 0.0,
+            "publishedTriangleAreaSumMinusUnionAreaM2": 0.0,
+            "publishedUnionAreaM2": 0.0,
+            "sourceGroupUnionAreaM2": 0.0,
+            "sourcePriorityVisibleAreaM2": 0.0,
+            "sourcePriorityVisiblePolygonAreaM2": 0.0,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": 0.0,
+            "sourceVisibleAreaM2": 0.0
           },
           "path": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 482.6638952861708,
-            "groupUnionAreaM2": 481.56869354974685,
-            "priorityPartitionedVisibleAreaM2": 472.37236928773336,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 472.3723692877338,
-            "reconstructedMinusPublishedAreaM2": -4.547473508864641e-13
+            "publishedIntersectingTriangleCount": 788,
+            "publishedTriangleAreaSumM2": 472.37236928773444,
+            "publishedTriangleAreaSumMinusUnionAreaM2": 1.0800249583553523e-12,
+            "publishedUnionAreaM2": 472.37236928773336,
+            "sourceGroupUnionAreaM2": 481.56869354974685,
+            "sourcePriorityVisibleAreaM2": 472.37236928773336,
+            "sourcePriorityVisiblePolygonAreaM2": 472.3723692877338,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": -4.547473508864641e-13,
+            "sourceVisibleAreaM2": 472.3723692877338
           },
           "vehicular": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 2913.673194148267,
-            "groupUnionAreaM2": 2825.9801118832834,
-            "priorityPartitionedVisibleAreaM2": 2825.9801118832834,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 2825.980111883293,
-            "reconstructedMinusPublishedAreaM2": -9.549694368615746e-12
+            "publishedIntersectingTriangleCount": 2438,
+            "publishedTriangleAreaSumM2": 2825.980111883295,
+            "publishedTriangleAreaSumMinusUnionAreaM2": -9.094947017729282e-13,
+            "publishedUnionAreaM2": 2825.980111883296,
+            "sourceGroupUnionAreaM2": 2825.9801118832834,
+            "sourcePriorityVisibleAreaM2": 2825.9801118832834,
+            "sourcePriorityVisiblePolygonAreaM2": 2825.980111883293,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": -9.549694368615746e-12,
+            "sourceVisibleAreaM2": 2825.980111883293
           }
         },
         "id": "cricketfield-teignmouth-junction",
+        "meshFootprintInterpretation": "Published triangles were reconstructed from surfaceBatches verticesXZ and indices, clipped to this registered local window, and unioned. The source comparison uses AOI-clipped group unions partitioned by the vehicular > cycleway > path priority. This window is not a screenshot camera match. Triangle area sums count overlaps before union; tiny slivers and Float32 renderer quantization can affect boundary-area comparisons.",
         "namedCandidateWays": {
           "eligiblePerWayBufferSumBeforeUnionM2": 1605.4862112612766,
           "intersectingWayCount": 5,
@@ -34707,13 +34780,22 @@
           "minimumAreaExcludedBufferSumM2": 0,
           "sumOfPerWayClippedBufferAreasBeforeUnionM2": 3396.337089434438
         },
-        "publishedPriorityVisibleAreaM2": 3298.3524811710267,
+        "publishedTriangleAreaSumM2": 3298.3524811710295,
+        "publishedUnionAreaM2": 3298.352481171036,
         "reconstructedPriorityVisibleAreaM2": 3298.3524811710167,
+        "sourcePublishedFootprintComparison": {
+          "publishedTriangleAreaSumM2": 3298.3524811710295,
+          "publishedTriangleAreaSumMinusUnionAreaM2": -6.366462912410498e-12,
+          "publishedUnionAreaM2": 3298.352481171036,
+          "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+          "sourceVisibleAreaM2": 3298.352481171025
+        },
         "title": "Cricketfield Road / Teignmouth Road · junction candidate",
         "windowAreaM2": 40000.0,
         "windowInterpretation": "Registered comparison-panel candidate window; this bounds local surface area only and does not establish a match to the user screenshot camera."
       },
       {
+        "areaUnits": "square metres in the package-local horizontal X/Z plane",
         "candidateWayIds": [
           30482119,
           30482121
@@ -34730,33 +34812,58 @@
           "minimumX": -591.744,
           "minimumZ": 127.096
         },
+        "footprintComparisonSemantics": {
+          "float32AndSliverCaveat": "The comparison reconstructs numeric X/Z triangles from roads.json; render-time Float32 conversion and tiny clipped boundary slivers may affect area at sub-millimetre scales. No threshold is applied.",
+          "publishedTriangleAreaSumM2": "Sum of each indexed roads.json triangle's clipped area; overlap is counted once per triangle before union.",
+          "publishedUnionAreaM2": "Area of the union of the clipped indexed roads.json triangles across display groups.",
+          "sourceGroupUnionAreaM2": "Source-derived per-way ribbon union before display-group priority partitioning.",
+          "sourcePriorityVisibleAreaM2": "Source-derived per-group visible area after priority partitioning.",
+          "sourcePublishedSymmetricDifferenceAreaM2": "Area present in exactly one of the source-visible geometry and the published indexed-triangle union.",
+          "sourceVisibleAreaM2": "Area of the AOI-clipped source-derived visible group polygons after vehicular > cycleway > path priority partitioning, unioned across groups."
+        },
         "groupUnionAndPriorityAreas": {
           "cycleway": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 0,
-            "groupUnionAreaM2": 0.0,
-            "priorityPartitionedVisibleAreaM2": 0.0,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 0.0,
-            "reconstructedMinusPublishedAreaM2": 0.0
+            "publishedIntersectingTriangleCount": 0,
+            "publishedTriangleAreaSumM2": 0.0,
+            "publishedTriangleAreaSumMinusUnionAreaM2": 0.0,
+            "publishedUnionAreaM2": 0.0,
+            "sourceGroupUnionAreaM2": 0.0,
+            "sourcePriorityVisibleAreaM2": 0.0,
+            "sourcePriorityVisiblePolygonAreaM2": 0.0,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": 0.0,
+            "sourceVisibleAreaM2": 0.0
           },
           "path": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 0,
-            "groupUnionAreaM2": 0.0,
-            "priorityPartitionedVisibleAreaM2": 0.0,
-            "priorityVisibleSymmetricDifferenceM2": 0.0,
-            "publishedVisibleSurfaceAreaM2": 0.0,
-            "reconstructedMinusPublishedAreaM2": 0.0
+            "publishedIntersectingTriangleCount": 0,
+            "publishedTriangleAreaSumM2": 0.0,
+            "publishedTriangleAreaSumMinusUnionAreaM2": 0.0,
+            "publishedUnionAreaM2": 0.0,
+            "sourceGroupUnionAreaM2": 0.0,
+            "sourcePriorityVisibleAreaM2": 0.0,
+            "sourcePriorityVisiblePolygonAreaM2": 0.0,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": 0.0,
+            "sourceVisibleAreaM2": 0.0
           },
           "vehicular": {
             "eligiblePerWayBufferSumBeforeGroupUnionM2": 2806.1191557046272,
-            "groupUnionAreaM2": 2722.655080100845,
-            "priorityPartitionedVisibleAreaM2": 2722.655080100845,
-            "priorityVisibleSymmetricDifferenceM2": 1.2789769243681803e-13,
-            "publishedVisibleSurfaceAreaM2": 2722.6550801008425,
-            "reconstructedMinusPublishedAreaM2": 2.7284841053187847e-12
+            "publishedIntersectingTriangleCount": 2424,
+            "publishedTriangleAreaSumM2": 2722.655080100848,
+            "publishedTriangleAreaSumMinusUnionAreaM2": 3.183231456205249e-12,
+            "publishedUnionAreaM2": 2722.6550801008448,
+            "sourceGroupUnionAreaM2": 2722.655080100845,
+            "sourcePriorityVisibleAreaM2": 2722.655080100845,
+            "sourcePriorityVisiblePolygonAreaM2": 2722.6550801008425,
+            "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+            "sourceReconstructedMinusVisiblePolygonAreaM2": 2.7284841053187847e-12,
+            "sourceVisibleAreaM2": 2722.6550801008425
           }
         },
         "id": "arthington-control",
+        "meshFootprintInterpretation": "Published triangles were reconstructed from surfaceBatches verticesXZ and indices, clipped to this registered local window, and unioned. The source comparison uses AOI-clipped group unions partitioned by the vehicular > cycleway > path priority. This window is not a screenshot camera match. Triangle area sums count overlaps before union; tiny slivers and Float32 renderer quantization can affect boundary-area comparisons.",
         "namedCandidateWays": {
           "eligiblePerWayBufferSumBeforeUnionM2": 390.7491535789687,
           "intersectingWayCount": 2,
@@ -34797,8 +34904,16 @@
           "minimumAreaExcludedBufferSumM2": 0,
           "sumOfPerWayClippedBufferAreasBeforeUnionM2": 2806.1191557046272
         },
-        "publishedPriorityVisibleAreaM2": 2722.6550801008425,
+        "publishedTriangleAreaSumM2": 2722.655080100848,
+        "publishedUnionAreaM2": 2722.655080100845,
         "reconstructedPriorityVisibleAreaM2": 2722.655080100845,
+        "sourcePublishedFootprintComparison": {
+          "publishedTriangleAreaSumM2": 2722.655080100848,
+          "publishedTriangleAreaSumMinusUnionAreaM2": 2.7284841053187847e-12,
+          "publishedUnionAreaM2": 2722.655080100845,
+          "sourcePublishedSymmetricDifferenceAreaM2": 0.0,
+          "sourceVisibleAreaM2": 2722.6550801008425
+        },
         "title": "Arthington · mild crossfall control",
         "windowAreaM2": 25600.0,
         "windowInterpretation": "Registered comparison-panel candidate window; this bounds local surface area only and does not establish a match to the user screenshot camera."

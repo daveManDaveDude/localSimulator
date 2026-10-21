@@ -548,7 +548,7 @@ test('Road-alignment current 2km captures the three candidate contexts', async (
         },
         {
           poseX: x,
-          poseY: ground.orthometricM + view.eyeHeightAboveTerrainM,
+          poseY: ground.localM + view.eyeHeightAboveTerrainM,
           poseZ: z,
           poseBearing: bearing,
           posePitch: view.pitchDegrees,
@@ -562,10 +562,6 @@ test('Road-alignment current 2km captures the three candidate contexts', async (
         })
         .toBeLessThan(0.02);
       const pose = await cameraPose(page);
-      expect(pose.y).toBeCloseTo(
-        ground.orthometricM + view.eyeHeightAboveTerrainM,
-        2,
-      );
       expect(pose.bearing).toBeCloseTo(bearing, 1);
       expect(pose.pitch).toBeCloseTo(view.pitchDegrees, 1);
       const sampledGroundLocalM = Number(
@@ -580,6 +576,14 @@ test('Road-alignment current 2km captures the three candidate contexts', async (
       );
       expect(sampledGroundLocalM).toBeCloseTo(ground.localM, 3);
       expect(sampledGroundOrthometricM).toBeCloseTo(ground.orthometricM, 3);
+      expect(pose.y).toBeCloseTo(
+        sampledGroundLocalM + view.eyeHeightAboveTerrainM,
+        2,
+      );
+      expect(pose.y - sampledGroundLocalM).toBeCloseTo(
+        view.eyeHeightAboveTerrainM,
+        2,
+      );
 
       const readVisibleRoadLabels = async (): Promise<VisibleRoadLabel[]> =>
         page
@@ -692,9 +696,15 @@ test('Road-alignment current 2km captures the three candidate contexts', async (
           'nearest projected point on the named current-release package centerline; ' +
           'low-oblique camera is offset opposite its local tangent; bearing follows tangent',
         camera: pose,
+        cameraYLocalM: pose.y,
+        cameraYDatum:
+          'package-local scene vertical coordinate; requested clearance is measured from local heightfield ground',
         sampledGroundLocalM,
         sampledGroundOrthometricM,
-        eyeHeightAboveSampledTerrainM: pose.y - sampledGroundOrthometricM,
+        sampledGroundOrthometricValueDefinition:
+          'existing orthometric terrain telemetry: package-local heightfield sample plus manifest origin elevation; retained separately and not used as camera Y',
+        requestedEyeHeightAboveLocalTerrainM: view.eyeHeightAboveTerrainM,
+        measuredEyeHeightAboveLocalTerrainM: pose.y - sampledGroundLocalM,
         releaseId: ready.releaseId,
         sceneProfile: manifest.sceneProfile,
         roadManifestSha256: roadManifest.assets.roads.sha256,

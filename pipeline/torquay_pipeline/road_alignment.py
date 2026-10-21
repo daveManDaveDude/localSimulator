@@ -14,6 +14,7 @@ import math
 import os
 import struct
 import tempfile
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -775,6 +776,138 @@ def _triangle_area(points: list[tuple[float, float]]) -> float:
     return abs(_horizontal_cross(points)) / 2
 
 
+def camera_local_y_for_clearance(local_ground_m: float, requested_clearance_m: float) -> float:
+    """Return scene-local camera Y from local ground and requested clearance."""
+    if not math.isfinite(local_ground_m) or not math.isfinite(requested_clearance_m):
+        raise RoadAlignmentError("camera ground and clearance must be finite")
+    if requested_clearance_m < 0:
+        raise RoadAlignmentError("camera clearance cannot be negative")
+    return local_ground_m + requested_clearance_m
+
+
+def _triangle_coverage(triangles: Iterable[Any], window: Any) -> tuple[float, Any, int]:
+    """Clip published triangles to a window, keeping overlap area and union separate."""
+    clipped_triangles = []
+    triangle_area_sum = 0.0
+    for triangle in triangles:
+        clipped = triangle.intersection(window)
+        if clipped.is_empty or clipped.area <= 0:
+            continue
+        triangle_area_sum += float(clipped.area)
+        clipped_triangles.append(clipped)
+    union = unary_union(clipped_triangles) if clipped_triangles else Polygon()
+    return triangle_area_sum, union, len(clipped_triangles)
+
+
+def _indexed_surface_coverage(batch: Any, window: Any) -> tuple[float, Any, int]:
+    """Reconstruct and clip one published surface batch from its indexed XZ mesh."""
+    if not isinstance(batch, dict):
+        raise RoadAlignmentError("road surface batch is missing")
+    vertices = batch.get("verticesXZ")
+    indices = batch.get("indices")
+    if not isinstance(vertices, list) or not isinstance(indices, list):
+        raise RoadAlignmentError("road surface batch indexed XZ mesh is malformed")
+
+    min_x, min_z, max_x, max_z = window.bounds
+
+    def triangles() -> Iterable[Any]:
+        for face in indices:
+            if not isinstance(face, list) or len(face) != 3:
+                raise RoadAlignmentError("road surface face must have three vertex indices")
+            points = []
+            for raw_index in face:
+                index = int(raw_index)
+                if index < 0 or index >= len(vertices):
+                    raise RoadAlignmentError("road surface face references a missing vertex")
+                vertex = vertices[index]
+                if not isinstance(vertex, list) or len(vertex) < 2:
+                    raise RoadAlignmentError("road surface vertex is malformed")
+                x, z = float(vertex[0]), float(vertex[1])
+                if not math.isfinite(x) or not math.isfinite(z):
+                    raise RoadAlignmentError("road surface vertex is not finite")
+                points.append((x, z))
+            triangle = Polygon(points)
+            if triangle.is_empty or triangle.area <= 0:
+                continue
+            tri_min_x, tri_min_z, tri_max_x, tri_max_z = triangle.bounds
+            if tri_max_x < min_x or tri_min_x > max_x or tri_max_z < min_z or tri_min_z > max_z:
+                continue
+            yield triangle
+
+    return _triangle_coverage(triangles(), window)
+
+
+def _surface_footprint_comparison(
+    source_visible: Any,
+    published_triangle_area_sum_m2: float,
+    published_union: Any,
+) -> dict[str, float]:
+    """Compare source-visible geometry with the indexed published triangle footprint."""
+    return {
+        "sourceVisibleAreaM2": float(source_visible.area),
+        "publishedTriangleAreaSumM2": published_triangle_area_sum_m2,
+        "publishedUnionAreaM2": float(published_union.area),
+        "publishedTriangleAreaSumMinusUnionAreaM2": published_triangle_area_sum_m2
+        - float(published_union.area),
+        "sourcePublishedSymmetricDifferenceAreaM2": float(
+            source_visible.symmetric_difference(published_union).area
+        ),
+    }
+
+
+def _coordinate_operation_summary(metadata: Any) -> dict[str, Any]:
+    """Read the pinned transform's actual snake_case manifest metadata."""
+    if not isinstance(metadata, dict):
+        return {
+            "reportedAccuracyM": None,
+            "selectedOperationGridStatus": None,
+            "bestAvailableOperation": None,
+            "preferredMissingOperations": [],
+            "preferredMissingGridNames": [],
+            "coordinateOperationCaveat": None,
+        }
+    preferred = metadata.get("preferred_missing_operations")
+    preferred_records = preferred if isinstance(preferred, list) else []
+    missing_grid_names = sorted(
+        {
+            str(grid.get("short_name"))
+            for operation in preferred_records
+            if isinstance(operation, dict)
+            for grid in operation.get("grids", [])
+            if isinstance(grid, dict) and grid.get("available") is False and grid.get("short_name")
+        }
+    )
+    summarized_preferred = [
+        {
+            "name": operation.get("name"),
+            "reportedAccuracyM": operation.get("reported_accuracy_m"),
+            "missingGridNames": sorted(
+                {
+                    str(grid.get("short_name"))
+                    for grid in operation.get("grids", [])
+                    if isinstance(grid, dict)
+                    and grid.get("available") is False
+                    and grid.get("short_name")
+                }
+            ),
+        }
+        for operation in preferred_records
+        if isinstance(operation, dict)
+    ]
+    caveat = None
+    if metadata.get("best_available") is False:
+        unavailable = ", ".join(missing_grid_names) or "preferred operation resources"
+        caveat = f"The selected operation is not best available; unavailable: {unavailable}."
+    return {
+        "reportedAccuracyM": metadata.get("reported_accuracy_m"),
+        "selectedOperationGridStatus": metadata.get("grid_status"),
+        "bestAvailableOperation": metadata.get("best_available"),
+        "preferredMissingOperations": summarized_preferred,
+        "preferredMissingGridNames": missing_grid_names,
+        "coordinateOperationCaveat": caveat,
+    }
+
+
 def _scan_mesh(
     road_payload: dict[str, Any], grid: TerrainGrid
 ) -> tuple[dict[str, Any], dict[str, float]]:
@@ -917,8 +1050,9 @@ def _candidate_window_surface_summaries(
     visible_polygons: dict[str, Any],
     aoi: AoiConfig,
     grid: TerrainGrid,
+    road_payload: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """Summarize configured road ribbons within the registered map context windows."""
+    """Compare source ribbons with indexed published mesh footprints in bounded windows."""
     center_e, center_n = aoi.center_bng_m
     west, south, east, north = aoi.bbox_m
     local_aoi = box(west - center_e, center_n - north, east - center_e, center_n - south)
@@ -932,6 +1066,13 @@ def _candidate_window_surface_summaries(
         window = box(min_x, min_z, max_x, max_z)
         by_group: dict[str, list[Any]] = {group: [] for group in DISPLAY_GROUPS}
         intersecting_ways: list[dict[str, Any]] = []
+        surface_batches = road_payload.get("surfaceBatches")
+        if not isinstance(surface_batches, dict):
+            raise RoadAlignmentError("roads payload is missing surfaceBatches")
+        published_coverage = {
+            group: _indexed_surface_coverage(surface_batches.get(group), window)
+            for group in DISPLAY_GROUPS
+        }
 
         for feature in features:
             group = feature.get("displayGroup")
@@ -970,7 +1111,9 @@ def _candidate_window_surface_summaries(
         occupied = Polygon()
         group_records = {}
         rederived_visible_area = 0.0
-        published_visible_area = 0.0
+        source_visible_geometries = []
+        published_union_geometries = []
+        published_triangle_area_sum = 0.0
         for group in DISPLAY_GROUPS:
             pieces = by_group[group]
             group_union = unary_union(pieces) if pieces else Polygon()
@@ -980,30 +1123,48 @@ def _candidate_window_surface_summaries(
                 else group_union
             )
             expected_visible = visible_polygons[group].intersection(window)
-            symmetric_difference_area = float(
-                priority_visible.symmetric_difference(expected_visible).area
-            )
             group_area = float(group_union.area)
             priority_area = float(priority_visible.area)
             expected_area = float(expected_visible.area)
+            triangle_area_sum, published_union, intersecting_triangle_count = published_coverage[
+                group
+            ]
+            footprint_comparison = _surface_footprint_comparison(
+                expected_visible, triangle_area_sum, published_union
+            )
             group_records[group] = {
                 "eligiblePerWayBufferSumBeforeGroupUnionM2": sum(
                     record["clippedRibbonAreaM2"]
                     for record in intersecting_ways
                     if record["displayGroup"] == group and record["eligibleForPublishedUnion"]
                 ),
-                "groupUnionAreaM2": group_area,
-                "priorityPartitionedVisibleAreaM2": priority_area,
-                "publishedVisibleSurfaceAreaM2": expected_area,
-                "reconstructedMinusPublishedAreaM2": priority_area - expected_area,
-                "priorityVisibleSymmetricDifferenceM2": symmetric_difference_area,
+                "sourceGroupUnionAreaM2": group_area,
+                "sourcePriorityVisibleAreaM2": priority_area,
+                "sourcePriorityVisiblePolygonAreaM2": expected_area,
+                "sourceReconstructedMinusVisiblePolygonAreaM2": priority_area - expected_area,
+                "publishedIntersectingTriangleCount": intersecting_triangle_count,
+                **footprint_comparison,
             }
             rederived_visible_area += priority_area
-            published_visible_area += expected_area
+            source_visible_geometries.append(expected_visible)
+            published_union_geometries.append(published_union)
+            published_triangle_area_sum += triangle_area_sum
             if not group_union.is_empty:
                 occupied = (
                     unary_union([occupied, group_union]) if not occupied.is_empty else group_union
                 )
+
+        source_visible_union = (
+            unary_union(source_visible_geometries) if source_visible_geometries else Polygon()
+        )
+        published_visible_union = (
+            unary_union(published_union_geometries) if published_union_geometries else Polygon()
+        )
+        window_footprint_comparison = _surface_footprint_comparison(
+            source_visible_union,
+            published_triangle_area_sum,
+            published_visible_union,
+        )
 
         def summarize_way_set(records: list[dict[str, Any]]) -> dict[str, Any]:
             eligible_records = [record for record in records if record["eligibleForPublishedUnion"]]
@@ -1062,12 +1223,53 @@ def _candidate_window_surface_summaries(
                     "eastEasting": grid.origin_e_m + max_x,
                     "northNorthing": grid.origin_n_m - min_z,
                 },
+                "areaUnits": "square metres in the package-local horizontal X/Z plane",
+                "footprintComparisonSemantics": {
+                    "sourceVisibleAreaM2": (
+                        "Area of the AOI-clipped source-derived visible group polygons after "
+                        "vehicular > cycleway > path priority partitioning, unioned across groups."
+                    ),
+                    "publishedTriangleAreaSumM2": (
+                        "Sum of each indexed roads.json triangle's clipped area; overlap is "
+                        "counted once per triangle before union."
+                    ),
+                    "publishedUnionAreaM2": (
+                        "Area of the union of the clipped indexed roads.json triangles across "
+                        "display groups."
+                    ),
+                    "sourcePublishedSymmetricDifferenceAreaM2": (
+                        "Area present in exactly one of the source-visible geometry and the "
+                        "published indexed-triangle union."
+                    ),
+                    "sourceGroupUnionAreaM2": (
+                        "Source-derived per-way ribbon union before display-group priority "
+                        "partitioning."
+                    ),
+                    "sourcePriorityVisibleAreaM2": (
+                        "Source-derived per-group visible area after priority partitioning."
+                    ),
+                    "float32AndSliverCaveat": (
+                        "The comparison reconstructs numeric X/Z triangles from roads.json; "
+                        "render-time Float32 conversion and tiny clipped boundary slivers may "
+                        "affect area at sub-millimetre scales. No threshold is applied."
+                    ),
+                },
                 "windowAreaM2": float(window.area),
                 "network": summarize_way_set(intersecting_ways),
                 "namedCandidateWays": summarize_way_set(candidate_records),
                 "groupUnionAndPriorityAreas": group_records,
                 "reconstructedPriorityVisibleAreaM2": rederived_visible_area,
-                "publishedPriorityVisibleAreaM2": published_visible_area,
+                "publishedTriangleAreaSumM2": published_triangle_area_sum,
+                "publishedUnionAreaM2": float(published_visible_union.area),
+                "sourcePublishedFootprintComparison": window_footprint_comparison,
+                "meshFootprintInterpretation": (
+                    "Published triangles were reconstructed from surfaceBatches verticesXZ "
+                    "and indices, clipped to this registered local window, and unioned. The "
+                    "source comparison uses AOI-clipped group unions partitioned by the "
+                    "vehicular > cycleway > path priority. This window is not a screenshot "
+                    "camera match. Triangle area sums count overlaps before union; tiny slivers "
+                    "and Float32 renderer quantization can affect boundary-area comparisons."
+                ),
             }
         )
     return summaries
@@ -1334,7 +1536,7 @@ def run_assessment(project_root: Path, requested_output_dir: Path) -> dict[str, 
     mesh_report, mesh_areas = _scan_mesh(road_payload, grid)
     surface_report = _surface_comparison(imported.features, source_display_polygons, mesh_areas)
     surface_report["candidateWindowSummaries"] = _candidate_window_surface_summaries(
-        imported.features, source_display_polygons, aoi, grid
+        imported.features, source_display_polygons, aoi, grid, road_payload
     )
     surface_report["prePriorityGroupAreasM2"] = source_buffer_areas
     # Check every re-imported way against the same public package feature contract.
@@ -1424,9 +1626,7 @@ def run_assessment(project_root: Path, requested_output_dir: Path) -> dict[str, 
             "pbfSha256": pbf_record.get("sha256"),
             "replicationTimestamp": pbf_record.get("replication_data_timestamp"),
             "coordinateOperation": operation,
-            "reportedAccuracyM": coordinate_accuracy.get("reportedAccuracyM"),
-            "preferredMissingGridNames": coordinate_accuracy.get("preferredMissingGridNames"),
-            "coordinateOperationCaveat": coordinate_accuracy.get("missingPreferredGridCaveat"),
+            **_coordinate_operation_summary(coordinate_accuracy),
             "sourceCoordinatesCompared": coordinate_comparison,
             "terrainRasters": [
                 {

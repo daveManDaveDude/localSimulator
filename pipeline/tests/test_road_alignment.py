@@ -4,11 +4,16 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from shapely.geometry import Polygon, box
 
 from torquay_pipeline.road_alignment import (
     RoadAlignmentError,
     TerrainGrid,
+    _coordinate_operation_summary,
+    _surface_footprint_comparison,
+    _triangle_coverage,
     absolute_grade_percent,
+    camera_local_y_for_clearance,
     coordinate_delta_summary,
     cross_grade_percent,
     guard_output_directory,
@@ -70,6 +75,88 @@ def test_steep_cross_section_is_reported_as_terrain_crossfall() -> None:
     assert first == pytest.approx(-2.0)
     assert second == pytest.approx(2.0)
     assert cross_grade_percent(first, second, 4.0) == pytest.approx(100.0)
+
+
+def test_camera_clearance_uses_local_ground_y_with_nonzero_origin() -> None:
+    local_ground_m = 4.25
+    vertical_origin_m = 120.0
+    orthometric_ground_m = vertical_origin_m + local_ground_m
+    requested_clearance_m = 15.0
+
+    camera_local_y_m = camera_local_y_for_clearance(local_ground_m, requested_clearance_m)
+
+    assert camera_local_y_m == pytest.approx(19.25)
+    assert camera_local_y_m - local_ground_m == pytest.approx(requested_clearance_m)
+    assert camera_local_y_m != pytest.approx(orthometric_ground_m + requested_clearance_m)
+
+
+def test_equal_area_translated_surface_has_nonzero_spatial_difference() -> None:
+    source = box(0.0, 0.0, 2.0, 3.0)
+    published = box(5.0, 0.0, 7.0, 3.0)
+
+    comparison = _surface_footprint_comparison(source, published.area, published)
+
+    assert comparison["sourceVisibleAreaM2"] == pytest.approx(6.0)
+    assert comparison["publishedUnionAreaM2"] == pytest.approx(6.0)
+    assert comparison["sourcePublishedSymmetricDifferenceAreaM2"] == pytest.approx(12.0)
+
+
+def test_triangle_coverage_keeps_overlap_sum_separate_from_union() -> None:
+    first = Polygon([(0.0, 0.0), (2.0, 0.0), (0.0, 2.0)])
+    overlapping = Polygon([(1.0, 0.0), (3.0, 0.0), (1.0, 2.0)])
+    gapped = Polygon([(3.0, 0.0), (5.0, 0.0), (3.0, 2.0)])
+    window = box(-1.0, -1.0, 6.0, 3.0)
+
+    overlap_sum, overlap_union, overlap_count = _triangle_coverage([first, overlapping], window)
+    gap_sum, gap_union, gap_count = _triangle_coverage([first, gapped], window)
+    intended_gapped_footprint = box(0.0, 0.0, 5.0, 2.0)
+    gap_comparison = _surface_footprint_comparison(intended_gapped_footprint, gap_sum, gap_union)
+
+    assert overlap_count == 2
+    assert overlap_sum == pytest.approx(4.0)
+    assert overlap_union.area == pytest.approx(3.5)
+    assert overlap_sum > overlap_union.area
+    assert gap_count == 2
+    assert gap_sum == pytest.approx(4.0)
+    assert gap_union.area == pytest.approx(4.0)
+    assert gap_sum == pytest.approx(gap_union.area)
+    assert gap_comparison["sourceVisibleAreaM2"] == pytest.approx(10.0)
+    assert gap_comparison["sourcePublishedSymmetricDifferenceAreaM2"] > 0
+
+
+def test_coordinate_operation_summary_reads_snake_case_manifest_metadata() -> None:
+    summary = _coordinate_operation_summary(
+        {
+            "reported_accuracy_m": 2,
+            "grid_status": "selected operation uses no grid files",
+            "best_available": False,
+            "preferred_missing_operations": [
+                {
+                    "name": "Preferred operation",
+                    "reported_accuracy_m": 1,
+                    "grids": [
+                        {
+                            "short_name": "uk_os_OSTN15_NTv2_OSGBtoETRS.tif",
+                            "available": False,
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+
+    assert summary["reportedAccuracyM"] == 2
+    assert summary["selectedOperationGridStatus"] == "selected operation uses no grid files"
+    assert summary["bestAvailableOperation"] is False
+    assert summary["preferredMissingGridNames"] == ["uk_os_OSTN15_NTv2_OSGBtoETRS.tif"]
+    assert summary["preferredMissingOperations"] == [
+        {
+            "name": "Preferred operation",
+            "reportedAccuracyM": 1,
+            "missingGridNames": ["uk_os_OSTN15_NTv2_OSGBtoETRS.tif"],
+        }
+    ]
+    assert "not best available" in summary["coordinateOperationCaveat"]
 
 
 def test_exact_fixed_triangle_face_conforms_and_diagonal_crossing_is_detected() -> None:
