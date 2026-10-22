@@ -1,0 +1,13 @@
+{
+  "format_version": 1,
+  "release_id": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "output_directory": "public/worlds/torquay-road-surface-preview",
+  "transition_distance_factor": 1.0,
+  "ambiguity_distance_m": 2.0,
+  "ambiguity_height_difference_m": 1.0,
+  "maximum_changed_height_m": 10.0,
+  "fallback_absolute_change_m": 5.0,
+  "fallback_added_gradient_m_per_m": 1.0,
+  "fallback_minimum_region_area_m2": 8.0,
+  "fallback_fade_distance_m": 32.0
+}

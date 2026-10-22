@@ -1,0 +1,19 @@
+{
+  "issue": "Road-surface treatment preservation comparison",
+  "baseline": "docs/milestones/artifacts/Viewer-cleanup/preservation.json",
+  "baselineSha256": "c508e9e15b822f6ae4de8f6f12e0fdc8e98ca2f6488c826396626e996465cb5c",
+  "historicalProtectedFileCount": 149,
+  "excludedCoordinatorCheckpoint": ".codex/torquay-plan-implementation.md",
+  "comparedFileCount": 148,
+  "changed": [
+    {
+      "path": "TMOG-Task-Manager-1.0.1-Setup.exe",
+      "expectedSha256": "b4edf70fa040968958c662ffb09feeeb0eeca07759e6ed7742606bcc39f29fc6",
+      "actualSha256": null,
+      "result": "missing"
+    }
+  ],
+  "currentReleaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "previewDerivativeIgnored": true,
+  "previewDirectoryIgnored": true
+}

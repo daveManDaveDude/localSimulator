@@ -1,0 +1,17 @@
+{
+  "browser": "156.0.8078.4",
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "requests": [
+    "http://127.0.0.1:4211/worlds/torquay-poc-001-2km/ready.json",
+    "http://127.0.0.1:4211/worlds/synthetic-terrain-demo/manifest.json",
+    "http://127.0.0.1:4211/worlds/synthetic-terrain-demo/heightfield.f32"
+  ],
+  "pageErrors": [],
+  "unexpectedConsoleErrors": [],
+  "unexpectedResponses": [],
+  "visibleRoadNameLabelCount": 0,
+  "observation": "Share build auto-fell back after readiness; no GIS runtime assets requested. Synthetic movement/reset/walk passed."
+}

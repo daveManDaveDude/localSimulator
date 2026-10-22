@@ -27,18 +27,26 @@ export interface HeightfieldWorld {
 }
 
 /** Assemble a validated local package into a mesh and terrain-following guides. */
-export function createHeightfieldWorld(loaded: LoadedWorld): HeightfieldWorld {
+export function createHeightfieldWorld(
+  loaded: LoadedWorld,
+  displayHeights?: ArrayLike<number>,
+): HeightfieldWorld {
   const { manifest, heights } = loaded;
   const { columns, rows, spacingM } = manifest.heightfield;
   const isReal = manifest.worldType === 'real';
   const isCurrent2km = isReal && manifest.sceneProfile === 'current_2km';
+  if (displayHeights !== undefined && !isCurrent2km) {
+    throw new Error(
+      'display terrain derivatives are supported only for current_2km',
+    );
+  }
   const grid = createTerrainGrid({
     columns,
     rows,
     spacingM,
     widthM: manifest.extentM.width,
     depthM: manifest.extentM.depth,
-    heights,
+    heights: displayHeights ?? heights,
   });
   const group = new Group();
   group.name = `${isReal ? 'REAL LOCAL EA DTM' : 'SYNTHETIC'} — ${manifest.name}`;

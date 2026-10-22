@@ -1,0 +1,125 @@
+# Road-surface treatment preview — correction 1 handback
+
+**Updated:** 22 October 2026. **State:** correction candidate for independent Sol review; no issue-wide PASS is claimed and the preview remains opt-in.
+
+## Scope and runtime
+
+The default route / continues to load the accepted current 2 km package and source-draped terrain. The labelled comparison route is /?roadSurface=preview; it loads a separate ignored derivative from public/worlds/torquay-road-surface-preview/. The derivative is tied to release 616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a. Missing, corrupt, stale, or invalid preview inputs fall back to the coherent source terrain. The share build excludes the ignored derivative. The preview notice identifies the display as approximate and says the surrounding ground was adjusted. No change claims EA source terrain or surveyed road elevations.
+
+The derivative retains the 1001 × 1001 Float32 display grid, 2 m spacing, source origin and extent. Terrain, roads, building bases, street anchors and ground-following walk mode sample one shared display grid. Existing source road centerlines in X/Z and configured widths are retained. The target is zero imposed crossfall using unchanged baseline samples at eligible centerlines, with the sampled longitudinal terrain retained and shoulders blended smoothly. It is a visual approximation, with no collision or road engineering meaning.
+
+## Correction 1 fallback rule and all affected regions
+
+The generic preview safety heuristic retains source ground in a connected core when the candidate has at least 5 m absolute local cut/fill, or when a connected added-gradient region reaches 1.0 m/m and at least 8 m². A 32 m cubic smoothstep fade with zero slope at both ends returns from source ground to the candidate grid. These are preview policy heuristics, not engineering limits. The rule uses measured candidate harm and connected region geometry; it contains no coordinate-specific patch.
+
+The current QA records 15 fallback regions. Region columns show core area / fade area / affected area in grid-equivalent square metres. Core bounds are local X-min, Z-min, X-max, Z-max. Peak Δg is the peak added grid-edge gradient before fallback → the post-fallback peak in that connected region. Peak candidate |Δh| is the pre-fallback maximum absolute terrain change. Building IDs are nearby source building feature IDs; an empty dash means QA found no nearby building.
+
+| Region | Local core bounds | Core / fade / affected m² | Peak Δg m/m | Peak candidate |Δh| m | Road way IDs | Nearby building IDs |
+| --- | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | [286, -1000, 288, -996] | 16 / 1,772 / 1,788 | 1.059 → 0.475 | 4.296 | 34888536 | 201386470, 201386411, 198604140 |
+| 2 | [144, -794, 146, -792] | 16 / 3,120 / 3,136 | 1.137 → 0.641 | 2.570 | 34075996 | 198604317, 198604162 |
+| 3 | [142, -788, 144, -788] | 8 / 3,000 / 3,008 | 1.115 → 0.641 | 2.958 | 34075996 | 198604317, 198604162 |
+| 4 | [-248, -112, -248, -110] | 8 / 3,000 / 3,008 | 1.157 → 0.358 | 2.368 | 34074001 | 208684714, 208684815, 208684662, 208684732, 208684830 |
+| 5 | [-246, -52, -242, -50] | 24 / 3,240 / 3,264 | 1.103 → 0.695 | 3.336 | 78455388 (Pennys Hill) | 208877913 |
+| 6 | [-156, 58, -154, 58] | 8 / 3,000 / 3,008 | 1.024 → 0.633 | 2.520 | 30480989 (Parkfield Road) | — |
+| 7 | [-866, 344, -838, 376] | 344 / 5,636 / 5,980 | 1.264 → 0.495 | 9.677 | 46348326 (Newton Road), 1144364008 | 196536218, 196536220, 196536221, 196536227, 196536217 |
+| 8 | [-444, 568, -442, 570] | 16 / 3,120 / 3,136 | 1.200 → 0.588 | 2.728 | 1069535883 | 196833429, 196833394, 196833463, 196833446, 196833439, 196833449 |
+| 9 | [580, 812, 582, 812] | 8 / 3,000 / 3,008 | 1.046 → 0.452 | 3.636 | 30484378 | 207712123, 207711867 |
+| 10 | [-662, 822, -658, 826] | 28 / 3,296 / 3,324 | 1.117 → 0.210 | 4.401 | 560780943 | — |
+| 11 | [-674, 914, -662, 916] | 56 / 3,720 / 3,776 | 1.387 → 0.238 | 3.024 | 560780365 | 194444458 |
+| 12 | [-666, 928, -662, 930] | 24 / 3,240 / 3,264 | 1.170 → 0.238 | 3.187 | 560780365 | 196833431, 194444458 |
+| 13 | [742, 930, 744, 930] | 8 / 3,000 / 3,008 | 1.004 → 0.157 | 2.602 | 32110548 (Cavern Road) | 207341692, 207341535, 207341753 |
+| 14 | [746, 946, 752, 960] | 76 / 3,896 / 3,972 | 1.592 → 0.461 | 5.408 | 32110548 (Cavern Road) | 207341667, 207341692, 207341702, 207341535 |
+| 15 | [270, 968, 278, 978] | 56 / 3,528 / 3,584 | 1.298 → 0.625 | 5.601 | 22976772 | 181620521, 181620523 |
+
+Summed across regions, the fallback covers 50,264 m²: 696 m² of retained core and 49,568 m² of fade. Overlapping regions produce unique unions of 43,004 m² affected, 696 m² core and 42,308 m² fade. The minimum 8 m² cutoff catches the Sanford component that previously produced a visible narrow bank at 56 m². The maximum post-fallback positive edge-gradient increase across the full grid is 0.987095 m/m; no connected positive increase reaches the 1.0 m/m policy threshold.
+
+### Newton and Sanford measurements
+
+Before fallback, the Newton candidate reached +9.6767 m fill at local X/Z [-850, 356], 5.052 m from Newton Road way 46348326 at station 383.452 m. Its flagged edge from [-860, 352] to [-858, 352] changed from a 0.000364 m/m source gradient to 1.264754 m/m in the candidate. The connected source-ground core and 32 m fade reduce the region's maximum added gradient to 0.495385 m/m and maximum absolute candidate change after fallback to 2.8051 m. The region source maximum gradient is 2.931306 m/m; preview maximum is 2.942865 m/m.
+
+The Newton road section has 41 one-metre samples across ±20 m and a maximum baseline-to-preview height difference of 0.196763 m. A separate 33-sample, ±16 m cross-section along the original candidate bank gradient has a maximum difference of 0.040344 m. Five local building footing sections contain 87 samples, with maximum pointwise difference 0.016096 m. The whole building base deltas for 196536218, 196536220, 196536221, 196536227 and 196536217 are all 0 m. This addresses the earlier measured +6.446/+6.430/+6.336 m building shifts: the current source-ground fallback removes those shifts for the local Newton buildings.
+
+Both Newton Chromium views (overhead and low-oblique) remain substantially occluded by a large foreground roof. They provide context, not unobstructed visual proof of the bank/fade or building footings. The registered terrain and footing sections and their edge metrics are the direct evidence. The current maximum residual grid cut is 3.935783 m and fill is 4.186306 m; full-grid absolute change median / p95 / p99 is 0.044559 / 0.421223 / 1.085264 m.
+
+The Sanford component near [-674, 914, -662, 916] is now included. Before fallback its maximum added edge change was 1.387222 m/m between [-666, 914] and [-666, 916] (baseline 0.032656; candidate 1.419878 m/m). The 56 m² core and fade reduce its regional added gradient to 0.238499 m/m. Nearby building 194444458 has 0 m whole-base shift and its five registered footing samples are unchanged. The current Sanford low-oblique before/after pair is included below.
+
+## Determinism, terrain, roads and buildings
+
+Fresh final builds 17 and 18 use the same pinned release and match byte-for-byte. Full records are [build 17](artifacts/Road-surface-treatment/build-17.json) and [build 18](artifacts/Road-surface-treatment/build-18.json).
+
+| Derivative output |     Bytes | SHA-256                                                          |
+| ----------------- | --------: | ---------------------------------------------------------------- |
+| heightfield.f32   | 4,008,004 | 678b0748570867ba1cf6ee846cbceca5ee54d606833192b007dfacbb885b3485 |
+| manifest.json     |         — | f85404e84a134146255da9b754135175d694e8b78111875405ac41c1fc39b3da |
+| qa.json           |         — | 743b4b93e7add42d85c186a0602627c9d5be2d45601162f739191078a5a580ed |
+
+The seven pinned input digests are: ready.json 08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4; inventory.json a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0; source terrain manifest 588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a; source heightfield c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af; buildings payload 8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58; road manifest ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6; roads payload cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986.
+
+The candidate contains 330,625 vertices in the treatment domain, with 320,182 changed (1,280,728 m² vertex-equivalent) and 671,376 vertices outside all influence regions unchanged exactly. There are 4,395 eligible published ground-assumed vehicular segments. Across the full terrain grid, maximum absolute edge gradient is unchanged at 8.269859 m/m, on source edge [-44, -330] to [-42, -330]. The p95 absolute edge gradient moves from 0.387159 to 0.389351 m/m. The maximum absolute edge-gradient change is a reduction of 1.530610 m/m on [-176, -56] to [-176, -54]. The greatest positive increase is 0.987095 m/m on [286, 898] to [288, 898], below the explicit 1.0 m/m preview heuristic.
+
+Intersections and incompatible nearby road projections are not averaged. QA found 1,349 ambiguity seed vertices across 196 connected regions. It retains 11,197 ambiguous vertices / 44,788 m² core on source ground and fades 27,194 vertices / 108,776 m²; total affected is 153,564 m² across 332 ways. The largest reported connected ambiguity areas include [-850, 370, -736, 494] (5,372 m²; ways 163724033, 196536197, 196536286, 1144364008), [914, -846, 980, -782] (3,156 m²; ways 22975544, 862914875, 1367997435), [-426, 676, -360, 770] (3,052 m²; ways 22976773, 22976774, 23175763, 30478904, 30479066, 196684385, 196684391), [538, 608, 610, 674] (2,976 m²; ways 30484374, 31143421, 31143422, 31143423, 31143953, 31143954, 207874931, 653174664), and [-272, -82, -162, -48] (2,772 m²; Pennys/Teignmouth ways 78455388 and 78455395).
+
+Same-station sampled crossfall and longitudinal profiles are terrain comparisons, not engineered grades. Values are maximum / median absolute percent; longitudinal values are shown baseline → preview.
+
+| Road                      |     Crossfall baseline → preview | Longitudinal grade baseline → preview | Samples |
+| ------------------------- | -------------------------------: | ------------------------------------: | ------: |
+| Parkfield Road 30480989   |  42.710 / 4.448 → 31.496 / 0.332 |         6.533 / 1.462 → 6.552 / 1.467 |     102 |
+| Pennys Hill 78455388      | 48.460 / 18.188 → 48.024 / 1.335 |       14.932 / 7.273 → 14.983 / 7.443 |      31 |
+| Teignmouth Road 78455395  | 87.859 / 10.410 → 61.291 / 6.999 |       39.667 / 2.985 → 39.658 / 3.119 |      48 |
+| Newton Road 46348326      |  97.151 / 7.568 → 96.871 / 0.097 |       10.529 / 1.260 → 10.688 / 1.241 |      79 |
+| Lymington Road 1363931058 |    9.384 / 1.483 → 8.411 / 0.180 |         4.632 / 2.379 → 4.664 / 2.414 |      66 |
+| Arthington way 30482119   |    4.164 / 1.456 → 2.358 / 0.111 |         4.084 / 1.355 → 3.978 / 1.297 |      13 |
+| Arthington way 30482121   |    1.823 / 1.703 → 1.225 / 0.622 |         2.230 / 1.562 → 2.027 / 1.432 |       3 |
+
+Parkfield, Pennys Hill and Teignmouth Road improve in both maximum and median crossfall. Newton's median improves substantially while its maximum remains extreme because source ground is kept in the harm region. Building bases changed for 1,098 of 3,613 features. The full-grid median signed base delta is 0 m; p95 absolute shift is 0.182974 m; range is -0.537432 to +2.423530 m. The largest absolute shift is +2.423530 m for osm:way:207712106. That building is away from Newton and remains a preview limitation.
+
+## Browser evidence and exact captures
+
+The full isolated Chromium road-surface profile on port 4213 passed 5/5 tests in run 5 after the previous run's transient test-harness failure. Browser was Chromium 156.0.8078.4, 1440 × 960 CSS pixels, DPR 1. The test exercised baseline/preview capture and walk clearance, missing/corrupt/stale derivative fallback, route isolation/cancellation, direct derivative validation, and renderer observation. The previous full run's fallback assertion was interrupted by a one-off ECONNRESET in the Playwright stale-manifest interception before the application fallback assertion ran; the fallback case then passed standalone, and the complete five-test profile passed in run 5 without application code changes.
+
+Run 5 evidence is [browser-evidence.json](artifacts/Road-surface-treatment/correction-1/run-5/browser-evidence.json) and [runtime-observation.json](artifacts/Road-surface-treatment/correction-1/run-5/runtime-observation.json). It records the release and source hashes, camera poses, exact screenshot hashes, URLs and checks. Three preview derivative requests (manifest, heightfield, QA) succeeded; all requests were to localhost, with no external requests, failed requests, console errors or page errors. Derivative load was 67 ms. Four measured walk checks at Parkfield and Pennys/Teignmouth centerline and transition shoulder all reported 1.7 m eye clearance above the displayed grid.
+
+All 26 screenshots were inspected. The two Newton views are substantially roof-occluded as described above. The two registered high-gradient region pairs show the generic harm regions; all fifteen fallback regions also have numerical section and edge QA. Exact run 5 pairs:
+
+| Context                                   | Baseline screenshot                                                                                                                        | Preview screenshot                                                                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Parkfield severe overhead                 | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-parkfield-severe-overhead.png)                         | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-parkfield-severe-overhead.png)                         |
+| Parkfield severe low-oblique              | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-parkfield-severe-low-oblique.png)                      | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-parkfield-severe-low-oblique.png)                      |
+| Pennys Hill / Teignmouth overhead         | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-pennys-teignmouth-overhead.png)                        | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-pennys-teignmouth-overhead.png)                        |
+| Pennys Hill / Teignmouth low-oblique      | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-pennys-teignmouth-low-oblique.png)                     | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-pennys-teignmouth-low-oblique.png)                     |
+| Parkfield / Lymington overview            | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-parkfield-lymington-overview-overhead.png)             | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-parkfield-lymington-overview-overhead.png)             |
+| Newton maximum-fill low-oblique, occluded | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-newton-high-fill-maximum-fill-low-oblique.png)         | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-newton-high-fill-maximum-fill-low-oblique.png)         |
+| Newton maximum-fill overhead, occluded    | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-newton-high-fill-maximum-fill-overhead.png)            | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-newton-high-fill-maximum-fill-overhead.png)            |
+| Maximum positive gradient region          | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-maximum-added-gradient-low-oblique.png)                | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-maximum-added-gradient-low-oblique.png)                |
+| Harm region 1 (Cavern Road)               | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-harm-gradient-region-01-harm-gradient-low-oblique.png) | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-harm-gradient-region-01-harm-gradient-low-oblique.png) |
+| Harm region 2 (Sanford Road)              | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-harm-gradient-region-02-harm-gradient-low-oblique.png) | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-harm-gradient-region-02-harm-gradient-low-oblique.png) |
+| Arthington control overhead               | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-arthington-control-overhead.png)                       | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-arthington-control-overhead.png)                       |
+| Arthington control low-oblique            | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-arthington-control-low-oblique.png)                    | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-arthington-control-low-oblique.png)                    |
+| Cricketfield junction                     | [baseline](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/baseline-cricketfield-junction-junction-oblique.png)            | [preview](artifacts/Road-surface-treatment/correction-1/run-5/screenshots/preview-cricketfield-junction-junction-oblique.png)            |
+
+The run 5 software-rendered geometry/frame observation records 2,969,627 triangles, 7 draw calls, 7 geometries and 1 texture. It used ANGLE/Vulkan SwiftShader in headless Chromium. Across 179 requestAnimationFrame intervals, median was 383.3 ms, p95 400 ms, maximum 1,616.6 ms, with 2.6 renderer-reported FPS. These are descriptive observations of this headless software-rendering session only; they are not a device benchmark and do not establish smooth playback on physical hardware.
+
+The current default route regression used a normal build and the URL with no roadSurface query: it loaded the real current_2km release, reported road-surface state off, hid the preview notice and made no preview derivative requests. The separate share build completed and its output was inspected: the ignored torquay-road-surface-preview directory is absent. The existing Viewer-cleanup real profile passed 5 tests with 1 skip; the share cleanup profile passed 3 with 3 profile skips. New cleanup outputs are kept in [real regression evidence](artifacts/Road-surface-treatment/correction-1/regressions/cleanup-real/docs/milestones/artifacts/Viewer-cleanup/real-browser.json) and [share regression evidence](artifacts/Road-surface-treatment/correction-1/regressions/cleanup-share/docs/milestones/artifacts/Viewer-cleanup/share-browser.json). Its saved share capture records the share build's own readiness fallback to synthetic and no GIS runtime requests. All 11 accepted Viewer-cleanup screenshot/report files were backed up and restored byte-for-byte after these regressions.
+
+## Execution-record safety and preservation
+
+The builder preflights the execution-record path before release validation, directory creation or derivative writes. It requires a new canonical direct build-N.json file under the dedicated Road-surface-treatment evidence directory. It rejects path traversal, aliases, reparse components, protected-input overlap, unsafe/unowned paths and existing record destinations. The exact approved ignored derivative directory is created only when absent, after safety checks, then reparse components are checked again. Focused tests cover adversarial destinations and prove rejection leaves protected files and existing derivative bytes identical. An initially absent approved output directory can be generated twice deterministically, without deleting unrelated backup paths. The Windows directory-symlink case was skipped because this account lacks the required symlink privilege; other traversal, existing path and alias cases ran.
+
+The preservation comparison in [preservation.json](artifacts/Road-surface-treatment/preservation.json) used the accepted Viewer-cleanup snapshot digest c508e9e15b822f6ae4de8f6f12e0fdc8e98ca2f6488c826396626e996465cb5c. It compared 148 historical paths: 147 match the current checkout, and one historical input is absent: TMOG-Task-Manager-1.0.1-Setup.exe (historical SHA-256 b4edf70fa040968958c662ffb09feeeb0eeca07759e6ed7742606bcc39f29fc6). It was not substituted with BeamNG.Earth-1.5.5-beta.exe; that separate untracked file is untouched. The accepted reports and screenshots were preserved. sites/ and the private coordinator checkpoint are also untouched by this correction and are excluded from any issue commit.
+
+## Commands and results
+
+- Focused Python: pipeline/.venv/Scripts/python.exe -m pytest tests/test_road_surface.py tests/test_road_alignment.py tests/test_roads.py tests/test_terrain_export.py — 59 passed, 1 skipped. The skipped case is Windows directory-symlink creation privilege.
+- Ruff: ruff check torquay_pipeline/road_surface.py tests/test_road_surface.py and ruff format --check torquay_pipeline/road_surface.py tests/test_road_surface.py — both passed.
+- Browser/app unit gates: npm.cmd run typecheck passed; npm.cmd run lint passed; npm.cmd run format:check passed after formatting the archived run-4 diagnostic; npx.cmd vitest run --exclude 'sites/**' passed 26 files / 305 tests.
+- Deterministic generation: `& pipeline/.venv/Scripts/python.exe scripts/build-road-surface-preview.py --config config/road-surface-preview.json --execution-record docs/milestones/artifacts/Road-surface-treatment/build-17.json` and the same command with build-18.json matched the three output hashes above and all seven release/source input hashes.
+- Isolated browser profile: `npx.cmd playwright test --config=playwright.road-surface.config.ts` passed 5/5 in run 5; it captured and we inspected 26 actual Chromium screenshots. Port 4213 was stopped after the run.
+- Default source-draped route check: `npm.cmd run build` then `npx.cmd playwright test --config=playwright.road-surface-share.config.ts` passed 1/1. It verified current_2km real scene, preview off/notice hidden and no derivative request; the port 4216 server stopped.
+- Share derivative check: `npm.cmd run build:share` succeeded and `dist/worlds/torquay-road-surface-preview/` was absent. `npm.cmd run test:e2e:cleanup:share` passed 3 tests and skipped 3 profile-dependent tests; its port 4211 server stopped.
+- Viewer-cleanup real regression: npm.cmd run test:e2e:cleanup:real passed 5 tests / 1 skip. This app runtime was unchanged by the correction from the earlier real cleanup run. Issue-specific browser output and screenshot are archived under the real regression path above.
+- Final formatting/diff: Prettier check passed for all matched files; git diff --check exited 0 (Git printed only line-ending normalization warnings for pre-existing modified files). The independent hash pass matched all seven pinned build inputs and all three current derivative outputs. A comparison against the accepted preservation snapshot found 147 of 148 compared paths unchanged and one missing historical executable; no changed protected files. All 11 accepted Viewer-cleanup evidence files match their byte-for-byte backup. Ports 4211, 4213 and 4216 have no listener; port 5173 remains listening on its pre-existing process.
+
+## Recommendation and limits
+
+Keep /?roadSurface=preview as an explicitly labelled opt-in display for independent review. The treatment reduces measured median crossfall on the mandatory Parkfield, Pennys and Teignmouth profiles, but high maximum crossfall remains on several corridors, ambiguity creates substantial unchanged/faded regions, and building bases elsewhere can shift by up to 2.424 m. Newton's local earthwork and footing concern is bounded by the new fallback and measured sections, though both registered views are occluded. This derivative is not road design, source elevation, an approved AOI, or a reason to change the default route.

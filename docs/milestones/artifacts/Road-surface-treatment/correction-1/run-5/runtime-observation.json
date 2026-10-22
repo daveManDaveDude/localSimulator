@@ -1,0 +1,47 @@
+{
+  "issue": "Road-surface treatment preview",
+  "route": "/?roadSurface=preview",
+  "browserName": "chromium",
+  "sceneProfile": "current_2km",
+  "runtime": {
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "canvas": {
+      "cssWidth": 1440,
+      "cssHeight": 960,
+      "width": 1440,
+      "height": 960
+    },
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+    "viewport": {
+      "width": 1440,
+      "height": 960,
+      "devicePixelRatio": 1
+    }
+  },
+  "rendererCounters": {
+    "drawCalls": 7,
+    "triangles": 2969627,
+    "geometries": 7,
+    "textures": 1
+  },
+  "rendererReportedFps": 2.6,
+  "frameIntervals": {
+    "sampleCount": 179,
+    "medianMs": 383.3000000000029,
+    "p95Ms": 400,
+    "maximumMs": 1616.5999999999985,
+    "interpretation": "descriptive requestAnimationFrame pacing in this headless Chromium run; not a performance benchmark or user-device FPS claim"
+  },
+  "canvas": {
+    "cssWidth": 1440,
+    "cssHeight": 960,
+    "width": 1440,
+    "height": 960
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 960,
+    "devicePixelRatio": 1
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36"
+}

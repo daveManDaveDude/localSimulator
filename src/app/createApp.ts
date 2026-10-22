@@ -13,6 +13,7 @@ import type { FlightBounds, Vec3Like } from '../camera/movement';
 import { loadWorld } from './worldLoader';
 import { loadBuildingPackage } from './buildingLoader';
 import { loadRoadPackage } from './roadLoader';
+import { loadRoadSurfacePreview } from './roadSurfaceLoader';
 import {
   loadCurrent2kmRelease,
   type SceneReleaseIntegrity,
@@ -102,7 +103,7 @@ export function createApp(container: HTMLElement): AppHandle {
     (initialRealProfile.profile === 'current_2km' ||
       new URLSearchParams(window.location.search).get('roads') === '1');
   container.innerHTML = `
-    <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-scene-profile="${initialRealProfile?.profile ?? ''}" data-load-state="loading" data-renderer-ready="false">
+    <main class="viewer-shell" data-world-mode="${m0Mode ? 'm0' : initialRealMode ? 'real' : 'synthetic'}" data-scene-profile="${initialRealProfile?.profile ?? ''}" data-load-state="loading" data-renderer-ready="false" data-road-surface-state="off">
       <canvas class="viewer-canvas" aria-label="Terrain navigation world"></canvas>
       <div class="viewer-ui">
         <div class="viewer-topline">
@@ -259,6 +260,7 @@ export function createApp(container: HTMLElement): AppHandle {
     'beforeend',
     `
     <p class="fallback-notice" data-testid="fallback-notice" role="status" hidden></p>
+    <p class="road-surface-preview-notice" data-testid="road-surface-preview-notice" role="status" aria-live="polite" data-state="off" hidden></p>
     <button type="button" data-testid="retry-torquay" hidden>Retry Torquay</button>
     <details class="sources" data-testid="sources">
       <summary>Sources</summary>
@@ -267,6 +269,7 @@ export function createApp(container: HTMLElement): AppHandle {
         <p>Torquay package: EA Composite DTM 1 m (2022), rendered at 2 m spacing; heights reference Ordnance Survey Newlyn. Tile metadata spans 2003–2022; this is not a 2026 survey.</p>
         <p>OSM Devon extract: 16 October 2026, provided by Geofabrik. Building heights are tagged or estimated and unverified; road widths are visual estimates, not measured kerbs.</p>
         <p>Only three historical road contexts were compared qualitatively; no numeric offset was measured. The recorded coordinate operation reports 2 m accuracy; the preferred OSTN15 grid was unavailable.</p>
+        <p data-testid="road-surface-preview-source-note">The road-surface preview is a local generated visual model using EA terrain and dated OSM road centerlines. Altered pavement and shoulders are not EA source data or surveyed road elevations.</p>
         <p>Finer EA products exist. Saved local index metadata lists 0.5 m footprints dated April 2010 over 9.9407% of the candidate; no finer raster was checked or adopted.</p>
         <p><a href="https://www.data.gov.uk/dataset/01b3ee39-da3f-47b6-83da-dc98e73a461f/lidar-composite-dtm-2022-1m" target="_blank" rel="noopener noreferrer">EA source catalogue</a> · <a href="https://www.data.gov.uk/dataset/8275e71e-1516-42a1-bb0c-4fa73807fe2b/lidar-dtm-time-stamped-tiles" target="_blank" rel="noopener noreferrer">EA time-stamped products</a></p>
       </div>
@@ -331,6 +334,9 @@ export function createApp(container: HTMLElement): AppHandle {
   );
   const realPackageExtentNotice = container.querySelector<HTMLElement>(
     '[data-testid="real-package-extent-notice"]',
+  );
+  const roadSurfacePreviewNotice = container.querySelector<HTMLElement>(
+    '[data-testid="road-surface-preview-notice"]',
   );
   const provenanceBadge = container.querySelector<HTMLElement>(
     '[data-testid="provenance-badge"]',
@@ -527,6 +533,7 @@ export function createApp(container: HTMLElement): AppHandle {
     !status ||
     !welcomeCopy ||
     !realPackageExtentNotice ||
+    !roadSurfacePreviewNotice ||
     !provenanceBadge ||
     !syntheticWorldButton ||
     !realWorldButton ||
@@ -660,6 +667,22 @@ export function createApp(container: HTMLElement): AppHandle {
   let currentWorldGroup: Scene['children'][number] | undefined;
   let resizeRenderer: () => void = () => undefined;
 
+  const setRoadSurfacePreviewState = (
+    state: 'off' | 'loading' | 'applied' | 'fallback',
+  ): void => {
+    shell.dataset.roadSurfaceState = state;
+    roadSurfacePreviewNotice.dataset.state = state;
+    roadSurfacePreviewNotice.hidden = state === 'off';
+    roadSurfacePreviewNotice.textContent =
+      state === 'applied'
+        ? 'Road-surface preview · approximate road grading; surrounding ground adjusted.'
+        : state === 'fallback'
+          ? 'Road-surface preview unavailable; showing source terrain.'
+          : state === 'loading'
+            ? 'Loading local road-surface preview…'
+            : '';
+  };
+
   const overview = createOverviewController({
     openButton: overviewButton,
     closeButton: overviewClose,
@@ -728,6 +751,7 @@ export function createApp(container: HTMLElement): AppHandle {
   };
 
   const clearCurrentWorld = (): void => {
+    setRoadSurfacePreviewState('off');
     clearBuildingLayer();
     clearRoadLayer();
     controller?.dispose();
@@ -1504,6 +1528,12 @@ export function createApp(container: HTMLElement): AppHandle {
     selectedWorldMode = mode;
     resizeRenderer();
     clearCurrentWorld();
+    const roadSurfacePreviewRequested =
+      mode === 'real' &&
+      selectedRealProfile.profile === 'current_2km' &&
+      new URLSearchParams(window.location.search).get('roadSurface') ===
+        'preview';
+    if (roadSurfacePreviewRequested) setRoadSurfacePreviewState('loading');
     activeLoad?.abort();
     const attempt = ++loadAttempt;
     const abortController = new AbortController();
@@ -1569,22 +1599,76 @@ export function createApp(container: HTMLElement): AppHandle {
           `manifest validation: expected ${selectedRealProfile.profile} but received ${loaded.manifest.sceneProfile}`,
         );
       }
+      let displayHeights: Float32Array | undefined;
+      let roadSurfacePreviewFailed = false;
+      if (roadSurfacePreviewRequested && releaseIntegrity !== undefined) {
+        const previewStartedAt = performance.now();
+        try {
+          const preview = await loadRoadSurfacePreview(
+            releaseIntegrity,
+            undefined,
+            abortController.signal,
+          );
+          displayHeights = preview.heights;
+        } catch (error) {
+          if (
+            disposed ||
+            attempt !== loadAttempt ||
+            abortController.signal.aborted
+          ) {
+            return;
+          }
+          roadSurfacePreviewFailed = true;
+          shell.dataset.roadSurfaceFailureDetail =
+            error instanceof Error ? error.message : String(error);
+        } finally {
+          shell.dataset.roadSurfaceLoadMs = Math.max(
+            0,
+            performance.now() - previewStartedAt,
+          ).toFixed(1);
+        }
+      } else if (roadSurfacePreviewRequested) {
+        roadSurfacePreviewFailed = true;
+      }
+      if (
+        disposed ||
+        attempt !== loadAttempt ||
+        abortController.signal.aborted
+      ) {
+        return;
+      }
       let world: HeightfieldWorld;
       let realManifestFields: Pick<
         ViewerWorld,
         'realManifest' | 'realManifestSha256'
       > = {};
       try {
-        world = createHeightfieldWorld(loaded);
-        if ('manifestSha256' in loaded) {
-          realManifestFields = {
-            realManifest: loaded.manifest,
-            realManifestSha256: loaded.manifestSha256,
-          };
-        }
+        world = createHeightfieldWorld(loaded, displayHeights);
       } catch (error) {
-        const detail = error instanceof Error ? error.message : String(error);
-        throw new Error(`terrain geometry: ${detail}`, { cause: error });
+        if (displayHeights === undefined) {
+          const detail = error instanceof Error ? error.message : String(error);
+          throw new Error(`terrain geometry: ${detail}`, { cause: error });
+        }
+        roadSurfacePreviewFailed = true;
+        shell.dataset.roadSurfaceFailureDetail =
+          error instanceof Error ? error.message : String(error);
+        try {
+          world = createHeightfieldWorld(loaded);
+        } catch (sourceError) {
+          const detail =
+            sourceError instanceof Error
+              ? sourceError.message
+              : String(sourceError);
+          throw new Error(`terrain geometry: ${detail}`, {
+            cause: sourceError,
+          });
+        }
+      }
+      if ('manifestSha256' in loaded) {
+        realManifestFields = {
+          realManifest: loaded.manifest,
+          realManifestSha256: loaded.manifestSha256,
+        };
       }
       installWorld({
         group: world.group,
@@ -1620,6 +1704,11 @@ export function createApp(container: HTMLElement): AppHandle {
           ? {}
           : { sceneRelease: releaseIntegrity }),
       });
+      if (roadSurfacePreviewRequested) {
+        setRoadSurfacePreviewState(
+          roadSurfacePreviewFailed ? 'fallback' : 'applied',
+        );
+      }
     } catch (error) {
       if (
         disposed ||

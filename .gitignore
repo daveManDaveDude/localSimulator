@@ -13,6 +13,7 @@ data/intermediate/
 data/generated/
 public/worlds/torquay-poc-001/
 public/worlds/torquay-poc-001-2km/
+public/worlds/torquay-road-surface-preview/
 /.torquay-poc-001-2km.stage-*
 
 # Local environment and editor files

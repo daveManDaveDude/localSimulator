@@ -60,6 +60,10 @@ export class SceneReleaseLoadError extends Error {
 
 export interface SceneReleaseIntegrity {
   readonly releaseId: string;
+  /** SHA-256 of the exact ready.json bytes that selected this release. */
+  readonly readySha256: string;
+  /** SHA-256 of the inventory.json bytes validated against ready.json. */
+  readonly inventorySha256: string;
   readonly releaseRootUrl: URL;
   readonly files: ReadonlyMap<Current2kmRuntimeFile, SceneReleaseFile>;
   assertAssetUrl(url: URL, label: string): void;
@@ -390,6 +394,7 @@ export async function loadCurrent2kmRelease(
     signal,
   );
   const ready = parseReady(parseJson(readyBytes, 'ready response'));
+  const readySha256 = await sha256Hex(readyBytes);
   const inventoryUrl = new URL(
     `/worlds/torquay-poc-001-2km/releases/${ready.releaseId}/inventory.json`,
     readyUrl.origin,
@@ -401,9 +406,10 @@ export async function loadCurrent2kmRelease(
     INVENTORY_LIMIT_BYTES,
     signal,
   );
+  const inventorySha256 = await sha256Hex(inventoryBytes);
   if (
     inventoryBytes.byteLength !== ready.inventoryByteLength ||
-    (await sha256Hex(inventoryBytes)) !== ready.inventorySha256
+    inventorySha256 !== ready.inventorySha256
   ) {
     throw new SceneReleaseLoadError(
       'inventory validation',
@@ -470,6 +476,8 @@ export async function loadCurrent2kmRelease(
   };
   return {
     releaseId: ready.releaseId,
+    readySha256,
+    inventorySha256,
     releaseRootUrl,
     files,
     assertAssetUrl,

@@ -105,6 +105,8 @@ describe('current 2 km readiness and immutable release pin', () => {
     expect(release.releaseRootUrl.pathname).toBe(
       `/worlds/torquay-poc-001-2km/releases/${release.releaseId}/`,
     );
+    expect(release.readySha256).toBe(await sha256(fixture.ready));
+    expect(release.inventorySha256).toBe(await sha256(fixture.inventory));
     for (const path of CURRENT_2KM_RUNTIME_FILES) {
       const url = new URL(path, release.releaseRootUrl);
       release.assertAssetUrl(url, path);
