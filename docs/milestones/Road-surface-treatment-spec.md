@@ -90,3 +90,74 @@ The known default Vitest collection conflict with unrelated untracked `sites/` m
 Hash and preserve original source GIS, intermediate/generated inputs, current and historical browser packages, readiness/inventory, original supplied plan, accepted Road-alignment and prior evidence, installer/recovery files, `sites/`, and unrelated working changes. Preserve TQ1 4HN, current AOI dimensions and `selected_pending_coverage` / `not_checked`. No new source acquisition, Google imagery extraction/redistribution, paid service, dependency or API. User-provided Google references are location/context evidence only.
 
 The treatment changes visible terrain around roads, can alter building footing/roof baselines and nearby path ground, can expose nearest-road conflicts at junctions, and cannot recover actual cuttings, walls, cambers or engineered road elevations. A 2 m grid limits the surface approximation. These risks are why the output is a separately labelled preview with source fallback and retained baseline comparisons. This issue authorizes no coordinate correction, surveyed-road claim, physical driving system, lateral building/road relocation or AOI approval.
+
+## Correction 2 amendment — 22 October 2026
+
+Status: coordinator-accepted additive correction to the same user-authorized Road-surface treatment preview. This is not TVW-016. Preserve the initial specification and prior results as history. The rules below supersede any earlier acceptance that permits a mandatory severe carriageway to remain effectively source-draped while whole-way summary statistics improve. Implementation remains Luna with independent Sol review under the existing protocol.
+
+### Evidence and objective
+
+The user reports that baseline and preview look indistinguishable. A read-only reproduction from the current source and derivative at Parkfield way 30480989, station 396.0108 m, gives local X/Z [-148.321982, 55.891902]. Across its configured 6 m width, baseline/preview endpoint crossfall is 35.931% / 33.957%, full-width height span is 2.156 / 2.037 m, and maximum absolute change within offsets ±3 m is 0.08965 m. The existing 8 m² harm core at [-156, 58]–[-154, 58] fades treatment across approximately 3,008 m² through a 32 m radial fallback. This suppresses the carriageway objective despite the improved whole-way median. These are terrain/rendering measurements, not surveyed pavement values.
+
+Deliver visibly flatter configured carriageways at the mandatory severe sections. Retain the current 2 m shared grid initially. No coordinate-specific patches, independent floating road surface or new source acquisition are authorized. If the fixed grid cannot meet the criteria without serious new banks, return measured residuals to planning before adding finer or conforming geometry.
+
+### Generic carriageway and shoulder policy
+
+1. Build an explicit configured-width mask from eligible published ground-assumed vehicular centerlines. Include every terrain triangle intersecting a ribbon in its support stencil; a vertex-only distance test must not leave a boundary triangle partly untreated. Preserve source X/Z and configured widths.
+2. Set supported carriageway heights from unchanged baseline centerline-projection elevations using deterministic ownership. Preserve longitudinal anchor variation. Separate overlapping carriageway cores from overlapping shoulders: another road's shoulder must not override an unambiguous carriageway owner.
+3. Begin the zero-end-slope smoothstep shoulder outside the supported carriageway boundary. When transition-gradient checks fail, widen it deterministically within a maximum of 32 m beyond the configured ribbon edge. Record actual width, cut/fill, area, competing roads and nearby buildings. Do not expand farther to obtain a pass.
+4. Ambiguity/harm fallback must not silently weaken a successful core through radial source-ground blending. For genuinely incompatible core targets, excessive earthwork or building conflicts, retain source terrain in a registered connected road section with an along-road transition. Record its feature, station interval, reason and untreated length. An untreated mandatory severe section fails the objective; exclusion is not evidence of improvement.
+5. Keep terrain, roads (+0.05 m), building bases, labels and walking on the same displayed derivative. Keep original package validation intact and retain truthful missing/stale/corrupt fallback. Bump the algorithm version so an earlier derivative is rejected safely. No overlay above unchanged ground, skirts concealing intersections, or separate road-height sampler.
+
+### Objective acceptance and safety limits
+
+These numerical limits are explicit display-preview tolerances, not road engineering standards.
+
+- At Parkfield stations **396.0108 m and 409.2610 m**, sample the complete configured width at intervals no greater than **0.25 m**, including both edges and center. Require endpoint crossfall **≤5%**, full-width maximum-minus-minimum height span **≤0.30 m**, and centerline deviation from baseline **≤0.10 m**. Supply baseline / previous preview / corrected preview section plots; endpoint comparison alone is insufficient.
+- Profile the complete Parkfield, Pennys Hill and adjacent Teignmouth corridors at station spacing **≤1 m**, adding original vertices, registered controls and treatment/transition boundaries. Every nonjunction severe station with baseline crossfall ≥10% must improve by at least 50%. Each mandatory corridor's maximum and p95 crossfall must decrease. Report maximum, p90, p95 and median; full-width span and maximum local lateral slope; and treated, transition and untreated lengths separately. Keep untreated samples in full-corridor statistics. No exclusion is permitted at the registered Parkfield controls or each mandatory corridor's baseline worst section. Register junction/end exceptions explicitly rather than silently omitting them.
+- Preserve the original sampled longitudinal centerline target. The synthetic longitudinal hill remains unchanged within Float32 tolerance. Mandatory real centerline deviation is ≤0.10 m; report signed grade differences at fixed 5 m stations, with maximum difference ≤2 percentage points. Identify junction/end transitions separately. Do not smooth hills to obtain lateral improvement.
+- Retain the 5 m absolute-change safety boundary. No connected positive added-gradient region may reach the existing 1.0 m/m diagnostic threshold. Register all rejected or expanded regions and residual gradient/cut/fill extrema. Preserve exact unchanged outer vertices and deterministic finite results.
+- Any new building-base displacement exceeding 0.50 m requires registered footing sections and paired visual review; existing large shifts must not silently grow. Global maximum absolute and p95 absolute base displacement must not exceed the accepted preview's 2.424 m / 0.183 m. Recheck Newton, Sanford and Cavern numerically and visually; Newton's previously affected five bases must remain within 0.05 m of baseline. Keep walls attached and disclose local burial/footing changes.
+- Preserve fixed-triangle road/terrain agreement and Float32 tolerances. Require walk eye clearance 1.70 ±0.05 m above displayed ground in carriageways and transitions. No holes, cracks, terrain through pavement, floating ribbons or conspicuous new transition walls in mandatory and risk-region views.
+- Acceptance remains for the labelled opt-in `/?roadSurface=preview` only. The accepted default `/` remains source-draped, with no derivative request or dependency. Historical/synthetic routes ignore the derivative; share output excludes it. No default activation or engineering-accuracy claim follows from a pass.
+
+### Files and independent controls
+
+Expected changes are limited to `config/road-surface-preview.json`, `pipeline/torquay_pipeline/road_surface.py`, `pipeline/tests/test_road_surface.py`, `src/geo/roadSurfaceSchema.ts`, `tests/geo/roadSurfaceSchema.test.ts`, `tests/app/roadSurfaceLoader.test.ts`, `tests/e2e/road-surface.spec.ts`, `docs/asset-contract.md`, and the current issue's specification/handback/evidence. Contract tests cover the bumped version and old-version fallback. Reuse the current camera hook and Playwright profile. No runtime architecture change is initially required; return a concrete amendment before expanding it.
+
+Add independent synthetic controls for oblique ribbons crossing triangle boundaries, a shoulder conflict beside a clear core, true incompatible overlapping cores, narrow-bank triggers, building constraints and rejected-section transitions. Preserve existing flat/hill/curved/junction/parallel/AOI-edge controls, source-integrity checks, adversarial output guards, initially absent output creation and cancellation/fallback regressions.
+
+### Verification and evidence
+
+Use new evidence under `docs/milestones/artifacts/Road-surface-treatment/correction-2/`. Preserve all earlier evidence, including accepted cleanup reports/screenshots. Generate twice using two new unused canonical `build-N.json` records in `docs/milestones/artifacts/Road-surface-treatment/`; never overwrite build-17/18 or another record. Require identical derivative, manifest and deterministic QA hashes and matching protected input hashes before/after.
+
+Run from the repository root, sequentially when build roots overlap:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path pipeline).Path
+pipeline/.venv/Scripts/python.exe scripts/build-road-surface-preview.py --config config/road-surface-preview.json --execution-record docs/milestones/artifacts/Road-surface-treatment/build-19.json
+pipeline/.venv/Scripts/python.exe scripts/build-road-surface-preview.py --config config/road-surface-preview.json --execution-record docs/milestones/artifacts/Road-surface-treatment/build-20.json
+pipeline/.venv/Scripts/python.exe -m pytest pipeline/tests/test_road_surface.py pipeline/tests/test_road_alignment.py pipeline/tests/test_roads.py pipeline/tests/test_terrain_export.py
+pipeline/.venv/Scripts/python.exe -m ruff check pipeline scripts/build-road-surface-preview.py
+pipeline/.venv/Scripts/python.exe -m ruff format --check pipeline scripts/build-road-surface-preview.py
+npm.cmd run typecheck
+npm.cmd run lint
+npm.cmd run format:check
+npm.cmd test
+npx.cmd vitest run --exclude "sites/**"
+npx.cmd playwright test --config=playwright.road-surface.config.ts
+npm.cmd run build
+npx.cmd playwright test --config=playwright.road-surface-share.config.ts
+npm.cmd run build:share
+npm.cmd run test:e2e:cleanup:real
+npm.cmd run test:e2e:cleanup:share
+git diff --check
+```
+
+Build-19/20 are examples only if still unused; choose the next unused numbers and record the actual commands. Capture cleanup regression outputs in the new issue directory and restore accepted evidence byte-for-byte if existing runners overwrite their paths. Disclose the known default Vitest collection conflict with unrelated untracked `sites/` separately from scoped results; record failures and unexecuted checks honestly.
+
+Capture actual after-Start baseline/corrected overhead and unobstructed low-oblique pairs at both Parkfield controls, Pennys/Teignmouth severe controls, Arthington and Cricketfield. Retain Parkfield/Lymington context and Newton/Sanford/Cavern and newly selected risk-region comparisons. Derive cameras from the registered stations and each displayed local grid, preserving datum distinctions. Include full-width section plots, pose, source/derivative hashes, viewport/GPU, local requests, load/frame observations, console/page errors and achieved walk clearances. Inspect every image; occlusion cannot count as unobstructed visual proof. Re-run missing/stale/corrupt fallback, retry/cancellation, reset/resize, default/historical/synthetic isolation and share exclusion. Independent Sol verifies the actual outputs and images against every mandatory criterion.
+
+### Preservation
+
+Keep the preview opt-in and preserve all original source GIS, EA rasters, current/historical browser packages and readiness/inventory bytes, original plan, accepted earlier reports/screenshots, installer/recovery material, `sites/` and unrelated working changes. Preserve TQ1 4HN, the 2 km candidate extent, `selected_pending_coverage` / `not_checked`, and port 5173. No new downloads, dependencies, APIs, coordinate edits or AOI approval. The baseline-missing historical TMOG installer remains an environment caveat, not a file to replace with another installer. Hash preservation boundaries and retain the original accepted preview comparison evidence.
