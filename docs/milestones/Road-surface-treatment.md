@@ -1,6 +1,6 @@
-# Road-surface treatment preview — correction 1 handback
+# Road-surface treatment preview — accepted handback
 
-**Updated:** 22 October 2026. **State:** correction candidate for independent Sol review; no issue-wide PASS is claimed and the preview remains opt-in.
+**Updated:** 22 October 2026. **State:** PASS; coordinator-accepted after independent Sol review. The preview remains opt-in and does not change the default route.
 
 ## Scope and runtime
 
