@@ -13,6 +13,7 @@ from torquay_pipeline.road_surface import (
     RoadSegment,
     RoadSurfaceError,
     _apply_harm_fallback,
+    _apply_station_harm_fallback,
     _canonical_json,
     _fallback_distance_weights,
     _grade_grid,
@@ -404,11 +405,18 @@ def test_fallback_uses_zero_ended_smoothstep_and_keeps_the_outer_candidate_exact
         _config(fallback_fade_distance_m=8.0),
         np.zeros_like(baseline, dtype=np.int64),
     )
-    assert report["triggeredRegionCount"] == 1
+    assert report["triggeredRegionCount"] == 2
+    assert {trigger for region in report["regions"] for trigger in region["harmTriggers"]} == {
+        "absolute local cut/fill threshold",
+        "connected added-gradient threshold and minimum area",
+    }
     assert preview[20, 20] == pytest.approx(0.0)
     assert preview[0, 0] == candidate[0, 0]
     assert np.isfinite(preview).all()
     assert report["regions"][0]["postFallbackMaximumAddedGradientMPerM"] < 1.0
+    assert report["regions"][0]["fadeDistanceM"] == 8.0
+    assert report["uniqueRetainedCoreAreaEquivalentM2"] >= 25.0
+    assert report["uniqueAffectedAreaEquivalentM2"] <= report["affectedAreaEquivalentM2"]
 
 
 def test_fallback_catches_minimum_two_vertex_added_gradient_component() -> None:
@@ -437,6 +445,46 @@ def test_fallback_catches_minimum_two_vertex_added_gradient_component() -> None:
     assert "connected added-gradient threshold and minimum area" in region["harmTriggers"]
     assert np.all(preview[20, 10:24] == baseline[20, 10:24])
     assert region["postFallbackMaximumAddedGradientMPerM"] < 1.0
-    assert region["fadeDistanceM"] == 8.0
-    assert report["uniqueRetainedCoreAreaEquivalentM2"] == 56.0
-    assert report["uniqueAffectedAreaEquivalentM2"] == report["affectedAreaEquivalentM2"]
+
+
+def test_shoulder_only_harm_fallback_preserves_flattened_carriageway_core() -> None:
+    baseline = np.broadcast_to(
+        (np.arange(21, dtype=np.float32) - 10.0)[:, None] * 0.2, (21, 21)
+    ).copy()
+    candidate = baseline.copy()
+    candidate[9:12, :] = 0.0
+    candidate[14, 8:13] += 6.0
+    segments = _segments_from_payload(
+        {"features": [_road(44, [[-10.0, 0.0], [10.0, 0.0]], width=2.0)]}, 1.0, 1.0
+    )
+    nearest_way = np.full((21, 21), 44, dtype=np.int64)
+    nearest_segment = np.zeros((21, 21), dtype=np.int32)
+    nearest_station = np.broadcast_to(np.arange(21, dtype=np.float64), (21, 21)).copy()
+    nearest_distance = np.broadcast_to(
+        np.abs(np.arange(21, dtype=np.float64) - 10.0)[:, None], (21, 21)
+    ).copy()
+
+    preview, report = _apply_station_harm_fallback(
+        baseline,
+        candidate,
+        segments,
+        1.0,
+        2.0,
+        20.0,
+        _config(fallback_fade_distance_m=8.0),
+        nearest_way,
+        nearest_segment,
+        nearest_station,
+        nearest_distance,
+        [],
+    )
+
+    assert preview[9:12, :] == pytest.approx(candidate[9:12, :])
+    assert np.max(np.abs(preview[14, 8:13] - baseline[14, 8:13])) < 5.0
+    interval = report["regions"][0]["stationIntervals"][0]
+    assert interval["fallbackScope"] == (
+        "affected shoulder band with smooth cross-road fade; carriageway core protected"
+    )
+    assert interval["componentLateralDistanceRangeM"] == pytest.approx([4.0, 4.0])
+    assert interval["maximumSourceGroundStrengthWithinBand"] == pytest.approx(1.0 - 4.5 / 6.0)
+    assert report["maximumAddedGradientAfterFallbackMPerM"] < 1.0

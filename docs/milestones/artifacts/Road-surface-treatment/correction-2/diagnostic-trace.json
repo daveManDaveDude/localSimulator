@@ -1,0 +1,103 @@
+{
+  "formatVersion": 1,
+  "classification": "diagnostic-only; strict Correction 2 candidate rejected; no derivative written",
+  "algorithmVersion": "road-surface-preview-2.0.0",
+  "source": {
+    "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+    "heightfieldSha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+  },
+  "inMemoryGridSha256": "d9fa06b3143303e515f1c383b8961f481fc7527be8c8794be2bbc68240f92e66",
+  "diagnosticMethod": "The deterministic grid was computed in memory. Only the final added-gradient exception inside the fallback was bypassed to inspect the otherwise rejected grid. The grid was not written, installed, requested by the app, or used for browser captures.",
+  "strictBuild": {
+    "command": "pipeline/.venv/Scripts/python.exe scripts/build-road-surface-preview.py --config config/road-surface-preview.json --execution-record docs/milestones/artifacts/Road-surface-treatment/build-19.json",
+    "result": "failed before derivative and execution-record writes",
+    "error": "station harm fallback left a connected added-gradient safety heuristic at 1.374476 m/m near x-edge [750, 958] to [752, 958], nearest way 32110548 at stations 28.7148-29.1840 m",
+    "expectedExecutionRecordCreated": false
+  },
+  "policyLimits": {
+    "maximumAbsoluteTerrainChangeM": 5.0,
+    "maximumPositiveAddedGradientMPerMExclusive": 1.0,
+    "parkfield": {
+      "maximumEndpointCrossfallPercent": 5.0,
+      "maximumFullWidthSpanM": 0.3,
+      "maximumCenterlineDeviationM": 0.1
+    }
+  },
+  "global": {
+    "maximumAbsoluteTerrainChangeM": 4.362612724304199,
+    "maximumPositiveAddedGradientMPerM": 1.3744755983352661,
+    "maximumGradientEdge": {
+      "axis": "x",
+      "firstLocalXZ": [750.0, 958.0],
+      "secondLocalXZ": [752.0, 958.0],
+      "baselineGradientMPerM": 0.38636112213134766,
+      "previewGradientMPerM": 1.7608367204666138,
+      "wayId": 32110548
+    },
+    "connectedRegionsAtOrAboveThreshold": [
+      {
+        "affectedAreaEquivalentM2": 24.0,
+        "localBoundsXZ": [580.0, 808.0, 582.0, 812.0],
+        "maximumPositiveIncreaseMPerM": 1.1587584018707275,
+        "edgeCount": 3
+      },
+      {
+        "affectedAreaEquivalentM2": 16.0,
+        "localBoundsXZ": [748.0, 950.0, 750.0, 952.0],
+        "maximumPositiveIncreaseMPerM": 1.3343971967697144,
+        "edgeCount": 2
+      },
+      {
+        "affectedAreaEquivalentM2": 16.0,
+        "localBoundsXZ": [750.0, 958.0, 752.0, 960.0],
+        "maximumPositiveIncreaseMPerM": 1.3744755983352661,
+        "edgeCount": 2
+      },
+      {
+        "affectedAreaEquivalentM2": 8.0,
+        "localBoundsXZ": [272.0, 970.0, 274.0, 970.0],
+        "maximumPositiveIncreaseMPerM": 1.1436128616333008,
+        "edgeCount": 1
+      },
+      {
+        "affectedAreaEquivalentM2": 8.0,
+        "localBoundsXZ": [276.0, 976.0, 278.0, 976.0],
+        "maximumPositiveIncreaseMPerM": 1.2929143905639648,
+        "edgeCount": 1
+      }
+    ]
+  },
+  "parkfieldControls": [
+    {
+      "wayId": 30480989,
+      "stationM": 396.0108,
+      "sampleStepM": 0.25,
+      "widthM": 6.0,
+      "baselineEndpointCrossfallPercent": 35.930637371135106,
+      "previewEndpointCrossfallPercent": 4.692117917146099,
+      "baselineFullWidthSpanM": 2.155838242268106,
+      "previewFullWidthSpanM": 0.28152707502876595,
+      "centerDeviationM": 0.013161778957561765,
+      "passes": true
+    },
+    {
+      "wayId": 30480989,
+      "stationM": 409.261,
+      "sampleStepM": 0.25,
+      "widthM": 6.0,
+      "baselineEndpointCrossfallPercent": 42.70974382608711,
+      "previewEndpointCrossfallPercent": 5.760252780253161,
+      "baselineFullWidthSpanM": 2.562584629565227,
+      "previewFullWidthSpanM": 0.34561516681518967,
+      "centerDeviationM": 0.002440758688225131,
+      "passes": false
+    }
+  ],
+  "rejectedExperiment": {
+    "description": "Gradual shoulder-strength envelope bounded by 32 m beyond configured half-width, with configured core protected and fallback mapping limited to candidate-modified vertices.",
+    "strictFailure": "maximum local terrain change 5.664381 m exceeds the unchanged 5 m cap",
+    "focusedSyntheticPythonResult": "21 passed, 1 skipped (Windows directory-symlink privilege)",
+    "usedForCurrentCandidate": false
+  },
+  "browserEvidence": "not run because strict construction failed; prior Correction 1 screenshots are not Correction 2 evidence"
+}

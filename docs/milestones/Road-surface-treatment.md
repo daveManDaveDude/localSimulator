@@ -2,6 +2,27 @@
 
 **Updated:** 22 October 2026. **State:** PASS; coordinator-accepted after independent Sol review. The preview remains opt-in and does not change the default route.
 
+## Correction 2 candidate status — strict gates fail; not accepted
+
+The accepted Correction 2 amendment (specification commit `383d9cd`) is not accepted. The PASS state above and all following build/browser records document the earlier Correction 1 candidate only. They are retained as history and do not establish the amended Parkfield full-carriageway gates.
+
+The strict command `pipeline/.venv/Scripts/python.exe scripts/build-road-surface-preview.py --config config/road-surface-preview.json --execution-record docs/milestones/artifacts/Road-surface-treatment/build-19.json` failed before writing the derivative or execution record. The builder rejected the candidate at a connected added-gradient increase of **1.3744755983352661 m/m**, above the unchanged 1.0 m/m policy cap. The edge is local X/Z `[750, 958]` to `[752, 958]`, way **32110548**, station 28.7148–29.1840 m; baseline edge gradient is 0.386361 m/m and preview edge gradient is 1.760837 m/m. The affected shoulder fallback on this way spans only about 1.18 m between the configured half-width and the nearest measured-harm band, producing a new bank at its transition.
+
+An in-memory diagnostic suppressed only the final gradient exception so that the exact candidate grid could be measured. It did not write or activate a derivative. That grid hash is `d9fa06b3143303e515f1c383b8961f481fc7527be8c8794be2bbc68240f92e66`, derived from the pinned release `616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a` and source heightfield `c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af`. Its maximum absolute terrain change is 4.362613 m, within the 5 m cap. However, five connected positive added-gradient regions exceed 1.0 m/m: 24 m² at `[580, 808]`–`[582, 812]` (1.158758 m/m), 16 m² at `[748, 950]`–`[750, 952]` (1.334397), 16 m² at `[750, 958]`–`[752, 960]` (1.374476), 8 m² at `[272, 970]`–`[274, 970]` (1.143613), and 8 m² at `[276, 976]`–`[278, 976]` (1.292914). The exact diagnostic trace is [correction-2 diagnostic](artifacts/Road-surface-treatment/correction-2/diagnostic-trace.json).
+
+At Parkfield way 30480989, both controls were sampled across the complete 6 m configured width at 0.25 m spacing, including both edges and center:
+
+|    Station | Baseline crossfall / span | Candidate crossfall / span | Candidate center deviation | Result                   |
+| ---------: | ------------------------: | -------------------------: | -------------------------: | ------------------------ |
+| 396.0108 m |       35.931% / 2.15584 m |         4.692% / 0.28153 m |                 +0.01316 m | Passes this control      |
+| 409.2610 m |       42.710% / 2.56258 m |         5.760% / 0.34562 m |                 +0.00244 m | Fails crossfall and span |
+
+The center-deviation limit is 0.10 m; the crossfall and full-width span limits are 5% and 0.30 m. The candidate therefore fails the amended mandatory controls even though station 396.0108 passes. These samples are display-grid comparisons, not pavement survey measurements.
+
+One bounded follow-up experiment widened the source-strength envelope within the 32 m shoulder cap while leaving the configured core unchanged. Restricting fallback mapping to changed vertices made the focused synthetic suite pass (21 passed, one Windows symlink-capability skip), but the real build then failed the unchanged 5 m terrain-change cap at **5.664381 m**. That experiment was discarded. No strict-passing treatment was found; do not use its values as evidence. Widening the grading domain, weakening either safety threshold, or altering the mandatory station samples would violate the accepted amendment.
+
+No Correction 2 derivative, `build-19.json` record, or paired Chromium screenshots were produced. The strict rejection occurs before output writes, and the diagnostic grid above was never materialized as an asset. Consequently, full-corridor Parkfield/Pennys/Teignmouth statistics, corrected building-footing QA, walk-clearance checks, route-isolation regressions and visual acceptance remain unverified for Correction 2. Earlier Correction 1 screenshots do not count as Correction 2 evidence. The current recommendation is to return the measured infeasibility to planning; do not claim the amended preview is complete or accepted.
+
 ## Scope and runtime
 
 The default route / continues to load the accepted current 2 km package and source-draped terrain. The labelled comparison route is /?roadSurface=preview; it loads a separate ignored derivative from public/worlds/torquay-road-surface-preview/. The derivative is tied to release 616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a. Missing, corrupt, stale, or invalid preview inputs fall back to the coherent source terrain. The share build excludes the ignored derivative. The preview notice identifies the display as approximate and says the surrounding ground was adjusted. No change claims EA source terrain or surveyed road elevations.

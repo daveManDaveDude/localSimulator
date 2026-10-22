@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import shapely
 from pyproj import Transformer
 from shapely.geometry import (
     GeometryCollection,
@@ -32,7 +33,9 @@ from shapely.geometry import (
 from .road_alignment import CURRENT_RELEASE_ID, sha256_file
 from .terrain_export import _sample_bilinear_mosaic
 
-ALGORITHM_VERSION = "road-surface-preview-1.0.0"
+ALGORITHM_VERSION = "road-surface-preview-2.0.0"
+FALLBACK_ABSOLUTE_CHANGE_HEADROOM_M = 0.5
+FALLBACK_ADDED_GRADIENT_BLEND_TARGET_M_PER_M = 0.5
 OUTPUT_FILES = frozenset({"manifest.json", "heightfield.f32", "qa.json"})
 RUNTIME_FILES = (
     "buildings/buildings.json",
@@ -84,6 +87,7 @@ class RoadSegment:
     dz: float
     length_squared: float
     influence_m: float
+    station_start_m: float = 0.0
 
     @property
     def length_m(self) -> float:
@@ -101,6 +105,7 @@ class Projection:
     width_m: float
     part_index: int
     segment_index_in_part: int
+    station_m: float
 
 
 @dataclass(frozen=True)
@@ -561,6 +566,7 @@ def _segments_from_payload(
         for part_index, part in enumerate(parts):
             if not isinstance(part, list):
                 raise RoadSurfaceError(f"way {way_id} centerline part is malformed")
+            station_start_m = 0.0
             for segment_index, (first, second) in enumerate(zip(part, part[1:], strict=False)):
                 if (
                     not isinstance(first, list)
@@ -591,8 +597,10 @@ def _segments_from_payload(
                         dz=dz,
                         length_squared=length_squared,
                         influence_m=influence,
+                        station_start_m=station_start_m,
                     )
                 )
+                station_start_m += math.sqrt(length_squared)
     return sorted(segments, key=lambda item: item.sort_key)
 
 
@@ -625,6 +633,7 @@ def _project(
         width_m=segment.width_m,
         part_index=segment.sort_key[1],
         segment_index_in_part=segment.sort_key[2],
+        station_m=segment.station_start_m + amount * segment.length_m,
     )
 
 
@@ -649,10 +658,353 @@ def _blend_weight(distance: float, half_width: float, transition: float) -> floa
     return 1 - (3 * position * position - 2 * position * position * position)
 
 
+def _transition_for_station(
+    segment: RoadSegment,
+    station_m: float,
+    spacing_m: float,
+    config: PreviewConfig,
+    expanded_intervals: dict[tuple[int, int], list[tuple[float, float]]] | None,
+) -> float:
+    base_transition = max(segment.width_m, 2 * spacing_m) * config.transition_distance_factor
+    if not expanded_intervals:
+        return base_transition
+    maximum_transition = 32.0
+    if maximum_transition <= base_transition:
+        return base_transition
+    intervals = expanded_intervals.get((segment.way_id, segment.sort_key[1]), [])
+    amount = 0.0
+    for start_station, end_station in intervals:
+        distance = max(start_station - station_m, station_m - end_station, 0.0)
+        if distance >= config.fallback_fade_distance_m:
+            continue
+        position = distance / config.fallback_fade_distance_m
+        blend = 1 - (3 * position * position - 2 * position * position * position)
+        amount = max(amount, blend)
+    return base_transition + amount * (maximum_transition - base_transition)
+
+
 def _grid_tile_range(tile_index: int, spacing_m: float, half_extent: float, count: int) -> range:
     lower = math.ceil((tile_index * SPATIAL_TILE_M + half_extent) / spacing_m)
     upper_exclusive = math.ceil(((tile_index + 1) * SPATIAL_TILE_M + half_extent) / spacing_m)
     return range(max(0, lower), min(count, upper_exclusive))
+
+
+def _sample_grid_many(
+    heights: np.ndarray, x: np.ndarray, z: np.ndarray, spacing_m: float
+) -> np.ndarray:
+    """Vectorized form of the renderer's fixed-diagonal terrain sampler."""
+    columns, rows = heights.shape[1], heights.shape[0]
+    half_width = (columns - 1) * spacing_m / 2
+    half_depth = (rows - 1) * spacing_m / 2
+    gx = np.clip((x + half_width) / spacing_m, 0, columns - 1)
+    gz = np.clip((z + half_depth) / spacing_m, 0, rows - 1)
+    column = np.minimum(np.floor(gx).astype(np.int64), columns - 2)
+    row = np.minimum(np.floor(gz).astype(np.int64), rows - 2)
+    u, v = gx - column, gz - row
+    a = heights[row, column].astype(np.float64)
+    b = heights[row, column + 1].astype(np.float64)
+    c = heights[row + 1, column].astype(np.float64)
+    d = heights[row + 1, column + 1].astype(np.float64)
+    first = a + (b - a) * u + (c - a) * v
+    second = d + (c - d) * (1 - u) + (b - d) * (1 - v)
+    return np.where(u + v <= 1, first, second)
+
+
+def _carriageway_triangle_owners(
+    baseline: np.ndarray,
+    segments: list[RoadSegment],
+    spacing_m: float,
+    width_m: float,
+    depth_m: float,
+    ambiguity_height_difference_m: float,
+) -> tuple[np.ndarray, np.ndarray, list[dict[str, Any]]]:
+    """Assign every grid vertex in a triangle touched by a road ribbon to its owner.
+
+    The support stencil is formed by exact Shapely intersections against the same
+    fixed diagonal triangles used by the displayed heightfield. Each supported
+    vertex is marked as carriageway core or shoulder support so only the core gets
+    full flattening. Incompatible carriageway cores are retained at source ground.
+    """
+    rows, columns = baseline.shape
+    half_width, half_depth = width_m / 2, depth_m / 2
+    grouped: dict[tuple[int, int], list[tuple[int, RoadSegment]]] = {}
+    for segment_index, segment in enumerate(segments):
+        grouped.setdefault((segment.way_id, segment.sort_key[1]), []).append(
+            (segment_index, segment)
+        )
+    owners = np.full(rows * columns, -1, dtype=np.int32)
+    owner_is_core = np.zeros(rows * columns, dtype=bool)
+    owner_distances = np.full(rows * columns, np.inf, dtype=np.float64)
+    owner_targets = np.zeros(rows * columns, dtype=np.float64)
+    owner_stations = np.zeros(rows * columns, dtype=np.float64)
+    conflicts: dict[int, dict[str, Any]] = {}
+
+    for group_key in sorted(grouped):
+        group = sorted(grouped[group_key], key=lambda item: item[1].sort_key[2])
+        group_segments = [segment for _index, segment in group]
+        points = [(group_segments[0].first_x, group_segments[0].first_z)]
+        points.extend(
+            (segment.first_x + segment.dx, segment.first_z + segment.dz)
+            for segment in group_segments
+        )
+        ribbon = LineString(points).buffer(
+            group_segments[0].width_m / 2, cap_style="flat", join_style="mitre"
+        )
+        min_x, min_z, max_x, max_z = ribbon.bounds
+        min_column = max(0, math.floor((min_x + half_width) / spacing_m))
+        max_column = min(columns - 2, math.floor((max_x + half_width) / spacing_m))
+        min_row = max(0, math.floor((min_z + half_depth) / spacing_m))
+        max_row = min(rows - 2, math.floor((max_z + half_depth) / spacing_m))
+        if min_column > max_column or min_row > max_row:
+            continue
+
+        grid_rows, grid_columns = np.mgrid[min_row : max_row + 1, min_column : max_column + 1]
+        first_x = grid_columns.ravel() * spacing_m - half_width
+        first_z = grid_rows.ravel() * spacing_m - half_depth
+        lower_left = np.column_stack((first_x, first_z))
+        lower_right = lower_left + np.array([spacing_m, 0.0])
+        upper_left = lower_left + np.array([0.0, spacing_m])
+        upper_right = lower_left + np.array([spacing_m, spacing_m])
+        first_triangles = shapely.polygons(
+            np.stack((lower_left, lower_right, upper_left, lower_left), axis=1)
+        )
+        second_triangles = shapely.polygons(
+            np.stack((upper_right, upper_left, lower_right, upper_right), axis=1)
+        )
+        intersects_first = shapely.intersects(ribbon, first_triangles)
+        intersects_second = shapely.intersects(ribbon, second_triangles)
+        rr, cc = grid_rows.ravel(), grid_columns.ravel()
+        triangle_vertices = np.concatenate(
+            (
+                np.column_stack(
+                    (
+                        rr[intersects_first] * columns + cc[intersects_first],
+                        rr[intersects_first] * columns + cc[intersects_first] + 1,
+                        (rr[intersects_first] + 1) * columns + cc[intersects_first],
+                    )
+                ),
+                np.column_stack(
+                    (
+                        (rr[intersects_second] + 1) * columns + cc[intersects_second] + 1,
+                        (rr[intersects_second] + 1) * columns + cc[intersects_second],
+                        rr[intersects_second] * columns + cc[intersects_second] + 1,
+                    )
+                ),
+            ),
+            axis=0,
+        )
+        vertex_indices = np.unique(triangle_vertices)
+        if not vertex_indices.size:
+            continue
+        vertex_rows, vertex_columns = np.divmod(vertex_indices, columns)
+        x = vertex_columns.astype(np.float64) * spacing_m - half_width
+        z = vertex_rows.astype(np.float64) * spacing_m - half_depth
+        best_distances = np.full(vertex_indices.size, np.inf, dtype=np.float64)
+        best_segments = np.full(vertex_indices.size, -1, dtype=np.int32)
+        best_amounts = np.zeros(vertex_indices.size, dtype=np.float64)
+        for segment_index, segment in group:
+            amount = np.clip(
+                ((x - segment.first_x) * segment.dx + (z - segment.first_z) * segment.dz)
+                / segment.length_squared,
+                0.0,
+                1.0,
+            )
+            projected_x = segment.first_x + amount * segment.dx
+            projected_z = segment.first_z + amount * segment.dz
+            distance = np.hypot(projected_x - x, projected_z - z)
+            choose = distance < best_distances - 1e-9
+            best_distances[choose] = distance[choose]
+            best_segments[choose] = segment_index
+            best_amounts[choose] = amount[choose]
+        target_x = np.empty(vertex_indices.size, dtype=np.float64)
+        target_z = np.empty(vertex_indices.size, dtype=np.float64)
+        for segment_index, segment in group:
+            selected = best_segments == segment_index
+            if not np.any(selected):
+                continue
+            amount = np.clip(
+                (
+                    (x[selected] - segment.first_x) * segment.dx
+                    + (z[selected] - segment.first_z) * segment.dz
+                )
+                / segment.length_squared,
+                0.0,
+                1.0,
+            )
+            target_x[selected] = segment.first_x + amount * segment.dx
+            target_z[selected] = segment.first_z + amount * segment.dz
+        targets = _sample_grid_many(baseline, target_x, target_z, spacing_m)
+        candidate_is_core = best_distances <= group_segments[0].width_m / 2 + 1e-9
+        candidate_stations = np.asarray(
+            [
+                segments[int(segment_index)].station_start_m
+                + best_amounts[index] * segments[int(segment_index)].length_m
+                for index, segment_index in enumerate(best_segments)
+            ],
+            dtype=np.float64,
+        )
+        previous = owners[vertex_indices]
+        free = previous < 0
+        # A prior incompatible conflict stays source-owned. Compatible overlaps
+        # resolve by nearest centerline and the stable sorted feature order.
+        conflict_vertex = previous == -2
+        assign_free = free & ~conflict_vertex
+        owners[vertex_indices[assign_free]] = best_segments[assign_free]
+        owner_is_core[vertex_indices[assign_free]] = candidate_is_core[assign_free]
+        owner_distances[vertex_indices[assign_free]] = best_distances[assign_free]
+        owner_targets[vertex_indices[assign_free]] = targets[assign_free]
+        owner_stations[vertex_indices[assign_free]] = candidate_stations[assign_free]
+        occupied = (previous >= 0) & (previous != -2)
+        if not np.any(occupied):
+            continue
+        old_indices = vertex_indices[occupied]
+        old_segments = owners[old_indices].copy()
+        old_ways = np.asarray([segments[index].way_id for index in old_segments], dtype=np.int64)
+        new_ways = np.full(old_ways.shape, group_key[0], dtype=np.int64)
+        different_ways = old_ways != new_ways
+        if not np.any(different_ways):
+            prior_is_core = owner_is_core[old_indices]
+            new_is_core = candidate_is_core[occupied]
+            choose_new = (new_is_core & ~prior_is_core) | (
+                (new_is_core == prior_is_core)
+                & (best_distances[occupied] < owner_distances[old_indices] - 1e-9)
+            )
+            owners[old_indices[choose_new]] = best_segments[occupied][choose_new]
+            owner_is_core[old_indices[choose_new]] = new_is_core[choose_new]
+            owner_distances[old_indices[choose_new]] = best_distances[occupied][choose_new]
+            owner_targets[old_indices[choose_new]] = targets[occupied][choose_new]
+            owner_stations[old_indices[choose_new]] = candidate_stations[occupied][choose_new]
+            continue
+        height_differences = np.abs(owner_targets[old_indices] - targets[occupied])
+        prior_is_core = owner_is_core[old_indices]
+        new_is_core = candidate_is_core[occupied]
+        incompatible = (
+            different_ways
+            & prior_is_core
+            & new_is_core
+            & (height_differences >= ambiguity_height_difference_m)
+        )
+        for local_index in np.flatnonzero(incompatible):
+            flat_index = int(old_indices[local_index])
+            prior_segment = int(old_segments[local_index])
+            record = conflicts.setdefault(
+                flat_index,
+                {
+                    "ways": set(),
+                    "heightDifferenceM": 0.0,
+                    "stationByWayM": {},
+                    "segmentByWay": {},
+                    "partIndexByWay": {},
+                },
+            )
+            new_segment = int(best_segments[occupied][local_index])
+            record["ways"].update((segments[prior_segment].way_id, group_key[0]))
+            record["heightDifferenceM"] = max(
+                record["heightDifferenceM"], float(height_differences[local_index])
+            )
+            record["stationByWayM"][segments[prior_segment].way_id] = float(
+                owner_stations[flat_index]
+            )
+            record["stationByWayM"][group_key[0]] = float(candidate_stations[occupied][local_index])
+            record["segmentByWay"][segments[prior_segment].way_id] = prior_segment
+            record["segmentByWay"][group_key[0]] = new_segment
+            record["partIndexByWay"][segments[prior_segment].way_id] = segments[
+                prior_segment
+            ].sort_key[1]
+            record["partIndexByWay"][group_key[0]] = segments[new_segment].sort_key[1]
+            owners[flat_index] = -2
+            owner_is_core[flat_index] = False
+        compatible = different_ways & ~incompatible
+        choose_compatible = compatible & (
+            (new_is_core & ~prior_is_core)
+            | (
+                (new_is_core == prior_is_core)
+                & (best_distances[occupied] < owner_distances[old_indices] - 1e-9)
+            )
+        )
+        owners[old_indices[choose_compatible]] = best_segments[occupied][choose_compatible]
+        owner_is_core[old_indices[choose_compatible]] = new_is_core[choose_compatible]
+        owner_distances[old_indices[choose_compatible]] = best_distances[occupied][
+            choose_compatible
+        ]
+        owner_targets[old_indices[choose_compatible]] = targets[occupied][choose_compatible]
+        owner_stations[old_indices[choose_compatible]] = candidate_stations[occupied][
+            choose_compatible
+        ]
+
+    segment_ways = np.asarray([segment.way_id for segment in segments], dtype=np.int64)
+
+    def mark_incompatible_edges(first: np.ndarray, second: np.ndarray) -> None:
+        first_owner, second_owner = owners[first], owners[second]
+        eligible = (first_owner >= 0) & (second_owner >= 0)
+        eligible &= owner_is_core[first] & owner_is_core[second]
+        eligible &= (
+            segment_ways[np.maximum(first_owner, 0)] != segment_ways[np.maximum(second_owner, 0)]
+        )
+        eligible &= np.abs(owner_targets[first] - owner_targets[second]) >= (
+            ambiguity_height_difference_m
+        )
+        for first_index, second_index in zip(first[eligible], second[eligible], strict=True):
+            for flat_index, other_flat_index in (
+                (int(first_index), int(second_index)),
+                (int(second_index), int(first_index)),
+            ):
+                prior_segment = int(owners[flat_index])
+                other_segment = int(owners[other_flat_index])
+                prior_way, other_way = (
+                    segments[prior_segment].way_id,
+                    segments[other_segment].way_id,
+                )
+                record = conflicts.setdefault(
+                    flat_index,
+                    {
+                        "ways": set(),
+                        "heightDifferenceM": 0.0,
+                        "stationByWayM": {},
+                        "segmentByWay": {},
+                        "partIndexByWay": {},
+                    },
+                )
+                record["ways"].update((prior_way, other_way))
+                record["heightDifferenceM"] = max(
+                    record["heightDifferenceM"],
+                    abs(owner_targets[flat_index] - owner_targets[other_flat_index]),
+                )
+                for way, segment_index, station in (
+                    (prior_way, prior_segment, owner_stations[flat_index]),
+                    (other_way, other_segment, owner_stations[other_flat_index]),
+                ):
+                    record["stationByWayM"][way] = float(station)
+                    record["segmentByWay"][way] = segment_index
+                    record["partIndexByWay"][way] = segments[segment_index].sort_key[1]
+                owners[flat_index] = -2
+                owner_is_core[flat_index] = False
+
+    flat_indices = np.arange(rows * columns, dtype=np.int64).reshape(rows, columns)
+    mark_incompatible_edges(flat_indices[:, :-1], flat_indices[:, 1:])
+    mark_incompatible_edges(flat_indices[:-1, :], flat_indices[1:, :])
+    mark_incompatible_edges(flat_indices[:-1, 1:], flat_indices[1:, :-1])
+
+    return (
+        owners.reshape(rows, columns),
+        owner_is_core.reshape(rows, columns),
+        [
+            {
+                "row": index // columns,
+                "column": index % columns,
+                "ways": sorted(record["ways"]),
+                "heightDifferenceM": float(record["heightDifferenceM"]),
+                "stationByWayM": record["stationByWayM"],
+                "segmentByWay": record["segmentByWay"],
+                "partIndexByWay": record["partIndexByWay"],
+                "localXZ": [
+                    (index % columns) * spacing_m - half_width,
+                    (index // columns) * spacing_m - half_depth,
+                ],
+            }
+            for index, record in sorted(conflicts.items())
+        ],
+    )
 
 
 def _mask_components(mask: np.ndarray) -> list[list[tuple[int, int]]]:
@@ -699,117 +1051,135 @@ def _connected_fallback_regions(
     candidate_z = np.abs(np.diff(candidate.astype(np.float64), axis=0)) / spacing_m
     added_x = np.maximum(candidate_x - baseline_x, 0.0)
     added_z = np.maximum(candidate_z - baseline_z, 0.0)
-    seed_mask = np.abs(candidate.astype(np.float64) - baseline.astype(np.float64)) >= (
+    cut_fill_seed_mask = np.abs(candidate.astype(np.float64) - baseline.astype(np.float64)) >= (
         config.fallback_absolute_change_m
     )
+    gradient_seed_mask = np.zeros(baseline.shape, dtype=bool)
     steep_x = added_x >= config.fallback_added_gradient_m_per_m
     steep_z = added_z >= config.fallback_added_gradient_m_per_m
-    seed_mask[:, :-1] |= steep_x
-    seed_mask[:, 1:] |= steep_x
-    seed_mask[:-1, :] |= steep_z
-    seed_mask[1:, :] |= steep_z
-    components = _mask_components(seed_mask)
+    gradient_seed_mask[:, :-1] |= steep_x
+    gradient_seed_mask[:, 1:] |= steep_x
+    gradient_seed_mask[:-1, :] |= steep_z
+    gradient_seed_mask[1:, :] |= steep_z
+    # Keep distinct harm causes as distinct connected regions. Unioning cut/fill
+    # and gradient seeds can chain through roads and spuriously retain a long
+    # corridor that includes otherwise safe mandatory stations.
+    components_by_trigger = [
+        ("absolute local cut/fill threshold", _mask_components(cut_fill_seed_mask)),
+        (
+            "connected added-gradient threshold and minimum area",
+            _mask_components(gradient_seed_mask),
+        ),
+    ]
     half_width, half_depth = width_m / 2, depth_m / 2
     delta = candidate.astype(np.float64) - baseline.astype(np.float64)
     output = []
-    for component in components:
-        vertex_mask = np.zeros(seed_mask.shape, dtype=bool)
-        rows = np.asarray([point[0] for point in component], dtype=np.intp)
-        columns = np.asarray([point[1] for point in component], dtype=np.intp)
-        vertex_mask[rows, columns] = True
-        cell_area = len(component) * spacing_m * spacing_m
-        x_edges = vertex_mask[:, :-1] | vertex_mask[:, 1:]
-        z_edges = vertex_mask[:-1, :] | vertex_mask[1:, :]
-        maximum_added_gradient = max(
-            float(np.max(added_x[x_edges])) if np.any(x_edges) else 0.0,
-            float(np.max(added_z[z_edges])) if np.any(z_edges) else 0.0,
-        )
-        maximum_change = float(np.max(np.abs(delta[vertex_mask])))
-        cut_fill_trigger = maximum_change >= config.fallback_absolute_change_m
-        gradient_trigger = (
-            maximum_added_gradient >= config.fallback_added_gradient_m_per_m
-            and cell_area >= config.fallback_minimum_region_area_m2
-        )
-        if not (cut_fill_trigger or gradient_trigger):
-            continue
-        maximum_index = int(np.argmax(np.abs(delta[vertex_mask])))
-        maximum_row = int(rows[maximum_index])
-        maximum_column = int(columns[maximum_index])
-        if maximum_change < config.fallback_absolute_change_m:
-            if np.any(x_edges) and float(np.max(added_x[x_edges])) >= maximum_added_gradient:
-                local_index = np.argmax(np.where(x_edges, added_x, -1.0))
-                edge_row, edge_column = np.unravel_index(local_index, added_x.shape)
-                maximum_row, maximum_column = int(edge_row), int(edge_column)
+    for trigger_name, components in components_by_trigger:
+        for component in components:
+            vertex_mask = np.zeros(baseline.shape, dtype=bool)
+            rows = np.asarray([point[0] for point in component], dtype=np.intp)
+            columns = np.asarray([point[1] for point in component], dtype=np.intp)
+            vertex_mask[rows, columns] = True
+            cell_area = len(component) * spacing_m * spacing_m
+            x_edges = vertex_mask[:, :-1] | vertex_mask[:, 1:]
+            z_edges = vertex_mask[:-1, :] | vertex_mask[1:, :]
+            maximum_added_gradient = max(
+                float(np.max(added_x[x_edges])) if np.any(x_edges) else 0.0,
+                float(np.max(added_z[z_edges])) if np.any(z_edges) else 0.0,
+            )
+            maximum_change = float(np.max(np.abs(delta[vertex_mask])))
+            cut_fill_trigger = (
+                trigger_name == "absolute local cut/fill threshold"
+                and maximum_change >= config.fallback_absolute_change_m
+            )
+            gradient_trigger = (
+                trigger_name == "connected added-gradient threshold and minimum area"
+                and maximum_added_gradient >= config.fallback_added_gradient_m_per_m
+                and cell_area >= config.fallback_minimum_region_area_m2
+            )
+            if not (cut_fill_trigger or gradient_trigger):
+                continue
+            maximum_index = int(np.argmax(np.abs(delta[vertex_mask])))
+            maximum_row = int(rows[maximum_index])
+            maximum_column = int(columns[maximum_index])
+            if maximum_change < config.fallback_absolute_change_m:
+                if np.any(x_edges) and float(np.max(added_x[x_edges])) >= maximum_added_gradient:
+                    local_index = np.argmax(np.where(x_edges, added_x, -1.0))
+                    edge_row, edge_column = np.unravel_index(local_index, added_x.shape)
+                    maximum_row, maximum_column = int(edge_row), int(edge_column)
+                else:
+                    local_index = np.argmax(np.where(z_edges, added_z, -1.0))
+                    edge_row, edge_column = np.unravel_index(local_index, added_z.shape)
+                    maximum_row, maximum_column = int(edge_row), int(edge_column)
+            x_max = float(np.max(np.where(x_edges, added_x, -1.0))) if np.any(x_edges) else -1.0
+            z_max = float(np.max(np.where(z_edges, added_z, -1.0))) if np.any(z_edges) else -1.0
+            if x_max >= z_max and x_max >= 0.0:
+                edge_row, edge_column = np.unravel_index(
+                    int(np.argmax(np.where(x_edges, added_x, -1.0))), added_x.shape
+                )
+                edge_axis = "x"
+                edge_first = [
+                    float(edge_column * spacing_m - half_width),
+                    float(edge_row * spacing_m - half_depth),
+                ]
+                edge_second = [edge_first[0] + spacing_m, edge_first[1]]
+                edge_baseline = float(baseline_x[edge_row, edge_column])
+                edge_candidate = float(candidate_x[edge_row, edge_column])
+                edge_increase = float(added_x[edge_row, edge_column])
+            elif z_max >= 0.0:
+                edge_row, edge_column = np.unravel_index(
+                    int(np.argmax(np.where(z_edges, added_z, -1.0))), added_z.shape
+                )
+                edge_axis = "z"
+                edge_first = [
+                    float(edge_column * spacing_m - half_width),
+                    float(edge_row * spacing_m - half_depth),
+                ]
+                edge_second = [edge_first[0], edge_first[1] + spacing_m]
+                edge_baseline = float(baseline_z[edge_row, edge_column])
+                edge_candidate = float(candidate_z[edge_row, edge_column])
+                edge_increase = float(added_z[edge_row, edge_column])
             else:
-                local_index = np.argmax(np.where(z_edges, added_z, -1.0))
-                edge_row, edge_column = np.unravel_index(local_index, added_z.shape)
-                maximum_row, maximum_column = int(edge_row), int(edge_column)
-        x_max = float(np.max(np.where(x_edges, added_x, -1.0))) if np.any(x_edges) else -1.0
-        z_max = float(np.max(np.where(z_edges, added_z, -1.0))) if np.any(z_edges) else -1.0
-        if x_max >= z_max and x_max >= 0.0:
-            edge_row, edge_column = np.unravel_index(
-                int(np.argmax(np.where(x_edges, added_x, -1.0))), added_x.shape
+                edge_axis, edge_first, edge_second = None, None, None
+                edge_baseline, edge_candidate, edge_increase = 0.0, 0.0, 0.0
+            output.append(
+                {
+                    "corePoints": component,
+                    "coreVertexCount": len(component),
+                    "coreAreaEquivalentM2": cell_area,
+                    "coreLocalBoundsXZ": [
+                        float(np.min(columns) * spacing_m - half_width),
+                        float(np.min(rows) * spacing_m - half_depth),
+                        float(np.max(columns) * spacing_m - half_width),
+                        float(np.max(rows) * spacing_m - half_depth),
+                    ],
+                    "maximumCandidateAbsoluteChangeM": maximum_change,
+                    "maximumCandidateChangeLocalXZ": [
+                        float(maximum_column * spacing_m - half_width),
+                        float(maximum_row * spacing_m - half_depth),
+                    ],
+                    "maximumCandidateAddedGradientMPerM": maximum_added_gradient,
+                    "maximumCandidateAddedGradientEdge": {
+                        "axis": edge_axis,
+                        "firstLocalXZ": edge_first,
+                        "secondLocalXZ": edge_second,
+                        "baselineMagnitudeMPerM": edge_baseline,
+                        "candidateMagnitudeMPerM": edge_candidate,
+                        "addedMagnitudeMPerM": edge_increase,
+                    },
+                    "harmTriggers": [
+                        trigger
+                        for trigger, active in (
+                            ("absolute local cut/fill threshold", cut_fill_trigger),
+                            (
+                                "connected added-gradient threshold and minimum area",
+                                gradient_trigger,
+                            ),
+                        )
+                        if active
+                    ],
+                }
             )
-            edge_axis = "x"
-            edge_first = [
-                float(edge_column * spacing_m - half_width),
-                float(edge_row * spacing_m - half_depth),
-            ]
-            edge_second = [edge_first[0] + spacing_m, edge_first[1]]
-            edge_baseline = float(baseline_x[edge_row, edge_column])
-            edge_candidate = float(candidate_x[edge_row, edge_column])
-            edge_increase = float(added_x[edge_row, edge_column])
-        elif z_max >= 0.0:
-            edge_row, edge_column = np.unravel_index(
-                int(np.argmax(np.where(z_edges, added_z, -1.0))), added_z.shape
-            )
-            edge_axis = "z"
-            edge_first = [
-                float(edge_column * spacing_m - half_width),
-                float(edge_row * spacing_m - half_depth),
-            ]
-            edge_second = [edge_first[0], edge_first[1] + spacing_m]
-            edge_baseline = float(baseline_z[edge_row, edge_column])
-            edge_candidate = float(candidate_z[edge_row, edge_column])
-            edge_increase = float(added_z[edge_row, edge_column])
-        else:
-            edge_axis, edge_first, edge_second = None, None, None
-            edge_baseline, edge_candidate, edge_increase = 0.0, 0.0, 0.0
-        output.append(
-            {
-                "corePoints": component,
-                "coreVertexCount": len(component),
-                "coreAreaEquivalentM2": cell_area,
-                "coreLocalBoundsXZ": [
-                    float(np.min(columns) * spacing_m - half_width),
-                    float(np.min(rows) * spacing_m - half_depth),
-                    float(np.max(columns) * spacing_m - half_width),
-                    float(np.max(rows) * spacing_m - half_depth),
-                ],
-                "maximumCandidateAbsoluteChangeM": maximum_change,
-                "maximumCandidateChangeLocalXZ": [
-                    float(maximum_column * spacing_m - half_width),
-                    float(maximum_row * spacing_m - half_depth),
-                ],
-                "maximumCandidateAddedGradientMPerM": maximum_added_gradient,
-                "maximumCandidateAddedGradientEdge": {
-                    "axis": edge_axis,
-                    "firstLocalXZ": edge_first,
-                    "secondLocalXZ": edge_second,
-                    "baselineMagnitudeMPerM": edge_baseline,
-                    "candidateMagnitudeMPerM": edge_candidate,
-                    "addedMagnitudeMPerM": edge_increase,
-                },
-                "harmTriggers": [
-                    trigger
-                    for trigger, active in (
-                        ("absolute local cut/fill threshold", cut_fill_trigger),
-                        ("connected added-gradient threshold and minimum area", gradient_trigger),
-                    )
-                    if active
-                ],
-            }
-        )
     return output
 
 
@@ -977,6 +1347,328 @@ def _apply_harm_fallback(
     }
 
 
+def _apply_station_harm_fallback(
+    baseline: np.ndarray,
+    candidate: np.ndarray,
+    segments: list[RoadSegment],
+    spacing_m: float,
+    width_m: float,
+    depth_m: float,
+    config: PreviewConfig,
+    nearest_way_grid: np.ndarray,
+    nearest_segment_grid: np.ndarray,
+    nearest_station_grid: np.ndarray,
+    nearest_distance_grid: np.ndarray,
+    core_conflict_seeds: list[dict[str, Any]],
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Retain source ground along only the road station spans linked to measured harm."""
+    rows, columns = baseline.shape
+    scale = np.ones((rows, columns), dtype=np.float32)
+    regions = _connected_fallback_regions(baseline, candidate, spacing_m, config, width_m, depth_m)
+    segment_groups = {
+        index: (segment.way_id, segment.sort_key[1]) for index, segment in enumerate(segments)
+    }
+    group_widths: dict[tuple[int, int], float] = {}
+    for index, segment in enumerate(segments):
+        group_widths.setdefault(segment_groups[index], segment.width_m)
+    sorted_groups = sorted(set(segment_groups.values()))
+    group_indexes = {group: index for index, group in enumerate(sorted_groups)}
+    segment_group_indexes = np.asarray(
+        [group_indexes[segment_groups[index]] for index in range(len(segments))],
+        dtype=np.int32,
+    )
+    nearest_group_grid = np.full((rows, columns), -1, dtype=np.int32)
+    valid_segments = nearest_segment_grid >= 0
+    nearest_group_grid[valid_segments] = segment_group_indexes[nearest_segment_grid[valid_segments]]
+    group_masks = {
+        group: nearest_group_grid == group_index for group, group_index in group_indexes.items()
+    }
+
+    def retain_interval(
+        group: tuple[int, int],
+        start_station: float,
+        end_station: float,
+        lateral_band: tuple[float, float] | None = None,
+        lateral_source_strength: float = 1.0,
+    ) -> tuple[int, int]:
+        mask = group_masks.get(group)
+        if mask is None:
+            return 0, 0
+        station_grid = np.where(mask, nearest_station_grid, -1.0)
+        distance = np.maximum(
+            np.maximum(start_station - station_grid, station_grid - end_station), 0.0
+        )
+        station_strength = np.zeros((rows, columns), dtype=np.float32)
+        station_core = mask & (distance <= 1e-9)
+        station_fade = mask & (distance > 1e-9) & (distance < config.fallback_fade_distance_m)
+        station_strength[station_core] = 1.0
+        if np.any(station_fade):
+            position = distance[station_fade] / config.fallback_fade_distance_m
+            station_strength[station_fade] = (1 - 3 * position**2 + 2 * position**3).astype(
+                np.float32
+            )
+        lateral_strength = np.ones((rows, columns), dtype=np.float32)
+        if lateral_band is not None:
+            road_distance = np.where(mask, nearest_distance_grid, -1.0)
+            half_road = group_widths[group] / 2
+            lower, upper = lateral_band
+            lateral_strength[:] = 0.0
+            protected_core = mask & (road_distance <= half_road + 1e-9)
+            interior_fade = mask & (road_distance > half_road) & (road_distance < lower)
+            band_core = mask & (road_distance >= lower) & (road_distance <= upper)
+            exterior_fade = (
+                mask
+                & (road_distance > upper)
+                & (road_distance < upper + config.fallback_fade_distance_m)
+            )
+            lateral_strength[protected_core] = 0.0
+            lateral_strength[band_core] = lateral_source_strength
+            if np.any(interior_fade):
+                width = max(lower - half_road, 1e-9)
+                position = (road_distance[interior_fade] - half_road) / width
+                lateral_strength[interior_fade] = (
+                    lateral_source_strength * (3 * position**2 - 2 * position**3)
+                ).astype(np.float32)
+            if np.any(exterior_fade):
+                position = (road_distance[exterior_fade] - upper) / config.fallback_fade_distance_m
+                lateral_strength[exterior_fade] = (
+                    lateral_source_strength * (1 - 3 * position**2 + 2 * position**3)
+                ).astype(np.float32)
+        section_strength = station_strength * lateral_strength
+        section_scale = np.ones((rows, columns), dtype=np.float32)
+        section_scale[mask] = 1.0 - section_strength[mask]
+        np.minimum(scale, section_scale, out=scale)
+        return (
+            int(np.count_nonzero(section_strength >= 1.0)),
+            int(np.count_nonzero((section_strength > 0.0) & (section_strength < 1.0))),
+        )
+
+    conflict_station_values: dict[tuple[int, int], list[float]] = {}
+    for seed in core_conflict_seeds:
+        for way_id, station in seed.get("stationByWayM", {}).items():
+            part_index = seed.get("partIndexByWay", {}).get(way_id)
+            if part_index is None:
+                continue
+            conflict_station_values.setdefault((int(way_id), int(part_index)), []).append(
+                float(station)
+            )
+    incompatible_sections = []
+    for group, values in sorted(conflict_station_values.items()):
+        ordered = sorted(values)
+        intervals: list[list[float]] = []
+        for station in ordered:
+            if intervals and station - intervals[-1][1] <= max(2 * spacing_m, 1.0):
+                intervals[-1][1] = station
+            else:
+                intervals.append([station, station])
+        for start_station, end_station in intervals:
+            retain_interval(group, start_station, end_station)
+            incompatible_sections.append(
+                {
+                    "wayId": group[0],
+                    "partIndex": group[1],
+                    "startM": float(start_station),
+                    "endM": float(end_station),
+                    "retainedLengthM": float(max(spacing_m, end_station - start_station)),
+                    "fadeDistanceAtEachEndM": config.fallback_fade_distance_m,
+                    "reason": "incompatible adjacent or overlapping carriageway core anchors",
+                }
+            )
+
+    for region in regions:
+        component = region.pop("corePoints")
+        grouped_stations: dict[tuple[int, int], list[tuple[float, float]]] = {}
+        for row, column in component:
+            segment_index = int(nearest_segment_grid[row, column])
+            station = float(nearest_station_grid[row, column])
+            if segment_index < 0 or station < 0:
+                continue
+            grouped_stations.setdefault(segment_groups[segment_index], []).append(
+                (station, float(nearest_distance_grid[row, column]))
+            )
+        road_ids = sorted({group[0] for group in grouped_stations})
+        region["nearestRoadWayIds"] = road_ids
+        region["stationIntervals"] = []
+        region["retainedCoreVertexCount"] = 0
+        region["fadeVertexCount"] = 0
+        for group, samples in sorted(grouped_stations.items()):
+            stations = [sample[0] for sample in samples]
+            lateral_distances = [sample[1] for sample in samples]
+            start_station, end_station = min(stations), max(stations)
+            minimum_lateral = min(lateral_distances)
+            maximum_lateral = max(lateral_distances)
+            half_road = group_widths[group] / 2
+            lateral_band = (
+                None if minimum_lateral <= half_road + 1e-9 else (minimum_lateral, maximum_lateral)
+            )
+            lateral_source_strength = 0.0
+            if lateral_band is not None:
+                if "absolute local cut/fill threshold" in region["harmTriggers"]:
+                    lateral_source_strength = max(
+                        lateral_source_strength,
+                        1.0
+                        - max(
+                            0.0,
+                            config.fallback_absolute_change_m - FALLBACK_ABSOLUTE_CHANGE_HEADROOM_M,
+                        )
+                        / max(region["maximumCandidateAbsoluteChangeM"], 1e-9),
+                    )
+                if "connected added-gradient threshold and minimum area" in region["harmTriggers"]:
+                    lateral_source_strength = max(
+                        lateral_source_strength,
+                        1.0
+                        - min(
+                            config.fallback_added_gradient_m_per_m,
+                            FALLBACK_ADDED_GRADIENT_BLEND_TARGET_M_PER_M,
+                        )
+                        / max(region["maximumCandidateAddedGradientMPerM"], 1e-9),
+                    )
+                lateral_source_strength = float(np.clip(lateral_source_strength, 0.0, 1.0))
+            retained_count, faded_count = retain_interval(
+                group,
+                start_station,
+                end_station,
+                lateral_band,
+                lateral_source_strength,
+            )
+            core_samples = np.asarray(
+                [
+                    station
+                    for row, column in component
+                    if int(nearest_segment_grid[row, column]) >= 0
+                    and segment_groups[int(nearest_segment_grid[row, column])] == group
+                    for station in [float(nearest_station_grid[row, column])]
+                    if station >= 0
+                ],
+                dtype=np.float64,
+            )
+            region["retainedCoreVertexCount"] += retained_count
+            region["fadeVertexCount"] += faded_count
+            region["stationIntervals"].append(
+                {
+                    "wayId": group[0],
+                    "partIndex": group[1],
+                    "startM": float(start_station),
+                    "endM": float(end_station),
+                    "retainedLengthM": float(max(spacing_m, end_station - start_station)),
+                    "fadeDistanceAtEachEndM": config.fallback_fade_distance_m,
+                    "componentStationSampleCount": int(core_samples.size),
+                    "componentLateralDistanceRangeM": [
+                        float(minimum_lateral),
+                        float(maximum_lateral),
+                    ],
+                    "maximumSourceGroundStrengthWithinBand": lateral_source_strength,
+                    "fallbackScope": (
+                        "full road section because candidate harm reaches carriageway core"
+                        if lateral_band is None
+                        else (
+                            "affected shoulder band with smooth cross-road fade; "
+                            "carriageway core protected"
+                        )
+                    ),
+                }
+            )
+        region["effect"] = (
+            "retain source ground across linked road station intervals and affected lateral "
+            "bands, with smooth zero-ended longitudinal and cross-road fades; preserve the "
+            "carriageway core when measured harm is limited to a shoulder"
+        )
+        region["fadeDistanceM"] = config.fallback_fade_distance_m
+        region["fadeBlend"] = "cubic smoothstep along road station with zero slope at both ends"
+        region["coreAreaEquivalentM2"] = float(
+            region["retainedCoreVertexCount"] * spacing_m * spacing_m
+        )
+        region["fadedAreaEquivalentM2"] = float(region["fadeVertexCount"] * spacing_m * spacing_m)
+        region["affectedAreaEquivalentM2"] = (
+            region["coreAreaEquivalentM2"] + region["fadedAreaEquivalentM2"]
+        )
+
+    output = (
+        baseline.astype(np.float64)
+        + scale.astype(np.float64) * (candidate.astype(np.float64) - baseline.astype(np.float64))
+    ).astype("<f4")
+    if not np.isfinite(output).all():
+        raise RoadSurfaceError("station harm fallback produced a non-finite display height")
+    actual_delta = np.abs(output.astype(np.float64) - baseline.astype(np.float64))
+    maximum_after_fallback = float(np.max(actual_delta))
+    if maximum_after_fallback > config.fallback_absolute_change_m + 1e-5:
+        raise RoadSurfaceError(
+            "station harm fallback could not keep the local terrain change within the "
+            f"{config.fallback_absolute_change_m:g} m preview policy; residual is "
+            f"{maximum_after_fallback:.6f} m"
+        )
+    gradient_change = _terrain_gradient_change_summary(
+        baseline.astype(np.float64),
+        output.astype(np.float64),
+        spacing_m,
+        width_m,
+        depth_m,
+    )
+    if gradient_change["maximumPositiveIncreaseMPerM"] >= config.fallback_added_gradient_m_per_m:
+        edge = gradient_change["maximumPositiveIncreaseEdge"]
+        edge_diagnostics = []
+        for point in (edge["firstLocalXZ"], edge["secondLocalXZ"]):
+            column = min(columns - 1, max(0, round((point[0] + width_m / 2) / spacing_m)))
+            row = min(rows - 1, max(0, round((point[1] + depth_m / 2) / spacing_m)))
+            segment_index = int(nearest_segment_grid[row, column])
+            edge_diagnostics.append(
+                {
+                    "localXZ": point,
+                    "wayId": int(nearest_way_grid[row, column]),
+                    "stationM": float(nearest_station_grid[row, column]),
+                    "segmentIndex": segment_index,
+                }
+            )
+        raise RoadSurfaceError(
+            "station harm fallback left a connected added-gradient safety heuristic "
+            f"at {gradient_change['maximumPositiveIncreaseMPerM']:.6f} m/m near "
+            f"{edge}; nearest projections {edge_diagnostics}"
+        )
+    for region in regions:
+        bounds = region["coreLocalBoundsXZ"]
+        min_column = max(0, math.floor((bounds[0] + width_m / 2) / spacing_m))
+        max_column = min(columns - 1, math.ceil((bounds[2] + width_m / 2) / spacing_m))
+        min_row = max(0, math.floor((bounds[1] + depth_m / 2) / spacing_m))
+        max_row = min(rows - 1, math.ceil((bounds[3] + depth_m / 2) / spacing_m))
+        local_delta = output[min_row : max_row + 1, min_column : max_column + 1].astype(
+            np.float64
+        ) - baseline[min_row : max_row + 1, min_column : max_column + 1].astype(np.float64)
+        region["postFallbackMaximumAbsoluteChangeM"] = float(np.max(np.abs(local_delta)))
+        region["postFallbackMaximumAddedGradientMPerM"] = float(
+            gradient_change["maximumPositiveIncreaseMPerM"]
+        )
+    return output, {
+        "policy": {
+            "maximumAbsoluteLocalChangeM": config.fallback_absolute_change_m,
+            "minimumNewGradientIncreaseMPerM": config.fallback_added_gradient_m_per_m,
+            "minimumConnectedGradientAreaM2": config.fallback_minimum_region_area_m2,
+            "alongRoadFadeDistanceM": config.fallback_fade_distance_m,
+            "interpretation": (
+                "preview safety heuristics only; connected cut/fill or added-gradient regions "
+                "map to the nearest source road station interval, where source ground is retained "
+                "and treatment fades along that same road"
+            ),
+        },
+        "triggeredRegionCount": len(regions),
+        "retainedCoreAreaEquivalentM2": float(
+            sum(region["coreAreaEquivalentM2"] for region in regions)
+        ),
+        "fadedAreaEquivalentM2": float(sum(region["fadedAreaEquivalentM2"] for region in regions)),
+        "affectedAreaEquivalentM2": float(
+            sum(region["affectedAreaEquivalentM2"] for region in regions)
+        ),
+        "uniqueRetainedCoreAreaEquivalentM2": float(np.count_nonzero(scale == 0.0) * spacing_m**2),
+        "uniqueFadedAreaEquivalentM2": float(
+            np.count_nonzero((scale > 0.0) & (scale < 1.0)) * spacing_m**2
+        ),
+        "uniqueAffectedAreaEquivalentM2": float(np.count_nonzero(scale < 1.0) * spacing_m**2),
+        "regions": regions,
+        "incompatibleCoreSections": incompatible_sections,
+        "maximumChangeAfterFallbackM": maximum_after_fallback,
+        "maximumAddedGradientAfterFallbackMPerM": gradient_change["maximumPositiveIncreaseMPerM"],
+    }
+
+
 def _grade_grid(
     baseline: np.ndarray,
     segments: list[RoadSegment],
@@ -984,13 +1676,28 @@ def _grade_grid(
     width_m: float,
     depth_m: float,
     config: PreviewConfig,
+    expanded_shoulder_intervals: dict[tuple[int, int], list[tuple[float, float]]] | None = None,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     """Apply nearest-road anchored cross sections and retain ground in conflicts."""
     rows, columns = baseline.shape
     half_width, half_depth = width_m / 2, depth_m / 2
     tiles: dict[tuple[int, int], list[int]] = {}
+    triangle_owner_segments, triangle_owner_is_core, core_conflict_seeds = (
+        _carriageway_triangle_owners(
+            baseline,
+            segments,
+            spacing_m,
+            width_m,
+            depth_m,
+            config.ambiguity_height_difference_m,
+        )
+    )
     for segment_index, segment in enumerate(segments):
+        group = (segment.way_id, segment.sort_key[1])
+        widened = bool(expanded_shoulder_intervals and group in expanded_shoulder_intervals)
         radius = segment.influence_m + config.ambiguity_distance_m
+        if widened:
+            radius = max(radius, segment.width_m / 2 + 32.0)
         min_tx = math.floor(
             (min(segment.first_x, segment.first_x + segment.dx) - radius) / SPATIAL_TILE_M
         )
@@ -1014,6 +1721,9 @@ def _grade_grid(
     candidate_vertex_count = 0
     affected_segment_ids: set[int] = set()
     nearest_way_grid = np.zeros((rows, columns), dtype=np.int64)
+    nearest_segment_grid = np.full((rows, columns), -1, dtype=np.int32)
+    nearest_station_grid = np.full((rows, columns), -1.0, dtype=np.float64)
+    nearest_distance_grid = np.full((rows, columns), -1.0, dtype=np.float64)
     for tile_x, tile_z in sorted(tiles, key=lambda key: (key[1], key[0])):
         candidates = sorted(set(tiles[(tile_x, tile_z)]))
         for row in _grid_tile_range(tile_z, spacing_m, half_depth, rows):
@@ -1036,6 +1746,40 @@ def _grade_grid(
                         ambiguity_projections.append(projection)
                         if projection.distance_m <= segment.influence_m + 1e-9:
                             active_projections.append(projection)
+                core_owner_index = int(triangle_owner_segments[row, column])
+                if core_owner_index >= 0:
+                    owner_projection = _project(
+                        core_owner_index,
+                        segments[core_owner_index],
+                        x,
+                        z,
+                        baseline,
+                        spacing_m,
+                    )
+                    if all(
+                        projection.segment_index != core_owner_index
+                        for projection in active_projections
+                    ):
+                        active_projections.append(owner_projection)
+                elif core_owner_index == -2:
+                    conflict = next(
+                        (
+                            item
+                            for item in core_conflict_seeds
+                            if item["row"] == row and item["column"] == column
+                        ),
+                        None,
+                    )
+                    if conflict is not None:
+                        ambiguous[row * columns + column] = {
+                            "row": row,
+                            "column": column,
+                            "ways": conflict["ways"],
+                            "heightDifferenceM": conflict["heightDifferenceM"],
+                            "retentionRadiusM": 0.0,
+                            "fadeDistanceM": 0.0,
+                        }
+                    continue
                 if not active_projections:
                     continue
                 vertex_index = row * columns + column
@@ -1048,8 +1792,19 @@ def _grade_grid(
                         current, segments
                     ):
                         by_way[projection.way_id] = projection
-                nearest = min(by_way.values(), key=lambda item: _projection_key(item, segments))
+                nearest = (
+                    next(
+                        projection
+                        for projection in active_projections
+                        if projection.segment_index == core_owner_index
+                    )
+                    if core_owner_index >= 0
+                    else min(by_way.values(), key=lambda item: _projection_key(item, segments))
+                )
                 nearest_way_grid[row, column] = nearest.way_id
+                nearest_segment_grid[row, column] = nearest.segment_index
+                nearest_station_grid[row, column] = nearest.station_m
+                nearest_distance_grid[row, column] = nearest.distance_m
                 ambiguity_by_way: dict[int, Projection] = {}
                 for projection in ambiguity_projections:
                     current = ambiguity_by_way.get(projection.way_id)
@@ -1057,9 +1812,17 @@ def _grade_grid(
                         current, segments
                     ):
                         ambiguity_by_way[projection.way_id] = projection
-                competitors = sorted(
-                    (item for way_id, item in ambiguity_by_way.items() if way_id != nearest.way_id),
-                    key=lambda item: _projection_key(item, segments),
+                competitors = (
+                    []
+                    if core_owner_index >= 0
+                    else sorted(
+                        (
+                            item
+                            for way_id, item in ambiguity_by_way.items()
+                            if way_id != nearest.way_id
+                        ),
+                        key=lambda item: _projection_key(item, segments),
+                    )
                 )
                 conflict = next(
                     (
@@ -1077,36 +1840,33 @@ def _grade_grid(
                         "column": column,
                         "ways": sorted({nearest.way_id, conflict.way_id}),
                         "heightDifferenceM": abs(nearest.target_y - conflict.target_y),
-                        "retentionRadiusM": max(
-                            segments[nearest.segment_index].width_m / 2,
-                            segments[conflict.segment_index].width_m / 2,
-                        )
-                        + spacing_m,
-                        "fadeDistanceM": max(
-                            segments[nearest.segment_index].width_m,
-                            segments[conflict.segment_index].width_m,
-                            2 * spacing_m,
-                        ),
+                        "retentionRadiusM": 0.0,
+                        "fadeDistanceM": 0.0,
                     }
                     affected_segment_ids.update((nearest.segment_index, conflict.segment_index))
                     continue
                 segment = segments[nearest.segment_index]
                 half_road = segment.width_m / 2
-                transition = max(segment.width_m, 2 * spacing_m) * config.transition_distance_factor
+                transition = _transition_for_station(
+                    segment,
+                    nearest.station_m,
+                    spacing_m,
+                    config,
+                    expanded_shoulder_intervals,
+                )
                 if half_road < nearest.distance_m < half_road + transition:
                     transition_mask[row, column] = True
-                weight = _blend_weight(nearest.distance_m, half_road, transition)
+                weight = (
+                    1.0
+                    if core_owner_index >= 0 and triangle_owner_is_core[row, column]
+                    else _blend_weight(nearest.distance_m, half_road, transition)
+                )
                 if weight <= 0:
                     continue
                 base_y = float(baseline[row, column])
                 graded_y = base_y + weight * (nearest.target_y - base_y)
                 if not math.isfinite(graded_y) or not math.isfinite(float(np.float32(graded_y))):
                     raise RoadSurfaceError("grading produced a non-finite visual height")
-                if abs(graded_y - base_y) > config.maximum_changed_height_m:
-                    raise RoadSurfaceError(
-                        "grading exceeds configured local height change "
-                        f"at row {row}, column {column}"
-                    )
                 output[row, column] = np.float32(graded_y)
     affected_mask = np.zeros((rows, columns), dtype=bool)
     fully_retained_mask = np.zeros((rows, columns), dtype=bool)
@@ -1163,7 +1923,70 @@ def _grade_grid(
         * (original_output[affected_mask] - baseline_float64[affected_mask])
     ).astype("<f4")
     candidate_before_harm_fallback = output.copy()
-    output, harm_fallback = _apply_harm_fallback(
+    shoulder_expansion_regions: list[dict[str, Any]] = []
+    if expanded_shoulder_intervals is None:
+        candidate_regions = _connected_fallback_regions(
+            baseline, candidate_before_harm_fallback, spacing_m, config, width_m, depth_m
+        )
+        expansion_points: dict[tuple[int, int], list[float]] = {}
+        expansion_region_records: dict[tuple[int, int], list[dict[str, Any]]] = {}
+        for region in candidate_regions:
+            component = region["corePoints"]
+            local_by_group: dict[tuple[int, int], list[float]] = {}
+            for row, column in component:
+                segment_index = int(nearest_segment_grid[row, column])
+                station = float(nearest_station_grid[row, column])
+                if segment_index < 0 or station < 0:
+                    continue
+                group = (segments[segment_index].way_id, segments[segment_index].sort_key[1])
+                local_by_group.setdefault(group, []).append(station)
+            for group, stations in local_by_group.items():
+                expansion_points.setdefault(group, []).extend(stations)
+                expansion_region_records.setdefault(group, []).append(
+                    {
+                        "coreLocalBoundsXZ": region["coreLocalBoundsXZ"],
+                        "maximumCandidateAbsoluteChangeM": region[
+                            "maximumCandidateAbsoluteChangeM"
+                        ],
+                        "maximumCandidateAddedGradientMPerM": region[
+                            "maximumCandidateAddedGradientMPerM"
+                        ],
+                        "harmTriggers": region["harmTriggers"],
+                    }
+                )
+        if expansion_points:
+            intervals = {
+                group: [(min(stations), max(stations))]
+                for group, stations in expansion_points.items()
+            }
+            final_grid, final_report = _grade_grid(
+                baseline,
+                segments,
+                spacing_m,
+                width_m,
+                depth_m,
+                config,
+                intervals,
+            )
+            for group, (start_station, end_station) in sorted(
+                (group, values[0]) for group, values in intervals.items()
+            ):
+                shoulder_expansion_regions.append(
+                    {
+                        "wayId": group[0],
+                        "partIndex": group[1],
+                        "stationStartM": float(start_station),
+                        "stationEndM": float(end_station),
+                        "transitionMaximumM": 32.0,
+                        "fadeBeyondStationIntervalM": config.fallback_fade_distance_m,
+                        "reason": "connected candidate cut/fill or added-gradient safety trigger",
+                        "candidateRegions": expansion_region_records[group],
+                    }
+                )
+            final_report["shoulderExpansionRegions"] = shoulder_expansion_regions
+            final_report["shoulderExpansionCount"] = len(shoulder_expansion_regions)
+            return final_grid, final_report
+    output, harm_fallback = _apply_station_harm_fallback(
         baseline,
         output,
         segments,
@@ -1172,6 +1995,10 @@ def _grade_grid(
         depth_m,
         config,
         nearest_way_grid,
+        nearest_segment_grid,
+        nearest_station_grid,
+        nearest_distance_grid,
+        core_conflict_seeds,
     )
     if not np.isfinite(output).all():
         raise RoadSurfaceError("graded display grid contains non-finite values")
@@ -1285,6 +2112,26 @@ def _grade_grid(
             ],
         },
         "harmFallback": harm_fallback,
+        "shoulderExpansionRegions": shoulder_expansion_regions,
+        "shoulderExpansionCount": len(shoulder_expansion_regions),
+        "triangleCoreOwnership": {
+            "supportRule": (
+                "all three vertices of every fixed-diagonal terrain triangle intersected by "
+                "a configured-width road ribbon are assigned to a deterministic owner; vertices "
+                "inside the ribbon receive full core treatment and outside vertices blend "
+                "as shoulders"
+            ),
+            "supportedVertexCount": int(np.count_nonzero(triangle_owner_segments >= 0)),
+            "coreVertexCount": int(
+                np.count_nonzero((triangle_owner_segments >= 0) & triangle_owner_is_core)
+            ),
+            "supportShoulderVertexCount": int(
+                np.count_nonzero((triangle_owner_segments >= 0) & ~triangle_owner_is_core)
+            ),
+            "incompatibleCoreVertexCount": int(np.count_nonzero(triangle_owner_segments == -2)),
+            "incompatibleCoreSeeds": core_conflict_seeds,
+            "coreRoadOwnsOverlappingShoulders": True,
+        },
     }
     return output, report
 
