@@ -46,7 +46,7 @@ Missing/corrupt/stale derivative must give a truthful `Road-surface preview unav
 
 - New: `config/road-surface-preview.json`, `pipeline/torquay_pipeline/road_surface.py`, `pipeline/tests/test_road_surface.py`, `scripts/build-road-surface-preview.py`.
 - New typed contract/loader and tests: `src/geo/roadSurfaceSchema.ts`, `src/geo/roadSurfaceSchema.test.ts`, `src/app/roadSurfaceLoader.ts`, `src/app/roadSurfaceLoader.test.ts`.
-- Narrow integration: `src/scene/createHeightfieldWorld.ts` and its tests, `src/app/createApp.ts`, `src/style.css` only if needed for the preview notice. Existing terrain/road/building algorithms remain source-compatible; do not weaken their validation or drape guarantees.
+- Narrow integration: `src/scene/createHeightfieldWorld.ts` and its tests, `src/app/createApp.ts`, `src/app/sceneRelease.ts` and focused tests only to expose the already-validated readiness/inventory SHA-256 values required to reject stale derivatives, `src/style.css` only if needed for the preview notice. Existing terrain/road/building algorithms remain source-compatible; do not weaken their validation or drape guarantees.
 - New browser proof: `tests/e2e/road-surface.spec.ts`, `playwright.road-surface.config.ts`, isolated port 4213, one worker, retries zero. Reuse the existing DEV-only alignment camera hook; do not duplicate it.
 - Documentation: `docs/asset-contract.md`, `docs/milestones/Road-surface-treatment.md`, artifacts/screenshots in dedicated `Road-surface-treatment/` directories, `.gitignore` for the new generated derivative directory. Coordinator updates the checkpoint. Preserve all earlier reports and screenshots.
 
