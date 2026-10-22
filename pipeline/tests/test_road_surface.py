@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 
 import numpy as np
 import pytest
@@ -15,6 +16,7 @@ from torquay_pipeline.road_surface import (
     _apply_harm_fallback,
     _apply_station_harm_fallback,
     _canonical_json,
+    _carriageway_triangle_owners,
     _fallback_distance_weights,
     _grade_grid,
     _preflight_execution_record,
@@ -79,7 +81,7 @@ def test_flat_surface_is_byte_identical_and_no_vertices_change() -> None:
 def test_longitudinal_hill_is_retained_while_lateral_slope_is_removed() -> None:
     x = np.linspace(-5.0, 5.0, 11, dtype=np.float32)
     z = np.linspace(-5.0, 5.0, 11, dtype=np.float32)
-    baseline = np.asarray(0.1 * x[None, :] + 0.5 * z[:, None], dtype="<f4")
+    baseline = np.asarray(0.1 * x[None, :] + 0.4 * z[:, None], dtype="<f4")
     preview, _ = _grade(baseline, [_road(10, [[-5.0, 0.0], [5.0, 0.0]])])
 
     # The centerline carries the original longitudinal profile; both road edges
@@ -92,7 +94,7 @@ def test_longitudinal_hill_is_retained_while_lateral_slope_is_removed() -> None:
 
 def test_smoothstep_shoulder_returns_to_baseline_and_outer_vertices_are_exact() -> None:
     baseline = np.broadcast_to(
-        np.linspace(-2.5, 2.5, 11, dtype=np.float32)[:, None], (11, 11)
+        np.linspace(-0.5, 0.5, 11, dtype=np.float32)[:, None], (11, 11)
     ).copy()
     preview, report = _grade(baseline, [_road(10, [[-5.0, 0.0], [5.0, 0.0]])])
 
@@ -102,6 +104,41 @@ def test_smoothstep_shoulder_returns_to_baseline_and_outer_vertices_are_exact() 
     assert preview[2, 5] == baseline[2, 5]
     assert preview[1, 5] == baseline[1, 5]
     assert report["verticesBeyondAllInfluenceRegionsExact"]
+
+
+def test_expanded_shoulder_uses_the_full_32m_projection_support() -> None:
+    coordinates = np.arange(-40.0, 41.0, dtype=np.float32)
+    baseline = np.broadcast_to(0.1 * coordinates[:, None], (81, 81)).copy()
+    segments = _segments_from_payload(
+        {"features": [_road(10, [[-40.0, 0.0], [40.0, 0.0]], width=6.0)]},
+        1.0,
+        1.0,
+    )
+    preview, _report = _grade_grid(
+        baseline,
+        segments,
+        1.0,
+        80.0,
+        80.0,
+        _config(),
+        {(10, 0): [(0.0, 80.0)]},
+    )
+
+    # At 20 m from the centerline the 32 m shoulder is still active and follows
+    # the same smoothstep as its target. The previous influence-radius clip
+    # returned the source value here, truncating the widened transition.
+    distance = 20.0
+    half_width = 3.0
+    transition = 32.0
+    position = (distance - half_width) / transition
+    weight = 1.0 - (3 * position**2 - 2 * position**3)
+    row_at_20m = int(distance + 40)
+    assert preview[row_at_20m, 40] == pytest.approx(
+        baseline[row_at_20m, 40] * (1.0 - weight), abs=1e-6
+    )
+    # The transition reaches unchanged source ground exactly at the 32 m cap.
+    row_at_35m = int(half_width + transition + 40)
+    assert preview[row_at_35m, 40] == baseline[row_at_35m, 40]
 
 
 def test_gradient_change_reports_new_slope_increases_separately_from_removed_slopes() -> None:
@@ -139,6 +176,67 @@ def test_ambiguous_parallel_roads_keep_original_ground_without_averaging() -> No
         region["effect"].startswith("retain original")
         for region in report["ambiguousConnectedRegions"]
     )
+
+
+def test_every_vertex_in_an_intersected_carriageway_triangle_keeps_core_ownership() -> None:
+    baseline = np.zeros((11, 11), dtype="<f4")
+    segments = _segments_from_payload(
+        {"features": [_road(40, [[-4.0, -1.0], [4.0, 1.0]], width=2.0)]}, 1.0, 1.0
+    )
+
+    owners, is_core, _conflicts = _carriageway_triangle_owners(
+        baseline, segments, 1.0, 10.0, 10.0, 1.0
+    )
+
+    supported = owners >= 0
+    assert supported.any()
+    assert np.all(is_core[supported])
+    # The oblique ribbon intersects triangles that contain vertices outside its
+    # half-width; those vertices still participate in renderer sampling.
+    outside_half_width = False
+    for row, column in np.argwhere(supported):
+        segment = segments[int(owners[row, column])]
+        x, z = float(column - 5), float(row - 5)
+        amount = np.clip(
+            ((x - segment.first_x) * segment.dx + (z - segment.first_z) * segment.dz)
+            / segment.length_squared,
+            0.0,
+            1.0,
+        )
+        distance = math.hypot(
+            x - (segment.first_x + amount * segment.dx),
+            z - (segment.first_z + amount * segment.dz),
+        )
+        outside_half_width |= distance > segment.width_m / 2 + 1e-9
+    assert outside_half_width
+
+
+def test_chained_adjacent_core_conflicts_use_only_snapshot_segment_owners() -> None:
+    def narrow_road(way_id: int, z: float) -> dict:
+        feature = _road(way_id, [[-5.0, z], [5.0, z]], width=0.2)
+        return feature
+
+    baseline = np.broadcast_to(
+        (np.arange(13, dtype=np.float32) - 6.0)[:, None] * 2.0, (13, 13)
+    ).copy()
+    segments = _segments_from_payload(
+        {"features": [narrow_road(101, -2.0), narrow_road(102, 0.0), narrow_road(103, 2.0)]},
+        1.0,
+        1.0,
+    )
+
+    _owners, _is_core, conflicts = _carriageway_triangle_owners(
+        baseline, segments, 1.0, 12.0, 12.0, 1.0
+    )
+
+    way_pairs = {tuple(item["ways"]) for item in conflicts}
+    assert (101, 102) in way_pairs
+    assert (102, 103) in way_pairs
+    assert way_pairs <= {(101, 102), (102, 103)}
+    for item in conflicts:
+        for way_id, segment_index in item["segmentByWay"].items():
+            assert segment_index >= 0
+            assert segments[segment_index].way_id == way_id
 
 
 @pytest.mark.parametrize(
@@ -452,7 +550,7 @@ def test_shoulder_only_harm_fallback_preserves_flattened_carriageway_core() -> N
         (np.arange(21, dtype=np.float32) - 10.0)[:, None] * 0.2, (21, 21)
     ).copy()
     candidate = baseline.copy()
-    candidate[9:12, :] = 0.0
+    candidate[8:13, :] = 0.0
     candidate[14, 8:13] += 6.0
     segments = _segments_from_payload(
         {"features": [_road(44, [[-10.0, 0.0], [10.0, 0.0]], width=2.0)]}, 1.0, 1.0
@@ -463,6 +561,9 @@ def test_shoulder_only_harm_fallback_preserves_flattened_carriageway_core() -> N
     nearest_distance = np.broadcast_to(
         np.abs(np.arange(21, dtype=np.float64) - 10.0)[:, None], (21, 21)
     ).copy()
+    triangle_owner = np.full((21, 21), -1, dtype=np.int32)
+    triangle_owner[8:13, :] = 0
+    triangle_owner_is_core = triangle_owner >= 0
 
     preview, report = _apply_station_harm_fallback(
         baseline,
@@ -477,14 +578,16 @@ def test_shoulder_only_harm_fallback_preserves_flattened_carriageway_core() -> N
         nearest_station,
         nearest_distance,
         [],
+        triangle_owner,
+        triangle_owner_is_core,
     )
 
-    assert preview[9:12, :] == pytest.approx(candidate[9:12, :])
+    assert preview[8:13, :] == pytest.approx(candidate[8:13, :])
     assert np.max(np.abs(preview[14, 8:13] - baseline[14, 8:13])) < 5.0
     interval = report["regions"][0]["stationIntervals"][0]
     assert interval["fallbackScope"] == (
         "affected shoulder band with smooth cross-road fade; carriageway core protected"
     )
     assert interval["componentLateralDistanceRangeM"] == pytest.approx([4.0, 4.0])
-    assert interval["maximumSourceGroundStrengthWithinBand"] == pytest.approx(1.0 - 4.5 / 6.0)
+    assert interval["maximumSourceGroundStrengthWithinBand"] == pytest.approx(0.25)
     assert report["maximumAddedGradientAfterFallbackMPerM"] < 1.0

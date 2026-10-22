@@ -33,9 +33,8 @@ from shapely.geometry import (
 from .road_alignment import CURRENT_RELEASE_ID, sha256_file
 from .terrain_export import _sample_bilinear_mosaic
 
-ALGORITHM_VERSION = "road-surface-preview-2.0.0"
+ALGORITHM_VERSION = "road-surface-preview-3.0.0"
 FALLBACK_ABSOLUTE_CHANGE_HEADROOM_M = 0.5
-FALLBACK_ADDED_GRADIENT_BLEND_TARGET_M_PER_M = 0.5
 OUTPUT_FILES = frozenset({"manifest.json", "heightfield.f32", "qa.json"})
 RUNTIME_FILES = (
     "buildings/buildings.json",
@@ -721,9 +720,10 @@ def _carriageway_triangle_owners(
     """Assign every grid vertex in a triangle touched by a road ribbon to its owner.
 
     The support stencil is formed by exact Shapely intersections against the same
-    fixed diagonal triangles used by the displayed heightfield. Each supported
-    vertex is marked as carriageway core or shoulder support so only the core gets
-    full flattening. Incompatible carriageway cores are retained at source ground.
+    fixed diagonal triangles used by the displayed heightfield. All vertices of
+    every intersected triangle receive the core target; the shoulder begins beyond
+    this triangle support. Incompatible carriageway cores are retained at source
+    ground.
     """
     rows, columns = baseline.shape
     half_width, half_depth = width_m / 2, depth_m / 2
@@ -834,7 +834,11 @@ def _carriageway_triangle_owners(
             target_x[selected] = segment.first_x + amount * segment.dx
             target_z[selected] = segment.first_z + amount * segment.dz
         targets = _sample_grid_many(baseline, target_x, target_z, spacing_m)
-        candidate_is_core = best_distances <= group_segments[0].width_m / 2 + 1e-9
+        # The renderer samples the whole fixed triangle. A vertex outside the
+        # geometric ribbon can still contribute to an intersected pavement
+        # triangle, so every vertex in this exact support stencil must keep the
+        # carriageway target instead of being weakened as a shoulder.
+        candidate_is_core = np.ones(best_distances.shape, dtype=bool)
         candidate_stations = np.asarray(
             [
                 segments[int(segment_index)].station_start_m
@@ -934,14 +938,23 @@ def _carriageway_triangle_owners(
 
     segment_ways = np.asarray([segment.way_id for segment in segments], dtype=np.int64)
 
+    # Edge checks use an immutable ownership snapshot. Mutating owners as each
+    # edge is found would let later edges interpret the -2 conflict sentinel as
+    # a segment index and serialize unrelated road identities.
+    owners_snapshot = owners.copy()
+    owner_is_core_snapshot = owner_is_core.copy()
+    owner_targets_snapshot = owner_targets.copy()
+    owner_stations_snapshot = owner_stations.copy()
+    conflict_edge_vertices: set[int] = set()
+
     def mark_incompatible_edges(first: np.ndarray, second: np.ndarray) -> None:
-        first_owner, second_owner = owners[first], owners[second]
+        first_owner, second_owner = owners_snapshot[first], owners_snapshot[second]
         eligible = (first_owner >= 0) & (second_owner >= 0)
-        eligible &= owner_is_core[first] & owner_is_core[second]
+        eligible &= owner_is_core_snapshot[first] & owner_is_core_snapshot[second]
         eligible &= (
             segment_ways[np.maximum(first_owner, 0)] != segment_ways[np.maximum(second_owner, 0)]
         )
-        eligible &= np.abs(owner_targets[first] - owner_targets[second]) >= (
+        eligible &= np.abs(owner_targets_snapshot[first] - owner_targets_snapshot[second]) >= (
             ambiguity_height_difference_m
         )
         for first_index, second_index in zip(first[eligible], second[eligible], strict=True):
@@ -949,8 +962,8 @@ def _carriageway_triangle_owners(
                 (int(first_index), int(second_index)),
                 (int(second_index), int(first_index)),
             ):
-                prior_segment = int(owners[flat_index])
-                other_segment = int(owners[other_flat_index])
+                prior_segment = int(owners_snapshot[flat_index])
+                other_segment = int(owners_snapshot[other_flat_index])
                 prior_way, other_way = (
                     segments[prior_segment].way_id,
                     segments[other_segment].way_id,
@@ -968,22 +981,28 @@ def _carriageway_triangle_owners(
                 record["ways"].update((prior_way, other_way))
                 record["heightDifferenceM"] = max(
                     record["heightDifferenceM"],
-                    abs(owner_targets[flat_index] - owner_targets[other_flat_index]),
+                    abs(
+                        owner_targets_snapshot[flat_index]
+                        - owner_targets_snapshot[other_flat_index]
+                    ),
                 )
                 for way, segment_index, station in (
-                    (prior_way, prior_segment, owner_stations[flat_index]),
-                    (other_way, other_segment, owner_stations[other_flat_index]),
+                    (prior_way, prior_segment, owner_stations_snapshot[flat_index]),
+                    (other_way, other_segment, owner_stations_snapshot[other_flat_index]),
                 ):
                     record["stationByWayM"][way] = float(station)
                     record["segmentByWay"][way] = segment_index
                     record["partIndexByWay"][way] = segments[segment_index].sort_key[1]
-                owners[flat_index] = -2
-                owner_is_core[flat_index] = False
+                conflict_edge_vertices.add(flat_index)
 
     flat_indices = np.arange(rows * columns, dtype=np.int64).reshape(rows, columns)
     mark_incompatible_edges(flat_indices[:, :-1], flat_indices[:, 1:])
     mark_incompatible_edges(flat_indices[:-1, :], flat_indices[1:, :])
     mark_incompatible_edges(flat_indices[:-1, 1:], flat_indices[1:, :-1])
+    if conflict_edge_vertices:
+        conflict_indices = np.fromiter(sorted(conflict_edge_vertices), dtype=np.int64)
+        owners[conflict_indices] = -2
+        owner_is_core[conflict_indices] = False
 
     return (
         owners.reshape(rows, columns),
@@ -1360,6 +1379,8 @@ def _apply_station_harm_fallback(
     nearest_station_grid: np.ndarray,
     nearest_distance_grid: np.ndarray,
     core_conflict_seeds: list[dict[str, Any]],
+    triangle_owner_segments: np.ndarray | None = None,
+    triangle_owner_is_core: np.ndarray | None = None,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     """Retain source ground along only the road station spans linked to measured harm."""
     rows, columns = baseline.shape
@@ -1380,6 +1401,17 @@ def _apply_station_harm_fallback(
     nearest_group_grid = np.full((rows, columns), -1, dtype=np.int32)
     valid_segments = nearest_segment_grid >= 0
     nearest_group_grid[valid_segments] = segment_group_indexes[nearest_segment_grid[valid_segments]]
+    triangle_core_group_grid = np.full((rows, columns), -1, dtype=np.int32)
+    if triangle_owner_segments is not None and triangle_owner_is_core is not None:
+        if triangle_owner_segments.shape != (rows, columns) or triangle_owner_is_core.shape != (
+            rows,
+            columns,
+        ):
+            raise RoadSurfaceError("triangle support ownership does not match the terrain grid")
+        triangle_core = (triangle_owner_segments >= 0) & triangle_owner_is_core
+        triangle_core_group_grid[triangle_core] = segment_group_indexes[
+            triangle_owner_segments[triangle_core]
+        ]
     group_masks = {
         group: nearest_group_grid == group_index for group, group_index in group_indexes.items()
     }
@@ -1413,7 +1445,11 @@ def _apply_station_harm_fallback(
             half_road = group_widths[group] / 2
             lower, upper = lateral_band
             lateral_strength[:] = 0.0
-            protected_core = mask & (road_distance <= half_road + 1e-9)
+            protected_core = (
+                mask & (triangle_core_group_grid == group_indexes[group])
+                if triangle_owner_segments is not None and triangle_owner_is_core is not None
+                else mask & (road_distance <= half_road + 1e-9)
+            )
             interior_fade = mask & (road_distance > half_road) & (road_distance < lower)
             band_core = mask & (road_distance >= lower) & (road_distance <= upper)
             exterior_fade = (
@@ -1421,7 +1457,6 @@ def _apply_station_harm_fallback(
                 & (road_distance > upper)
                 & (road_distance < upper + config.fallback_fade_distance_m)
             )
-            lateral_strength[protected_core] = 0.0
             lateral_strength[band_core] = lateral_source_strength
             if np.any(interior_fade):
                 width = max(lower - half_road, 1e-9)
@@ -1434,6 +1469,9 @@ def _apply_station_harm_fallback(
                 lateral_strength[exterior_fade] = (
                     lateral_source_strength * (1 - 3 * position**2 + 2 * position**3)
                 ).astype(np.float32)
+            # Keep the full triangle support stencil at candidate height. Apply
+            # this after shoulder bands/fades so their masks cannot overwrite it.
+            lateral_strength[protected_core] = 0.0
         section_strength = station_strength * lateral_strength
         section_scale = np.ones((rows, columns), dtype=np.float32)
         section_scale[mask] = 1.0 - section_strength[mask]
@@ -1477,14 +1515,16 @@ def _apply_station_harm_fallback(
 
     for region in regions:
         component = region.pop("corePoints")
-        grouped_stations: dict[tuple[int, int], list[tuple[float, float]]] = {}
+        grouped_stations: dict[tuple[int, int], list[tuple[float, float, bool]]] = {}
         for row, column in component:
             segment_index = int(nearest_segment_grid[row, column])
             station = float(nearest_station_grid[row, column])
             if segment_index < 0 or station < 0:
                 continue
-            grouped_stations.setdefault(segment_groups[segment_index], []).append(
-                (station, float(nearest_distance_grid[row, column]))
+            group = segment_groups[segment_index]
+            support_core = triangle_core_group_grid[row, column] == group_indexes[group]
+            grouped_stations.setdefault(group, []).append(
+                (station, float(nearest_distance_grid[row, column]), bool(support_core))
             )
         road_ids = sorted({group[0] for group in grouped_stations})
         region["nearestRoadWayIds"] = road_ids
@@ -1494,12 +1534,15 @@ def _apply_station_harm_fallback(
         for group, samples in sorted(grouped_stations.items()):
             stations = [sample[0] for sample in samples]
             lateral_distances = [sample[1] for sample in samples]
+            has_triangle_core = any(sample[2] for sample in samples)
             start_station, end_station = min(stations), max(stations)
             minimum_lateral = min(lateral_distances)
             maximum_lateral = max(lateral_distances)
             half_road = group_widths[group] / 2
             lateral_band = (
-                None if minimum_lateral <= half_road + 1e-9 else (minimum_lateral, maximum_lateral)
+                None
+                if minimum_lateral <= half_road + 1e-9 or has_triangle_core
+                else (minimum_lateral, maximum_lateral)
             )
             lateral_source_strength = 0.0
             if lateral_band is not None:
@@ -1514,15 +1557,10 @@ def _apply_station_harm_fallback(
                         / max(region["maximumCandidateAbsoluteChangeM"], 1e-9),
                     )
                 if "connected added-gradient threshold and minimum area" in region["harmTriggers"]:
-                    lateral_source_strength = max(
-                        lateral_source_strength,
-                        1.0
-                        - min(
-                            config.fallback_added_gradient_m_per_m,
-                            FALLBACK_ADDED_GRADIENT_BLEND_TARGET_M_PER_M,
-                        )
-                        / max(region["maximumCandidateAddedGradientMPerM"], 1e-9),
-                    )
+                    # A threshold-crossing shoulder bank is rejected fully in its
+                    # measured lateral band; partial retention left residual banks
+                    # above the unchanged global cap on the actual 2 m mesh.
+                    lateral_source_strength = 1.0
                 lateral_source_strength = float(np.clip(lateral_source_strength, 0.0, 1.0))
             retained_count, faded_count = retain_interval(
                 group,
@@ -1557,6 +1595,7 @@ def _apply_station_harm_fallback(
                         float(minimum_lateral),
                         float(maximum_lateral),
                     ],
+                    "componentIntersectsTriangleCoreSupport": has_triangle_core,
                     "maximumSourceGroundStrengthWithinBand": lateral_source_strength,
                     "fallbackScope": (
                         "full road section because candidate harm reaches carriageway core"
@@ -1739,12 +1778,22 @@ def _grade_grid(
                 for segment_index in candidates:
                     segment = segments[segment_index]
                     projection = _project(segment_index, segment, x, z, baseline, spacing_m)
-                    if (
-                        projection.distance_m
-                        <= segment.influence_m + config.ambiguity_distance_m + 1e-9
-                    ):
+                    group = (segment.way_id, segment.sort_key[1])
+                    transition = (
+                        _transition_for_station(
+                            segment,
+                            projection.station_m,
+                            spacing_m,
+                            config,
+                            expanded_shoulder_intervals,
+                        )
+                        if expanded_shoulder_intervals and group in expanded_shoulder_intervals
+                        else segment.influence_m - segment.width_m / 2
+                    )
+                    active_extent = segment.width_m / 2 + transition
+                    if projection.distance_m <= active_extent + config.ambiguity_distance_m + 1e-9:
                         ambiguity_projections.append(projection)
-                        if projection.distance_m <= segment.influence_m + 1e-9:
+                        if projection.distance_m <= active_extent + 1e-9:
                             active_projections.append(projection)
                 core_owner_index = int(triangle_owner_segments[row, column])
                 if core_owner_index >= 0:
@@ -1999,6 +2048,8 @@ def _grade_grid(
         nearest_station_grid,
         nearest_distance_grid,
         core_conflict_seeds,
+        triangle_owner_segments,
+        triangle_owner_is_core,
     )
     if not np.isfinite(output).all():
         raise RoadSurfaceError("graded display grid contains non-finite values")
@@ -2117,17 +2168,14 @@ def _grade_grid(
         "triangleCoreOwnership": {
             "supportRule": (
                 "all three vertices of every fixed-diagonal terrain triangle intersected by "
-                "a configured-width road ribbon are assigned to a deterministic owner; vertices "
-                "inside the ribbon receive full core treatment and outside vertices blend "
-                "as shoulders"
+                "a configured-width road ribbon are assigned the deterministic full carriageway "
+                "target; shoulders begin beyond the triangle support stencil"
             ),
             "supportedVertexCount": int(np.count_nonzero(triangle_owner_segments >= 0)),
             "coreVertexCount": int(
                 np.count_nonzero((triangle_owner_segments >= 0) & triangle_owner_is_core)
             ),
-            "supportShoulderVertexCount": int(
-                np.count_nonzero((triangle_owner_segments >= 0) & ~triangle_owner_is_core)
-            ),
+            "supportShoulderVertexCount": 0,
             "incompatibleCoreVertexCount": int(np.count_nonzero(triangle_owner_segments == -2)),
             "incompatibleCoreSeeds": core_conflict_seeds,
             "coreRoadOwnsOverlappingShoulders": True,

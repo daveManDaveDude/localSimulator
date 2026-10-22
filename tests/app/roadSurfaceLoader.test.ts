@@ -229,4 +229,29 @@ describe('road-surface derivative loader', () => {
     );
     expect(requests).toHaveLength(1);
   });
+
+  it('rejects a stale algorithm before requesting derivative assets', async () => {
+    const test = await fixture();
+    const requests: string[] = [];
+    const stale: RoadSurfaceFetch = async (url, init) => {
+      requests.push(url.pathname);
+      if (url.pathname.endsWith('/manifest.json')) {
+        const manifest = JSON.parse(
+          new TextDecoder().decode(
+            await (await test.fetcher(url, init)).arrayBuffer(),
+          ),
+        ) as Record<string, unknown>;
+        manifest['algorithmVersion'] = 'road-surface-preview-2.0.0';
+        return new Response(JSON.stringify(manifest));
+      }
+      return test.fetcher(url, init);
+    };
+
+    await expect(loadRoadSurfacePreview(test.release, stale)).rejects.toThrow(
+      'supported current_2km derivative',
+    );
+    expect(requests).toEqual([
+      '/worlds/torquay-road-surface-preview/manifest.json',
+    ]);
+  });
 });

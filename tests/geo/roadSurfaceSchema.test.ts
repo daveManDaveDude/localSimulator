@@ -124,4 +124,16 @@ describe('road-surface preview contract', () => {
       'outside/source.tif';
     expect(() => parseRoadSurfacePreviewQa(invalidMetadata)).toThrow();
   });
+
+  it('rejects a stale algorithm version in both manifest and QA', () => {
+    const staleManifest = manifest();
+    staleManifest.algorithmVersion = 'road-surface-preview-2.0.0';
+    expect(() => parseRoadSurfacePreviewManifest(staleManifest)).toThrow(
+      'supported current_2km derivative',
+    );
+
+    const staleQa = qa();
+    staleQa.algorithmVersion = 'road-surface-preview-2.0.0';
+    expect(() => parseRoadSurfacePreviewQa(staleQa)).toThrow('invalid header');
+  });
 });

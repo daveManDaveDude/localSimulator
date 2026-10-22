@@ -1,6 +1,16 @@
 # Road-surface treatment preview — accepted handback
 
-**Updated:** 22 October 2026. **State:** PASS; coordinator-accepted after independent Sol review. The preview remains opt-in and does not change the default route.
+**Updated:** 23 October 2026. **State:** Correction 1 remains historically accepted; Correction 2 is not accepted. The preview remains opt-in and does not change the default route.
+
+## Correction 2 — Luna fix 1 strict outcome
+
+Sol's review of the first Correction 2 submission returned FIX REQUIRED. This fix resolves the review's carriageway support ownership, chained conflict-sentinel, shoulder projection extent, and Python/TypeScript version synchronization findings. The two registered Parkfield controls now pass their full-width measurements. The candidate still fails strict global safety and building-base gates: after the source-ground fallback, the maximum added grid-edge gradient is **1.963506 m/m** on way `197534372` and global building-base p95 / maximum absolute shifts are **0.268273 m / 4.014984 m**, above unchanged limits of 1.0 m/m and 0.183 m / 2.424 m. No further grading algorithm change was made in this bounded fix.
+
+The full in-memory diagnostic and exact Parkfield, seam, building and limitation data are recorded in [Correction 2 fix 1 strict diagnostic](artifacts/Road-surface-treatment/correction-2/fix-1/strict-diagnostic.md). Because numerical gates fail, **no derivative build record, browser run or screenshot was produced**. This candidate is not accepted and must not be described as complete. Earlier Correction 1 build and browser evidence below remains historical only.
+
+### Fix 1 checks
+
+From `pipeline/`, `.venv/Scripts/python.exe -m pytest tests/test_road_surface.py -q` passed **24 tests, 1 skipped**; the broader focused command `.venv/Scripts/python.exe -m pytest tests/test_road_surface.py tests/test_road_alignment.py tests/test_roads.py tests/test_terrain_export.py -q` passed **63 tests, 1 skipped**. The skipped Windows symlink adversarial case requires a privilege unavailable to this account. `.venv/Scripts/ruff.exe check torquay_pipeline/road_surface.py tests/test_road_surface.py` and `.venv/Scripts/ruff.exe format --check torquay_pipeline/road_surface.py tests/test_road_surface.py` passed. From the repository root, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run format:check`, and `npx.cmd vitest run tests/geo/roadSurfaceSchema.test.ts tests/app/roadSurfaceLoader.test.ts` passed; Vitest reports 2 files / 6 tests. `git diff --check` exited 0 (Git emitted only LF-to-CRLF working-copy notices). No build or browser command was run because the strict global numerical gates failed.
 
 ## Correction 2 candidate status — strict gates fail; not accepted
 

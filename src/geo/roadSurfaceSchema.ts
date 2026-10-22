@@ -1,4 +1,4 @@
-export const ROAD_SURFACE_PREVIEW_ALGORITHM = 'road-surface-preview-1.0.0';
+export const ROAD_SURFACE_PREVIEW_ALGORITHM = 'road-surface-preview-3.0.0';
 export const ROAD_SURFACE_GRID = {
   columns: 1001,
   rows: 1001,
