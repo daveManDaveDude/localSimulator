@@ -1,5 +1,11 @@
 # Project instructions
 
+## Agent workflow update (2026-10-23)
+
+The user authorized the revised agent skills and handoff workflow on 2026-10-23. Follow `docs/agent-workflow.md` and the current `torquay-plan-implementation` skill for model routing, early diagnosis, bounded corrections and evidence reuse. The invoking chat is the sole coordinator: recommend Luna medium for routine coordination and Sol 6.1 medium for the current coupled Teignmouth numerical/timing work. A skill cannot change the chat's selected model. Existing issue budgets and reserved attempts carry forward; this metadata update grants no extra correction or trial attempts and does not resume the user's paused implementation. Resume only on subsequent user direction, after reconciling the compact checkpoint at `.codex/torquay-plan-implementation.md` with actual files and agent state. Keep the scope and geographic/source constraints below.
+
+## Accepted product and geographic constraints
+
 The user separately authorized **v0.1.0 viewer cleanup** on 2026-10-20 and explicitly requested Sol for implementation. The amended cleanup, including roads and source-derived street names on by default, passed independent Sol review and coordinator acceptance on 2026-10-20; see `docs/milestones/Viewer-cleanup.md` and its specification. The current product entry `/` selects the existing combined 2 km package and truthfully falls back to synthetic when unavailable; world/layer/debug choices are removed from the product UI. The product displays roads and validated OSM names by default without a label toggle and creates no road QA landmark marker. This supersedes earlier synthetic-default/visible-debug requirements only. Preserve all GIS/source/package bytes, internal fixtures, historical 1 km profile, pending AOI and TQ1 4HN center. TVW-016 and later remain unauthorized.
 
 The user separately authorized the **Road-surface treatment preview** on 2026-10-22. It passed independent Sol review and coordinator acceptance; see `docs/milestones/Road-surface-treatment.md`. The preview is a local, opt-in route at `/?roadSurface=preview` backed by an ignored offline derivative. Keep `/` on the accepted source-draped scene, preserve the AOI as pending/not checked, and do not treat this approval as authorizing TVW-016 or later.
