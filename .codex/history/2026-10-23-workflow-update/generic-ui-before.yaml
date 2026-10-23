@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spec Implementation Orchestrator"
+  short_description: "Plan, implement, and review spec items with agents"
+  default_prompt: "Use $spec-implementation-orchestrator to implement this specification one item at a time."

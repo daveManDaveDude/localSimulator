@@ -1,0 +1,4 @@
+interface:
+  display_name: "Torquay Plan Implementation"
+  short_description: "Sol planning and review with bounded Luna fix attempts"
+  default_prompt: "Use $torquay-plan-implementation to implement the next unfinished issue from the Torquay PoC plan."

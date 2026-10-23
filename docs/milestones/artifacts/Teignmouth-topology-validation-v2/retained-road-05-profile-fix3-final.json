@@ -1,0 +1,355 @@
+{
+  "acceptedPreviewHashes": {
+    "heightfield.f32": "037a74320557088135e0885386c24fdcdea6171469db1d6329c3e82997f5c1e9",
+    "manifest.json": "9a3cb6c08fb57a19f94e1215ac526b1baf28634d38be1ffc7d4ed61f2de7c6f7",
+    "qa.json": "43d7058a339416d308be09292598949d3d97f4b764a147ccc2d5fb771d434f20"
+  },
+  "additionalPreflightProjectionSeconds": 1.290773100045044,
+  "aggregatePassFailPreserved": true,
+  "allReportIdentityFieldsEquivalent": true,
+  "allTwelveGateReportsEquivalent": true,
+  "cacheAndRejectionStats": {
+    "acceptedCoarsePolygonCreations": 4754,
+    "acceptedCoarsePolygonHits": 490,
+    "acceptedIntersectionCalls": 5244,
+    "baselineCoarsePolygonCreations": 895160,
+    "baselineCoarsePolygonHits": 32724,
+    "baselineIntersectionCalls": 5244,
+    "bboxDisjointRejections": 2289,
+    "disjointBuildingFastPaths": 0,
+    "pairedGridBuildings": 3604,
+    "pairedGridIntersectionCalls": 922640,
+    "pairedGridSampleBatches": 3608,
+    "pairedGridSamplePoints": 2052922,
+    "patchFaceIntersectionCalls": 10775,
+    "patchFacePolygonCreations": 10775,
+    "patchFacePolygonHits": 0
+  },
+  "cacheSizes": {
+    "acceptedCoarsePolygon": 4754,
+    "baselineCoarsePolygon": 8192,
+    "patchFaceBounds": 10775,
+    "patchFacePolygon": 10775,
+    "triangleCoordinateArrayBytes": 2878944,
+    "triangleHeightArrayBytes": 1439472
+  },
+  "candidateFloat32Sha256": "a6251101e907f4dc1179fd15c07795078b10768386633405e06ed88109b413a8",
+  "candidateOutputStillAbsent": true,
+  "conditionalAssemblyProfile": {
+    "available": false,
+    "passes": null,
+    "reason": "retained road-05 reclip did not produce valid candidate road groups"
+  },
+  "consumedTrialTransitions": {
+    "currentInputSnapshotSha256": "e2ce6dfd26b69fc60db55fd1b0afb879fd4a970359aab588a709e6584e3417e4",
+    "currentProtectedEntryCount": 36,
+    "passed": true,
+    "priorInputTransitions": [
+      {
+        "finalProtectedMapSha256": "9ab17cc0c3aa76dd6a1f8de72de24cd613c69dc468018c8cc3b131c337f44fd1",
+        "permittedLegacyDifferences": [
+          "protected:.codex/torquay-plan-implementation.md",
+          "studyEvidenceTree:docs/milestones/artifacts/Road-surface-treatment"
+        ],
+        "recordedInputSnapshotSha256": "32eaf12ebacb24f689a8c2019e5f47b3c50ef3e5920954142e4ed9195ab3de1a",
+        "trialId": "flip-05"
+      },
+      {
+        "finalProtectedMapSha256": "9ab17cc0c3aa76dd6a1f8de72de24cd613c69dc468018c8cc3b131c337f44fd1",
+        "permittedLegacyDifferences": [
+          "protected:.codex/torquay-plan-implementation.md",
+          "studyEvidenceTree:docs/milestones/artifacts/Road-surface-treatment"
+        ],
+        "recordedInputSnapshotSha256": "9ab17cc0c3aa76dd6a1f8de72de24cd613c69dc468018c8cc3b131c337f44fd1",
+        "trialId": "road-05"
+      }
+    ],
+    "transitionId": "teignmouth-validation-window-120-125-135-v2"
+  },
+  "contextSetupSeconds": 0.012763700011419132,
+  "finalizationProbeByteLength": 283282,
+  "gateSeconds": {
+    "acceptedPlaneRefinement": 11.068803700007265,
+    "completeBuildingFootprints": 41.248791399993934,
+    "compositeTerrain": 0.33440029999474064,
+    "earthworkOverlay": 6.721616200025892,
+    "float32FinalValidation": 0.27584630000637844,
+    "localCorridorLongitudinal": 0.26124130000243895,
+    "roadPathReclip": 1.4910263000056148,
+    "sourceTriangleOwnership": 4.371757400018396,
+    "topology": 0.0714082999911625,
+    "walkClearance": 0.28130179998697713
+  },
+  "historical": {
+    "finalizationAndOtherResidualSeconds": 5.625867400024532,
+    "legacyValidationProfileSeconds": 80.517233,
+    "preSolverPreparationSeconds": 16.082547899975907,
+    "solverSeconds": 26.04878219999955,
+    "trialElapsedSeconds": 128.2744305
+  },
+  "independentSolProfile": {
+    "requiredBeforeActivation": true,
+    "status": "pending"
+  },
+  "passes": true,
+  "preparationSeconds": 16.43540079999366,
+  "profileMode": "read-only retained witness; no solver invocation",
+  "projectedEndToEndLowerBoundSeconds": 115.69235720004954,
+  "projectedEndToEndSeconds": null,
+  "projectionIncludesConditionalAssemblyPath": false,
+  "protectedCurrentMapSha256": "e2ce6dfd26b69fc60db55fd1b0afb879fd4a970359aab588a709e6584e3417e4",
+  "qualificationLimitSeconds": 125.0,
+  "qualificationMarginSeconds": null,
+  "qualifiesForNextTrialTiming": false,
+  "rawTrialDirectoryAfter": [
+    [
+      "attempt.json",
+      "5957d438c866e1c8afec4471ddd76208c7074e04df70987b824367ef0cff6bbe",
+      8844
+    ],
+    [
+      "candidate-heights.f32",
+      "a6251101e907f4dc1179fd15c07795078b10768386633405e06ed88109b413a8",
+      120292
+    ],
+    [
+      "certificate-verification.json",
+      "3a761d82212f4c84460ecb700051e7a6bc2d787b4edac4677d9dee614c37ec26",
+      113
+    ],
+    [
+      "constraints.json",
+      "f6fdf22b3478341a8fa4d0accf15ff822c2fd059a2e2e20e33eb05632e8fd445",
+      635126
+    ],
+    [
+      "offline-aggregate.json",
+      "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352",
+      293218
+    ],
+    [
+      "patch-base-heights.f32",
+      "2f6538b002c5402b6a11a4eaffa97c825fae3bf8f3b92e0fed9580c386d16dcd",
+      120292
+    ],
+    [
+      "patch-triangles.u32",
+      "47f8b1fac3a4b8933b6f6643147b04dacd1fe3deb6712545341ce6286d3da2b7",
+      719736
+    ],
+    [
+      "patch-vertices-xz.f64",
+      "877d814365e74942fe53fd40b2946d362492bfe0d518136b62534f883521f5db",
+      481168
+    ],
+    [
+      "solver-phase.json",
+      "373c0a7c878689fad7a23e1d5d70111f75eddb091209ab603feca5f3bd724732",
+      3927
+    ],
+    [
+      "topology.json",
+      "4d16c05213cf0b259fe051381cb5b09c86ed29b1645957e8f39426f2ae9c3bc9",
+      1581
+    ]
+  ],
+  "rawTrialDirectoryBefore": [
+    [
+      "attempt.json",
+      "5957d438c866e1c8afec4471ddd76208c7074e04df70987b824367ef0cff6bbe",
+      8844
+    ],
+    [
+      "candidate-heights.f32",
+      "a6251101e907f4dc1179fd15c07795078b10768386633405e06ed88109b413a8",
+      120292
+    ],
+    [
+      "certificate-verification.json",
+      "3a761d82212f4c84460ecb700051e7a6bc2d787b4edac4677d9dee614c37ec26",
+      113
+    ],
+    [
+      "constraints.json",
+      "f6fdf22b3478341a8fa4d0accf15ff822c2fd059a2e2e20e33eb05632e8fd445",
+      635126
+    ],
+    [
+      "offline-aggregate.json",
+      "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352",
+      293218
+    ],
+    [
+      "patch-base-heights.f32",
+      "2f6538b002c5402b6a11a4eaffa97c825fae3bf8f3b92e0fed9580c386d16dcd",
+      120292
+    ],
+    [
+      "patch-triangles.u32",
+      "47f8b1fac3a4b8933b6f6643147b04dacd1fe3deb6712545341ce6286d3da2b7",
+      719736
+    ],
+    [
+      "patch-vertices-xz.f64",
+      "877d814365e74942fe53fd40b2946d362492bfe0d518136b62534f883521f5db",
+      481168
+    ],
+    [
+      "solver-phase.json",
+      "373c0a7c878689fad7a23e1d5d70111f75eddb091209ab603feca5f3bd724732",
+      3927
+    ],
+    [
+      "topology.json",
+      "4d16c05213cf0b259fe051381cb5b09c86ed29b1645957e8f39426f2ae9c3bc9",
+      1581
+    ]
+  ],
+  "rawTrialDirectoryByteIdentical": true,
+  "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "reportByteEquivalentToRetainedRoad05": {
+    "acceptedPlaneRefinement": true,
+    "candidateFloat32Sha256": true,
+    "completeBuildingFootprints": true,
+    "compositeTerrain": true,
+    "earthworkOverlay": true,
+    "float32FinalValidation": true,
+    "gateNames": true,
+    "inputBindings": true,
+    "localCorridorLongitudinal": true,
+    "passes": true,
+    "roadPathReclip": true,
+    "solverWitness": true,
+    "sourceTriangleOwnership": true,
+    "topology": true,
+    "walkClearance": true
+  },
+  "retainedAggregateSha256": "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352",
+  "retainedTopologyExact": true,
+  "studyConfigSha256": "5c292d2afb43f6f67b83d34a663494a138506bee18ea00d33b61f88569a1a26d",
+  "syntheticApprovalChainProfileOnly": true,
+  "transitionBoundedWriteProbeSeconds": 0.012843200005590916,
+  "transitionFinalizationProjectionSeconds": 5.625867400024532,
+  "transitionFinalizationSerializationSeconds": 0.007113400002708659,
+  "transitionFinalizationSnapshotSeconds": 0.5630338999908417,
+  "transitionFinalizationTotalSeconds": 0.5829904999991413,
+  "transitionId": "teignmouth-validation-window-120-125-135-v2",
+  "transitionInputInventoryAndPriorMapValidationSeconds": 1.062921800010372,
+  "transitionInputValidation": {
+    "checkpointBaselineAtImplementationStartSha256": "5b0cfb793f3780b9ee2af6087d643a22cde32b43c9b7442ed9940306b09a17a6",
+    "checkpointSha256": "83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814",
+    "evidenceTreeSha256": "4413d4fc79adcf846d578e51fa2d65ee46b674721b1e1e61759fae1a0214f94a",
+    "inventory": {
+      "byteLength": 2411,
+      "path": "docs/milestones/artifacts/Road-surface-treatment/teignmouth-topology-study/profiles/consumed-trials-inventory-v2.json",
+      "sha256": "9e9c9d083014dd2649fc2b4d284a235423358466b6e91b3d07959c2369f5d8d6"
+    },
+    "legacyEvidenceTreeReconstructedSha256": "a83f7f30ebd3fba437364a570ee3349e72bec7b62e5bc9304708b1d50512c688",
+    "passed": true,
+    "retainedTrialInventory": {
+      "flip-05": {
+        "attempt.json": {
+          "byteLength": 8452,
+          "sha256": "baf177cb4b918603a1e59a1381bcae2e27f2ea82d93d7452cad9011602be3b64"
+        },
+        "candidate-heights.f32": {
+          "byteLength": 109548,
+          "sha256": "00b0491d895916be3157cdaa4d75910c6b03386e3cc684de6672d98fb26121d3"
+        },
+        "certificate-verification.json": {
+          "byteLength": 113,
+          "sha256": "3a761d82212f4c84460ecb700051e7a6bc2d787b4edac4677d9dee614c37ec26"
+        },
+        "constraints.json": {
+          "byteLength": 655721,
+          "sha256": "398286722e9058db3c7861e66e8d93c9fa4058234fd89217e6fdc13bcf33de82"
+        },
+        "offline-aggregate.json": {
+          "byteLength": 19521,
+          "sha256": "c8546b9c5bf410118386a2574c5e4aae5b7398e73fbace72ec3c4919b5d3525c"
+        },
+        "patch-base-heights.f32": {
+          "byteLength": 109548,
+          "sha256": "899d85cda685cb01ee2dad74d55826d78dc41650128f014e12e21df548c8172d"
+        },
+        "patch-triangles.u32": {
+          "byteLength": 655272,
+          "sha256": "3026ed3258fc59bb4ded5cc6b11fac4d48cb71b2da3cc18bf2b8eb6485d6e9db"
+        },
+        "patch-vertices-xz.f64": {
+          "byteLength": 438192,
+          "sha256": "a6e00a248018947607dad377622edcf6365eb22cd6ddc0eb0cbf87e224423285"
+        },
+        "solver-phase.json": {
+          "byteLength": 3418,
+          "sha256": "fb4f125c6f365ca1d11e9627232abc78b39242bd0adc4d0bd9dbc1391681cf79"
+        },
+        "topology.json": {
+          "byteLength": 1579,
+          "sha256": "24e0e0b31b2b082dd5729472814e103b7651fb117b6b150c23e2f4e44da56146"
+        }
+      },
+      "road-05": {
+        "attempt.json": {
+          "byteLength": 8844,
+          "sha256": "5957d438c866e1c8afec4471ddd76208c7074e04df70987b824367ef0cff6bbe"
+        },
+        "candidate-heights.f32": {
+          "byteLength": 120292,
+          "sha256": "a6251101e907f4dc1179fd15c07795078b10768386633405e06ed88109b413a8"
+        },
+        "certificate-verification.json": {
+          "byteLength": 113,
+          "sha256": "3a761d82212f4c84460ecb700051e7a6bc2d787b4edac4677d9dee614c37ec26"
+        },
+        "constraints.json": {
+          "byteLength": 635126,
+          "sha256": "f6fdf22b3478341a8fa4d0accf15ff822c2fd059a2e2e20e33eb05632e8fd445"
+        },
+        "offline-aggregate.json": {
+          "byteLength": 293218,
+          "sha256": "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352"
+        },
+        "patch-base-heights.f32": {
+          "byteLength": 120292,
+          "sha256": "2f6538b002c5402b6a11a4eaffa97c825fae3bf8f3b92e0fed9580c386d16dcd"
+        },
+        "patch-triangles.u32": {
+          "byteLength": 719736,
+          "sha256": "47f8b1fac3a4b8933b6f6643147b04dacd1fe3deb6712545341ce6286d3da2b7"
+        },
+        "patch-vertices-xz.f64": {
+          "byteLength": 481168,
+          "sha256": "877d814365e74942fe53fd40b2946d362492bfe0d518136b62534f883521f5db"
+        },
+        "solver-phase.json": {
+          "byteLength": 3927,
+          "sha256": "373c0a7c878689fad7a23e1d5d70111f75eddb091209ab603feca5f3bd724732"
+        },
+        "topology.json": {
+          "byteLength": 1581,
+          "sha256": "4d16c05213cf0b259fe051381cb5b09c86ed29b1645957e8f39426f2ae9c3bc9"
+        }
+      }
+    }
+  },
+  "transitionSerializationAndWriteSafetyMarginSeconds": 0.5,
+  "transitionStaticPreflightSeconds": 0.02251139999134466,
+  "transitionSyntheticApprovalArtifactValidationSeconds": 0.03741970000555739,
+  "transitionTrialCodeHashPassSeconds": 0.018553700007032603,
+  "trialId": "road-05",
+  "unmeasuredAcceptanceTimeBudgetSeconds": 9.307642799950457,
+  "validationSeconds": 66.13162289999309,
+  "validationWithContextSeconds": 66.14438660000451,
+  "validatorVersion": "teignmouth-offline-validator-v2",
+  "wrapperStateKeys": [
+    "acceptance_gates_completed_monotonic",
+    "before_map",
+    "current_map",
+    "deadlines",
+    "post_solver_gates_active",
+    "protected_parts",
+    "solver_budget_at_start",
+    "transition_preflight"
+  ]
+}

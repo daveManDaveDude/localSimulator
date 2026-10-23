@@ -1,0 +1,38 @@
+[
+  {
+    "sha256": "99c6a53c7ffdcece81b167be9c7df63e9d477f7f20239f0c12146c812819a103",
+    "backup": "C:\\vibe\\localSimulator\\.codex\\history\\2026-10-23-workflow-update\\generic-skill-before.md",
+    "bytes": 13549,
+    "source": "C:\\Users\\david\\.codex\\skills\\spec-implementation-orchestrator\\SKILL.md"
+  },
+  {
+    "sha256": "50fd12b267c3bb7ff2fd1f7e1073efa905a96bbc98eb0f4633539fa1e52842dd",
+    "backup": "C:\\vibe\\localSimulator\\.codex\\history\\2026-10-23-workflow-update\\torquay-ui-before.yaml",
+    "bytes": 258,
+    "source": "C:\\Users\\david\\.codex\\skills\\torquay-plan-implementation\\agents\\openai.yaml"
+  },
+  {
+    "sha256": "b4c1c15a75d34d8ba9cb12366ca1442bd709f692e7d7eccba66eab3f74732267",
+    "backup": "C:\\vibe\\localSimulator\\.codex\\history\\2026-10-23-workflow-update\\AGENTS-before.md",
+    "bytes": 5512,
+    "source": "C:\\vibe\\localSimulator\\AGENTS.md"
+  },
+  {
+    "sha256": "de9def3b0fecfbb71cbed2a687d5037ae5106ab5fb7601c07e7507741fafa596",
+    "backup": "C:\\vibe\\localSimulator\\.codex\\history\\2026-10-23-workflow-update\\torquay-skill-before.md",
+    "bytes": 9956,
+    "source": "C:\\Users\\david\\.codex\\skills\\torquay-plan-implementation\\SKILL.md"
+  },
+  {
+    "sha256": "7e595a8557c6d003b93180359b834f444b4674de18e1e678dff2d0a9cbef1cf7",
+    "backup": "C:\\vibe\\localSimulator\\.codex\\history\\2026-10-23-workflow-update\\generic-ui-before.yaml",
+    "bytes": 250,
+    "source": "C:\\Users\\david\\.codex\\skills\\spec-implementation-orchestrator\\agents\\openai.yaml"
+  },
+  {
+    "sha256": "83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814",
+    "backup": "C:\\vibe\\localSimulator\\.codex\\history\\2026-10-23-workflow-update\\checkpoint-before.md",
+    "bytes": 82257,
+    "source": "C:\\vibe\\localSimulator\\.codex\\torquay-plan-implementation.md"
+  }
+]

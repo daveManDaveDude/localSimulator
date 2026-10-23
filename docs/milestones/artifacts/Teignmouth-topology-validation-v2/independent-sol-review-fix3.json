@@ -1,0 +1,71 @@
+{
+  "blockingFinding": {
+    "detail": "validate_candidate calls validate_offline_candidate_v2 directly. Only assembly/asset-validation/resource wrappers call _run_validation_phase. Existing long Python reclip/walk/composite routines therefore rely on checks after return and can consume the finalization reserve.",
+    "file": "pipeline/scripts/run_teignmouth_topology_validation_v2.py",
+    "priority": 1,
+    "requiredCorrection": "Supervise actual numerical validator dispatch and verify an in-flight legacy Python gate interrupts at125 with truthful unavailable status; reprofile actual supervised path.",
+    "syntheticProof": {
+      "continuedPastHardCutoff": true,
+      "hardCompletionCutoff": 235.0,
+      "invocationStart": 100.0,
+      "method": "Called the actual patched validate_offline_candidate dispatch with in-memory context/validator stubs; no run_one_trial or source data solve invoked",
+      "traceInsideDispatchedValidator": null,
+      "validationCutoff": 225.0,
+      "validatorReturnedAt": 240.0
+    },
+    "title": "Main numerical validator bypasses the trace supervisor"
+  },
+  "independentChecks": {
+    "activationEnabled": false,
+    "approvalArtifactsAbsent": true,
+    "candidateAndCollarPathsAbsent": true,
+    "consumedTrialFileCounts": {
+      "flip-05": 10,
+      "road-05": 10
+    },
+    "focusedTestsPassed": 36,
+    "gitDiffCheck": "passed",
+    "ruffCheck": "passed",
+    "ruffFormatCheck": "passed",
+    "staticRuntimeHashMapEntriesVerified": 23,
+    "transitionInputAndPriorMapValidation": "passed"
+  },
+  "preservation": "Consumed inventories and current source/release/accepted-preview chains verified without mutation. Only this separate review artifact is written; no trial, solver, activation, candidate/default/package/site change or consumed evidence modification. Review artifact is not a current fixed transition input.",
+  "priorSafetyFixesConfirmed": [
+    "v1 runtime dependency hash binding",
+    "exact Sol/config/spec/runtime-map and coordinator receipt chain",
+    "unshifted monotonic clock",
+    "protected before equals after and captured maps",
+    "assembly/resource/determinism cutoff125 rather than135",
+    "late aggregate failure and no-overwrite temporary final commit"
+  ],
+  "qualification": {
+    "authoritativeCompleteProjectionSeconds": null,
+    "authoritativeLowerBoundSeconds": 111.96811639994567,
+    "authoritativeQualifiesForNextTrialTiming": false,
+    "capRecommendation": "No numeric cap recommendation pending durable, independently verified complete instrumented timing evidence.",
+    "currentLimitSeconds": 125.0,
+    "newFlip05TimingArtifact": "absent; supplied message-only numbers unverified",
+    "performanceOnlySyntheticAssemblySeconds": 0.1995934,
+    "remainingUnmeasured": "Complete supervised successful path, including remaining runner phases and real road/walk/assembly/resource/determinism work",
+    "syntheticHarnessIsCandidateAcceptanceEvidence": false,
+    "unverifiedReportedTimings": {
+      "flipBaselineProjectionSeconds": 131.4084365,
+      "realReclipSeconds": 24.4701864,
+      "roadBaselineProjectionSeconds": 135.362211,
+      "twoAssembliesAndValidationsSeconds": 0.2662587
+    }
+  },
+  "reviewScope": "Luna fix3 only; reviewed before fix4; no activation, topology trial or source solve",
+  "reviewedBindingsAtInspection": {
+    "checkpointSha256": "83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814",
+    "consumedInventorySha256": "9e9c9d083014dd2649fc2b4d284a235423358466b6e91b3d07959c2369f5d8d6",
+    "lunaAuditProfileSha256": "3f5555863a7c9b4f47054936afe79eb6aa645399731e3cb1653222e66dd17965",
+    "lunaHarnessProfileSha256": "615fcf3fff9353703b95f91a9ee7d321794ef2e7ac274d3271a8ff2290fa08a2",
+    "retainedRoad05AggregateSha256": "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352",
+    "transitionConfigSha256": "e74c4426d8d7ddea958082df9d2a6071ffc52d5d2fe6fa9806e057cc1c28a4f6",
+    "validatorV2Sha256": "4b8182f9c584d4ca4b7b67017cce7374e607f75476628d3d0d40d6b28eafe587"
+  },
+  "reviewer": "independent Sol 6.1 medium",
+  "verdict": "FIX REQUIRED"
+}

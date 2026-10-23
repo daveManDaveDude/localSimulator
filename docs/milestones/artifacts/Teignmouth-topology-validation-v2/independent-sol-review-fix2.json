@@ -1,0 +1,98 @@
+{
+  "checks": {
+    "activationEnabled": false,
+    "candidateOutputExists": false,
+    "collarTrialExists": false,
+    "focusedV1V2TransitionTestsPassed": 27,
+    "gitDiffCheck": "passed",
+    "ruffCheck": "passed",
+    "ruffFormatCheck": "passed",
+    "studyAndReconciliationTestsPassed": 28,
+    "windowsDirectorySymlinkPrivilegeSkips": 1
+  },
+  "findings": [
+    {
+      "detail": "V2 imports/subclasses/calls road_surface_validation_v1.py, which is absent from legacy and extension hash maps; v1 tests are also imported by v2 tests and not pinned.",
+      "id": "F1",
+      "priority": 1,
+      "title": "Runtime v1 dependency omitted from extension bindings"
+    },
+    {
+      "detail": "Static bindings accept qualification limit 999; config self-digest is runtime-recorded only. Activation accepts arbitrary 64-character review hash without reading/binding review artifact. Current checkpoint permits any changed bytes retaining the marker.",
+      "id": "F2",
+      "priority": 1,
+      "title": "No externally anchored transition policy/config/checkpoint approval chain"
+    },
+    {
+      "detail": "Synthetic wrapper probe with actual elapsed139 seconds serialized passes=true and trialMaximumWallSeconds=135. CLI after-return status cannot repair the retained aggregate.",
+      "id": "F3",
+      "priority": 1,
+      "title": "Shifted clock and missing hard finalization enforcement permit a late passing aggregate"
+    },
+    {
+      "detail": "Synthetic changed-source before/after maps were rewritten protectedHashesMatch=true because each matched its independently captured endpoint.",
+      "id": "F4",
+      "priority": 2,
+      "title": "Preservation flag rewrite omits before equals after"
+    },
+    {
+      "detail": "phase_for_runner_check maps independent asset assembly and resource/determinism validation to135-second finalization cutoff instead of125-second post-solver work cutoff.",
+      "id": "F5",
+      "priority": 1,
+      "title": "Candidate assembly consumes reserved finalization window"
+    },
+    {
+      "detail": "Profile uses historical preparation/solver/finalization residual; new static binding, transition inventory/tree checks are outside timed preparation and not separately added. Include measured added overhead and bounded final writes in qualification.",
+      "id": "F6",
+      "priority": 2,
+      "title": "Complete projection does not time added transition preflight/finalization"
+    }
+  ],
+  "preservation": {
+    "lunaProfileSha256": "7bd00eaffe376ff1fd9f732dc688aeec1fd2718410ed425226baf58a356b3fa1",
+    "noSourceSolveOrTrialRun": true,
+    "retainedRoad05AggregateSha256": "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352",
+    "reviewEvidenceIsNotCurrentTransitionInput": true
+  },
+  "profile": {
+    "allTwelveGateReportsEquivalent": true,
+    "path": "docs/milestones/artifacts/Teignmouth-topology-validation-v2/independent-sol-road05-profile-fix2.json",
+    "projectedEndToEndSeconds": 109.04173669998718,
+    "qualificationMarginSeconds": 15.958263300012817,
+    "rawTrialDirectoryByteIdentical": true,
+    "sha256": "9a6c02e8f7cb6b9add4b80b23a59af5debb71652962e4f92dd9eccd623e25f20",
+    "validationWithContextSeconds": 61.284539199987194
+  },
+  "reviewedCheckpointSha256": "871a226730ae9ed15f388e227e450f17cd30e64183c51f315a26a3d8f811d6c3",
+  "reviewedCodeHashes": {
+    ".gitignore": "aeb27922fd21425787432be5d930a879271095967b04c37bf5b6dc1e928509e1",
+    "config/road-surface-teignmouth-candidate.json": "0616b0584cfc2d9043dd0b0e8c81926a45487e456855ab9375ce0878c6412140",
+    "config/road-surface-teignmouth-topology-study.json": "5c292d2afb43f6f67b83d34a663494a138506bee18ea00d33b61f88569a1a26d",
+    "config/road-surface-teignmouth-topology-transition-v2.json": "eeeb53e2562d8502ca92af388cd9407a3becd0563afd4f6a898df7f355b84948",
+    "docs/milestones/Teignmouth-topology-refinement-spec.md": "03bc2ce6e5927307245aa0470cf8cc404838b5517efec5bf5e5db689e74416a1",
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md": "83d13691a73aaa54e9abcf79385ce23e44fb0f6d49ac723307ca12dc04b95eea",
+    "pipeline/scripts/profile_teignmouth_validation_v2.py": "27f7bb0e61dc8321215c636291aa7df7a21709ae46ef04b036187cfadb0e649e",
+    "pipeline/scripts/run_teignmouth_topology_after_reconciliation.py": "e357a96def7b9ba8be83d88b14c99b029bdb0ab638f56c6570cc7ce85a3452c6",
+    "pipeline/scripts/run_teignmouth_topology_study.py": "1f33704b6e9103a84429097b0f6c7d153647b7092dac2d7f6e49ec97c46a141f",
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py": "5932a90193f2dceac5680e64c165a6be709ccb434c9a90694e4d2962f37c8792",
+    "pipeline/tests/test_road_surface_patch.py": "676d0e01af86fee069e3e5a9ef1a4fceead54754880f4a8fd4ef48eb0480823c",
+    "pipeline/tests/test_road_surface_study.py": "3817788ce0e1b0682722fee2be8fa3b56af8905fdf8ec30ce1bb7f82320a542c",
+    "pipeline/tests/test_road_surface_study_reconciliation.py": "34e94ef5ea8d98fd6d7479918516922ca460591f9e5416c6b6e3c55eb40fcf75",
+    "pipeline/tests/test_road_surface_topology.py": "388a83cfa0b1034fd4546155a5d812a2cc980937b9eed9ea360b6c8e8b730009",
+    "pipeline/tests/test_road_surface_validation_transition_v2.py": "160d93542dad09332ff8de240d3575625f32b1e8711efdae30be8b73825fd847",
+    "pipeline/tests/test_road_surface_validation_v1.py": "dd07b1eb10ed4979c5b668916a367c7de4b8e0e38a9155e397c504f6dc99b935",
+    "pipeline/tests/test_road_surface_validation_v2.py": "04e12c629e3d27c9c875bf4a024223c82c8b4d56fcd0562da076bdb819796f01",
+    "pipeline/torquay_pipeline/road_surface.py": "ef26431929a2f44b1f739a11bdd9962530f25b8c029f7f8dbf46f5ef6dfcdd7a",
+    "pipeline/torquay_pipeline/road_surface_patch.py": "fb153a57c845fc09bb3c4de4e38b5b713710399a1fb8e444640c223ed443e825",
+    "pipeline/torquay_pipeline/road_surface_study.py": "e62cd3b1dd597cd67fe4f1dbdbac7613390da15ce67d81ce54cc79c07be24cce",
+    "pipeline/torquay_pipeline/road_surface_study_reconciliation.py": "f60d62b9ddd95d43e7892c66864643689caa53888454a9eea000e012bc9e113e",
+    "pipeline/torquay_pipeline/road_surface_topology.py": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880",
+    "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py": "a112655f9e38a23ba0e144be96b899815d9d1f5f55c466c84f037e4c81cb96da",
+    "pipeline/torquay_pipeline/road_surface_validation_v1.py": "50f97a2b7fb09f10094de8932eeb05a4858f978edfec35e3e51a3682071c501a",
+    "pipeline/torquay_pipeline/road_surface_validation_v2.py": "4b8182f9c584d4ca4b7b67017cce7374e607f75476628d3d0d40d6b28eafe587"
+  },
+  "reviewedTransitionConfigSha256": "eeeb53e2562d8502ca92af388cd9407a3becd0563afd4f6a898df7f355b84948",
+  "reviewer": "independent Sol 6.1 medium",
+  "scope": "Luna fix 2; validation transition v2; no activation or topology trial",
+  "verdict": "FIX REQUIRED"
+}

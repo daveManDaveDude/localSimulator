@@ -1,0 +1,117 @@
+{
+  "bindings": {
+    "checkpointSha256": "83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814",
+    "configSha256": "91761e9acc23a989767e74d4cb04296d9ce899df795d879eb9702c0f485961c9",
+    "consumedInventorySha256": "9e9c9d083014dd2649fc2b4d284a235423358466b6e91b3d07959c2369f5d8d6",
+    "profileSha256": "c55954145cc1c8f0d0e481cf7794c050a9120b7a5dd0c410342c2edfee2622c6",
+    "reviewedCodeHashes": {
+      "docs/milestones/Teignmouth-topology-validation-v2-spec.md": "82e636a66c649908880e8b4be6c314419c34c1810d8e653c579af86b759b8c0f",
+      "pipeline/scripts/profile_teignmouth_flip05_performance_v2.py": "890a071c6ff25091d6c4171bac33266fdf5d560ac581c3904c3c95ad7fce7545",
+      "pipeline/scripts/profile_teignmouth_validation_v2.py": "215d0a7407964e20a64562f56e111ff1ec330ba47edfd5196fb7d4558ba02480",
+      "pipeline/scripts/run_teignmouth_topology_validation_v2.py": "1b3c879c76383ad1abc09a780c7f756ac16336cdda54ac646b50674b6a2bfb95",
+      "pipeline/tests/test_road_surface_validation_transition_v2.py": "5c9682c415e4ecb3eaf27756e644c3923197f08bffc82c04fee633201d62cd67",
+      "pipeline/tests/test_road_surface_validation_v2.py": "04e12c629e3d27c9c875bf4a024223c82c8b4d56fcd0562da076bdb819796f01",
+      "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py": "63cedbea812e6879c8f926e0a5f381f143f22c367dd32d800c1e5f3fae9cf0a2",
+      "pipeline/torquay_pipeline/road_surface_validation_v1.py": "50f97a2b7fb09f10094de8932eeb05a4858f978edfec35e3e51a3682071c501a",
+      "pipeline/torquay_pipeline/road_surface_validation_v2.py": "4b8182f9c584d4ca4b7b67017cce7374e607f75476628d3d0d40d6b28eafe587"
+    },
+    "specSha256": "82e636a66c649908880e8b4be6c314419c34c1810d8e653c579af86b759b8c0f"
+  },
+  "capRecommendation": null,
+  "capRecommendationReason": "No independently verified complete instrumented projected path exists, including full validator trace overhead. A numeric increase is not justified from these partial timings.",
+  "dispatchAssessment": {
+    "activationDisabled": true,
+    "assemblyAndResourcesUse125": true,
+    "completeUnavailableReportsOnSupervisorDeadline": true,
+    "fullValidatorNowSupervised": true,
+    "maximumIterations": 2000,
+    "nativeCallLimitation": "sys.settrace checks Python lines in the workspace and after calls. It cannot preempt an in-progress GEOS/NumPy/native call. It rejects late results after return; it does not guarantee physical return at 125 or 135 seconds. No hard native-call timing proof was established.",
+    "noLatePassRetained": true,
+    "solverUsesT0Plus120Remaining": true
+  },
+  "findings": [
+    {
+      "detail": "The new performance artifact measures direct untraced road reclip and synthetic-flag assembly plus 100 no-op supervisor calls. It excludes complete traced numerical validation, successful walk path, runner dispatch and preservation/finalization. Per-line Path.resolve tracing overhead over the complete validator is unmeasured. Neither this artifact nor old untraced lower-bound projections establish the required <=125 s complete end-to-end projection in both implementer and independent reviewer profiles. Keep activation disabled and do not launch collar-05.",
+      "priority": 1,
+      "title": "Mandatory complete timing qualification remains absent"
+    },
+    {
+      "detail": "inputIdentity.sourceManifestSha256 is 588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a, the release terrain manifest. Actual data/source-manifest.json SHA is e2a5237d99fd8b0b0dd0174430ba18b58f2d778f498275c609c24bed5c3ccf8c and is correctly included in protected inputs. Correct the profile helper metadata and create a new versioned evidence record; preserve this write-once artifact.",
+      "priority": 2,
+      "title": "Performance profile source manifest field is mislabeled"
+    }
+  ],
+  "formatVersion": 1,
+  "limitations": [
+    "Review checks establish late-result rejection, not preemptive native-call wall control.",
+    "No new all-twelve-report source validation was run; prior exact-equivalence checks remain prior evidence, and current profile explicitly does not establish gate acceptance.",
+    "The failed exploratory inventory check initially treated prefixed protected-map keys as literal paths and stopped with FileNotFoundError before source reconstruction; subsequent complete protected-map reconstruction and topology checks passed."
+  ],
+  "personallyRunChecks": [
+    {
+      "command": "pipeline/.venv/Scripts/python.exe -B -m pytest -p no:cacheprovider tests/test_road_surface_validation_transition_v2.py tests/test_road_surface_validation_v2.py -q (cwd pipeline)",
+      "result": "37 passed in 2.16s"
+    },
+    {
+      "command": "Ruff check and format --check --no-cache on v2 validator, transition module, runner, both profile scripts, both v2 test modules",
+      "result": "passed; 7 files formatted"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed, existing CRLF warnings only"
+    },
+    {
+      "command": "independent in-memory synthetic actual patched validator dispatch; code filename under workspace; no file or source solve",
+      "proof": {
+        "all12GatesUnavailableDeadline": true,
+        "invocationT0": 100.0,
+        "lateLineNeverExecuted": true,
+        "observed": {
+          "entered": true
+        },
+        "passes": false,
+        "syntheticCode": "def validator(*args,**kwargs):\n    observed[\"entered\"] = True\n    clock.now = 226.0\n    observed[\"late_line_executed\"] = True\n    raise AssertionError(\"late line executed\")\n",
+        "traceRestoredToNone": true,
+        "validationComplete": false,
+        "validationCutoff": 225.0
+      },
+      "result": "PASS"
+    },
+    {
+      "command": "independent canonical inventory reconstruction from both raw trial directories",
+      "result": "all 10 files per trial match profile before/after maps and 2411-byte canonical artifact SHA 9e9c9d083014dd2649fc2b4d284a235423358466b6e91b3d07959c2369f5d8d6"
+    },
+    {
+      "command": "current static bindings/runtime code map/protected source and release snapshot reconstruction",
+      "result": "static bindings passed; runtime map matches profile; all 36 protected entries match profile before/after"
+    },
+    {
+      "command": "read-only exact flip-05 mesh reconstruction from pinned source and accepted preview; no solve",
+      "result": "vertices XZ Float64, base heights Float32 and triangle UInt32 buffers byte-identical; candidate Float32 witness and accepted preview hashes exact"
+    }
+  ],
+  "preservation": {
+    "noActivation": true,
+    "noCandidateOutputExists": true,
+    "noCodeConfigCheckpointEdits": true,
+    "noConsumedEvidenceWrites": true,
+    "noSolverOrTrialRun": true,
+    "onlyNewReviewArtifactWritten": true
+  },
+  "profileMethodology": {
+    "assemblyConditionalPathSeconds": 0.40101659996435046,
+    "candidateAcceptanceEvidence": false,
+    "classification": "timing_only_no_gate_acceptance",
+    "completeProjectedEndToEndMeasured": false,
+    "directUntracedReclipAndAssembly": true,
+    "fullValidatorTracingOverheadMeasured": false,
+    "independentCompleteTimingProfileRun": false,
+    "realRoadReclipSeconds": 26.23003289999906,
+    "sha256Verified": true,
+    "syntheticGateFlagsAndBorrowedRoad05QaDisclosed": true,
+    "timingsNotIndependentlyRerun": "Input bytes and methodology independently verified, not timing measurements; no solver/trial was run."
+  },
+  "reviewer": "independent Sol 6.1 medium",
+  "scope": "Luna fix 4 validation transition v2, read-only review before any trial",
+  "verdict": "FIX REQUIRED"
+}

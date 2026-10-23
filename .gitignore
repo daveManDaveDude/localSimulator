@@ -14,6 +14,7 @@ data/generated/
 public/worlds/torquay-poc-001/
 public/worlds/torquay-poc-001-2km/
 public/worlds/torquay-road-surface-preview/
+public/worlds/torquay-road-surface-teignmouth-candidate/
 /.torquay-poc-001-2km.stage-*
 
 # Local environment and editor files
@@ -22,6 +23,9 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 pipeline/.venv/
+/.codex/evidence/teignmouth-road-surface-fix3/
+/.codex/evidence/teignmouth-road-surface-fix4/
+/.codex/evidence/teignmouth-topology-study/
 .env
 .env.*
 !.env.example

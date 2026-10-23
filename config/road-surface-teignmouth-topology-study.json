@@ -1,0 +1,99 @@
+{
+  "format_version": 1,
+  "study_id": "teignmouth-topology-refinement-2026-10-23",
+  "release_id": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "candidate_base_config": {
+    "path": "config/road-surface-teignmouth-candidate.json",
+    "sha256": "0616b0584cfc2d9043dd0b0e8c81926a45487e456855ab9375ce0878c6412140"
+  },
+  "accepted_preview": {
+    "manifest.json": "9a3cb6c08fb57a19f94e1215ac526b1baf28634d38be1ffc7d4ed61f2de7c6f7",
+    "heightfield.f32": "037a74320557088135e0885386c24fdcdea6171469db1d6329c3e82997f5c1e9",
+    "qa.json": "43d7058a339416d308be09292598949d3d97f4b764a147ccc2d5fb771d434f20"
+  },
+  "replacement_cells": {
+    "first_row": 432,
+    "first_column": 409,
+    "row_count": 41,
+    "column_count": 42,
+    "cell_spacing_m": 2.0
+  },
+  "target": {
+    "way_id": 78455395,
+    "part_index": 0,
+    "station_start_m": 140.0,
+    "station_end_m": 155.0,
+    "width_m": 6.0,
+    "anchor_station_m": 148.15104603556912,
+    "anchor_xz": [-139.6017351396, -95.8223807515],
+    "maximum_station_spacing_m": 1.0,
+    "maximum_lateral_spacing_m": 0.25
+  },
+  "run_policy": {
+    "maximum_iterations": 2000,
+    "maximum_wall_seconds": 120.0,
+    "tolerance_m": 0.00002,
+    "write_once": true,
+    "retry_allowed": false,
+    "raw_evidence_directory": ".codex/evidence/teignmouth-topology-study",
+    "durable_evidence_directory": "docs/milestones/artifacts/Road-surface-treatment/teignmouth-topology-study"
+  },
+  "topology_variants": [
+    {
+      "trial_id": "flip-05",
+      "stage": 1,
+      "method": "deterministic alternate diagonal flips inside the fixed deformation influence; keep all existing vertices and all faces outside influence"
+    },
+    {
+      "trial_id": "road-05",
+      "stage": 1,
+      "method": "road centerline, configured ribbon boundary, station-normal sections at 0.5 m and lateral nodes at 0.5 m, noded with the existing source mesh and influence boundary"
+    },
+    {
+      "trial_id": "collar-05",
+      "stage": 1,
+      "method": "road-aligned core with nested conforming collar boundaries at 0.5 m, 1 m and 2 m"
+    },
+    {
+      "trial_id": "local-025",
+      "stage": 2,
+      "nominal_spacing_m": 0.25,
+      "method": "best completed road-aligned topology refined in the complete ribbon and one-source-cell support zone clipped to influence"
+    },
+    {
+      "trial_id": "local-0125",
+      "stage": 3,
+      "nominal_spacing_m": 0.125,
+      "method": "same selected road-aligned topology and refinement zone as local-025"
+    }
+  ],
+  "refinement_policy": {
+    "zone": "complete configured ribbon plus one original source cell, clipped to the existing influence",
+    "grid_origin": "global zero-multiple of the declared spacing",
+    "base_selection": "road-05 or collar-05 with the lowest finite maximum normalized local, global terrain, and building gate ratio; ties prefer road-05",
+    "stage_2_requires_all_topology_trials_failed": true,
+    "stage_3_requires_local_025_failed": true
+  },
+  "resource_limits": {
+    "replacement_terrain_and_road_triangles": 250000,
+    "vertices": 150000,
+    "added_draw_calls": 4,
+    "runtime_asset_bytes": 8388608,
+    "manifest_bytes": 262144,
+    "qa_bytes": 524288,
+    "added_resident_geometry_bytes": 16777216,
+    "peak_construction_bytes": 67108864
+  },
+  "raw_trial_files": [
+    "attempt.json",
+    "topology.json",
+    "constraints.json",
+    "candidate-heights.f32",
+    "patch-vertices-xz.f64",
+    "patch-base-heights.f32",
+    "patch-triangles.u32",
+    "solver-phase.json",
+    "offline-aggregate.json",
+    "certificate-verification.json"
+  ]
+}

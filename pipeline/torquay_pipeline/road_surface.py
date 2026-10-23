@@ -56,6 +56,17 @@ PROFILE_WAY_IDS = (78455388, 78455395, 30480989, 1363931058, 30482119, 30482121,
 SEVERE_CORRIDOR_WAY_IDS = (30480989, 78455388, 78455395)
 SEVERE_CROSSFALL_NUMERICAL_MARGIN_M = 0.001
 FALLBACK_MIN_CONNECTED_AREA_M2 = 8.0
+TEIGNMOUTH_CANDIDATE_VARIANT = "teignmouth-circled-segment"
+TEIGNMOUTH_CANDIDATE_OUTPUT = "public/worlds/torquay-road-surface-teignmouth-candidate"
+TEIGNMOUTH_WAY_ID = 78455395
+TEIGNMOUTH_PART_INDEX = 0
+TEIGNMOUTH_STATION_START_M = 140.0
+TEIGNMOUTH_STATION_END_M = 155.0
+TEIGNMOUTH_CROSSFALL_LIMIT_PERCENT = 5.0
+TEIGNMOUTH_WIDTH_SPAN_LIMIT_M = 0.30
+# Leave deterministic float32/solver headroom beneath the inclusive preview gates.
+TEIGNMOUTH_SOLVER_HEADROOM_M = 0.0001
+TEIGNMOUTH_MAX_PROJECTION_ITERATIONS = 2000
 
 
 class RoadSurfaceError(ValueError):
@@ -74,6 +85,7 @@ class PreviewConfig:
     fallback_added_gradient_m_per_m: float
     fallback_minimum_region_area_m2: float
     fallback_fade_distance_m: float
+    treatment_variant: str = "accepted-preview"
 
 
 @dataclass(frozen=True)
@@ -141,6 +153,7 @@ class ReleaseInputs:
     origin_y_m: float
     buildings: dict[str, Any]
     source_hashes: dict[str, dict[str, Any]]
+    accepted_preview_qa: dict[str, Any] | None = None
 
 
 def load_config(path: Path) -> PreviewConfig:
@@ -162,15 +175,22 @@ def load_config(path: Path) -> PreviewConfig:
         "fallback_minimum_region_area_m2",
         "fallback_fade_distance_m",
     }
-    if not isinstance(raw, dict) or set(raw) != expected:
+    candidate_shape = expected | {"treatment_variant"}
+    if not isinstance(raw, dict) or set(raw) not in (expected, candidate_shape):
         raise RoadSurfaceError("preview config has an invalid object shape")
+    treatment_variant = raw.get("treatment_variant", "accepted-preview")
+    expected_output = {
+        "accepted-preview": "public/worlds/torquay-road-surface-preview",
+        TEIGNMOUTH_CANDIDATE_VARIANT: TEIGNMOUTH_CANDIDATE_OUTPUT,
+    }.get(treatment_variant)
     if (
         raw["format_version"] != 1
         or raw["release_id"] != CURRENT_RELEASE_ID
-        or raw["output_directory"] != "public/worlds/torquay-road-surface-preview"
+        or raw["output_directory"] != expected_output
         or raw["transition_distance_factor"] != 1.0
+        or ("treatment_variant" in raw) != (treatment_variant != "accepted-preview")
     ):
-        raise RoadSurfaceError("preview config does not match the accepted pinned output policy")
+        raise RoadSurfaceError("preview config does not match an exact pinned output policy")
     for name in (
         "ambiguity_distance_m",
         "ambiguity_height_difference_m",
@@ -199,6 +219,7 @@ def load_config(path: Path) -> PreviewConfig:
         fallback_added_gradient_m_per_m=float(raw["fallback_added_gradient_m_per_m"]),
         fallback_minimum_region_area_m2=float(raw["fallback_minimum_region_area_m2"]),
         fallback_fade_distance_m=float(raw["fallback_fade_distance_m"]),
+        treatment_variant=treatment_variant,
     )
 
 
@@ -244,16 +265,28 @@ def _paths_overlap(first: Path, second: Path) -> bool:
         return False
 
 
-def guard_output_directory(project_root: Path, requested: Path, protected: list[Path]) -> Path:
+def guard_output_directory(
+    project_root: Path,
+    requested: Path,
+    protected: list[Path],
+    *,
+    owned_files: frozenset[str] = OUTPUT_FILES,
+) -> Path:
     """Guard the exact owned derivative directory before creating or replacing files."""
     project_root = project_root.resolve()
-    expected = project_root / "public/worlds/torquay-road-surface-preview"
+    expected_outputs = {
+        project_root / "public/worlds/torquay-road-surface-preview",
+        project_root / TEIGNMOUTH_CANDIDATE_OUTPUT,
+    }
     candidate = requested if requested.is_absolute() else project_root / requested
     _assert_no_reparse_components(candidate)
     resolved = candidate.resolve(strict=False)
-    if os.path.normcase(str(resolved)) != os.path.normcase(str(expected)):
+    if not any(
+        os.path.normcase(str(resolved)) == os.path.normcase(str(expected))
+        for expected in expected_outputs
+    ):
         raise RoadSurfaceError(
-            "output directory must be exactly public/worlds/torquay-road-surface-preview"
+            "output directory must be exactly one of the exact allowlisted derivative paths"
         )
     _assert_no_reparse_components(project_root / "public/worlds")
     _assert_no_reparse_components(resolved)
@@ -264,7 +297,7 @@ def guard_output_directory(project_root: Path, requested: Path, protected: list[
         raise RoadSurfaceError("output directory exists but is not a directory")
     if resolved.is_dir():
         for child in resolved.iterdir():
-            if child.name not in OUTPUT_FILES or child.is_dir() or _is_reparse_point(child):
+            if child.name not in owned_files or child.is_dir() or _is_reparse_point(child):
                 raise RoadSurfaceError(
                     f"output directory contains an unowned or unsafe entry: '{child.name}'"
                 )
@@ -280,9 +313,13 @@ def _protected_execution_inputs(project_root: Path) -> list[Path]:
         project_root / "docs/asset-contract.md",
         project_root / "docs/milestones/Road-alignment.md",
         project_root / "docs/milestones/Road-surface-treatment-spec.md",
+        project_root / "docs/milestones/Road-surface-treatment-teignmouth-spec.md",
         project_root / "config/road-surface-preview.json",
+        project_root / "config/road-surface-teignmouth-candidate.json",
         project_root / "scripts/build-road-surface-preview.py",
         project_root / "pipeline/torquay_pipeline/road_surface.py",
+        project_root / "pipeline/torquay_pipeline/road_surface_patch.py",
+        project_root / "pipeline/tests/test_road_surface_patch.py",
         project_root / "data/source-manifest.json",
         project_root / "data/raw/ea_dtm",
         project_root / "public/worlds/torquay-poc-001-2km",
@@ -2126,6 +2163,17 @@ def _grade_grid(
     """Apply nearest-road anchored cross sections and retain ground in conflicts."""
     rows, columns = baseline.shape
     half_width, half_depth = width_m / 2, depth_m / 2
+    configured_shoulder_intervals: dict[tuple[int, int], list[tuple[float, float]]] = {}
+    if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT:
+        configured_shoulder_intervals[(TEIGNMOUTH_WAY_ID, TEIGNMOUTH_PART_INDEX)] = [
+            (TEIGNMOUTH_STATION_START_M, TEIGNMOUTH_STATION_END_M)
+        ]
+    effective_shoulder_intervals = {
+        group: list(intervals) for group, intervals in (expanded_shoulder_intervals or {}).items()
+    }
+    for group, intervals in configured_shoulder_intervals.items():
+        existing = effective_shoulder_intervals.setdefault(group, [])
+        existing.extend(interval for interval in intervals if interval not in existing)
     tiles: dict[tuple[int, int], list[int]] = {}
     triangle_owner_segments, triangle_owner_is_core, core_conflict_seeds = (
         _carriageway_triangle_owners(
@@ -2139,7 +2187,7 @@ def _grade_grid(
     )
     for segment_index, segment in enumerate(segments):
         group = (segment.way_id, segment.sort_key[1])
-        widened = bool(expanded_shoulder_intervals and group in expanded_shoulder_intervals)
+        widened = bool(effective_shoulder_intervals and group in effective_shoulder_intervals)
         radius = segment.influence_m + config.ambiguity_distance_m
         if widened:
             radius = max(radius, segment.width_m / 2 + 32.0)
@@ -2191,9 +2239,9 @@ def _grade_grid(
                             projection.station_m,
                             spacing_m,
                             config,
-                            expanded_shoulder_intervals,
+                            effective_shoulder_intervals,
                         )
-                        if expanded_shoulder_intervals and group in expanded_shoulder_intervals
+                        if effective_shoulder_intervals and group in effective_shoulder_intervals
                         else segment.influence_m - segment.width_m / 2
                     )
                     active_extent = segment.width_m / 2 + transition
@@ -2307,7 +2355,7 @@ def _grade_grid(
                     nearest.station_m,
                     spacing_m,
                     config,
-                    expanded_shoulder_intervals,
+                    effective_shoulder_intervals,
                 )
                 if half_road < nearest.distance_m < half_road + transition:
                     transition_mask[row, column] = True
@@ -2410,10 +2458,17 @@ def _grade_grid(
                     }
                 )
         if expansion_points:
-            intervals = {
+            generated_intervals = {
                 group: [(min(stations), max(stations))]
                 for group, stations in expansion_points.items()
             }
+            intervals = {
+                group: list(values) for group, values in configured_shoulder_intervals.items()
+            }
+            for group, values in generated_intervals.items():
+                intervals.setdefault(group, []).extend(
+                    value for value in values if value not in intervals.get(group, [])
+                )
             final_grid, final_report = _grade_grid(
                 baseline,
                 segments,
@@ -2425,7 +2480,7 @@ def _grade_grid(
                 inputs,
             )
             for group, (start_station, end_station) in sorted(
-                (group, values[0]) for group, values in intervals.items()
+                (group, values[0]) for group, values in generated_intervals.items()
             ):
                 shoulder_expansion_regions.append(
                     {
@@ -2600,6 +2655,23 @@ def _grade_grid(
             "coreRoadOwnsOverlappingShoulders": True,
         },
     }
+    if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT:
+        report["teignmouthCandidateShoulder"] = {
+            "wayId": TEIGNMOUTH_WAY_ID,
+            "partIndex": TEIGNMOUTH_PART_INDEX,
+            "stationStartM": TEIGNMOUTH_STATION_START_M,
+            "stationEndM": TEIGNMOUTH_STATION_END_M,
+            "baseTransitionBeyondConfiguredHalfWidthM": max(6.0, 2 * spacing_m),
+            "maximumTransitionBeyondConfiguredHalfWidthM": 32.0,
+            "alongRoadFadeBeyondStationWindowM": config.fallback_fade_distance_m,
+            "blend": (
+                "existing cubic smoothstep from base to 32 m over the configured along-road fade"
+            ),
+            "reason": (
+                "local shared-surface shoulder support for registered "
+                "Teignmouth full-width controls"
+            ),
+        }
     return output, report
 
 
@@ -3465,6 +3537,240 @@ def _severe_station_crossfall_constraints(
     }
 
 
+def _teignmouth_registered_stations(
+    inputs: ReleaseInputs,
+) -> tuple[dict[str, Any], list[list[float]], float, list[float]]:
+    """Return the registered Teignmouth station set, including every source vertex."""
+    matches = [
+        feature
+        for feature in inputs.road_payload.get("features", [])
+        if isinstance(feature, dict) and feature.get("source", {}).get("osmId") == TEIGNMOUTH_WAY_ID
+    ]
+    if len(matches) != 1:
+        raise RoadSurfaceError(
+            f"Teignmouth candidate requires exactly one source way {TEIGNMOUTH_WAY_ID}"
+        )
+    feature = matches[0]
+    raw_parts = feature.get("centerlinePartsXZ", [])
+    if len(raw_parts) <= TEIGNMOUTH_PART_INDEX:
+        raise RoadSurfaceError("Teignmouth candidate source part 0 is missing")
+    part = [[float(point[0]), float(point[1])] for point in raw_parts[TEIGNMOUTH_PART_INDEX]]
+    width_m = float(feature.get("estimatedWidthM", 0.0))
+    if not math.isclose(width_m, 6.0, rel_tol=0.0, abs_tol=1e-9):
+        raise RoadSurfaceError(
+            f"Teignmouth candidate expected the unchanged configured 6 m width; found {width_m:g} m"
+        )
+    cumulative = [0.0]
+    for first, second in zip(part, part[1:], strict=False):
+        cumulative.append(cumulative[-1] + math.dist(first, second))
+    if cumulative[-1] < TEIGNMOUTH_STATION_END_M:
+        raise RoadSurfaceError("Teignmouth candidate station interval is outside source part 0")
+    # The regular <=1 m lattice bounds all gaps; add exact source vertices and the
+    # registered user-view worst section without dropping either class of sample.
+    count = math.ceil(TEIGNMOUTH_STATION_END_M - TEIGNMOUTH_STATION_START_M)
+    stations = {
+        TEIGNMOUTH_STATION_START_M
+        + (TEIGNMOUTH_STATION_END_M - TEIGNMOUTH_STATION_START_M) * index / count
+        for index in range(count + 1)
+    }
+    stations.update(
+        station
+        for station in cumulative
+        if TEIGNMOUTH_STATION_START_M <= station <= TEIGNMOUTH_STATION_END_M
+    )
+    stations.add(148.15104603556912)
+    ordered = sorted(stations)
+    if ordered[0] != TEIGNMOUTH_STATION_START_M or ordered[-1] != TEIGNMOUTH_STATION_END_M:
+        raise RoadSurfaceError("Teignmouth candidate station coverage omitted a window endpoint")
+    if max(np.diff(ordered), default=0.0) > 1.0 + 1e-9:
+        raise RoadSurfaceError("Teignmouth candidate station spacing exceeds 1 m")
+    return feature, part, width_m, ordered
+
+
+def _teignmouth_section_samples(
+    inputs: ReleaseInputs,
+    baseline: np.ndarray,
+    spacing_m: float,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Build renderer-triangle samples and ≤5%/≤0.30 m local halfspaces."""
+    _feature, part, width_m, stations = _teignmouth_registered_stations(inputs)
+    lateral_step_m = 0.25
+    lateral_count_float = width_m / lateral_step_m
+    lateral_count = round(lateral_count_float)
+    if not math.isclose(lateral_count_float, lateral_count, rel_tol=0.0, abs_tol=1e-9):
+        raise RoadSurfaceError("configured Teignmouth width is not divisible by 0.25 m")
+
+    constraints: list[dict[str, Any]] = []
+    constraint_signatures: set[tuple[Any, ...]] = set()
+    sample_records = []
+    slope_limit_m = (
+        TEIGNMOUTH_CROSSFALL_LIMIT_PERCENT / 100.0 * lateral_step_m - TEIGNMOUTH_SOLVER_HEADROOM_M
+    )
+
+    def add_constraint(
+        coefficients: dict[int, float],
+        limit_m: float,
+        label: dict[str, Any],
+    ) -> None:
+        indices = np.asarray(sorted(coefficients), dtype=np.int64)
+        values = np.asarray([coefficients[index] for index in indices], dtype=np.float64)
+        keep = np.abs(values) > 1e-15
+        indices, values = indices[keep], values[keep]
+        if indices.size == 0:
+            raise RoadSurfaceError(
+                "Teignmouth cross-section constraint has no active grid vertices"
+            )
+        signature = (
+            round(limit_m, 12),
+            tuple(
+                (int(index), round(float(value), 12))
+                for index, value in zip(indices, values, strict=True)
+            ),
+        )
+        if signature in constraint_signatures:
+            return
+        constraint_signatures.add(signature)
+        constraints.append(
+            {"indices": indices, "coefficients": values, "limitM": limit_m, "label": label}
+        )
+
+    for station_m in stations:
+        (center_x, center_z), tangent = _line_point_tangent(part, station_m)
+        normal_x, normal_z = -tangent[1], tangent[0]
+        lateral_samples: list[dict[int, float]] = []
+        baseline_heights = []
+        for lateral_index in range(lateral_count + 1):
+            offset_m = -width_m / 2 + lateral_index * lateral_step_m
+            x = center_x + normal_x * offset_m
+            z = center_z + normal_z * offset_m
+            weights = dict(_active_triangle_vertex_weights(baseline, x, z, spacing_m))
+            lateral_samples.append(weights)
+            baseline_heights.append(
+                sum(float(baseline.ravel()[vertex]) * weight for vertex, weight in weights.items())
+            )
+        baseline_slopes = [
+            abs(second - first) / lateral_step_m * 100.0
+            for first, second in zip(baseline_heights, baseline_heights[1:], strict=False)
+        ]
+        section = {
+            "stationM": float(station_m),
+            "baselineMaximumAbsoluteLateralSlopePercent": max(baseline_slopes, default=0.0),
+            "baselineEndpointSpanM": abs(baseline_heights[-1] - baseline_heights[0]),
+        }
+        sample_records.append(section)
+        for lateral_index, (first, second) in enumerate(
+            zip(lateral_samples, lateral_samples[1:], strict=False)
+        ):
+            difference = dict(second)
+            for vertex, weight in first.items():
+                difference[vertex] = difference.get(vertex, 0.0) - weight
+            label = {
+                "kind": "teignmouth-local-lateral-slope",
+                "wayId": TEIGNMOUTH_WAY_ID,
+                "partIndex": TEIGNMOUTH_PART_INDEX,
+                "stationM": float(station_m),
+                "lateralOffsetStartM": float(-width_m / 2 + lateral_index * lateral_step_m),
+                "sampleSpacingM": lateral_step_m,
+                "limitPercent": TEIGNMOUTH_CROSSFALL_LIMIT_PERCENT,
+            }
+            add_constraint(difference, slope_limit_m, {**label, "direction": "increasing-offset"})
+            add_constraint(
+                {vertex: -weight for vertex, weight in difference.items()},
+                slope_limit_m,
+                {**label, "direction": "decreasing-offset"},
+            )
+    return constraints, {
+        "wayId": TEIGNMOUTH_WAY_ID,
+        "partIndex": TEIGNMOUTH_PART_INDEX,
+        "stationStartM": TEIGNMOUTH_STATION_START_M,
+        "stationEndM": TEIGNMOUTH_STATION_END_M,
+        "configuredWidthM": width_m,
+        "maximumStationSpacingM": max(np.diff(stations), default=0.0),
+        "stationCount": len(stations),
+        "sampleSpacingAcrossWidthM": lateral_step_m,
+        "samplesPerSection": lateral_count + 1,
+        "maximumAbsoluteLateralSlopePercent": TEIGNMOUTH_CROSSFALL_LIMIT_PERCENT,
+        "maximumEndpointSpanM": TEIGNMOUTH_WIDTH_SPAN_LIMIT_M,
+        "endpointSpanGateImpliedBySlopeHalfspaces": True,
+        "derivedMaximumEndpointSpanM": lateral_count * slope_limit_m,
+        "solverHeadroomM": TEIGNMOUTH_SOLVER_HEADROOM_M,
+        "constraintCount": len(constraints),
+        "constraintDeduplication": "identical sparse halfspaces collapsed per registered section",
+        "baselineSections": sample_records,
+        "interpolation": "renderer fixed-diagonal triangle barycentric weights",
+    }
+
+
+def _teignmouth_section_metrics(
+    inputs: ReleaseInputs,
+    baseline: np.ndarray,
+    preview: np.ndarray,
+    spacing_m: float,
+) -> dict[str, Any]:
+    """Measure candidate crossfall on the exact registered 1 m × 0.25 m lattice."""
+    _feature, part, width_m, stations = _teignmouth_registered_stations(inputs)
+    lateral_step_m = 0.25
+    lateral_count = round(width_m / lateral_step_m)
+    sections = []
+    for station_m in stations:
+        (center_x, center_z), tangent = _line_point_tangent(part, station_m)
+        normal_x, normal_z = -tangent[1], tangent[0]
+        values = {"baseline": [], "preview": []}
+        for index in range(lateral_count + 1):
+            offset = -width_m / 2 + index * lateral_step_m
+            x = center_x + normal_x * offset
+            z = center_z + normal_z * offset
+            values["baseline"].append(_sample_grid(baseline, x, z, spacing_m))
+            values["preview"].append(_sample_grid(preview, x, z, spacing_m))
+        baseline_slopes = [
+            abs(second - first) / lateral_step_m * 100.0
+            for first, second in zip(values["baseline"], values["baseline"][1:], strict=False)
+        ]
+        preview_slopes = [
+            abs(second - first) / lateral_step_m * 100.0
+            for first, second in zip(values["preview"], values["preview"][1:], strict=False)
+        ]
+        sections.append(
+            {
+                "stationM": float(station_m),
+                "baselineMaximumAbsoluteLateralSlopePercent": max(baseline_slopes, default=0.0),
+                "previewMaximumAbsoluteLateralSlopePercent": max(preview_slopes, default=0.0),
+                "baselineEndpointSpanM": abs(values["baseline"][-1] - values["baseline"][0]),
+                "previewEndpointSpanM": abs(values["preview"][-1] - values["preview"][0]),
+                "centerlineDeviationM": abs(
+                    _sample_grid(preview, center_x, center_z, spacing_m)
+                    - _sample_grid(baseline, center_x, center_z, spacing_m)
+                ),
+            }
+        )
+    max_slope = max(item["previewMaximumAbsoluteLateralSlopePercent"] for item in sections)
+    max_span = max(item["previewEndpointSpanM"] for item in sections)
+    max_centerline = max(item["centerlineDeviationM"] for item in sections)
+    return {
+        "wayId": TEIGNMOUTH_WAY_ID,
+        "partIndex": TEIGNMOUTH_PART_INDEX,
+        "stationStartM": TEIGNMOUTH_STATION_START_M,
+        "stationEndM": TEIGNMOUTH_STATION_END_M,
+        "configuredWidthM": width_m,
+        "maximumStationSpacingM": max(np.diff(stations), default=0.0),
+        "sampleSpacingAcrossWidthM": lateral_step_m,
+        "samplesPerSection": lateral_count + 1,
+        "maximumAbsoluteLateralSlopePercentLimit": TEIGNMOUTH_CROSSFALL_LIMIT_PERCENT,
+        "maximumObservedAbsoluteLateralSlopePercent": max_slope,
+        "maximumEndpointSpanM": TEIGNMOUTH_WIDTH_SPAN_LIMIT_M,
+        "maximumObservedEndpointSpanM": max_span,
+        "centerlineDeviationLimitM": 0.10,
+        "maximumCenterlineDeviationM": max_centerline,
+        "allStationsPass": bool(
+            max_slope <= TEIGNMOUTH_CROSSFALL_LIMIT_PERCENT + 1e-6
+            and max_span <= TEIGNMOUTH_WIDTH_SPAN_LIMIT_M + 1e-6
+            and max_centerline <= 0.10 + 1e-6
+        ),
+        "sections": sections,
+        "interpolation": "renderer fixed-diagonal triangle barycentric sampling",
+    }
+
+
 def _surface_control_vertices(
     inputs: ReleaseInputs, candidate: np.ndarray
 ) -> tuple[np.ndarray, list[tuple[float, float]], dict[str, Any]]:
@@ -4216,6 +4522,14 @@ def _project_grid_edge_constraints(
             if maximum_violation <= tolerance_m:
                 break
     if maximum_violation > tolerance_m:
+        residual_x = np.abs(np.diff(projected, axis=1)) - edge_limit_x
+        residual_z = np.abs(np.diff(projected, axis=0)) - edge_limit_z
+        edge_x_index = np.unravel_index(int(np.argmax(residual_x)), residual_x.shape)
+        edge_z_index = np.unravel_index(int(np.argmax(residual_z)), residual_z.shape)
+        fixed_residual = (
+            float(np.max(np.abs(projected[fixed] - fixed_values[fixed]))) if np.any(fixed) else 0.0
+        )
+        node_residual = float(np.max(np.maximum(lower - projected, projected - upper)))
         remaining_linear_violations = [
             float(np.dot(item["coefficients"], projected.ravel()[item["indices"]]) - item["limitM"])
             for item in linear_constraints
@@ -4233,8 +4547,11 @@ def _project_grid_edge_constraints(
         )
         raise RoadSurfaceError(
             "strict final-surface projection did not converge within "
-            f"{maximum_iterations} iterations; maximum residual is {maximum_violation:.6f} m; "
-            f"worst severe-station constraint is {worst_linear}"
+            f"{maximum_iterations} iterations; maximum residual is {maximum_violation:.6f} m "
+            f"(edgeX={float(residual_x[edge_x_index]):.6f} at {edge_x_index}, "
+            f"edgeZ={float(residual_z[edge_z_index]):.6f} at {edge_z_index}, "
+            f"fixed={fixed_residual:.6f}, node={node_residual:.6f}); "
+            f"worst linear constraint is {worst_linear}"
         )
     output = projected.astype("<f4")
     output_violation = max(
@@ -4321,8 +4638,15 @@ def _project_final_surface(
     severe_constraints, severe_constraint_report = _severe_station_crossfall_constraints(
         inputs, baseline, spacing_m, harm_fallback
     )
+    teignmouth_constraint_report = None
+    teignmouth_constraints: list[dict[str, Any]] = []
+    if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT:
+        teignmouth_constraints, teignmouth_constraint_report = _teignmouth_section_samples(
+            inputs, baseline, spacing_m
+        )
+    projection_constraints = severe_constraints + teignmouth_constraints
     constrained_station_vertices = np.zeros_like(controls)
-    for constraint in severe_constraints:
+    for constraint in projection_constraints:
         constrained_station_vertices.ravel()[constraint["indices"]] = True
     initial_buildings = _building_base_report(inputs, candidate)
     building_limit = 2.424
@@ -4371,7 +4695,12 @@ def _project_final_surface(
             adjustable,
             pinned_mask,
             pinned_values,
-            linear_constraints=severe_constraints,
+            maximum_iterations=(
+                TEIGNMOUTH_MAX_PROJECTION_ITERATIONS
+                if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT
+                else 500
+            ),
+            linear_constraints=projection_constraints,
         )
         new_centerline_pins, centerline_report = _centerline_retention_vertices(
             centerline_positions, baseline, projected, spacing_m
@@ -4410,6 +4739,26 @@ def _project_final_surface(
         )
 
     assert projection_report is not None and final_buildings is not None
+    teignmouth_metrics = None
+    if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT:
+        teignmouth_metrics = _teignmouth_section_metrics(inputs, baseline, projected, spacing_m)
+        if not teignmouth_metrics["allStationsPass"]:
+            worst_slope = max(
+                teignmouth_metrics["sections"],
+                key=lambda item: item["previewMaximumAbsoluteLateralSlopePercent"],
+            )
+            worst_span = max(
+                teignmouth_metrics["sections"],
+                key=lambda item: item["previewEndpointSpanM"],
+            )
+            raise RoadSurfaceError(
+                "strict Teignmouth local shared-surface gate failed: "
+                f"maxSlope={teignmouth_metrics['maximumObservedAbsoluteLateralSlopePercent']:.6f}% "
+                f"at station {worst_slope['stationM']:.6f} m, "
+                f"maxSpan={teignmouth_metrics['maximumObservedEndpointSpanM']:.6f} m "
+                f"at station {worst_span['stationM']:.6f} m, "
+                f"centerlineMax={teignmouth_metrics['maximumCenterlineDeviationM']:.6f} m"
+            )
     gradient = _terrain_gradient_change_summary(
         baseline64, projected.astype(np.float64), spacing_m, inputs.width_m, inputs.depth_m
     )
@@ -4470,6 +4819,15 @@ def _project_final_surface(
             "centerlineProfileConstraint": centerline_report,
             "strictCorridorMetrics": corridor_metrics,
             "terrainGradientChange": gradient,
+            "teignmouthLocalCrossfall": (
+                {
+                    **teignmouth_constraint_report,
+                    **teignmouth_metrics,
+                    "constraintCount": len(teignmouth_constraints),
+                }
+                if teignmouth_metrics is not None and teignmouth_constraint_report is not None
+                else None
+            ),
             "policy": (
                 "preview-only deterministic projection: preserve active centerline and registered "
                 "Parkfield sample stencils; pin only buildings exceeding accepted base-shift caps; "
@@ -5157,10 +5515,16 @@ def build_preview(
     project_root = project_root.resolve()
     execution_record_path = _preflight_execution_record(project_root, execution_record)
     release_root = project_root / "public/worlds/torquay-poc-001-2km/releases" / config.release_id
+    protected_output_inputs = [
+        project_root / "public/worlds/torquay-poc-001-2km",
+        release_root,
+    ]
+    if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT:
+        protected_output_inputs.append(project_root / "public/worlds/torquay-road-surface-preview")
     output_directory = guard_output_directory(
         project_root,
         project_root / config.output_directory,
-        [project_root / "public/worlds/torquay-poc-001-2km", release_root],
+        protected_output_inputs,
     )
     inputs = load_release_inputs(project_root, config)
     segments = _segments_from_payload(
@@ -5341,6 +5705,11 @@ def build_preview(
             ),
         ],
     }
+    if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT:
+        qa["treatmentVariant"] = TEIGNMOUTH_CANDIDATE_VARIANT
+        qa["teignmouthLocalAcceptance"] = grid_report["finalSurfaceProjection"][
+            "teignmouthLocalCrossfall"
+        ]
     qa_bytes = _canonical_json(_safe_float(qa))
     qa_hash = hashlib.sha256(qa_bytes).hexdigest()
     manifest = {
@@ -5406,7 +5775,12 @@ def build_preview(
             raise RoadSurfaceError(
                 f"EA raster comparison input changed during preview generation: '{path}'"
             )
-    protected_output_inputs = [project_root / "public/worlds/torquay-poc-001-2km", release_root]
+    protected_output_inputs = [
+        project_root / "public/worlds/torquay-poc-001-2km",
+        release_root,
+    ]
+    if config.treatment_variant == TEIGNMOUTH_CANDIDATE_VARIANT:
+        protected_output_inputs.append(project_root / "public/worlds/torquay-road-surface-preview")
     guard_output_directory(project_root, output_directory, protected_output_inputs)
     output_directory = _prepare_output_directory(
         project_root, output_directory, protected_output_inputs

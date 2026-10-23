@@ -28,10 +28,14 @@ from torquay_pipeline.road_surface import (
     _sample_grid,
     _segments_from_payload,
     _severe_station_crossfall_constraints,
+    _teignmouth_section_metrics,
+    _teignmouth_section_samples,
     _terrain_gradient_change_summary,
     _topology_node_distances,
     _topology_station_distances,
+    _transition_for_station,
     guard_output_directory,
+    load_config,
 )
 
 
@@ -509,9 +513,15 @@ def test_output_guard_accepts_only_exact_owned_directory_and_rejects_overlap(tmp
     output = worlds / "torquay-road-surface-preview"
     accepted = guard_output_directory(tmp_path, output, [worlds / "torquay-poc-001-2km"])
     assert accepted == output
+    candidate = worlds / "torquay-road-surface-teignmouth-candidate"
+    assert guard_output_directory(tmp_path, candidate, [output]) == candidate
 
     with pytest.raises(RoadSurfaceError, match="exactly"):
         guard_output_directory(tmp_path, worlds / "torquay-poc-001-2km", [])
+    with pytest.raises(RoadSurfaceError, match="exact allowlisted"):
+        guard_output_directory(
+            tmp_path, worlds / "torquay-road-surface-teignmouth-candidate-copy", []
+        )
     with pytest.raises(RoadSurfaceError, match="overlaps protected"):
         guard_output_directory(tmp_path, output, [worlds])
 
@@ -542,6 +552,13 @@ def test_absent_output_directory_is_created_after_guard_and_repeated_prepare_is_
     with pytest.raises(RoadSurfaceError, match="unowned or unsafe"):
         _prepare_output_directory(tmp_path, output, [])
     assert backup.read_bytes() == b"preserve me"
+
+    candidate_output = worlds / "torquay-road-surface-teignmouth-candidate"
+    candidate_prepared = _prepare_output_directory(
+        tmp_path, candidate_output, [output, worlds / "source"]
+    )
+    assert candidate_prepared == candidate_output
+    assert candidate_output.is_dir()
 
 
 def test_builder_creates_absent_approved_output_then_repeats_deterministically(
@@ -620,6 +637,110 @@ def test_builder_creates_absent_approved_output_then_repeats_deterministically(
     second_bytes = {path.name: path.read_bytes() for path in output.iterdir()}
     assert first["outputHashes"] == second["outputHashes"]
     assert first_bytes == second_bytes
+
+
+def test_teignmouth_config_is_bound_to_its_exact_candidate_output(tmp_path: Path) -> None:
+    import json
+
+    project_root = Path(__file__).resolve().parents[2]
+    accepted = load_config(project_root / "config/road-surface-preview.json")
+    candidate_path = project_root / "config/road-surface-teignmouth-candidate.json"
+    candidate = load_config(candidate_path)
+    assert accepted.treatment_variant == "accepted-preview"
+    assert accepted.output_directory == "public/worlds/torquay-road-surface-preview"
+    assert candidate.treatment_variant == "teignmouth-circled-segment"
+    assert candidate.output_directory == "public/worlds/torquay-road-surface-teignmouth-candidate"
+
+    raw = json.loads(candidate_path.read_text(encoding="utf-8"))
+    raw["output_directory"] = "public/worlds/torquay-road-surface-preview"
+    invalid = tmp_path / "invalid-teignmouth-config.json"
+    invalid.write_text(json.dumps(raw), encoding="utf-8")
+    with pytest.raises(RoadSurfaceError, match="exact pinned output policy"):
+        load_config(invalid)
+
+
+def test_teignmouth_registered_full_width_constraints_include_source_vertices_and_anchor() -> None:
+    baseline = np.zeros((301, 301), dtype="<f4")
+    z = np.arange(301, dtype=np.float32) * 2.0 - 300.0
+    baseline[:] = (z[:, None] * 0.6).astype("<f4")
+    inputs = ReleaseInputs(
+        release_root=Path("unused"),
+        release_id="a" * 64,
+        ready_sha256="1" * 64,
+        inventory_sha256="2" * 64,
+        manifest={},
+        manifest_sha256="3" * 64,
+        road_manifest={},
+        road_manifest_sha256="4" * 64,
+        road_payload={
+            "features": [
+                {
+                    "source": {"osmId": 78455395},
+                    "estimatedWidthM": 6.0,
+                    "centerlinePartsXZ": [[[-200.0, 0.0], [-55.5, 0.0], [200.0, 0.0]]],
+                }
+            ]
+        },
+        road_payload_sha256="5" * 64,
+        baseline=baseline,
+        columns=301,
+        rows=301,
+        spacing_m=2.0,
+        width_m=600.0,
+        depth_m=600.0,
+        origin_e_m=0.0,
+        origin_n_m=0.0,
+        origin_y_m=0.0,
+        buildings={"buildings": []},
+        source_hashes={},
+    )
+
+    constraints, report = _teignmouth_section_samples(inputs, baseline, 2.0)
+    assert report["stationStartM"] == 140.0
+    assert report["stationEndM"] == 155.0
+    assert report["maximumStationSpacingM"] <= 1.0
+    assert report["sampleSpacingAcrossWidthM"] == 0.25
+    assert report["samplesPerSection"] == 25
+    assert report["constraintCount"] == len(constraints)
+    assert report["constraintCount"] < report["stationCount"] * 48
+    stations = {section["stationM"] for section in report["baselineSections"]}
+    assert 144.5 in stations  # Exact source vertex station.
+    assert 148.15104603556912 in stations  # Registered worst section.
+    assert (
+        max(
+            item["baselineMaximumAbsoluteLateralSlopePercent"]
+            for item in report["baselineSections"]
+        )
+        > 5
+    )
+
+    flat = np.zeros_like(baseline)
+    metrics = _teignmouth_section_metrics(inputs, baseline, flat, 2.0)
+    assert metrics["allStationsPass"]
+    assert metrics["maximumObservedAbsoluteLateralSlopePercent"] == 0
+    assert metrics["maximumObservedEndpointSpanM"] == 0
+    assert metrics["maximumCenterlineDeviationM"] == 0
+
+
+def test_teignmouth_candidate_shoulder_uses_bounded_smooth_existing_transition() -> None:
+    segment = RoadSegment(
+        sort_key=("way/78455395", 0, 0),
+        way_id=78455395,
+        name="Teignmouth Road",
+        width_m=6.0,
+        first_x=0.0,
+        first_z=0.0,
+        dx=10.0,
+        dz=0.0,
+        length_squared=100.0,
+        influence_m=9.0,
+    )
+    config = _config(fallback_fade_distance_m=32.0)
+    intervals = {(78455395, 0): [(140.0, 155.0)]}
+    assert _transition_for_station(segment, 148.0, 2.0, config, intervals) == 32.0
+    assert _transition_for_station(segment, 187.0, 2.0, config, intervals) == 6.0
+    middle = _transition_for_station(segment, 171.0, 2.0, config, intervals)
+    assert 6.0 < middle < 32.0
 
 
 @pytest.mark.parametrize(
