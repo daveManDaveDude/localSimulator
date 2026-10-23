@@ -1,8 +1,8 @@
 # Road-surface treatment preview — implementation handback
 
-**Updated:** 23 October 2026. **State:** Correction 1 remains historically accepted. The current Correction 2 fix-2 candidate passes the recorded numerical, deterministic-build, and browser gates and is awaiting independent Sol review; it is not yet accepted. The preview remains opt-in and does not change the default route.
+**Updated:** 23 October 2026. **State:** Correction 1 remains historically accepted. Correction 2 is coordinator-accepted for the labelled opt-in `/?roadSurface=preview` after independent Sol PASS on documentation-only Fix 3 commit `503efdd`. Its geometry candidate is commit `bafb17d`. The preview remains opt-in and does not change the default route.
 
-## Correction 2 — Luna fix 2 candidate (independent review pending)
+## Correction 2 — Luna fix 2 candidate (accepted after independent Sol review)
 
 This section records the current candidate after Sol's fix-required review of commit `dadcefc`. It supersedes the initial failing candidate and in-memory diagnostics later in this file. The Python and TypeScript derivative contract is `road-surface-preview-3.0.0`. It protects the full renderer triangle support for road-core samples, resolves chained core conflicts from immutable ownership snapshots, constrains the final display grid against all sampled severe-station cross-sections, signed centerline profiles, grid-edge increases, terrain-change bounds, and building-base limits, and validates the finished grid rather than only the blend mask. Thresholds were not relaxed.
 
@@ -100,7 +100,7 @@ The fix changes the Python derivative/projection and its tests plus issue-owned 
 
 Build 19 and 20 record the same seven current release inputs and three derivative output hashes listed above. Source GIS, package releases, readiness/inventory bytes, accepted reports and AOI state remain unchanged. The ignored local derivative is not part of the issue commit. The prior preservation snapshot discrepancy remains: historical `TMOG-Task-Manager-1.0.1-Setup.exe` is missing from the checkout and was not substituted with the distinct BeamNG installer. `sites/`, BeamNG and `.codex/torquay-plan-implementation.md` are excluded from the issue allowlist.
 
-**Recommendation:** keep this candidate opt-in and send the exact strict QA and visual comparisons to Sol. Do not promote it to `/` or describe Correction 2 as accepted until independent review and coordinator acceptance.
+**Coordinator decision:** accept Correction 2 for the labelled opt-in preview after the independent Sol PASS. Keep `/` source-draped; this acceptance does not authorize default activation, publishing, AOI approval, or any later issue. The visual treatment is an approximation: Parkfield cross-sections flatten clearly in the measured plot, while the in-world road-ribbon silhouette changes more subtly.
 
 ## Correction 2 — Luna fix 1 strict outcome
 
