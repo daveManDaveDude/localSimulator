@@ -18,6 +18,16 @@ type RoadSurfaceContext = {
   stationM?: number;
 };
 
+type RoadFeature = {
+  source?: { osmId?: number };
+  centerlinePartsXZ?: number[][][];
+};
+
+type BuildingFeature = {
+  id?: string;
+  geometry?: { polygons?: { exteriorXZ?: number[][] }[] };
+};
+
 type Pose = {
   x: number;
   y: number;
@@ -39,7 +49,7 @@ const previewDirectory = resolve(
 );
 const evidenceDirectory = resolve(
   process.cwd(),
-  'docs/milestones/artifacts/Road-surface-treatment/correction-1/run-5',
+  'docs/milestones/artifacts/Road-surface-treatment/correction-2/fix-2',
 );
 const screenshotDirectory = resolve(evidenceDirectory, 'screenshots');
 
@@ -74,6 +84,144 @@ function terrainSampler(
         : d + (c - d) * (1 - u) + (b - d) * (1 - v);
     return { localM, orthometricM: localM + manifest.origin.elevationM };
   };
+}
+
+function roadContextAtStation(
+  features: RoadFeature[],
+  wayId: number,
+  stationM: number,
+  id: string,
+): RoadSurfaceContext {
+  const feature = features.find((item) => item.source?.osmId === wayId);
+  if (!feature?.centerlinePartsXZ)
+    throw new Error(`Road geometry for way ${wayId} is missing.`);
+  for (const part of feature.centerlinePartsXZ) {
+    let stationStart = 0;
+    for (const [index, first] of part.slice(0, -1).entries()) {
+      const second = part[index + 1];
+      if (!second) continue;
+      const dx = second[0]! - first[0]!;
+      const dz = second[1]! - first[1]!;
+      const length = Math.hypot(dx, dz);
+      if (length <= 1e-9) continue;
+      if (stationM <= stationStart + length + 1e-9) {
+        const amount = Math.max(
+          0,
+          Math.min(1, (stationM - stationStart) / length),
+        );
+        return {
+          id,
+          anchorLocalXZ: [first[0]! + dx * amount, first[1]! + dz * amount],
+          tangentXZ: [dx / length, dz / length],
+          wayIds: [wayId],
+          stationM,
+        };
+      }
+      stationStart += length;
+    }
+  }
+  throw new Error(`Station ${stationM} is outside way ${wayId}.`);
+}
+
+function roadContextNearestToPoint(
+  features: RoadFeature[],
+  wayId: number,
+  point: [number, number],
+  id: string,
+  buildingIds: string[],
+): RoadSurfaceContext {
+  const feature = features.find((item) => item.source?.osmId === wayId);
+  if (!feature?.centerlinePartsXZ)
+    throw new Error(`Road geometry for way ${wayId} is missing.`);
+  let nearest:
+    | {
+        distanceM: number;
+        stationM: number;
+        tangentXZ: [number, number];
+        projectionXZ: [number, number];
+      }
+    | undefined;
+  for (const part of feature.centerlinePartsXZ) {
+    let stationStart = 0;
+    for (const [index, first] of part.slice(0, -1).entries()) {
+      const second = part[index + 1];
+      if (!second) continue;
+      const dx = second[0]! - first[0]!;
+      const dz = second[1]! - first[1]!;
+      const lengthSquared = dx * dx + dz * dz;
+      const length = Math.sqrt(lengthSquared);
+      if (length <= 1e-9) continue;
+      const amount = Math.max(
+        0,
+        Math.min(
+          1,
+          ((point[0] - first[0]!) * dx + (point[1] - first[1]!) * dz) /
+            lengthSquared,
+        ),
+      );
+      const projectedX = first[0]! + dx * amount;
+      const projectedZ = first[1]! + dz * amount;
+      const distanceM = Math.hypot(
+        point[0] - projectedX,
+        point[1] - projectedZ,
+      );
+      if (!nearest || distanceM < nearest.distanceM)
+        nearest = {
+          distanceM,
+          stationM: stationStart + amount * length,
+          tangentXZ: [dx / length, dz / length],
+          projectionXZ: [projectedX, projectedZ],
+        };
+      stationStart += length;
+    }
+  }
+  if (!nearest)
+    throw new Error(`Road way ${wayId} has no usable centerline segments.`);
+  return {
+    id,
+    anchorLocalXZ: nearest.projectionXZ,
+    tangentXZ: nearest.tangentXZ,
+    wayIds: [wayId],
+    buildingIds,
+    stationM: nearest.stationM,
+  };
+}
+
+function newtonFootingContext(
+  buildings: BuildingFeature[],
+  roads: RoadFeature[],
+): RoadSurfaceContext {
+  const buildingIds = [
+    'osm:way:196536218',
+    'osm:way:196536220',
+    'osm:way:196536221',
+    'osm:way:196536227',
+    'osm:way:196536217',
+  ];
+  const selected = buildingIds.map((id) => {
+    const feature = buildings.find((item) => item.id === id);
+    if (!feature?.geometry?.polygons)
+      throw new Error(`Registered Newton footing building ${id} is missing.`);
+    return feature;
+  });
+  const points = selected.flatMap((feature) =>
+    (feature.geometry?.polygons ?? []).flatMap(
+      (polygon) => polygon.exteriorXZ ?? [],
+    ),
+  );
+  if (!points.length)
+    throw new Error('Registered Newton footing footprints have no vertices.');
+  const center: [number, number] = [
+    points.reduce((sum, point) => sum + point[0]!, 0) / points.length,
+    points.reduce((sum, point) => sum + point[1]!, 0) / points.length,
+  ];
+  return roadContextNearestToPoint(
+    roads,
+    46348326,
+    center,
+    'newton-footing-buildings',
+    buildingIds,
+  );
 }
 
 async function readObject<T>(path: string): Promise<T> {
@@ -184,6 +332,12 @@ test('captures the labelled current-release road-surface comparison and walk cle
     profiles: { ways: Record<string, unknown>[] };
     browserContexts: RoadSurfaceContext[];
   }>(resolve(previewDirectory, 'qa.json'));
+  const roads = await readObject<{ features: RoadFeature[] }>(
+    resolve(releaseRoot, 'roads/roads.json'),
+  );
+  const buildings = await readObject<{ buildings: BuildingFeature[] }>(
+    resolve(releaseRoot, 'buildings/buildings.json'),
+  );
   const baselineBytes = await readFile(resolve(releaseRoot, 'heightfield.f32'));
   const previewBytes = await readFile(
     resolve(previewDirectory, 'heightfield.f32'),
@@ -200,6 +354,19 @@ test('captures the labelled current-release road-surface comparison and walk cle
     return context;
   });
   const parkfield = byId.get('parkfield-severe')!;
+  const parkfieldControl396 = roadContextAtStation(
+    roads.features,
+    30480989,
+    396.0108,
+    'parkfield-control-396-0108',
+  );
+  const parkfieldControl409 = roadContextAtStation(
+    roads.features,
+    30480989,
+    409.261,
+    'parkfield-control-409-2610',
+  );
+  expect(parkfield.stationM).toBeCloseTo(parkfieldControl409.stationM!, 3);
   const lymingtonContext = byId.get('user-map-context-2')!;
   const cricketfield = byId.get('cricketfield-junction')!;
   const overviewContext: RoadSurfaceContext = {
@@ -214,9 +381,9 @@ test('captures the labelled current-release road-surface comparison and walk cle
   const addedGradientContext = byId.get('maximum-added-gradient');
   if (!addedGradientContext)
     throw new Error('Required maximum added-gradient QA context is missing.');
-  const newtonContext = byId.get('newton-high-fill');
-  if (!newtonContext)
-    throw new Error('Required Newton maximum-fill QA context is missing.');
+  const newtonContext =
+    byId.get('newton-high-fill') ??
+    newtonFootingContext(buildings.buildings, roads.features);
   const harmfulGradientContexts = qa.browserContexts
     .filter((context) => context.id.startsWith('harm-gradient-region-'))
     .slice(0, 2);
@@ -345,6 +512,10 @@ test('captures the labelled current-release road-surface comparison and walk cle
     for (const view of primaryViews)
       await capture('baseline', context, view, baselineAt);
   }
+  for (const context of [parkfieldControl396]) {
+    for (const view of primaryViews)
+      await capture('baseline', context, view, baselineAt);
+  }
   await capture(
     'baseline',
     overviewContext,
@@ -378,13 +549,13 @@ test('captures the labelled current-release road-surface comparison and walk cle
   await capture(
     'baseline',
     newtonContext,
-    { id: 'maximum-fill-overhead', offsetM: 0, clearanceM: 48, pitch: -78 },
+    { id: 'footing-overhead', offsetM: 0, clearanceM: 48, pitch: -78 },
     baselineAt,
   );
   await capture(
     'baseline',
     newtonContext,
-    { id: 'maximum-fill-low-oblique', offsetM: 18, clearanceM: 16, pitch: -28 },
+    { id: 'footing-low-oblique', offsetM: 18, clearanceM: 8, pitch: -14 },
     baselineAt,
   );
 
@@ -427,6 +598,10 @@ test('captures the labelled current-release road-surface comparison and walk cle
     for (const view of primaryViews)
       await capture('preview', context, view, previewAt);
   }
+  for (const context of [parkfieldControl396]) {
+    for (const view of primaryViews)
+      await capture('preview', context, view, previewAt);
+  }
   await capture(
     'preview',
     overviewContext,
@@ -460,17 +635,17 @@ test('captures the labelled current-release road-surface comparison and walk cle
   await capture(
     'preview',
     newtonContext,
-    { id: 'maximum-fill-overhead', offsetM: 0, clearanceM: 48, pitch: -78 },
+    { id: 'footing-overhead', offsetM: 0, clearanceM: 48, pitch: -78 },
     previewAt,
   );
   await capture(
     'preview',
     newtonContext,
-    { id: 'maximum-fill-low-oblique', offsetM: 18, clearanceM: 16, pitch: -28 },
+    { id: 'footing-low-oblique', offsetM: 18, clearanceM: 8, pitch: -14 },
     previewAt,
   );
   expect(screenshotRecords).toHaveLength(
-    22 + 2 * harmfulGradientContexts.length,
+    26 + 2 * harmfulGradientContexts.length,
   );
 
   await page.setViewportSize({ width: 1280, height: 800 });

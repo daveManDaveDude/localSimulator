@@ -1,0 +1,113 @@
+{
+  "actualGeneratorMaskCrossCheck": {
+    "ambiguousConflictVertices": 754,
+    "changedAmongConflictSupportVertices": 26,
+    "changedOutsideActualInfluenceAndTriangleSupport": 0,
+    "changedOutsideActualInfluenceButWithinTriangleSupport": 26,
+    "changedOutsideActualInfluenceMask": 26,
+    "changedOutsideRawAllowedRadiusMask": 0,
+    "exactOutsideActualInfluenceUnionTriangleSupport": true,
+    "qaCandidateGridVertexCount": 365398,
+    "qaVerticesOutsideMaskCount": 636603,
+    "recomputedActualInfluenceMaskCount": 365398,
+    "recomputedVerticesOutsideMaskCount": 636603
+  },
+  "algorithmVersion": "road-surface-preview-3.0.0",
+  "baselineHeightfieldSha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af",
+  "changedBeyond32mFromOriginalConfiguredInfluenceEdge": 0,
+  "changedBeyond32mFromOriginalConfiguredInfluenceEdgeIncludingSupport": 0,
+  "changedOutsideEffectiveAllowedInfluenceAndTriangleSupport": {
+    "count": 0,
+    "farthestDistanceXZ": null,
+    "maxAbsChangeM": 0.0,
+    "maxAbsChangeXZ": null,
+    "maxDistanceFromBaseInfluenceEdgeM": 0.0
+  },
+  "changedOutsideEffectiveAllowedInfluenceButInsideTriangleSupport": {
+    "count": 0,
+    "farthestDistanceXZ": null,
+    "maxAbsChangeM": 0.0,
+    "maxAbsChangeXZ": null,
+    "maxDistanceFromBaseInfluenceEdgeM": 0.0
+  },
+  "changedOutsideOriginalConfiguredInfluence": {
+    "count": 22736,
+    "farthestDistanceXZ": [
+      -962.0,
+      306.0
+    ],
+    "maxAbsChangeM": 4.831289291381836,
+    "maxAbsChangeXZ": [
+      -954.0,
+      400.0
+    ],
+    "maxDistanceFromBaseInfluenceEdgeM": 28.635642126552707
+  },
+  "changedOutsideOriginalInfluenceButInsideExpandedAllowedShoulderAndNotSupport": {
+    "count": 22736,
+    "farthestDistanceXZ": [
+      -962.0,
+      306.0
+    ],
+    "maxAbsChangeM": 4.831289291381836,
+    "maxAbsChangeXZ": [
+      -954.0,
+      400.0
+    ],
+    "maxDistanceFromBaseInfluenceEdgeM": 28.635642126552707
+  },
+  "changedOutsideOriginalInfluenceButInsideTriangleSupport": {
+    "count": 0,
+    "farthestDistanceXZ": null,
+    "maxAbsChangeM": 0.0,
+    "maxAbsChangeXZ": null,
+    "maxDistanceFromBaseInfluenceEdgeM": 0.0
+  },
+  "definitions": {
+    "effectiveAllowedInfluence": "same mask, with only the 54 QA-recorded station intervals expanded to a maximum 32m shoulder transition and smooth 32m along-station fade",
+    "originalConfiguredInfluence": "grid nodes within exact point-to-segment distance <= width/2 + base configured shoulder transition on any eligible pinned road segment",
+    "triangleSupportStencil": "all vertices assigned by _carriageway_triangle_owners to any intersected fixed-diagonal road triangle, including ambiguous-core sentinels"
+  },
+  "effectiveAllowedInfluenceOrTriangleSupportVertexCount": 366152,
+  "effectiveAllowedInfluenceVertexCount": 366152,
+  "eligibleSegmentCount": 4395,
+  "exactFloat32ChangedVertexCount": 335548,
+  "exactlyUnchangedOutsideEffectiveAllowedInfluencePlusTriangleSupport": true,
+  "expandedRibbonCoverageCheck": {
+    "allOutsideBaseNodesCoveredWithinSmoothExpandedInterval": true,
+    "candidatePairs": 86402,
+    "changedOutsideOriginalConfiguredInfluenceCount": 22736,
+    "coveredByAtLeastOneExpandedRoadStationAndLateralMask": {
+      "covered": 22736,
+      "total": 22736,
+      "uncovered": 0
+    },
+    "expandedPartCount": 54,
+    "expandedSegmentCount": 452,
+    "maximumAllowedTransitionBeyondRoadEdgeM": 32.0,
+    "maximumOwningExpandedRibbonEdgeDistance": {
+      "centerlineDistanceM": 34.997718509332316,
+      "configuredTransitionAtStationM": 32.0,
+      "halfWidthM": 3.0,
+      "m": 31.997718509332316,
+      "nodeXZ": [
+        -134.0,
+        406.0
+      ],
+      "partIndex": 0,
+      "stationGapM": 0.0,
+      "stationM": 143.21675495829527,
+      "wayId": 30481427
+    },
+    "maximumQueryRadiusM": 37.01
+  },
+  "expandedRoadPartCount": 54,
+  "grid": {
+    "columns": 1001,
+    "rows": 1001,
+    "spacingM": 2.0
+  },
+  "originalConfiguredInfluenceVertexCount": 330625,
+  "previewHeightfieldSha256": "037a74320557088135e0885386c24fdcdea6171469db1d6329c3e82997f5c1e9",
+  "triangleSupportStencilVertexCount": 199841
+}

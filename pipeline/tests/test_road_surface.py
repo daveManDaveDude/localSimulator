@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -13,6 +14,7 @@ from torquay_pipeline.road_surface import (
     ReleaseInputs,
     RoadSegment,
     RoadSurfaceError,
+    _active_triangle_vertex_weights,
     _apply_harm_fallback,
     _apply_station_harm_fallback,
     _canonical_json,
@@ -21,8 +23,14 @@ from torquay_pipeline.road_surface import (
     _grade_grid,
     _preflight_execution_record,
     _prepare_output_directory,
+    _project_grid_edge_constraints,
+    _road_part_topology,
+    _sample_grid,
     _segments_from_payload,
+    _severe_station_crossfall_constraints,
     _terrain_gradient_change_summary,
+    _topology_node_distances,
+    _topology_station_distances,
     guard_output_directory,
 )
 
@@ -69,6 +77,48 @@ def _grade(baseline: np.ndarray, features: list[dict], config: PreviewConfig | N
     return _grade_grid(baseline, segments, 1.0, 10.0, 10.0, config or _config())
 
 
+def test_connected_part_harm_uses_shared_endpoint_retention_weights() -> None:
+    segments = _segments_from_payload(
+        {
+            "features": [
+                _road(100, [[0.0, 0.0], [10.0, 0.0]]),
+                _road(101, [[10.0, 0.0], [20.0, 0.0]]),
+                _road(102, [[20.0, 0.0], [30.0, 0.0]]),
+                _road(103, [[30.2, 0.0], [40.2, 0.0]]),
+            ]
+        },
+        1.0,
+        1.0,
+    )
+    topology = _road_part_topology(segments)
+    seeds = {(100, 0): [(9.0, 10.0)]}
+    node_distances = _topology_node_distances(topology, seeds)
+
+    first_end = _topology_station_distances(
+        topology, node_distances, (100, 0), np.asarray([10.0]), seeds
+    )[0]
+    second_start = _topology_station_distances(
+        topology, node_distances, (101, 0), np.asarray([0.0]), seeds
+    )[0]
+    second_end = _topology_station_distances(
+        topology, node_distances, (101, 0), np.asarray([10.0]), seeds
+    )[0]
+    third_start = _topology_station_distances(
+        topology, node_distances, (102, 0), np.asarray([0.0]), seeds
+    )[0]
+    third_interior = _topology_station_distances(
+        topology, node_distances, (102, 0), np.asarray([5.0]), seeds
+    )[0]
+    disconnected_start = _topology_station_distances(
+        topology, node_distances, (103, 0), np.asarray([0.0]), seeds
+    )[0]
+
+    assert first_end == second_start == pytest.approx(0.0)
+    assert second_end == third_start == pytest.approx(10.0)
+    assert third_interior == pytest.approx(15.0)
+    assert math.isinf(disconnected_start)
+
+
 def test_flat_surface_is_byte_identical_and_no_vertices_change() -> None:
     baseline = _grid()
     preview, report = _grade(baseline, [_road(10, [[-5.0, 0.0], [5.0, 0.0]])])
@@ -90,6 +140,180 @@ def test_longitudinal_hill_is_retained_while_lateral_slope_is_removed() -> None:
     assert preview[4, 2:9] == pytest.approx(baseline[5, 2:9], abs=1e-6)
     assert preview[6, 2:9] == pytest.approx(baseline[5, 2:9], abs=1e-6)
     assert np.diff(preview[5, :]) == pytest.approx(np.diff(baseline[5, :]), abs=1e-6)
+
+
+def test_final_surface_projection_keeps_pinned_control_and_caps_added_edge_gradient() -> None:
+    baseline = np.zeros((5, 5), dtype="<f4")
+    candidate = baseline.copy()
+    candidate[2, 2] = 4.0
+    adjustable = np.ones_like(baseline, dtype=bool)
+    pinned = np.zeros_like(adjustable)
+    pinned[2, 2] = True
+
+    projected, report = _project_grid_edge_constraints(
+        baseline,
+        candidate,
+        1.0,
+        adjustable,
+        pinned,
+        candidate,
+    )
+
+    assert projected[2, 2] == pytest.approx(4.0)
+    assert np.max(np.abs(np.diff(projected.astype(np.float64), axis=0))) <= 0.9991
+    assert np.max(np.abs(np.diff(projected.astype(np.float64), axis=1))) <= 0.9991
+    assert np.max(np.abs(projected)) < 5.0
+    assert report["maximumFloat32ConstraintResidualM"] <= 5e-5
+
+
+def test_final_surface_projection_rejects_incompatible_pinned_controls() -> None:
+    baseline = np.zeros((3, 3), dtype="<f4")
+    candidate = baseline.copy()
+    pinned = np.zeros_like(baseline, dtype=bool)
+    pinned[1, 1] = pinned[1, 2] = True
+    pinned_values = baseline.copy()
+    pinned_values[1, 1] = 0.0
+    pinned_values[1, 2] = 2.0
+
+    with pytest.raises(RoadSurfaceError, match="pinned samples violate"):
+        _project_grid_edge_constraints(
+            baseline,
+            candidate,
+            1.0,
+            np.ones_like(pinned),
+            pinned,
+            pinned_values,
+        )
+
+
+def test_final_surface_projection_enforces_sparse_lateral_crossfall_constraint() -> None:
+    baseline = np.zeros((3, 3), dtype="<f4")
+    candidate = baseline.copy()
+    candidate.flat[0] = 1.0
+    adjustable = np.ones_like(baseline, dtype=bool)
+    pinned = np.zeros_like(adjustable)
+    constraint = {
+        "indices": np.asarray([0, 1], dtype=np.int64),
+        "coefficients": np.asarray([1.0, -1.0], dtype=np.float64),
+        "limitM": 0.5,
+        "label": {
+            "wayId": 30480989,
+            "partIndex": 0,
+            "stationM": 12.0,
+            "direction": "right-minus-left",
+        },
+    }
+
+    projected, report = _project_grid_edge_constraints(
+        baseline,
+        candidate,
+        1.0,
+        adjustable,
+        pinned,
+        baseline,
+        linear_constraints=[constraint],
+    )
+
+    assert abs(float(projected.flat[0] - projected.flat[1])) <= 0.50005
+    assert report["linearConstraintCount"] == 1
+    assert report["maximumLinearConstraintViolationM"] <= 5e-5
+
+
+def test_final_surface_projection_names_fixed_lateral_constraint_conflict() -> None:
+    baseline = np.zeros((2, 2), dtype="<f4")
+    pinned = np.ones_like(baseline, dtype=bool)
+    pinned_values = baseline.copy()
+    pinned_values.flat[0] = 0.9
+    constraint = {
+        "indices": np.asarray([0, 1], dtype=np.int64),
+        "coefficients": np.asarray([1.0, -1.0], dtype=np.float64),
+        "limitM": 0.5,
+        "label": {
+            "wayId": 30480989,
+            "partIndex": 0,
+            "stationM": 12.0,
+            "direction": "right-minus-left",
+        },
+    }
+
+    with pytest.raises(RoadSurfaceError, match='stationM":12.0.*wayId":30480989'):
+        _project_grid_edge_constraints(
+            baseline,
+            baseline,
+            1.0,
+            np.ones_like(pinned),
+            pinned,
+            pinned_values,
+            linear_constraints=[constraint],
+        )
+
+
+def test_renderer_triangle_weights_match_display_sampler() -> None:
+    heights = np.arange(9, dtype="<f4").reshape((3, 3))
+
+    for x, z in ((-0.25, -0.25), (0.25, 0.25)):
+        weights = _active_triangle_vertex_weights(heights, x, z, 1.0)
+        weighted = sum(float(heights.flat[index]) * weight for index, weight in weights)
+        assert sum(weight for _index, weight in weights) == pytest.approx(1.0)
+        assert weighted == pytest.approx(_sample_grid(heights, x, z, 1.0))
+
+
+def test_severe_station_constraints_cover_all_required_sampled_stations() -> None:
+    z_values = np.arange(-2.0, 3.0, dtype=np.float32)
+    baseline = np.broadcast_to((0.2 * z_values[:, None]), (5, 5)).astype("<f4").copy()
+    roads = {
+        "features": [
+            _road(way_id, [[-1.0, 0.0], [1.0, 0.0]], width=2.0)
+            for way_id in (30480989, 78455388, 78455395)
+        ]
+    }
+    inputs = ReleaseInputs(
+        release_root=Path("unused"),
+        release_id="a" * 64,
+        ready_sha256="1" * 64,
+        inventory_sha256="2" * 64,
+        manifest={"heightfield": {"sha256": "3" * 64}},
+        manifest_sha256="4" * 64,
+        road_manifest={},
+        road_manifest_sha256="5" * 64,
+        road_payload=roads,
+        road_payload_sha256="6" * 64,
+        baseline=baseline,
+        columns=5,
+        rows=5,
+        spacing_m=1.0,
+        width_m=4.0,
+        depth_m=4.0,
+        origin_e_m=0.0,
+        origin_n_m=0.0,
+        origin_y_m=0.0,
+        buildings={"buildings": []},
+        source_hashes={},
+    )
+
+    constraints, report = _severe_station_crossfall_constraints(
+        inputs, baseline, 1.0, {"regions": []}
+    )
+
+    assert report["stationCountsByWay"] == {
+        "30480989": 3,
+        "78455388": 3,
+        "78455395": 3,
+    }
+    assert report["inequalityCount"] == 18
+    assert all(
+        item["label"]["baselineCrossfallPercent"] == pytest.approx(20.0)
+        for item in constraints[::2]
+    )
+    assert all(
+        item["label"]["maximumPreviewCrossfallPercent"] == pytest.approx(10.0)
+        for item in constraints[::2]
+    )
+    assert {item["wayId"] for item in report["baselineWorstStations"]} == {
+        30480989,
+        78455388,
+        78455395,
+    }
 
 
 def test_smoothstep_shoulder_returns_to_baseline_and_outer_vertices_are_exact() -> None:
@@ -362,7 +586,7 @@ def test_builder_creates_absent_approved_output_then_repeats_deterministically(
     monkeypatch.setattr(
         road_surface,
         "_grade_grid",
-        lambda *_args: (
+        lambda *_args, **_kwargs: (
             baseline.copy(),
             {
                 "changedVertexCount": 0,
@@ -545,7 +769,7 @@ def test_fallback_catches_minimum_two_vertex_added_gradient_component() -> None:
     assert region["postFallbackMaximumAddedGradientMPerM"] < 1.0
 
 
-def test_shoulder_only_harm_fallback_preserves_flattened_carriageway_core() -> None:
+def test_harm_fade_touching_carriageway_core_uses_core_aware_ramp() -> None:
     baseline = np.broadcast_to(
         (np.arange(21, dtype=np.float32) - 10.0)[:, None] * 0.2, (21, 21)
     ).copy()
@@ -583,11 +807,69 @@ def test_shoulder_only_harm_fallback_preserves_flattened_carriageway_core() -> N
     )
 
     assert preview[8:13, :] == pytest.approx(candidate[8:13, :])
-    assert np.max(np.abs(preview[14, 8:13] - baseline[14, 8:13])) < 5.0
-    interval = report["regions"][0]["stationIntervals"][0]
-    assert interval["fallbackScope"] == (
-        "affected shoulder band with smooth cross-road fade; carriageway core protected"
+    assert preview[14, 8:13] == pytest.approx(baseline[14, 8:13])
+    assert report["maximumChangeAfterFallbackM"] < 5.0
+    assert report["maximumAddedGradientAfterFallbackMPerM"] < 1.0
+    assert report["regions"]
+    for region in report["regions"]:
+        assert region["fallbackMode"] == "core-aware spatial source-retention ramp"
+        assert region["componentIntersectsTriangleCoreSupport"] is False
+        assert region["harmFadeEnvelopeIntersectsTriangleCoreSupport"] is True
+        assert region["sourceRetentionRamp"]["start"] == (
+            "0 at immutable triangle-support vertices"
+        )
+        assert region["sourceRetentionRamp"]["seed"] == (
+            "1 at the harmful component before strict surface-gradient validation"
+        )
+
+
+def test_core_intersecting_cut_fill_harm_rejects_its_connected_section() -> None:
+    baseline = np.zeros((21, 21), dtype="<f4")
+    candidate = baseline.copy()
+    candidate[10:15, 10] = 6.0
+    segments = _segments_from_payload(
+        {"features": [_road(44, [[-10.0, 0.0], [10.0, 0.0]], width=2.0)]}, 1.0, 1.0
     )
-    assert interval["componentLateralDistanceRangeM"] == pytest.approx([4.0, 4.0])
-    assert interval["maximumSourceGroundStrengthWithinBand"] == pytest.approx(0.25)
+    nearest_way = np.full((21, 21), 44, dtype=np.int64)
+    nearest_segment = np.zeros((21, 21), dtype=np.int32)
+    nearest_station = np.broadcast_to(np.arange(21, dtype=np.float64), (21, 21)).copy()
+    nearest_distance = np.broadcast_to(
+        np.abs(np.arange(21, dtype=np.float64) - 10.0)[:, None], (21, 21)
+    ).copy()
+    triangle_owner = np.full((21, 21), -1, dtype=np.int32)
+    triangle_owner[8:13, :] = 0
+    triangle_owner_is_core = triangle_owner >= 0
+
+    preview, report = _apply_station_harm_fallback(
+        baseline,
+        candidate,
+        segments,
+        1.0,
+        2.0,
+        20.0,
+        _config(fallback_fade_distance_m=8.0),
+        nearest_way,
+        nearest_segment,
+        nearest_station,
+        nearest_distance,
+        [],
+        triangle_owner,
+        triangle_owner_is_core,
+    )
+
+    region = next(
+        region
+        for region in report["regions"]
+        if "absolute local cut/fill threshold" in region["harmTriggers"]
+    )
+    assert region["coreCutFillConnectedSectionFallback"] is True
+    assert region["componentIntersectsTriangleCoreSupport"] is True
+    assert region["fallbackMode"] == "connected-section source retention for core cut/fill harm"
+    assert all(
+        interval["fallbackScope"]
+        == "full road section because candidate harm reaches carriageway core"
+        for interval in region["stationIntervals"]
+    )
+    assert preview[10:15, 10] == pytest.approx(baseline[10:15, 10])
+    assert report["maximumChangeAfterFallbackM"] < 5.0
     assert report["maximumAddedGradientAfterFallbackMPerM"] < 1.0
