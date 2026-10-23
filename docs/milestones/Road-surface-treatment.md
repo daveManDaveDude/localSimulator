@@ -10,25 +10,25 @@ The current derivative is still an opt-in visual candidate. `/` remains the acce
 
 ### Strict numerical outcome
 
-| Gate | Measured result | Fixed preview limit | Result |
-| --- | ---: | ---: | --- |
-| Maximum absolute terrain change | 4.831289 m (cut 4.565706 m; fill 4.831289 m) | <5 m | Pass |
-| Maximum positive added grid-edge gradient | 0.999000549 m/m on `[692,-570]` to `[694,-570]` (baseline 0.546886; preview 1.545887 m/m) | <1.0 m/m | Pass, 0.000999451 m/m margin |
-| Building-base p95 absolute shift | 0.089387 m | ≤0.183 m | Pass |
-| Building-base maximum absolute shift | 0.179241 m | ≤2.424 m | Pass |
-| Centerline profile maximum deviation | 0.099157459 m over 86,005 samples | ≤0.10 m | Pass |
-| Linear constraint residual | 0.000019276 m maximum | ≤0.00005 m | Pass |
-| Severe-station constraints | 439 / 439 meet at least 50% reduction | Every baseline-severe station | Pass |
-| Parkfield 396.0108 m control | 35.930637% / 2.155838 m baseline → 0.247913% / 0.018222 m preview; centerline +0.013162 m | ≤5%, ≤0.30 m, ≤0.10 m | Pass |
-| Parkfield 409.2610 m control | 42.709744% / 2.562585 m baseline → 0.054913% / 0.007073 m preview; centerline +0.002441 m | ≤5%, ≤0.30 m, ≤0.10 m | Pass |
+| Gate                                      |                                                                           Measured result |           Fixed preview limit | Result                       |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------: | ----------------------------: | ---------------------------- |
+| Maximum absolute terrain change           |                                              4.831289 m (cut 4.565706 m; fill 4.831289 m) |                          <5 m | Pass                         |
+| Maximum positive added grid-edge gradient | 0.999000549 m/m on `[692,-570]` to `[694,-570]` (baseline 0.546886; preview 1.545887 m/m) |                      <1.0 m/m | Pass, 0.000999451 m/m margin |
+| Building-base p95 absolute shift          |                                                                                0.089387 m |                      ≤0.183 m | Pass                         |
+| Building-base maximum absolute shift      |                                                                                0.179241 m |                      ≤2.424 m | Pass                         |
+| Centerline profile maximum deviation      |                                                         0.099157459 m over 86,005 samples |                       ≤0.10 m | Pass                         |
+| Linear constraint residual                |                                                                     0.000019276 m maximum |                    ≤0.00005 m | Pass                         |
+| Severe-station constraints                |                                                     439 / 439 meet at least 50% reduction | Every baseline-severe station | Pass                         |
+| Parkfield 396.0108 m control              | 35.930637% / 2.155838 m baseline → 0.247913% / 0.018222 m preview; centerline +0.013162 m |         ≤5%, ≤0.30 m, ≤0.10 m | Pass                         |
+| Parkfield 409.2610 m control              | 42.709744% / 2.562585 m baseline → 0.054913% / 0.007073 m preview; centerline +0.002441 m |         ≤5%, ≤0.30 m, ≤0.10 m | Pass                         |
 
 Both Parkfield controls sample the complete configured 6 m width at 0.25 m spacing, with 25 lateral points including both edges. Full mandatory corridors use ≤1 m centerline spacing and ≤0.25 m lateral spacing. Baseline-worst stations are included in the sample set. The table reports median, p90, p95 and maximum absolute crossfall; treated/transition/untreated lengths are allocated by station class and are preview-grid descriptions.
 
-| Corridor / way | Width / length | Samples / max station gap | Baseline → preview crossfall median / p90 / p95 / maximum (%) | Baseline-severe stations meeting 50% / total | Treated / transition / untreated length (m) |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Parkfield Road / 30480989 | 6 m / 501.035 m | 530 / 0.998077 m | 4.6725 / 28.2917 / 33.9839 / 44.8595 → 0.02854 / 0.21737 / 1.10249 / 8.37238 | 186 / 186 | 22.309 / 478.725 / 0 |
-| Pennys Hill / 78455388 | 7 m / 145.870 m | 155 / 0.999110 m | 19.1922 / 38.5130 / 42.5752 / 47.8641 → 0.47266 / 19.0417 / 21.2446 / 23.9177 | 108 / 108 | 2.997 / 142.873 / 0 |
-| Teignmouth Road / 78455395 | 6 m / 232.352 m | 252 / 0.997219 m | 11.3429 / 21.5777 / 55.6784 / 94.0281 → 4.32718 / 8.33874 / 26.3600 / 46.9974 | 145 / 145 | 14.868 / 193.551 / 23.933 |
+| Corridor / way             |  Width / length | Samples / max station gap |                 Baseline → preview crossfall median / p90 / p95 / maximum (%) | Baseline-severe stations meeting 50% / total | Treated / transition / untreated length (m) |
+| -------------------------- | --------------: | ------------------------: | ----------------------------------------------------------------------------: | -------------------------------------------: | ------------------------------------------: |
+| Parkfield Road / 30480989  | 6 m / 501.035 m |          530 / 0.998077 m |  4.6725 / 28.2917 / 33.9839 / 44.8595 → 0.02854 / 0.21737 / 1.10249 / 8.37238 |                                    186 / 186 |                        22.309 / 478.725 / 0 |
+| Pennys Hill / 78455388     | 7 m / 145.870 m |          155 / 0.999110 m | 19.1922 / 38.5130 / 42.5752 / 47.8641 → 0.47266 / 19.0417 / 21.2446 / 23.9177 |                                    108 / 108 |                         2.997 / 142.873 / 0 |
+| Teignmouth Road / 78455395 | 6 m / 232.352 m |          252 / 0.997219 m | 11.3429 / 21.5777 / 55.6784 / 94.0281 → 4.32718 / 8.33874 / 26.3600 / 46.9974 |                                    145 / 145 |                   14.868 / 193.551 / 23.933 |
 
 The baseline-worst sections are also represented: Parkfield station 410.209668 m falls from 44.8595% to 0.02079%; Pennys Hill station 31.971527 m falls from 47.8641% to 23.9177%; Teignmouth station 148.151046 m falls from 94.0281% to 46.9974%. All seven registered signed longitudinal comparisons use ≤5 m station spacing and pass the unchanged limits of ≤0.10 m elevation deviation and ≤2 percentage-point signed grade change. Maximum absolute elevation / grade-change results are: Parkfield 0.044866 m / 1.293743 pp; Arthington ways 30482119 and 30482121 0.005714 m / 0.131426 pp and 0.005476 m / 0.202998 pp; Newton 46348326 0.012437 m / 0.846460 pp; Pennys 0.036546 m / 0.737170 pp; Teignmouth 0.061817 m / 1.673850 pp; Lymington 1363931058 0.036546 m / 1.549754 pp.
 
@@ -38,26 +38,26 @@ All five registered Newton legacy building bases remain within 0.00000327 m of b
 
 Fresh builds 19 and 20 were generated from the pinned current release and matched exactly. Records: [build 19](artifacts/Road-surface-treatment/build-19.json) and [build 20](artifacts/Road-surface-treatment/build-20.json). Release ID: `616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a`; all seven pinned release/source input hashes matched. The separate ignored derivative output hashes are:
 
-| Output | Bytes | SHA-256 |
-| --- | ---: | --- |
+| Output            |     Bytes | SHA-256                                                            |
+| ----------------- | --------: | ------------------------------------------------------------------ |
 | `heightfield.f32` | 4,008,004 | `037a74320557088135e0885386c24fdcdea6171469db1d6329c3e82997f5c1e9` |
-| `manifest.json` | 1,012 | `9a3cb6c08fb57a19f94e1215ac526b1baf28634d38be1ffc7d4ed61f2de7c6f7` |
-| `qa.json` | 3,956,734 | `43d7058a339416d308be09292598949d3d97f4b764a147ccc2d5fb771d434f20` |
+| `manifest.json`   |     1,012 | `9a3cb6c08fb57a19f94e1215ac526b1baf28634d38be1ffc7d4ed61f2de7c6f7` |
+| `qa.json`         | 3,956,734 | `43d7058a339416d308be09292598949d3d97f4b764a147ccc2d5fb771d434f20` |
 
-The maximum absolute terrain change is 4.831289 m (p50 0.050632, p95 0.764225, p99 2.399363 m). The baseline and preview maximum absolute terrain gradient is unchanged at 8.269859 m/m at the same source cliff; p95 absolute gradient changes from 0.387159 to 0.393389 m/m. The maximum positive added gradient is measured against that edge's baseline gradient and is 0.999000549 m/m. The separate maximum spatial gradient of the *display-height difference* is 2.048646 m/m on `[128,644]` to `[130,644]`; this delta-gradient diagnostic is not the positive increase in terrain edge-gradient used by the strict 1.0 m/m gate and remains a visual review caveat. The generic fallback report records 106 connected regions, 266,012 m² unique affected area (54,520 m² retained core; 209,476 m² fade); its pre-projection fallback diagnostic reaches 2.256053 m/m before the later final-grid projection. The final grid-edge metric above is the authoritative strict result.
+The maximum absolute terrain change is 4.831289 m (p50 0.050632, p95 0.764225, p99 2.399363 m). The baseline and preview maximum absolute terrain gradient is unchanged at 8.269859 m/m at the same source cliff; p95 absolute gradient changes from 0.387159 to 0.393389 m/m. The maximum positive added gradient is measured against that edge's baseline gradient and is 0.999000549 m/m. The separate maximum spatial gradient of the _display-height difference_ is 2.048646 m/m on `[128,644]` to `[130,644]`; this delta-gradient diagnostic is not the positive increase in terrain edge-gradient used by the strict 1.0 m/m gate and remains a visual review caveat. The generic fallback report records 106 connected regions, 266,012 m² unique affected area (54,520 m² retained core; 209,476 m² fade); its pre-projection fallback diagnostic reaches 2.256053 m/m before the later final-grid projection. The final grid-edge metric above is the authoritative strict result.
 
 ### Influence-mask and byte-preservation audit
 
 An independent in-memory audit compared the pinned baseline Float32 grid with build 20's exact derivative bytes and rebuilt the road masks from the pinned centerlines. It did not write or regenerate the derivative. The evidence is [mask-exactness.json](artifacts/Road-surface-treatment/correction-2/fix-2/mask-exactness.json).
 
-| Classification | Vertices | Detail |
-| --- | ---: | --- |
-| Changed Float32 vertices | 335,548 | Exact baseline-versus-build-20 comparison |
-| Original configured influence | 330,625 | Half-width plus initial configured shoulder transition, over 4,395 eligible segments |
-| Changed outside original configured influence | 22,736 | 0 are in the triangle-support stencil; all 22,736 lie in the 54 explicitly recorded expanded station intervals |
-| Farthest outside-base vertex | — | 28.635642 m from the nearest original-influence grid node; max distance beyond the nearest owning road's half-width is 31.9977185 m |
-| Changed outside the generator's actual influence mask | 26 | All 26 are ambiguous-core vertices in the explicit road-triangle support stencil |
-| Changed outside actual influence ∪ triangle support | **0** | Exact Float32 equality holds everywhere outside this union |
+| Classification                                        | Vertices | Detail                                                                                                                              |
+| ----------------------------------------------------- | -------: | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Changed Float32 vertices                              |  335,548 | Exact baseline-versus-build-20 comparison                                                                                           |
+| Original configured influence                         |  330,625 | Half-width plus initial configured shoulder transition, over 4,395 eligible segments                                                |
+| Changed outside original configured influence         |   22,736 | 0 are in the triangle-support stencil; all 22,736 lie in the 54 explicitly recorded expanded station intervals                      |
+| Farthest outside-base vertex                          |        — | 28.635642 m from the nearest original-influence grid node; max distance beyond the nearest owning road's half-width is 31.9977185 m |
+| Changed outside the generator's actual influence mask |       26 | All 26 are ambiguous-core vertices in the explicit road-triangle support stencil                                                    |
+| Changed outside actual influence ∪ triangle support   |    **0** | Exact Float32 equality holds everywhere outside this union                                                                          |
 
 The maximum expanded-ribbon edge distance occurs at local `[-134, 406]`, way `30481427`, part 0, station 143.216755 m: centerline distance 34.997719 m less the 3 m half-width equals 31.997719 m, below the unchanged 32 m maximum transition. Every changed node outside the original mask is covered by at least one of the expanded road-part intervals, with its recorded smooth station fade and lateral transition. No changed vertex lies beyond that extent. The independently reconstructed actual influence mask contains 365,398 vertices, matching QA's candidate count; its 636,603-vertex complement also matches QA. QA's `verticesBeyondAllInfluenceRegionsExact=false` is the mask-only comparison: its 26 outside-mask changes are all covered by triangle support. The support-union audit confirms zero unexplained changes. The generated derivative hash remains `037a74320557088135e0885386c24fdcdea6171469db1d6329c3e82997f5c1e9`.
 
@@ -65,16 +65,16 @@ The maximum expanded-ribbon edge distance occurs at local `[-134, 406]`, way `30
 
 The complete isolated Chromium command `npx.cmd playwright test --config=playwright.road-surface.config.ts` passed **5/5** in the corrected full run. It exercised baseline and preview captures, shared-grid walking clearance, missing/corrupt/stale derivative fallback, route isolation/cancellation, direct derivative validation and renderer observation. The latest browser metadata is [browser-evidence.json](artifacts/Road-surface-treatment/correction-2/fix-2/browser-evidence.json); runtime data is [runtime-observation.json](artifacts/Road-surface-treatment/correction-2/fix-2/runtime-observation.json). It indexes 30 actual Chromium screenshots across 15 matched contexts. Four additional Newton maximum-fill PNGs from an earlier failed capture attempt remain in the same folder but are not indexed as current-run evidence; current Newton captures are the footing-specific pair below.
 
-| Context / view | Baseline | Preview |
-| --- | --- | --- |
-| Parkfield 396.0108 m / low oblique | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-control-396-0108-low-oblique.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-control-396-0108-low-oblique.png) |
-| Parkfield 396.0108 m / overhead | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-control-396-0108-overhead.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-control-396-0108-overhead.png) |
-| Parkfield 409.2610 m / low oblique | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-severe-low-oblique.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-severe-low-oblique.png) |
-| Parkfield 409.2610 m / overhead | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-severe-overhead.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-severe-overhead.png) |
-| Newton footing / low oblique | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-newton-footing-buildings-footing-low-oblique.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-newton-footing-buildings-footing-low-oblique.png) |
-| Newton footing / overhead | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-newton-footing-buildings-footing-overhead.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-newton-footing-buildings-footing-overhead.png) |
-| Pennys Hill / Teignmouth low oblique | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-pennys-teignmouth-low-oblique.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-pennys-teignmouth-low-oblique.png) |
-| Pennys Hill / Teignmouth overhead | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-pennys-teignmouth-overhead.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-pennys-teignmouth-overhead.png) |
+| Context / view                       | Baseline                                                                                                                         | Preview                                                                                                                         |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Parkfield 396.0108 m / low oblique   | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-control-396-0108-low-oblique.png)       | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-control-396-0108-low-oblique.png)       |
+| Parkfield 396.0108 m / overhead      | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-control-396-0108-overhead.png)          | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-control-396-0108-overhead.png)          |
+| Parkfield 409.2610 m / low oblique   | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-severe-low-oblique.png)                 | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-severe-low-oblique.png)                 |
+| Parkfield 409.2610 m / overhead      | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-parkfield-severe-overhead.png)                    | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-parkfield-severe-overhead.png)                    |
+| Newton footing / low oblique         | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-newton-footing-buildings-footing-low-oblique.png) | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-newton-footing-buildings-footing-low-oblique.png) |
+| Newton footing / overhead            | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-newton-footing-buildings-footing-overhead.png)    | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-newton-footing-buildings-footing-overhead.png)    |
+| Pennys Hill / Teignmouth low oblique | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-pennys-teignmouth-low-oblique.png)                | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-pennys-teignmouth-low-oblique.png)                |
+| Pennys Hill / Teignmouth overhead    | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/baseline-pennys-teignmouth-overhead.png)                   | [PNG](artifacts/Road-surface-treatment/correction-2/fix-2/screenshots/preview-pennys-teignmouth-overhead.png)                   |
 
 The complete captured pairs and SHA-256 digests are in browser metadata. All current captures were inspected in contact sheets and key Parkfield/Newton pairs were inspected individually. At Parkfield the low-oblique views show a smoother adjacent bank and fewer visible road-edge spikes. The orange road ribbon itself changes more subtly; the report does not overstate the in-world silhouette difference. Same-camera composites are [Parkfield 396.0108](artifacts/Road-surface-treatment/correction-2/fix-2/comparisons/parkfield-control-396-0108-low-oblique-side-by-side.png) and [Parkfield 409.2610](artifacts/Road-surface-treatment/correction-2/fix-2/comparisons/parkfield-severe-low-oblique-side-by-side.png). The common-scale, 0.25 m lateral sample plot and its 50-point source CSV are [cross-sections](artifacts/Road-surface-treatment/correction-2/fix-2/comparisons/parkfield-control-cross-sections.png) and [sample table](artifacts/Road-surface-treatment/correction-2/fix-2/comparisons/parkfield-control-cross-sections.csv). The plotted samples show the 6 m source-ground spans flattening to 0.018222 m and 0.007073 m while centerline changes remain +0.013162 m and +0.002441 m.
 
@@ -84,17 +84,17 @@ The runtime observation reports 2,969,627 triangles, 7 draw calls, 7 geometries 
 
 ### Route, share, quality and preservation checks
 
-| Command / check | Result |
-| --- | --- |
-| Focused Python road/terrain suite (`pytest` for road_surface, road_alignment, roads and terrain_export) | 71 passed, 1 skipped (Windows symlink privilege unavailable) |
-| Ruff check and format check for pipeline and builder | Passed |
-| `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run format:check` | Passed |
-| `npx.cmd vitest run --exclude "sites/**"` | 26 files / 307 tests passed |
-| `npm.cmd run build` | Passed; Vite emitted existing native-config and large-chunk warnings |
-| `npx.cmd playwright test --config=playwright.road-surface-share.config.ts` | 1/1 passed: real current 2 km route, preview off, no preview derivative requests |
-| `npm.cmd run build:share` and inspection of `dist/worlds/torquay-road-surface-preview` | Build passed; ignored preview derivative absent from share output |
-| `npx.cmd playwright test --config=playwright.road-surface.config.ts` | 5/5 passed; port 4213 stopped after run |
-| `git diff --check` | Pending final handback update |
+| Command / check                                                                                         | Result                                                                           |
+| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Focused Python road/terrain suite (`pytest` for road_surface, road_alignment, roads and terrain_export) | 71 passed, 1 skipped (Windows symlink privilege unavailable)                     |
+| Ruff check and format check for pipeline and builder                                                    | Passed                                                                           |
+| `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run format:check`                                 | Passed                                                                           |
+| `npx.cmd vitest run --exclude "sites/**"`                                                               | 26 files / 307 tests passed                                                      |
+| `npm.cmd run build`                                                                                     | Passed; Vite emitted existing native-config and large-chunk warnings             |
+| `npx.cmd playwright test --config=playwright.road-surface-share.config.ts`                              | 1/1 passed: real current 2 km route, preview off, no preview derivative requests |
+| `npm.cmd run build:share` and inspection of `dist/worlds/torquay-road-surface-preview`                  | Build passed; ignored preview derivative absent from share output                |
+| `npx.cmd playwright test --config=playwright.road-surface.config.ts`                                    | 5/5 passed; port 4213 stopped after run                                          |
+| `git diff --check`                                                                                      | Passed after the documentation-only Fix 3 update                                 |
 
 The fix changes the Python derivative/projection and its tests plus issue-owned browser evidence; it does not change viewer runtime. Earlier viewer-cleanup real and share regression suites remain applicable because runtime code is unchanged. The repository-wide `npm.cmd test` was previously reported with a collection failure in the pre-existing untracked `sites/torquay-virtual-world/tests/e2e/site-smoke.spec.ts`; that directory is excluded from the passing focused Vitest run and was not modified. The existing default port 5173 was not used or stopped. After the latest build and browser runs, ports 4213 and 4216 have no listener; port 5173 remains on its pre-existing listener.
 

@@ -1,6 +1,10 @@
-# Correction 2 — Luna fix 2 strict numerical diagnostic
+# Correction 2 — Luna fix 2 earlier superseded prototype
 
-**Result:** strict full-corridor acceptance failed. This is a read-only in-memory candidate, not an accepted derivative. No derivative bytes, build record, browser profile, screenshot, or runtime geometry evidence was produced for fix 2.
+> **Historical and superseded — 23 October 2026.** This file records an earlier in-memory prototype before the final constrained projection. Its strict severe-corridor gate failed. The “no derivative/build/browser evidence” statement below applies only to that earlier prototype at the time; it is not the status of the later fix-2 candidate. Do not use these earlier measurements as current acceptance results.
+>
+> The later fix-2 candidate is summarized in the [current handback](../../../../Road-surface-treatment.md), with deterministic [build 19](../../build-19.json) and [build 20](../../build-20.json) records and the current [Chromium evidence index](browser-evidence.json). The actual Parkfield captures and comparisons are linked from the handback; the current same-camera [396.0108 m comparison](comparisons/parkfield-control-396-0108-low-oblique-side-by-side.png) and [409.2610 m comparison](comparisons/parkfield-severe-low-oblique-side-by-side.png) are also available directly.
+
+**Earlier prototype result:** strict full-corridor acceptance failed. This was a read-only in-memory candidate, not an accepted derivative. At that stage, it produced no derivative bytes, build record, browser profile, screenshot, or runtime geometry evidence.
 
 ## Reproduction and global grid checks
 
