@@ -1,0 +1,11 @@
+{
+  "command": [
+    "pipeline/scripts/diagnose_teignmouth_float32_frame.py",
+    "--input-manifest",
+    "docs/milestones/artifacts/Teignmouth-float32-topology/input-manifest.json"
+  ],
+  "diagnosticOrdinal": 1,
+  "interpreter": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "wallLimitSeconds": 120
+}

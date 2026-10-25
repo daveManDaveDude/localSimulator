@@ -1,0 +1,117 @@
+{
+  "emptyArchivedOutputDirectory": {
+    "empty": true,
+    "exists": true,
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/partial-candidate-output"
+  },
+  "frozenAtUtc": "2026-10-24T12:49:07.218400+00:00",
+  "generatedCandidateOutputExists": false,
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "priorBuildOrdinal": 1,
+  "priorBuildStatus": "BLOCKED_EXCEPTION",
+  "priorEvidenceDirectory": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1",
+  "priorEvidenceFileCount": 20,
+  "priorEvidenceFiles": [
+    {
+      "byteLength": 4574,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/build-report.json",
+      "sha256": "3d9012f05ec6641e106ccf87391d1da7b804eab78090bfeec054de1652960ae1"
+    },
+    {
+      "byteLength": 122,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/candidate-failure.json",
+      "sha256": "b89523c175a6a5d87291c88b1710440f0ed00c448f32bf19b470dd465606bce7"
+    },
+    {
+      "byteLength": 23472,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/chart-fields.station-lateral.f64",
+      "sha256": "422ca324ba995f82eadf136b7b0716e4265e3b84b4731eb3e971549cd44f29e8"
+    },
+    {
+      "byteLength": 31104,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/chart-indices.u32",
+      "sha256": "8ba1c505d505ab25ce69db419ebfac7d9d7f22de92f4defe206fcb397e42e911"
+    },
+    {
+      "byteLength": 23472,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/chart-points.xz.f64",
+      "sha256": "fd90cdeb162afd8232fbd03531341d02acd1210e315bfce4582afa1e9ac6379e"
+    },
+    {
+      "byteLength": 737,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/chart-stage.json",
+      "sha256": "953597832a4aacc2b86818f79b7e5ebdadb3ef7eb920075fef8f74ae6421d4a2"
+    },
+    {
+      "byteLength": 1304,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/chart-stations.f64",
+      "sha256": "c5b30ebb60adc2076da97bb2f4abea456efde5a8e77186c52b5e55fde10471f1"
+    },
+    {
+      "byteLength": 1328,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/construction-boundary.u32",
+      "sha256": "4e4e85560ef27ab0ed544e4c73db6d7effe04f237d3c20abcd8270a9c35dbced"
+    },
+    {
+      "byteLength": 1093248,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/construction-constraints.u32",
+      "sha256": "ed24bc6e6107d46d7a8c6d035a9a9d875c96039aef6b40699c63c4beca018696"
+    },
+    {
+      "byteLength": 1552344,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/construction-indices.u32",
+      "sha256": "44c4ea2f3e918af36b73a60b4ae3dc6c9087e15017e00b7a6b73063ec5ae4bd6"
+    },
+    {
+      "byteLength": 1036240,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/construction-local-xz.f64",
+      "sha256": "d7a3d22ee57f341a9e158d36d37e041ced888d8e3f1cc7cc761389417d9392f9"
+    },
+    {
+      "byteLength": 230,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/construction-stage.json",
+      "sha256": "2612af8b9b3e7ec0f916afcdec6164a3a65cc86aa80de697aa27733591f8e275"
+    },
+    {
+      "byteLength": 518120,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/construction-stored-local-xz.f32",
+      "sha256": "2cac354326f95b68de715b6c52a8db0b72e9790070499001e7f2290d762476c9"
+    },
+    {
+      "byteLength": 1608,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/gate-state.json",
+      "sha256": "fcec866e11438ee11c17fb282f9b86a6777323b0592413814d3d3d752b2944da"
+    },
+    {
+      "byteLength": 70,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/post-run-preservation.json",
+      "sha256": "41348ac069a4a791a7f8dbef538a5693fd764d659643dd515d50c275536d145f"
+    },
+    {
+      "byteLength": 70,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/pre-run-preservation.json",
+      "sha256": "41348ac069a4a791a7f8dbef538a5693fd764d659643dd515d50c275536d145f"
+    },
+    {
+      "byteLength": 430,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/supervisor-report.json",
+      "sha256": "481caa888a03b2c9af75a8b44605c4650527209739d3fcd5d9b036b78c36b0a8"
+    },
+    {
+      "byteLength": 103,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/worker-progress.json",
+      "sha256": "02f78bfcfebdad382b018643b47484bca8f70d329e4c1824759e9d9ac6ba1454"
+    },
+    {
+      "byteLength": 0,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/worker.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "byteLength": 0,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/worker.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "schema": "teignmouth-prior-build-preservation-v1"
+}

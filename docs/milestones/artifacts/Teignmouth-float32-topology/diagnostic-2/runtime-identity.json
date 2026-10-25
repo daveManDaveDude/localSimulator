@@ -1,0 +1,10 @@
+{
+  "geosVersion": "3.14.1",
+  "interpreterSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+  "numpyVersion": "2.5.4",
+  "pythonImplementation": "CPython",
+  "pythonVersion": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "resolvedExecutable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+  "schema": "teignmouth-overlay-runtime-identity-v1",
+  "shapelyVersion": "2.2.0"
+}

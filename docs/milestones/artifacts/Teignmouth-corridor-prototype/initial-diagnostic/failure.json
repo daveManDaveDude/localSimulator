@@ -1,0 +1,16 @@
+{
+  "status": "IMPLEMENTATION_ERROR",
+  "attemptConsumed": true,
+  "diagnosticOrdinal": 1,
+  "fullBuildsUsedAtFailure": 0,
+  "recording": "Retrospective transcription of actual command output; the original process exited before writing a report.",
+  "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe -m pytest pipeline/tests/test_teignmouth_corridor_prototype.py -q; pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_prototype.py --diagnostic --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/initial-diagnostic",
+  "precedingTests": "7 passed in 2.05s",
+  "combinedCommandWallSeconds": 9.8927531,
+  "diagnosticOnlyWallSeconds": null,
+  "peakMemoryBytes": null,
+  "error": "ValueError: Both input arrays must be (arrays of) 3-dimensional vectors, but they are 2 and 2 dimensional instead.",
+  "location": "pipeline/torquay_pipeline/teignmouth_corridor_prototype.py:182, topology_report, np.cross on X/Z vectors",
+  "geometryResult": "NOT TESTED: no topology or safety verdict reached",
+  "disposition": "No diagnostic retry. Explicit 2D determinant fixed and covered by a synthetic regression within initial implementation. Coordinator authorized proceeding to separately budgeted full build 1."
+}

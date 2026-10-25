@@ -1,0 +1,42 @@
+{
+  "actualFloat32Sections": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  },
+  "completeBuildingContact": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  },
+  "independentDeterministicConfirmation": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  },
+  "influenceWideRoadOwnership": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  },
+  "sharedRoadBuildingWalkSurface": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  },
+  "sourceOverlayAndGradients": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  },
+  "sourcePerimeterAndPlanes": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  },
+  "storedLocalTopology": {
+    "passes": false,
+    "reason": "Float32CandidateError: chart does not cover candidate vertex [-140.0, -63.0]",
+    "status": "UNAVAILABLE_AFTER_FAILURE"
+  }
+}

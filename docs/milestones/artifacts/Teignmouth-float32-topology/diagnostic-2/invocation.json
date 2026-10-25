@@ -1,0 +1,50 @@
+{
+  "candidateBuilt": false,
+  "candidateEligibleForServing": false,
+  "childProcessExitCode": 0,
+  "childTerminationConfirmed": true,
+  "command": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\diagnose_teignmouth_overlay_face.py",
+    "--input-manifest",
+    "C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Teignmouth-float32-topology\\diagnostic-2\\input-manifest.json"
+  ],
+  "diagnosticRunnerChosenExitCode": 0,
+  "diagnosticRunnerSha256": "298f5865fc0cc3262e6e36ecde7383f01cd5ba91dd3e37199c16b5f573a7ff5c",
+  "diagnosticRunnerStatus": "WORKER_EXIT_ZERO",
+  "elapsedWallSeconds": 63.26575180000509,
+  "externalDeadlineUtc": "2026-10-24T17:04:36.610186+00:00",
+  "inputManifestSha256PostRun": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+  "inputManifestSha256PreRun": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+  "interpreterSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "jobClosedAfterWait": true,
+  "killOnJobCloseConfigured": true,
+  "manifestHashStable": true,
+  "outerCommandExitCode": 0,
+  "postRunPreservation": {
+    "build2ProtectedBindingCount": 225,
+    "changed": [],
+    "checkedFileCount": 291,
+    "expectedManifestSha256": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+    "manifestHashStable": true,
+    "manifestSha256": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+    "passes": true
+  },
+  "preRunPreservation": {
+    "build2ProtectedBindingCount": 225,
+    "changed": [],
+    "checkedFileCount": 291,
+    "manifestSha256": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+    "passes": true
+  },
+  "processTreeContainment": "Win32 Job Object with JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE",
+  "runnerProcessId": 36100,
+  "schema": "teignmouth-overlay-external-supervisor-v2",
+  "startedUtc": "2026-10-24T17:04:36.376442+00:00",
+  "status": "RUNNER_EXITED",
+  "supervisorSha256": "9f1d20086f0e2b26cd972101bda1b3d224f53e176c2f57e480e3dacb4ca7a17a",
+  "timedOut": false,
+  "wallLimitSeconds": 120.0
+}

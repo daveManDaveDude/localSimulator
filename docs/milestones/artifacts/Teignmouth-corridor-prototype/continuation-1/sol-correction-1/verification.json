@@ -1,0 +1,48 @@
+{
+  "status": "STOP; separate independent Sol review pending",
+  "commands": [
+    {
+      "cwd": "C:/vibe/localSimulator/pipeline",
+      "command": "./.venv/Scripts/python.exe -m pytest -p no:cacheprovider tests/test_teignmouth_corridor_continuation.py tests/test_teignmouth_corridor_continuous.py tests/test_teignmouth_corridor_prototype.py -q",
+      "result": "38 passed in 7.24s; exit0"
+    },
+    {
+      "cwd": "C:/vibe/localSimulator/pipeline",
+      "command": "./.venv/Scripts/python.exe -m ruff check torquay_pipeline/teignmouth_corridor_continuation.py scripts/build_teignmouth_corridor_continuation.py tests/test_teignmouth_corridor_continuation.py",
+      "result": "All checks passed; exit0"
+    },
+    {
+      "cwd": "C:/vibe/localSimulator/pipeline",
+      "command": "./.venv/Scripts/python.exe -m ruff format --check torquay_pipeline/teignmouth_corridor_continuation.py scripts/build_teignmouth_corridor_continuation.py tests/test_teignmouth_corridor_continuation.py",
+      "result": "3 files already formatted; exit0"
+    },
+    {
+      "cwd": "C:/vibe/localSimulator",
+      "command": "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --import-smoke",
+      "result": "continuation pipeline import passed; no GIS data read; exit0"
+    },
+    {
+      "cwd": "C:/vibe/localSimulator",
+      "command": "git diff --check",
+      "result": "exit0; existing CRLF warnings"
+    },
+    {
+      "cwd": "C:/vibe/localSimulator",
+      "command": "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6",
+      "result": "STOP at Float32 topology collision; nonzero exit; invoked exactly once; no retry"
+    }
+  ],
+  "attemptsConsumed": {
+    "solCorrections": 1,
+    "implementationBuilds": 6,
+    "diagnostics": 1,
+    "confirmationBuilds": 0,
+    "browserRuns": 0
+  },
+  "limits": {
+    "strictAbsoluteChangeM": 6.5,
+    "strictPositiveAddedGradientMPerM": 1.0,
+    "allOtherLimitsUnchanged": true
+  },
+  "remainingWork": "Separate independent Sol review; candidate remains unservable; no implementation correction allowance remains."
+}

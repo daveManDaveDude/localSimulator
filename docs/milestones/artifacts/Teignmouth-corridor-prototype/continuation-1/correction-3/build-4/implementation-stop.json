@@ -1,0 +1,27 @@
+{
+  "status": "STOP_BEFORE_BUILD",
+  "ordinal": 4,
+  "command": "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/build-4",
+  "exit": "nonzero",
+  "primaryError": "ValueError: expected a fresh correction-3/build-4 evidence directory",
+  "reason": "The evidence directory was created before invoking the runner; its exact-path guard intentionally requires it to be absent so the runner can create it. The command stopped at the guard before source/config loading or geometry.",
+  "interpreterIdentity": {
+    "executable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "prefix": "C:\\vibe\\localSimulator\\pipeline\\.venv"
+  },
+  "candidateGeometryEvaluated": false,
+  "candidateBuffersWritten": false,
+  "candidateEligibleForServing": false,
+  "roadBuildingWalkGates": {
+    "roadDrapeAndOwnership": false,
+    "completeBuildingContact": false,
+    "sharedWalkSurface": false
+  },
+  "browserRun": false,
+  "preservationSnapshot": "preservation-at-stop.json",
+  "preservationPaths": 920,
+  "currentOwnedOutputExcluded": true,
+  "build3AndEarlierEvidenceIncluded": true,
+  "nextFixSuggestion": "The next authorized correction should leave correction-3/build-4 nonexistent before calling the runner; do not repeat ordinal 4 unless the coordinator explicitly reconciles this consumed invocation."
+}

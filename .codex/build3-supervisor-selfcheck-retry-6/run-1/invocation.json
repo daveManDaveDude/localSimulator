@@ -1,0 +1,427 @@
+{
+  "absoluteDeadlineMonotonicSeconds": 322060.9045148,
+  "buildOrdinal": 3,
+  "candidateBuilt": false,
+  "candidateEligibleForServing": false,
+  "command": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\run_teignmouth_float32_build3.py",
+    "--self-check"
+  ],
+  "elapsedWallSeconds": 4.737420600024052,
+  "error": {
+    "message": "deadline during bounded descendant containment census",
+    "type": "TimeoutError"
+  },
+  "finallyTermination": {
+    "activeProcessCountAfterRequest": 0,
+    "deadlineReached": false,
+    "terminationConfirmed": true,
+    "terminationRequested": true,
+    "waitBudgetMilliseconds": 3000
+  },
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "mode": "self-check",
+  "modeBudgetSeconds": 10.0,
+  "monotonicStartSeconds": 322050.9045148,
+  "normalHelperCompletion": {
+    "drainError": null,
+    "drainIterations": 1,
+    "evidenceCheckpointErrors": [],
+    "exits": {
+      "interpreter": {
+        "code": 7,
+        "error": null,
+        "status": "observed"
+      },
+      "launcher": {
+        "code": 7,
+        "error": null,
+        "status": "observed"
+      }
+    },
+    "finalAcceptance": {
+      "accepted": true,
+      "accountingAfter": 0,
+      "accountingBefore": 0,
+      "completePids": [],
+      "interpreterExitCode": 7,
+      "launcherExitCode": 7
+    },
+    "firstSnapshot": {
+      "accountingAfter": {
+        "error": null,
+        "status": "observed",
+        "value": 0
+      },
+      "accountingBefore": {
+        "error": null,
+        "status": "observed",
+        "value": 0
+      },
+      "complete": true,
+      "exitStates": {
+        "interpreter": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        },
+        "launcher": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        }
+      },
+      "knownNormalPairPids": [
+        2604,
+        35560
+      ],
+      "normalPairIdentities": {
+        "interpreter": {
+          "creationFileTime": 134374043048703625,
+          "imagePath": "C:\\Python313\\python.exe",
+          "imageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+          "pid": 35560
+        },
+        "launcher": {
+          "creationFileTime": 134374043048560864,
+          "imagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+          "imageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+          "pid": 2604
+        }
+      },
+      "observedEndMonotonicSeconds": 322052.4724916,
+      "observedStartMonotonicSeconds": 322052.4724476,
+      "phase": "post-wait",
+      "pidCensus": {
+        "attempts": 1,
+        "bufferBytes": 264,
+        "bufferCapacity": 32,
+        "complete": true,
+        "countAssigned": 0,
+        "countListed": 0,
+        "partialPids": [],
+        "pids": [],
+        "queryError": null,
+        "returnedBytes": 8,
+        "status": "complete"
+      },
+      "unexpectedPids": [],
+      "waitStates": {
+        "interpreter": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        },
+        "launcher": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        }
+      }
+    },
+    "handleOwnership": {
+      "interpreter": {
+        "owned": false,
+        "status": "released"
+      },
+      "launcher": {
+        "owned": false,
+        "status": "released"
+      }
+    },
+    "helperStart": {
+      "deadlineQpc": 3220609045148,
+      "launcherCreationFileTime": 134374043048560864,
+      "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+      "launcherPid": 2604,
+      "mode": "nonzero",
+      "nonce": "29bfd3267f464e9a940bdd29242e3113",
+      "qpcFrequency": 10000000,
+      "schema": "teignmouth-build3-helper-script-start-v1",
+      "scriptCreationFileTime": 134374043048703625,
+      "scriptImagePath": "C:\\Python313\\python.exe",
+      "scriptImageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "scriptPid": 35560,
+      "supervisorCreationFileTime": 134374043044614052,
+      "supervisorPid": 4092
+    },
+    "identities": {
+      "interpreter": {
+        "creationFileTime": 134374043048703625,
+        "imagePath": "C:\\Python313\\python.exe",
+        "imageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+        "pid": 35560
+      },
+      "launcher": {
+        "creationFileTime": 134374043048560864,
+        "imagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+        "imageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+        "pid": 2604
+      }
+    },
+    "latestSnapshot": {
+      "accountingAfter": {
+        "error": null,
+        "status": "observed",
+        "value": 0
+      },
+      "accountingBefore": {
+        "error": null,
+        "status": "observed",
+        "value": 0
+      },
+      "complete": true,
+      "exitStates": {
+        "interpreter": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        },
+        "launcher": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        }
+      },
+      "knownNormalPairPids": [
+        2604,
+        35560
+      ],
+      "normalPairIdentities": {
+        "interpreter": {
+          "creationFileTime": 134374043048703625,
+          "imagePath": "C:\\Python313\\python.exe",
+          "imageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+          "pid": 35560
+        },
+        "launcher": {
+          "creationFileTime": 134374043048560864,
+          "imagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+          "imageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+          "pid": 2604
+        }
+      },
+      "observedEndMonotonicSeconds": 322052.4746972,
+      "observedStartMonotonicSeconds": 322052.4746521,
+      "phase": "drain-inner-job",
+      "pidCensus": {
+        "attempts": 1,
+        "bufferBytes": 264,
+        "bufferCapacity": 32,
+        "complete": true,
+        "countAssigned": 0,
+        "countListed": 0,
+        "partialPids": [],
+        "pids": [],
+        "queryError": null,
+        "returnedBytes": 8,
+        "status": "complete"
+      },
+      "unexpectedPids": [],
+      "waitStates": {
+        "interpreter": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        },
+        "launcher": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        }
+      }
+    },
+    "phase": "normal-complete",
+    "primaryError": null,
+    "waits": {
+      "interpreter": {
+        "signaled": true,
+        "status": "observed",
+        "telemetry": {
+          "lastSample": null,
+          "partialScope": false,
+          "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+          "peakPerProcessPeakWorkingSetBytes": {},
+          "sampleCount": 0,
+          "sampleIntervalTargetSeconds": 0.25,
+          "samplingErrors": [],
+          "successfulMemoryObservationCount": 0,
+          "telemetryStatus": "unavailable: no successful contained process samples",
+          "unavailableProcessObservationCount": 0
+        },
+        "timedOut": false
+      },
+      "launcher": {
+        "signaled": true,
+        "status": "observed",
+        "telemetry": {
+          "lastSample": null,
+          "partialScope": false,
+          "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+          "peakPerProcessPeakWorkingSetBytes": {},
+          "sampleCount": 0,
+          "sampleIntervalTargetSeconds": 0.25,
+          "samplingErrors": [],
+          "successfulMemoryObservationCount": 0,
+          "telemetryStatus": "unavailable: no successful contained process samples",
+          "unavailableProcessObservationCount": 0
+        },
+        "timedOut": false
+      }
+    }
+  },
+  "normalHelperExitCode": 7,
+  "normalHelperScriptStart": {
+    "deadlineQpc": 3220609045148,
+    "launcherCreationFileTime": 134374043048560864,
+    "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "launcherPid": 2604,
+    "mode": "nonzero",
+    "nonce": "29bfd3267f464e9a940bdd29242e3113",
+    "qpcFrequency": 10000000,
+    "schema": "teignmouth-build3-helper-script-start-v1",
+    "scriptCreationFileTime": 134374043048703625,
+    "scriptImagePath": "C:\\Python313\\python.exe",
+    "scriptImageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+    "scriptPid": 35560,
+    "supervisorCreationFileTime": 134374043044614052,
+    "supervisorPid": 4092
+  },
+  "normalHelperTelemetry": {
+    "lastSample": null,
+    "partialScope": false,
+    "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+    "peakPerProcessPeakWorkingSetBytes": {},
+    "sampleCount": 0,
+    "sampleIntervalTargetSeconds": 0.25,
+    "samplingErrors": [],
+    "successfulMemoryObservationCount": 0,
+    "telemetryStatus": "unavailable: no successful contained process samples",
+    "unavailableProcessObservationCount": 0
+  },
+  "normalHelperTimedOut": false,
+  "normalInterpreterTelemetry": {
+    "lastSample": null,
+    "partialScope": false,
+    "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+    "peakPerProcessPeakWorkingSetBytes": {},
+    "sampleCount": 0,
+    "sampleIntervalTargetSeconds": 0.25,
+    "samplingErrors": [],
+    "successfulMemoryObservationCount": 0,
+    "telemetryStatus": "unavailable: no successful contained process samples",
+    "unavailableProcessObservationCount": 0
+  },
+  "normalInterpreterTimedOut": false,
+  "numericalCutoffMonotonicSeconds": null,
+  "numericalCutoffSeconds": null,
+  "outerCommandExitCode": 2,
+  "parentHandoff": {
+    "baseInterpreterPath": "C:\\Python313\\python.exe",
+    "baseInterpreterSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+    "budgetSeconds": 10.0,
+    "clockDomain": "windows-qpc",
+    "deadlineQpc": 3220609045148,
+    "expectedSupervisorScript": "C:\\vibe\\localSimulator\\pipeline\\scripts\\run_teignmouth_float32_build3.py",
+    "externalRuntimeManifestSha256": null,
+    "inputManifestSha256": null,
+    "launcherCreationFileTime": 134374043043399572,
+    "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "launcherPath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "launcherPid": 27132,
+    "launcherSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "mode": "self-check",
+    "nonce": "29bfd3267f464e9a940bdd29242e3113",
+    "oneUse": true,
+    "phase": "nonnumerical-self-check",
+    "qpcFrequency": 10000000,
+    "reservedLedgerSnapshotSha256": null,
+    "runtimeIdentitySha256": null,
+    "schema": "teignmouth-build3-parent-handoff-v2",
+    "scriptStartIdentity": {
+      "absoluteDeadlineMonotonicSeconds": 322060.9045148,
+      "launcherCreationFileTime": 134374043043399572,
+      "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+      "launcherPid": 27132,
+      "mode": "self-check",
+      "nonce": "29bfd3267f464e9a940bdd29242e3113",
+      "schema": "teignmouth-build3-script-start-v1",
+      "scriptCreationFileTime": 134374043044614052,
+      "scriptImagePath": "C:\\Python313\\python.exe",
+      "scriptImageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "scriptPath": "C:\\vibe\\localSimulator\\pipeline\\scripts\\run_teignmouth_float32_build3.py",
+      "scriptPid": 4092,
+      "wrapperCreationFileTime": 134374043032488124,
+      "wrapperImagePath": "C:\\Users\\david\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "wrapperImageSha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+      "wrapperPid": 33604
+    },
+    "standaloneAuthorizationSha256": null,
+    "standalonePurpose": null,
+    "startQpc": 3220509045148,
+    "status": "LAUNCHER_BOUND_BEFORE_RESUME",
+    "wrapperCreationFileTime": 134374043032488124,
+    "wrapperImagePath": "C:\\Users\\david\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+    "wrapperImageSha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+    "wrapperPid": 33604
+  },
+  "schema": "teignmouth-build3-supervisor-invocation-v1",
+  "startedUtc": "2026-10-25T12:18:24.853550+00:00",
+  "status": "BLOCKED_SELFCHECK",
+  "supervisorPid": 4092,
+  "wallLimitSeconds": 10.0
+}

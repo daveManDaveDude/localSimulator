@@ -1,8 +1,8 @@
 # Project instructions
 
-## Agent workflow update (2026-10-23)
+## Agent workflow update (2026-10-24)
 
-The user authorized the revised agent skills and handoff workflow on 2026-10-23. Follow `docs/agent-workflow.md` and the current `torquay-plan-implementation` skill for model routing, early diagnosis, bounded corrections and evidence reuse. The invoking chat is the sole coordinator: recommend Luna medium for routine coordination and Sol 6.1 medium for the current coupled Teignmouth numerical/timing work. A skill cannot change the chat's selected model. Existing issue budgets and reserved attempts carry forward; this metadata update grants no extra correction or trial attempts and does not resume the user's paused implementation. Resume only on subsequent user direction, after reconciling the compact checkpoint at `.codex/torquay-plan-implementation.md` with actual files and agent state. Keep the scope and geographic/source constraints below.
+The user authorized the revised agent roles and correction workflow on 2026-10-24. Follow `docs/agent-workflow.md` and the current `torquay-plan-implementation` skill: Luna medium orchestrates and Luna high implements; Sol 6.1 medium always plans, diagnoses and independently reviews; Sol may make one correction only if an actionable finding remains after all four completed Luna correction cycles have been reviewed. A Sol correction must be reviewed by a different Sol session. A skill cannot change the chat's selected model. Existing issue budgets and reserved attempts carry forward; this metadata update grants no extra attempts to existing issues and does not resume paused or exhausted implementation. Resume only on subsequent user direction, after reconciling the compact checkpoint at `.codex/torquay-plan-implementation.md` with actual files and agent state. Keep the scope and geographic/source constraints below.
 
 ## Accepted product and geographic constraints
 

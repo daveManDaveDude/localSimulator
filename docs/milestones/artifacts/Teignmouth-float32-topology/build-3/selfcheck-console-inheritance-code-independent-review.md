@@ -1,0 +1,43 @@
+# Independent code review — self-check console inheritance
+
+2026-10-25. Independent Sol reviewer `/root/sol_review_face_diag`, under disposition 93. **FIX REQUIRED:** the new stdio cleanup suppresses unconfirmed release failures and can continue to successful execution. This is an implementation review, distinct from the accepted plan-only PASS. No correction or operation is authorized here.
+
+Reviewed actual S against `selfcheck-console-inheritance-plan.md` SHA-256 `d8400f4fa3c1b5c1e294cffbac6586eaea9830e20ea2dc9b10cdea0e3d2d519`, independent plan review, retry-4 diagnosis and dispositions 89–93. Reviewed the implementation handoff and coordinator-recorded Ruff check/format exit-0 results; no checks were rerun.
+
+## Verified bytes and scope
+
+| File | Independently recalculated SHA-256 |
+| --- | --- |
+| S `pipeline/scripts/run_teignmouth_float32_build3.py` | `107e60ec49a929e83511e832db4858884ac4c60327110d4fb7a085fd731bfd0d` |
+| W `pipeline/scripts/invoke_teignmouth_float32_build3.ps1` | `6ed89a17b769b15069c9ee47ca85f1bf72adf36e43b362772b0bf7749906049b` |
+| H `pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py` | `13188dc1bfb10c5e7e3e92da91274f1529b7771ea735e8675df8caff5ad4b501` |
+| P `pipeline/scripts/teignmouth_build3_runtime_preflight.py` | `aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b` |
+
+A read-only in-memory inverse removed the new query helper, new signature/type check, exactly two opt-in keywords and the changed creation/stdio block, restoring the old block exactly. Result SHA-256 is `64bf2c4abf822ad55252789315d71731d2660d66bb5b6bc7d60f810f2de492c7`, the accepted baseline. Thus no other S bytes changed, including diagnostics, census, rejection, retained-handle reaping, error-reporting guards, Jobs/identity/deadlines and final cleanup. W/H/P match their unchanged bindings. No reconstructed source was written or executed. These untracked operational files provide no reliable Git index baseline; none is claimed.
+
+## Concrete blocker
+
+**1. Stdio close failure disappears and does not block successful launch — S 2013–2020, followed by 2023–2040.** The new finally calls `kernel.CloseHandle(stdio_handle)` without inspecting its BOOL result (2016). Every raised BaseException is silently discarded (2017–2020), with no retained failure indicator, native error or release-unconfirmed state. If CreateProcess succeeded, execution proceeds to assignment, authorization, ResumeThread and successful return even when one or more parent stdio handles failed to close. The later self-check acceptance predicates cannot discover this discarded cleanup failure, so the overall result can still become PASS with unconfirmed stdio release. The shared function gives the same silent behavior to the three default callers.
+
+The loop does improve primary-launch-exception preservation and attempts later handles when a close raises. That does not establish successful closure or truthful cleanup/error behavior. Accepted plan 51 requires closing the owned handles on these paths without losing primary failure; plan 83 requires failure ownership, and the accepted independent plan review explicitly requires successful creation to remain under process/thread cleanup ownership if stdio cleanup reports a problem. The implementation never reports or retains such a problem. It has therefore implemented only the attempt portion of that contract.
+
+Required acceptance is to distinguish successful closure from false/raised/unconfirmed closure, preserve the original query/CreateProcess failure when one already exists, attempt the remaining handles without retry/double-close, and prevent an otherwise successful launch from silently accepting an unconfirmed cleanup failure. Any resulting failure after successful creation must retain suspended-process/thread/Job ownership and bounded cleanup; it must not orphan an unassigned suspended process by raising outside that ownership path. This report identifies the missing behavior; it does not authorize or implement a patch. No actual close failure or leak was reproduced.
+
+## Other criteria
+
+| Criterion | Assessment and current S references |
+| --- | --- |
+| API binding/laziness | **PASS.** `_api` retains WinDLL use_last_error at 195 and existing no-argument/DWORD GetCurrentProcessId binding at 273–274. New GetConsoleProcessList pointer/DWORD binding is local to `_require_current_console` (1880–1889), called only at 1993 when opted in. No import-time/default-mode query or wider API is added. |
+| Finite query and error semantics | **PASS.** 1891–1948 match native PID to os.getpid; start at 32 DWORDs; permit four calls/max4096; never pass null/zero; ignore an oversized buffer; reject zero/duplicate/missing-current IDs. Zero captures ctypes' saved native error before the next clock (1910–1917). A late call is TimeoutError before any success use; explicit captured code zero still raises failure. No native error is retrieved after cleanup. |
+| Deadline and attachment | **PASS, static.** Checks precede/follow binding, allocation, native query, PID traversal and final attachment acceptance. The original handoff-derived deadline is passed unchanged; no reset/sleep/unbounded retry. Query is immediately before creation, after authenticated handoff and stdio preparation. Current-console observation is not host ownership or an atomic association pin; unknown/late attachment cannot opt in. Native calls are not preempted by Python checks. |
+| Exactly two opted-in calls | **PASS.** Normal helper 3709–3719 and tree-root 3971–3981 alone pass True. Each independently calls the precondition. Standalone preflight 4299–4308, build preflight 4618–4627 and numerical runner 4716–4724 omit it. Keyword-only default and strict bool check at 1960–1964 prevent arbitrary truthy policy values. |
+| Flags, stdio and console scope | **PASS apart from cleanup blocker.** 1996–2009 preserve CREATE_SUSPENDED and add CREATE_NO_WINDOW only for the default. Commands, environment, CWD, inheritable redirected NUL/log handles and STARTF_USESTDHANDLES remain. No new/attached/freed/visible console API, breakaway, new group or interpreter replacement exists. Efficacy of inheritance remains a hypothesis. |
+| CreateProcess primary failure | **PASS for observed false/query/creation exceptions.** False error is saved immediately at 2011–2012, before stdio closes, then raised with that explicit code at 2021–2022. Query/creation exceptions propagate through finally; the current close suppression preserves them. This does not close blocker 1's false-success behavior. |
+| Suspended process/thread/Job ownership | **PASS for existing post-create paths.** 2023–2070 retains exact Job assignment before callback/resume, creation time/authorization, bounded termination/wait/exit evidence on failures and handle ownership. No resumed uncontained interval is introduced. A correction to blocker 1 must preserve these paths. Earlier partial-acquisition handling is byte-identical, not newly validated through execution. |
+| Strict census and acceptance | **PASS by exact inverse and inspected call ordering.** Complete post-wait capture at 3840, unconditional unexpected-member rejection and drain capture/rejection around 3891–3910 remain. Original zero/empty/zero prerequisite, actual retained exit7/7 proof and later tree probe remain untouched. Outer failure remains BLOCKED_SELFCHECK (4130 onward), with persistence guards and finally cleanup (4153 onward). Console clients are not admitted or reclassified as benign. |
+
+## Boundary and disposition
+
+Work was static source/document reading/searching, hashing and in-memory inverse comparison, plus this report. No source/checkpoint/disposition/manifest/evidence was edited. Retry evidence roots were not inspected or touched; their preservation is not independently rehashed by this review. No tests/imports/scripts/parsers/linters/compilers, process inspection/probes, wrapper/self-check/preflight/runtime/collection, root creation, GIS/numerical/build or browser operation ran. Coordinator-reported Ruff exit-0 results do not establish cleanup semantics or native behavior.
+
+No runtime efficacy, native handle success, containment timing or actual 10-second fit is demonstrated; **30-second runtime-profile fit remains unmeasured**. Consumed retry roots remain consumed/non-PASS. Outer exit1/internal2, historical census association uncertainty and unsaved `957157…` S provenance remain unresolved. FIX REQUIRED grants no correction or next action. Candidate remains **NO-GO and unservable**, build 3 **unreserved**, all fixed constraints/counters preserved. A separate coordinator decision is required; no self-check is authorized.

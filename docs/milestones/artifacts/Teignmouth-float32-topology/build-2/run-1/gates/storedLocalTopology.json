@@ -1,0 +1,13 @@
+{
+  "actualStoredLocalFloat32": true,
+  "boundaryEdgeCount": 166,
+  "constraintEdgeCount": 136656,
+  "edges": 194126,
+  "eulerCharacteristic": 1,
+  "missingConstraintEdges": 0,
+  "overlapAreaM2": 0.0,
+  "passes": true,
+  "triangles": 129362,
+  "uncoveredOrOutsideAreaM2": 0.0,
+  "vertices": 64765
+}

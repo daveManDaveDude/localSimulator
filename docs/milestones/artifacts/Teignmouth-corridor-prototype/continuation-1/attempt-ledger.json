@@ -1,0 +1,869 @@
+{
+  "schema": "torquay-attempt-ledger-v1",
+  "issueId": "Teignmouth-corridor-prototype-continuation-1",
+  "parentIssueId": "Teignmouth-corridor-prototype",
+  "authorizedDate": "2026-10-24",
+  "resetAuthorized": true,
+  "authorization": "User explicitly reset all attempt counters and delegated candidate-limit choices for continued Teignmouth road-alignment work.",
+  "scope": "Active local opt-in Teignmouth corridor prototype only. Earlier prototype attempts remain immutable history. The separate topology-validation-v2 issue is not reopened or run.",
+  "specification": {
+    "path": "docs/milestones/Teignmouth-corridor-prototype-continuation-spec.md",
+    "sha256": "BDAD83800B974D4E9BC4DB3ACB0100BC6B30F528DCB98797781A907167D92818",
+    "priorSha256": "474F8D46234D61B904511E372DA7F2A0181F20CD63106F37D33629788E53E933",
+    "coordinatorDecisionEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/limit-decision-1.md"
+  },
+  "solPlan": {
+    "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-plan.md",
+    "sha256": "99FF4419AAA779B1090C782EFFD91EC242A27BE8419607AA295E9A2D967F7981",
+    "agent": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium"
+  },
+  "roles": {
+    "orchestrator": "Luna",
+    "implementer": "Luna",
+    "planner": "Sol 6.1",
+    "reviewer": "Sol 6.1; reviewer must not have implemented the issue"
+  },
+  "limits": {
+    "candidateLocalMaxAbsoluteTerrainChangeM": "<6.5",
+    "candidateLocalMaxPositiveAddedEdgeGradientMPerM": "<1.0",
+    "targetLocalCrossSlopePercent": "<=5",
+    "targetFullWidthHeightSpanM": "<=0.30",
+    "targetCenterlineSourceHeightDeviationM": "<=2.0",
+    "targetAbsoluteLongitudinalGradePercent": "<=10",
+    "globalProductPolicyChanged": false
+  },
+  "budget": {
+    "diagnostics": {
+      "maximum": 3,
+      "used": 1,
+      "reserved": 0,
+      "maximumSecondsEach": 120
+    },
+    "lunaCorrectionCycles": {
+      "maximum": 4,
+      "used": 4,
+      "reserved": 0
+    },
+    "solCorrections": {
+      "maximum": 1,
+      "used": 1,
+      "reserved": 0,
+      "eligibleAfterLunaCyclesReviewed": 4
+    },
+    "implementationBuilds": {
+      "maximum": 6,
+      "used": 6,
+      "reserved": 0,
+      "maximumSecondsEach": 180
+    },
+    "independentConfirmationBuilds": {
+      "maximum": 1,
+      "used": 0,
+      "reserved": 0
+    },
+    "totalFullBuilds": {
+      "maximum": 7,
+      "used": 6,
+      "reserved": 0
+    },
+    "parameterSweeps": false,
+    "arbitraryMemoryCap": false
+  },
+  "priorHistory": {
+    "originalPrototypeBuilds": 1,
+    "originalPrototypeDiagnostics": 1,
+    "completedSolCorrectionCycles": 1,
+    "correctionBuilds": 1,
+    "historicalCounterReset": false,
+    "priorEvidencePreserved": true
+  },
+  "status": "NEEDS USER DECISION",
+  "solCorrection1Review": {
+    "reviewer": "/root/sol_correction_reviewer",
+    "model": "gpt-6.1-sol",
+    "verdict": "FIX REQUIRED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/independent-sol-review.md",
+    "finding": "Distinct Float64 construction vertices collide at Float32 precision; mandatory topology gate fails before completed final mesh. Later offline coherence gates remain unevidenced.",
+    "approvedCapCorrectionCorrectlyScoped": true,
+    "attemptsSpentByReview": 0,
+    "candidateEligibleForServing": false,
+    "nextDisposition": "NEEDS USER DECISION; stop implementation and dependent dispatch; no retry, confirmation, diagnostic or browser work authorized by review."
+  },
+  "events": [
+    {
+      "event": "continuation-budget-reset-authorized",
+      "actor": "user",
+      "date": "2026-10-24",
+      "countersAfterEvent": {
+        "diagnostics": 0,
+        "lunaCorrectionCycles": 0,
+        "solCorrections": 0,
+        "implementationBuilds": 0,
+        "confirmationBuilds": 0
+      }
+    },
+    {
+      "event": "sol-plan-accepted",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24"
+    },
+    {
+      "event": "initial-luna-implementation-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "implementationBuildReserved": false,
+      "diagnosticsReserved": 0
+    },
+    {
+      "event": "initial-build-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "date": "2026-10-24",
+      "buildOrdinal": 1,
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/build-1",
+      "wallLimitSeconds": 180,
+      "preconditions": {
+        "syntheticTests": "10 passed",
+        "ruff": "passed"
+      }
+    },
+    {
+      "event": "initial-build-failed-runtime-instrumentation",
+      "actor": "/root/corridor_continuation_luna",
+      "date": "2026-10-24",
+      "buildOrdinal": 1,
+      "used": true,
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/build-1",
+      "reason": "Windows ctypes.GetProcessMemoryInfo handle conversion raised OverflowError before report.json was written; no rerun performed."
+    },
+    {
+      "event": "initial-sol-independent-review-dispatched",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "implementationEditsForbidden": true,
+      "buildsOrTestsForbidden": true
+    },
+    {
+      "event": "initial-sol-independent-review-completed",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "verdict": "FIX REQUIRED",
+      "correctionCycleReserved": 1,
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/independent-sol-review.md",
+      "findings": [
+        "continuation parser rejects candidate config",
+        "Windows telemetry masks primary config error and prevents durable report",
+        "target-section acceptance samples ideal recipe rather than final mesh",
+        "preservation snapshot excludes historical corridor evidence"
+      ],
+      "attemptsSpentByReview": 0
+    },
+    {
+      "event": "luna-correction-cycle-1-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "reviewFindings": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "buildOrdinalReserved": false,
+      "nextBuildOrdinal": 2,
+      "diagnosticsReserved": 0
+    },
+    {
+      "event": "luna-correction-1-build-2-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 2,
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/build-2",
+      "wallLimitSeconds": 180,
+      "diagnosticsReserved": 0,
+      "focusedChecks": {
+        "pytest": "18 passed",
+        "ruff": "passed",
+        "pyCompile": "passed",
+        "builderHelp": "passed",
+        "gitDiffCheck": "passed"
+      }
+    },
+    {
+      "event": "luna-correction-1-submitted",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 2,
+      "verdictPending": "independent-sol-review",
+      "status": "STOP",
+      "reason": "builder invoked under repository root; pipeline package was absent from sys.path and import failed before geometry.",
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/build-2",
+      "preservationPaths": 910,
+      "preservationChangedPaths": 0
+    },
+    {
+      "event": "luna-correction-1-sol-independent-review-dispatched",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "implementationEditsForbidden": true,
+      "buildsOrTestsForbidden": true,
+      "attemptsSpent": 0
+    },
+    {
+      "event": "luna-correction-1-sol-independent-review-completed",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "verdict": "FIX REQUIRED",
+      "correctionCycleUsed": 1,
+      "buildsUsed": 2,
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/independent-sol-review.md",
+      "findings": [
+        "repository-root builder cannot import torquay_pipeline",
+        "missing combined primary-error and telemetry-failure regression test"
+      ],
+      "attemptsSpentByReview": 0
+    },
+    {
+      "event": "luna-correction-cycle-2-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "reviewFindings": [
+        1,
+        2
+      ],
+      "nextBuildOrdinal": 3,
+      "buildOrdinalReserved": false,
+      "diagnosticsReserved": 0
+    },
+    {
+      "event": "luna-correction-2-build-3-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 3,
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/build-3",
+      "wallLimitSeconds": 180,
+      "diagnosticsReserved": 0,
+      "focusedChecks": {
+        "pytest": "20 passed",
+        "ruff": "passed",
+        "pyCompile": "passed",
+        "rootImportSmoke": "passed",
+        "gitDiffCheck": "passed"
+      }
+    },
+    {
+      "event": "luna-correction-2-submitted",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 3,
+      "verdictPending": "independent-sol-review",
+      "status": "STOP",
+      "reason": "repository-root package discovery works, but invoking system Python lacks the existing pipeline numpy dependency; module import stopped before geometry.",
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/build-3",
+      "preservationPaths": 915,
+      "preservationChangedPaths": 0
+    },
+    {
+      "event": "luna-correction-2-sol-independent-review-completed",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "implementationEditsForbidden": true,
+      "buildsOrTestsForbidden": true,
+      "verdict": "FIX REQUIRED",
+      "findings": [
+        "root-level command selected a Python interpreter without project NumPy; existing pipeline virtual environment contains project dependencies",
+        "build-3 guard/error text still names correction-1/build-2",
+        "candidate geometry and offline coherence gates remain untested"
+      ],
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/independent-sol-review.md",
+      "attemptsSpent": 0,
+      "preservationRehash": {
+        "paths": 915,
+        "mismatches": 0,
+        "beforeAfterSnapshotsIdentical": true
+      }
+    },
+    {
+      "event": "luna-correction-cycle-3-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "reviewFindings": [
+        1,
+        2
+      ],
+      "nextBuildOrdinal": 4,
+      "buildOrdinalReserved": false,
+      "diagnosticsReserved": 0,
+      "requiredPreflight": "GIS-free import smoke using pipeline/.venv/Scripts/python.exe before reserving ordinal 4"
+    },
+    {
+      "event": "luna-correction-3-build-4-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 4,
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/build-4",
+      "wallLimitSeconds": 180,
+      "interpreter": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "preconditions": {
+        "pytest": "20 passed",
+        "ruff": "passed",
+        "pyCompile": "passed",
+        "gitDiffCheck": "passed",
+        "importSmoke": "passed with exact build interpreter; no GIS data read"
+      }
+    },
+    {
+      "event": "luna-correction-3-submitted-runner-guard-blocked",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 4,
+      "status": "STOP_BEFORE_BUILD",
+      "reason": "Precreated evidence directory violated runner freshness guard; runner exited before geometry. Invocation consumed and not repeated.",
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/build-4/implementation-stop.json",
+      "preservationPaths": 920,
+      "build3Included": true,
+      "verdictPending": "independent-sol-review"
+    },
+    {
+      "event": "luna-correction-3-sol-independent-review-completed",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "implementationEditsForbidden": true,
+      "buildsOrTestsForbidden": true,
+      "verdict": "FIX REQUIRED",
+      "findings": [
+        "build 4 evidence leaf was precreated; runner freshness guard correctly stopped before source loading",
+        "post-stop preservation inventory is not a before/after comparison or preservation pass"
+      ],
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/independent-sol-review.md",
+      "attemptsSpent": 0,
+      "countersAfterReview": {
+        "diagnostics": 0,
+        "implementationBuilds": 4,
+        "lunaCorrections": 3,
+        "solCorrections": 0
+      }
+    },
+    {
+      "event": "luna-correction-cycle-4-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "reviewFindings": [
+        1,
+        2
+      ],
+      "nextBuildOrdinal": 5,
+      "buildOrdinalReserved": false,
+      "diagnosticsReserved": 0,
+      "requiredPreflight": "Keep preparation metadata outside absent correction-4/build-5 leaf; let runner create the leaf"
+    },
+    {
+      "event": "luna-correction-4-build-5-reserved",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 5,
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5",
+      "wallLimitSeconds": 180,
+      "interpreter": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "preconditions": {
+        "pytest": "20 passed",
+        "ruff": "passed",
+        "pyCompile": "passed",
+        "gitDiffCheck": "passed",
+        "importSmoke": "passed with exact build interpreter; no GIS data read",
+        "outputLeafAbsent": true,
+        "priorBuild4FilesHashed": 2
+      }
+    },
+    {
+      "event": "luna-correction-4-submitted-earthwork-stop",
+      "actor": "/root/corridor_continuation_luna",
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "date": "2026-10-24",
+      "buildOrdinal": 5,
+      "status": "STOP",
+      "stopReason": "strict <6.0m candidate-local earthwork preflight failed at 6.05682075734589m, before full mesh assembly.",
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/report.json",
+      "preservationPaths": 925,
+      "preservationChangedPaths": [],
+      "build4FilesUnchanged": true,
+      "verdictPending": "independent-sol-review"
+    },
+    {
+      "event": "luna-correction-4-sol-independent-review-completed",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "implementationEditsForbidden": true,
+      "buildsOrTestsForbidden": true,
+      "verdict": "FIX REQUIRED",
+      "findings": [
+        "build 5 source/chart loaded but first earthwork sample 6.0568207573m exceeds strict <6.0m",
+        "reported violation is first failure, not global maximum",
+        "full mesh and coherence gates remain untested"
+      ],
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/independent-sol-review.md",
+      "attemptsSpent": 0,
+      "preservation": {
+        "paths": 925,
+        "reportedChangedPaths": 0,
+        "independentlyRehashed": false
+      }
+    },
+    {
+      "event": "sol-diagnostic-1-reserved",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "date": "2026-10-24",
+      "diagnosticLimitSeconds": 120,
+      "goal": "measure full unchanged candidate recipe source-relative earthwork field and global maximum/location; no edits, parameter sweep, mesh assembly or build",
+      "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/"
+    },
+    {
+      "event": "sol-diagnostic-1-consumed",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "status": "COMPLETE",
+      "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/full-field-earthwork.json",
+      "diagnosticsUsed": 1,
+      "diagnosticsReserved": 0,
+      "implementationBuildsSpent": 0,
+      "correctionCyclesSpent": 0
+    },
+    {
+      "event": "coordinator-limit-decision-1",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "scope": "continuation-1 candidate-local terrain-change gate only",
+      "oldValue": "<6.0 m",
+      "newValue": "<6.5 m",
+      "basis": "Diagnostic 1 computed 6.397848390875038 m maximum absolute change across all 21336 required preflight samples; 49 exceed old 6 m gate. All other thresholds remain unchanged.",
+      "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/limit-decision-1.md",
+      "specSha256": "BDAD83800B974D4E9BC4DB3ACB0100BC6B30F528DCB98797781A907167D92818"
+    },
+    {
+      "event": "sol-correction-cycle-1-reserved",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "date": "2026-10-24",
+      "eligibleAfterAllFourLunaReviews": true,
+      "candidateLocalLimitChange": "<6.0 m -> <6.5 m",
+      "requiredBuildOrdinal": 6,
+      "buildLimitSeconds": 180,
+      "independentReviewerRequired": true
+    },
+    {
+      "event": "sol-correction-1-submitted-build-6-consumed",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "date": "2026-10-24",
+      "status": "STOP",
+      "reason": "TopologyError: distinct Float64 topology vertices collide after Float32 conversion: (-164.2316811012587, -85.5) and (-164.23167542853238, -85.5)",
+      "solCorrectionsUsed": 1,
+      "implementationBuildsUsed": 6,
+      "independentConfirmationBuildsUsed": 0,
+      "separateIndependentSolReviewRequired": true
+    }
+  ],
+  "initialReview": {
+    "reviewer": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "verdict": "FIX REQUIRED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/independent-sol-review.md",
+    "correctionCycleReserved": 1
+  },
+  "correction1Review": {
+    "reviewer": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "verdict": "FIX REQUIRED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/independent-sol-review.md",
+    "findings": [
+      "root invocation cannot import package",
+      "telemetry-failure regression test missing"
+    ],
+    "correctionCycleReserved": 2
+  },
+  "initialImplementation": {
+    "agent": "/root/corridor_continuation_luna",
+    "model": "gpt-6-luna",
+    "reasoning": "high",
+    "reserved": false,
+    "startedAt": "2026-10-24",
+    "plannedPaths": [
+      "pipeline/torquay_pipeline/teignmouth_corridor_continuation.py",
+      "pipeline/scripts/build_teignmouth_corridor_continuation.py",
+      "pipeline/tests/test_teignmouth_corridor_continuation.py",
+      "config/road-surface-teignmouth-corridor-continuation.json",
+      "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/"
+    ],
+    "implementationBuildReserved": false,
+    "diagnosticsReserved": 0,
+    "submitted": true,
+    "result": {
+      "buildOrdinal": 1,
+      "command": "python pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/build-1",
+      "exit": "nonzero; builder crashed while measuring peak working set",
+      "exception": "ctypes.ArgumentError: argument 1: OverflowError: int too long to convert",
+      "evidenceObserved": [
+        "preservation-before.json"
+      ],
+      "reportWritten": false,
+      "geometryBuffersWritten": false,
+      "candidateRuntimeBuffersWritten": false,
+      "browser": "not run",
+      "primaryErrorInferredFromCodeReview": {
+        "finding": "legacy parser rejects the continuation-only config shape and data/generated output path",
+        "source": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/independent-sol-review.md",
+        "capturedTraceback": false
+      }
+    }
+  },
+  "correction1": {
+    "agent": "/root/corridor_continuation_luna",
+    "model": "gpt-6-luna",
+    "reasoning": "high",
+    "reviewFindingsAddressed": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "reserved": false,
+    "focusedChecks": {
+      "pytest": "18 passed",
+      "ruffCheck": "passed",
+      "ruffFormat": "passed",
+      "pyCompile": "passed",
+      "builderHelp": "passed",
+      "gitDiffCheck": "passed"
+    },
+    "buildOrdinalReserved": false,
+    "buildLimitSeconds": 180,
+    "diagnosticsReserved": 0,
+    "browserAuthorized": false,
+    "submitted": true,
+    "result": {
+      "buildOrdinal": 2,
+      "command": "python pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/build-2",
+      "status": "STOP",
+      "primaryError": "ModuleNotFoundError: No module named torquay_pipeline",
+      "primaryErrorCaptured": true,
+      "preservation": {
+        "passes": true,
+        "comparedPaths": 910,
+        "changedPaths": [],
+        "previousCorridorEvidenceIncluded": true
+      },
+      "resources": {
+        "wallSeconds": 0.8531114000070374,
+        "peakWorkingSetBytes": 24616960,
+        "peakWorkingSetStatus": "measured"
+      },
+      "candidateGeometryEvaluated": false,
+      "candidateEligibleForServing": false,
+      "browser": "not run"
+    }
+  },
+  "correction2": {
+    "agent": "/root/corridor_continuation_luna",
+    "model": "gpt-6-luna",
+    "reasoning": "high",
+    "reserved": false,
+    "reviewFindingsAddressed": [
+      1,
+      2
+    ],
+    "focusedChecks": {
+      "pytest": "20 passed",
+      "ruffCheck": "passed",
+      "ruffFormat": "passed",
+      "pyCompile": "passed",
+      "repositoryRootImportSmoke": "passed; no GIS data read",
+      "gitDiffCheck": "passed"
+    },
+    "buildOrdinalReserved": false,
+    "buildLimitSeconds": 180,
+    "diagnosticsReserved": 0,
+    "browserAuthorized": false,
+    "submitted": true,
+    "result": {
+      "buildOrdinal": 3,
+      "command": "python pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/build-3",
+      "status": "STOP",
+      "primaryError": "ModuleNotFoundError: No module named numpy",
+      "primaryErrorCaptured": true,
+      "preservation": {
+        "passes": true,
+        "comparedPaths": 915,
+        "changedPaths": [],
+        "correction1EvidenceIncluded": true,
+        "historicalCorridorEvidenceIncluded": true
+      },
+      "resources": {
+        "wallSeconds": 0.8656799999880604,
+        "peakWorkingSetBytes": 26271744,
+        "peakWorkingSetStatus": "measured"
+      },
+      "candidateGeometryEvaluated": false,
+      "candidateEligibleForServing": false,
+      "browser": "not run"
+    }
+  },
+  "correction2Review": {
+    "reviewer": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "verdict": "FIX REQUIRED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/independent-sol-review.md",
+    "findings": [
+      "system Python lacks NumPy; use the existing pipeline virtual environment",
+      "correct stale correction-1/build-2 guard text",
+      "geometry remains untested"
+    ],
+    "correctionCycleReserved": 3,
+    "attemptsSpentByReview": 0
+  },
+  "correction3": {
+    "agent": "/root/corridor_continuation_luna",
+    "model": "gpt-6-luna",
+    "reasoning": "high",
+    "reserved": false,
+    "reviewFindingsAddressed": [
+      1,
+      2
+    ],
+    "buildOrdinalReserved": false,
+    "buildLimitSeconds": 180,
+    "diagnosticsReserved": 0,
+    "browserAuthorized": false,
+    "requiredPreconditions": [
+      "use repository pipeline virtual environment explicitly",
+      "GIS-free import smoke passes under exact build interpreter",
+      "correct stale build guard text",
+      "record interpreter identity and preservation exclusion"
+    ],
+    "focusedChecks": {
+      "pytest": "20 passed",
+      "ruffCheck": "passed",
+      "ruffFormat": "passed",
+      "pyCompile": "passed",
+      "exactVenvImportSmoke": "passed; no GIS data read",
+      "gitDiffCheck": "passed"
+    },
+    "interpreterIdentity": {
+      "executable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "recordedAt": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/preflight.json"
+    },
+    "submitted": true,
+    "result": {
+      "buildOrdinal": 4,
+      "command": "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/build-4",
+      "status": "STOP_BEFORE_BUILD",
+      "primaryError": "ValueError: expected a fresh correction-3/build-4 evidence directory",
+      "cause": "The directory was precreated, but runner guard requires absent output and creates it itself; no config/source import or geometry ran.",
+      "interpreter": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "preservation": {
+        "paths": 920,
+        "build3AndEarlierIncluded": true,
+        "snapshot": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/build-4/preservation-at-stop.json",
+        "changedPaths": "not measured; pre-build guard exited before before/after snapshots"
+      },
+      "candidateGeometryEvaluated": false,
+      "candidateEligibleForServing": false,
+      "browser": "not run"
+    }
+  },
+  "correction3Review": {
+    "reviewer": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "verdict": "FIX REQUIRED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/independent-sol-review.md",
+    "findings": [
+      "precreated build-4 leaf failed freshness guard before source load",
+      "post-stop inventory cannot establish preservation unchanged"
+    ],
+    "correctionCycleUsed": 3,
+    "buildsUsed": 4,
+    "correctionCycleReserved": 4,
+    "attemptsSpentByReview": 0
+  },
+  "correction4": {
+    "agent": "/root/corridor_continuation_luna",
+    "model": "gpt-6-luna",
+    "reasoning": "high",
+    "reserved": false,
+    "reviewFindingsAddressed": [
+      1,
+      2
+    ],
+    "focusedChecks": {
+      "pytest": "20 passed",
+      "ruffCheck": "passed",
+      "ruffFormat": "passed",
+      "pyCompile": "passed",
+      "exactVenvImportSmoke": "passed; no GIS data read",
+      "gitDiffCheck": "passed"
+    },
+    "interpreterIdentity": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/preflight.json",
+    "buildOrdinalReserved": false,
+    "buildLimitSeconds": 180,
+    "diagnosticsReserved": 0,
+    "browserAuthorized": false,
+    "build5LeafConfirmedAbsentBeforeReservation": true,
+    "submitted": true,
+    "result": {
+      "buildOrdinal": 5,
+      "command": "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5",
+      "status": "STOP",
+      "stopReasons": [
+        "necessary earthwork preflight violates strict <6m ceiling"
+      ],
+      "sourceLoaded": true,
+      "continuousChartConstructed": true,
+      "fullMeshAssembled": false,
+      "necessaryEarthworkPreflight": {
+        "criterion": "strict absolute source-relative earthwork <6 m",
+        "firstViolation": {
+          "absoluteChangeM": 6.05682075734589,
+          "candidateY": -2.7285011821391274,
+          "lateralM": -4.728539723370747,
+          "rule": "chart/source-plane edge intersection",
+          "sourceY": 3.3283195752067627,
+          "stationM": 144.0,
+          "xz": [
+            -145.09527317325922,
+            -96.90472682674081
+          ]
+        },
+        "maximumObservedAbsoluteChangeM": 6.05682075734589,
+        "passes": false,
+        "testedSamples": 8920
+      },
+      "candidateRuntimeBuffersWritten": false,
+      "candidateEligibleForServing": false,
+      "preservation": {
+        "passes": true,
+        "comparedPaths": 925,
+        "changedPaths": [],
+        "build4PreflightHashMatch": true
+      },
+      "interpreterIdentity": {
+        "executable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+        "prefix": "C:\\vibe\\localSimulator\\pipeline\\.venv",
+        "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]"
+      },
+      "resources": {
+        "candidateRuntimeBuffersWritten": false,
+        "peakWorkingSetBytes": 512458752,
+        "peakWorkingSetStatus": "measured",
+        "wallLimitSeconds": 180,
+        "wallSeconds": 3.1328547000011895
+      },
+      "browser": "not run"
+    }
+  },
+  "correction4Review": {
+    "reviewer": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "verdict": "FIX REQUIRED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/independent-sol-review.md",
+    "firstViolationM": 6.0568207573,
+    "strictLimitM": 6.0,
+    "violationIsGlobalMaximum": false,
+    "implementationBuildsUsed": 5,
+    "lunaCorrectionsUsed": 4,
+    "attemptsSpentByReview": 0
+  },
+  "diagnostic1": {
+    "agent": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "reserved": false,
+    "maximumSeconds": 120,
+    "goal": "measure the full current recipe earthwork field and global maximum against the unchanged <6.0m bound",
+    "constraints": [
+      "read-only code/data",
+      "no parameter sweeps",
+      "no mesh assembly",
+      "no implementation build",
+      "no browser or product work"
+    ],
+    "evidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/",
+    "completed": true,
+    "resultSha256": "0dea4598e429bffd12038bb401c00f922130e5c1fc0d243acb20be59ef4cd56f"
+  },
+  "diagnostic1Result": {
+    "status": "COMPLETE",
+    "evidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/full-field-earthwork.json",
+    "sha256": "0dea4598e429bffd12038bb401c00f922130e5c1fc0d243acb20be59ef4cd56f",
+    "wallSeconds": 2.5741689999995288,
+    "fullMeshAssembled": false,
+    "implementationBuildsSpent": 0,
+    "correctionCyclesSpent": 0
+  },
+  "solCorrection1": {
+    "agent": "/root/beamng_corridor_plan",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "reserved": false,
+    "role": "single authorized Sol correction after four reviewed Luna cycles",
+    "diagnosticEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/full-field-earthwork.json",
+    "decisionEvidence": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/limit-decision-1.md",
+    "requiredChange": "Update only candidate-local strict terrain-change gate and its focused tests/evidence to <6.5m; preserve every other limit and behavior.",
+    "implementationBuildOrdinal": 6,
+    "buildOrdinalReserved": false,
+    "buildEvidencePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6",
+    "buildLimitSeconds": 180,
+    "diagnosticsReserved": 0,
+    "browserAuthorized": false,
+    "independentSolReviewerRequired": true,
+    "submitted": true,
+    "result": {
+      "buildOrdinal": 6,
+      "status": "STOP",
+      "reason": "TopologyError: distinct Float64 topology vertices collide after Float32 conversion: (-164.2316811012587, -85.5) and (-164.23167542853238, -85.5)",
+      "report": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/report.json",
+      "observations": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/stage-observations.json",
+      "candidateEligibleForServing": false,
+      "preservationComparedPaths": 944,
+      "preservationChangedPaths": 0,
+      "wallSeconds": 7.373759900016012,
+      "peakWorkingSetBytes": 564113408,
+      "confirmationBuildRun": false,
+      "browserRun": false
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "actualModel": "unknown; runtime identity not exposed",
+  "actualReasoningEffort": "unknown; runtime setting not exposed",
+  "checks": [
+    {
+      "argv": [
+        "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_teignmouth_validation_process.py",
+        "tests/test_road_surface_validation_transition_v2.py",
+        "tests/test_road_surface_validation_v2.py",
+        "tests/test_teignmouth_cached_supervisor.py",
+        "tests/test_teignmouth_complete_profile.py",
+        "tests/test_road_surface_study.py",
+        "tests/test_road_surface_patch.py::test_patch_terrain_resource_limits_accept_boundary_and_reject_overflow",
+        "-q"
+      ],
+      "cwd": "C:\\vibe\\localSimulator\\pipeline",
+      "elapsedSeconds": 3.870027900004061,
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "........................................................................ [ 55%]\n...............................................s..........               [100%]\n=========================== short test summary info ===========================\nSKIPPED [1] tests\\test_road_surface_study.py:76: directory symlink creation is unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\david\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-david\\\\pytest-411\\\\test_study_preflight_rejects_s0\\\\outside' -> 'C:\\\\Users\\\\david\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-david\\\\pytest-411\\\\test_study_preflight_rejects_s0\\\\.codex\\\\evidence\\\\teignmouth-topology-study'\n129 passed, 1 skipped in 3.46s\n"
+    },
+    {
+      "argv": [
+        "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\ruff.exe",
+        "check",
+        "--no-cache",
+        "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+        "pipeline/tests/test_teignmouth_validation_process.py"
+      ],
+      "cwd": "C:\\vibe\\localSimulator",
+      "elapsedSeconds": 0.025171999994199723,
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "argv": [
+        "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\ruff.exe",
+        "format",
+        "--check",
+        "--no-cache",
+        "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+        "pipeline/tests/test_teignmouth_validation_process.py"
+      ],
+      "cwd": "C:\\vibe\\localSimulator",
+      "elapsedSeconds": 0.025095099990721792,
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "2 files already formatted\n"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "C:\\vibe\\localSimulator",
+      "elapsedSeconds": 0.05954529999871738,
+      "exitCode": 0,
+      "stderr": "warning: in the working copy of '.codex/torquay-plan-implementation.md', LF will be replaced by CRLF the next time Git touches it\n",
+      "stdout": ""
+    }
+  ],
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "requestedModel": "gpt-6.1-sol",
+  "requestedReasoningEffort": "medium"
+}

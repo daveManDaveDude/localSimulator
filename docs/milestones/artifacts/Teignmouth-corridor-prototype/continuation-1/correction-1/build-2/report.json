@@ -1,0 +1,36 @@
+{
+  "additionalOfflineGates": {
+    "candidateEligibleForServing": false,
+    "completeBuildingContact": false,
+    "reason": "required coherence gates are not implemented and evidenced",
+    "roadDrapeAndOwnership": false,
+    "sharedWalkSurface": false
+  },
+  "preservation": {
+    "changedPaths": [],
+    "comparedPaths": 910,
+    "excludedPaths": [
+      ".codex/torquay-plan-implementation.md",
+      "continuation-1/attempt-ledger.json",
+      "current owned correction-1 output directory"
+    ],
+    "passes": true,
+    "rawDataHashing": "raw GIS excluded; packaged source hashes reported by loader"
+  },
+  "primaryError": {
+    "message": "No module named 'torquay_pipeline'",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\vibe\\localSimulator\\pipeline\\scripts\\build_teignmouth_corridor_continuation.py\", line 119, in main\n    from torquay_pipeline.teignmouth_corridor_continuation import build_continuation\nModuleNotFoundError: No module named 'torquay_pipeline'\n",
+    "type": "ModuleNotFoundError"
+  },
+  "resources": {
+    "candidateRuntimeBuffersWritten": false,
+    "peakWorkingSetBytes": 24616960,
+    "peakWorkingSetStatus": "measured",
+    "wallLimitSeconds": 180,
+    "wallSeconds": 0.8531114000070374
+  },
+  "status": "STOP",
+  "stopReasons": [
+    "ModuleNotFoundError: No module named 'torquay_pipeline'"
+  ]
+}

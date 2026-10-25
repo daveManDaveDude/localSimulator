@@ -1,0 +1,49 @@
+{
+  "compatibleSuccessfulWitnessFound": false,
+  "exactProductionReceiptsPresent": {
+    "docs/milestones/artifacts/Teignmouth-topology-validation-v2/coordinator-acceptance.json": false,
+    "docs/milestones/artifacts/Teignmouth-topology-validation-v2/independent-sol-review.json": false
+  },
+  "fullTimingQualified": false,
+  "inspectionOnly": true,
+  "missing": [
+    "Genuine all-gates-successful compatible witness and successful assembly/validation/finalization evidence.",
+    "Exact genuine production Sol review and coordinator acceptance receipts.",
+    "Separately reviewed staged approval/bootstrap specification and explicit Phase 2 execution authorization."
+  ],
+  "numericalValidationRun": false,
+  "phase2Executable": false,
+  "solverTrialProbeReplayProfileBrowserRun": false,
+  "witnesses": [
+    {
+      "passes": false,
+      "path": ".codex/evidence/teignmouth-road-surface-fix3/offline-aggregate.json",
+      "sha256": "ceed9866163002dd3b9692cf644a878bf10bfb0fbe925708774eeedd18b67d3c",
+      "successfulAssemblyPresent": false
+    },
+    {
+      "passes": false,
+      "path": ".codex/evidence/teignmouth-road-surface-fix4/offline-aggregate.json",
+      "sha256": "e293437a49d6c5409fa717cd65cc4e498344fe86cf6cf14b5dc0df0da13abde1",
+      "successfulAssemblyPresent": false
+    },
+    {
+      "passes": false,
+      "path": ".codex/evidence/teignmouth-road-surface-sol-escalation/offline-aggregate.json",
+      "sha256": "944ab8a6adc92f5f67ac46d60a900ac03c505704eca851ee076fdfbc8db4c066",
+      "successfulAssemblyPresent": false
+    },
+    {
+      "passes": false,
+      "path": ".codex/evidence/teignmouth-topology-study/flip-05/offline-aggregate.json",
+      "sha256": "c8546b9c5bf410118386a2574c5e4aae5b7398e73fbace72ec3c4919b5d3525c",
+      "successfulAssemblyPresent": false
+    },
+    {
+      "passes": false,
+      "path": ".codex/evidence/teignmouth-topology-study/road-05/offline-aggregate.json",
+      "sha256": "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352",
+      "successfulAssemblyPresent": false
+    }
+  ]
+}

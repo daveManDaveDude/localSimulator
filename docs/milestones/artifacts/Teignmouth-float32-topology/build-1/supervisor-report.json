@@ -1,0 +1,18 @@
+{
+  "elapsedSeconds": 16.182695900002727,
+  "maximumSeconds": 180.0,
+  "peakWorkingSetBytes": 607260672,
+  "peakWorkingSetStatus": "measured via GetProcessMemoryInfo",
+  "postRunPreservation": {
+    "changed": [],
+    "checkedFileCount": 193,
+    "passes": true
+  },
+  "preRunPreservation": {
+    "changed": [],
+    "checkedFileCount": 193,
+    "passes": true
+  },
+  "timedOut": false,
+  "workerReturnCode": 0
+}

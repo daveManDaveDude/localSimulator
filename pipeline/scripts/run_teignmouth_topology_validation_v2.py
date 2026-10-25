@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import runpy
 import sys
@@ -16,7 +17,20 @@ import time
 from pathlib import Path
 from typing import Any
 
-import numpy as np
+GUARDIAN_T0_ENV = "TVW_TEIGNMOUTH_T0_MONOTONIC"
+GUARDIAN_JOB_ENV = "TVW_TEIGNMOUTH_OUTER_JOB_NAME"
+GUARDIAN_LIMIT_ENV = "TVW_TEIGNMOUTH_OUTER_JOB_COMMIT_LIMIT"
+
+if __name__ == "__main__" and not all(
+    os.environ.get(name) for name in (GUARDIAN_T0_ENV, GUARDIAN_JOB_ENV, GUARDIAN_LIMIT_ENV)
+):
+    print(
+        "This transition runner must be launched by run_teignmouth_topology_guardian.py.",
+        file=sys.stderr,
+    )
+    raise SystemExit(2)
+
+import numpy as np  # noqa: E402 - guarded before numerical imports
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "pipeline"))
@@ -28,6 +42,10 @@ from torquay_pipeline.road_surface_patch import (  # noqa: E402
 )
 from torquay_pipeline.road_surface_study_reconciliation import (  # noqa: E402
     validate_reconciled_stage_order,
+)
+from torquay_pipeline.road_surface_validation_process_v1 import (  # noqa: E402
+    ProcessValidationError,
+    supervise,
 )
 from torquay_pipeline.road_surface_validation_transition_v2 import (  # noqa: E402
     ELIGIBLE_TRIALS,
@@ -46,10 +64,6 @@ from torquay_pipeline.road_surface_validation_transition_v2 import (  # noqa: E4
     phase_for_runner_check,
     validate_prior_input_transition,
     validate_transition_inputs,
-)
-from torquay_pipeline.road_surface_validation_v2 import (  # noqa: E402
-    ValidationContextV2,
-    validate_offline_candidate_v2,
 )
 
 CONFIG_PATH = ROOT / "config/road-surface-teignmouth-topology-transition-v2.json"
@@ -75,8 +89,23 @@ EXTENSION_CODE_PATHS = (
     "pipeline/scripts/profile_teignmouth_complete_dispatch_sol.py",
     "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_optimized.py",
     "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_all_codes.py",
+    "pipeline/scripts/profile_teignmouth_frame_selected_sol.py",
     "pipeline/tests/test_teignmouth_complete_profile.py",
     "pipeline/tests/test_teignmouth_cached_supervisor.py",
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+    "pipeline/scripts/run_teignmouth_validation_worker_v1.py",
+    "pipeline/scripts/profile_teignmouth_process_validation_v1.py",
+    "pipeline/tests/test_teignmouth_validation_process.py",
+    "docs/milestones/Teignmouth-process-validation.md",
+    "pipeline/torquay_pipeline/road_surface_memory_admission.py",
+    "pipeline/scripts/assess_teignmouth_memory_admission.py",
+    "pipeline/tests/test_teignmouth_memory_admission.py",
+    "docs/milestones/Teignmouth-bootstrap-memory-amendment.md",
+    "pipeline/scripts/run_teignmouth_topology_guardian.py",
+    "pipeline/tests/test_teignmouth_guardian.py",
+    "docs/milestones/Teignmouth-operational-memory-containment.md",
+    "docs/milestones/Teignmouth-operational-memory-handback.md",
+    "docs/milestones/Teignmouth-timing-bootstrap.md",
 )
 
 APPROVAL_ROOT = "docs/milestones/artifacts/Teignmouth-topology-validation-v2"
@@ -428,11 +457,47 @@ def _run_validation_phase(
                 deadlines.check("validation", clock())
         return deadline_trace
 
+    def workspace_trace(frame, event, arg):
+        # Absolute safe membership is invariant for this immutable phase. Avoid
+        # repeating dictionary/path work, but keep EVERY workspace line poll.
+        if event == "line":
+            counts["lineEvents"] += 1
+            counts["clockPolls"] += 1
+            deadlines.check("validation", clock())
+        return workspace_trace
+
+    def select_frame(frame, event, arg):
+        if event != "call":
+            return None
+        code = frame.f_code
+        raw_filename = code.co_filename
+        if not os.path.isabs(raw_filename):
+            return deadline_trace
+        cached = membership.get(id(code))
+        if cached is None:
+            counts["membershipResolutions"] += 1
+            try:
+                road_surface._assert_no_reparse_components(Path(raw_filename))
+            except (road_surface.RoadSurfaceError, OSError, ValueError):
+                # Reparse/unknown membership keeps the per-line safety path.
+                return deadline_trace
+            try:
+                in_workspace = Path(raw_filename).resolve().is_relative_to(root)
+            except (OSError, ValueError):
+                return deadline_trace
+            membership[id(code)] = (code, in_workspace, None, False)
+        else:
+            counts["cacheHits"] += 1
+            in_workspace = cached[1]
+        # Global call tracing remains active for workspace descendants entered
+        # through external code, even when that external frame has no line hook.
+        return workspace_trace if in_workspace else None
+
     if previous_trace is not None:
         raise RoadSurfacePatchError(
             f"cannot start bounded validation phase {label}: an external trace hook is active"
         )
-    sys.settrace(deadline_trace)
+    sys.settrace(select_frame)
     try:
         result = function(*args, **kwargs)
         deadlines.check("validation", clock())
@@ -443,6 +508,7 @@ def _run_validation_phase(
             metrics.update(counts)
             metrics["codeObjectsCached"] = len(membership)
             metrics["pollingCadence"] = "every workspace line"
+            metrics["membershipSelection"] = "safe absolute frames; relative/reparse per line"
         membership.clear()
 
 
@@ -546,9 +612,6 @@ def _patch_runner(
     base_load_configs = namespace["_load_frozen_configs"]
     base_serialize = namespace["serialize_offline_report"]
     base_exclusive_write = namespace["_exclusive_write"]
-    base_asset_assembly = namespace["assemble_deterministic_candidate_assets"]
-    base_asset_validation = namespace["validate_candidate_patch_assets"]
-    base_resource_report = namespace["_resource_report"]
     base_digest = namespace["_digest"]
     base_classify = namespace["_final_classification"]
     base_run_one_trial = namespace["run_one_trial"]
@@ -663,59 +726,122 @@ def _patch_runner(
         accepted_preview_hashes: dict[str, str],
     ) -> dict[str, Any]:
         state["post_solver_gates_active"] = True
-        context = ValidationContextV2(surface)
+        state["process_result"] = None
+        state["process_operation"] = 1
+        state["process_surface"] = surface
+        gate_seconds: dict[str, float] = {}
         try:
-            report, context = run_validation(
-                validate_offline_candidate_v2,
-                "complete-offline-candidate-validation",
-                surface,
-                influence,
-                constraints,
-                solver_report,
-                accepted_preview_hashes,
-                context=context,
-                validation_deadline_monotonic=state["deadlines"].validation,
+            state["deadlines"].check("validation", real_time.monotonic())
+            import shapely
+
+            bindings = {
+                "runtimeHashes": {
+                    **_runtime_code_hashes(config, ROOT),
+                    CONFIG_PATH.relative_to(ROOT).as_posix(): file_digest(CONFIG_PATH),
+                },
+                "protectedBefore": state.get("before_map"),
+                "consumedInventorySha256": config["consumed_inventory"]["sha256"],
+                "dataSourceManifestSha256": file_digest(ROOT / "data/source-manifest.json"),
+                "releaseTerrainManifestSha256": surface.inputs.manifest_sha256,
+                "releaseSourceHashes": surface.inputs.source_hashes,
+                "environment": {
+                    "python": sys.version,
+                    "numpy": np.__version__,
+                    "shapely": shapely.__version__,
+                    "geos": shapely.geos_version_string,
+                },
+            }
+            response = supervise(
+                ROOT,
+                {
+                    "surface": surface,
+                    "influence": influence,
+                    "constraints": constraints,
+                    "solver": solver_report,
+                    "acceptedPreviewHashes": accepted_preview_hashes,
+                    "candidateSha256": hashlib.sha256(
+                        surface.patch_heights.astype("<f4", copy=False).tobytes()
+                    ).hexdigest(),
+                    "bindings": bindings,
+                    "deadline": state["deadlines"].validation,
+                },
+                deadline=state["deadlines"].validation,
+                finalization_deadline=state["deadlines"].finalization,
                 clock=real_time.monotonic,
             )
-        except TransitionDeadlineExceeded as exc:
+            state["deadlines"].check("validation", real_time.monotonic())
+            state["process_result"] = response
+            report = response["report"]
+            gate_seconds = response["gateSeconds"]
+        except (
+            ProcessValidationError,
+            TransitionDeadlineExceeded,
+            OSError,
+            ValueError,
+            KeyError,
+            TypeError,
+        ) as exc:
             report = _offline_validation_unavailable(
                 surface,
                 solver_report,
                 accepted_preview_hashes,
-                reason=str(exc),
-                gate_seconds=context.gate_seconds,
+                reason=f"process validation unavailable: {exc}",
+                gate_seconds=gate_seconds,
             )
         report["validationTransition"] = {
             "transitionId": TRANSITION_ID,
             "validatorVersion": "teignmouth-offline-validator-v2",
             "deadlineMonotonicSeconds": state["deadlines"].validation,
             "validationComplete": report["validationComplete"],
-            "gateSeconds": context.gate_seconds,
-            "traceMetrics": state["trace_metrics"].get("complete-offline-candidate-validation", {}),
+            "gateSeconds": gate_seconds,
+            "supervision": "windows-job-process-v1",
+            "processTransport": (state["process_result"] or {}).get("processTransport"),
         }
         return report
 
-    def run_validation(function: Any, label: str, *args: Any, **kwargs: Any) -> Any:
-        return _run_validation_phase(
-            function,
-            args,
-            kwargs,
-            deadlines=state["deadlines"],
-            clock=real_time.monotonic,
-            label=label,
-            metrics=state["trace_metrics"].setdefault(label, {}),
-        )
+    def consume_process_result(expected: int) -> dict[str, Any]:
+        state["deadlines"].check("validation", real_time.monotonic())
+        result = state.get("process_result")
+        if not isinstance(result, dict) or state["process_operation"] != expected:
+            raise RoadSurfacePatchError("process result operation missing, reused or out of order")
+        state["process_operation"] += 1
+        return result
 
-    def asset_assembly(*args: Any, **kwargs: Any) -> Any:
-        return run_validation(base_asset_assembly, "independent-asset-assembly", *args, **kwargs)
+    def asset_assembly(surface: Any, clipped: Any, aggregate: Any) -> Any:
+        result = consume_process_result(1)
+        if (
+            surface is not state["process_surface"]
+            or clipped is not result["report"]["roadPathReclip"]
+            or aggregate["candidateFloat32Sha256"] != result["report"]["candidateFloat32Sha256"]
+        ):
+            raise RoadSurfacePatchError("process assembly inputs changed")
+        return result["firstAssets"], result["secondAssets"], result["deterministic"]
 
-    def asset_validation(*args: Any, **kwargs: Any) -> Any:
-        return run_validation(base_asset_validation, "candidate-asset-validation", *args, **kwargs)
+    def asset_validation(assets: Any, surface: Any, candidate_hash: str, clipped: Any) -> Any:
+        step = state["process_operation"]
+        if step not in (2, 3):
+            raise RoadSurfacePatchError("unexpected process asset validation")
+        result = consume_process_result(step)
+        key = "first" if step == 2 else "second"
+        if (
+            assets is not result[key + "Assets"]
+            or surface is not state["process_surface"]
+            or candidate_hash != result["report"]["candidateFloat32Sha256"]
+            or clipped is not result["report"]["roadPathReclip"]
+        ):
+            raise RoadSurfacePatchError("process asset validation inputs changed")
+        return result[key + "Validation"]
 
-    def resource_report(*args: Any, **kwargs: Any) -> Any:
-        return run_validation(
-            base_resource_report, "resource-determinism-validation", *args, **kwargs
-        )
+    def resource_report(mesh: Any, clipped: Any, first: Any, second: Any) -> Any:
+        result = consume_process_result(4)
+        if (
+            mesh is not state["process_surface"].mesh
+            or clipped is not result["report"]["roadPathReclip"]
+            or first is not result["firstAssets"]
+            or second is not result["secondAssets"]
+        ):
+            raise RoadSurfacePatchError("process resource inputs changed")
+        return result["resources"]
 
     def digest_with_validation_deadline(payload: bytes) -> str:
         if state["post_solver_gates_active"]:
@@ -907,7 +1033,24 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--transition-config", required=True, type=Path)
     parser.add_argument("--trial", required=True, choices=ELIGIBLE_TRIALS)
     args = parser.parse_args(argv)
-    invocation_start = time.monotonic()
+    try:
+        invocation_start = float(os.environ[GUARDIAN_T0_ENV])
+        outer_job_name = os.environ[GUARDIAN_JOB_ENV]
+        outer_job_limit = int(os.environ[GUARDIAN_LIMIT_ENV])
+        if (
+            not math.isfinite(invocation_start)
+            or not outer_job_name.startswith("Local\\TVW-Teignmouth-")
+            or outer_job_limit <= 0
+        ):
+            raise ValueError("invalid guardian binding")
+    except (KeyError, ValueError) as exc:
+        raise RoadSurfacePatchError("valid whole-tree guardian bindings are required") from exc
+    from torquay_pipeline.road_surface_validation_process_v1 import (
+        current_process_job_admission,
+    )
+
+    if not current_process_job_admission(outer_job_name, outer_job_limit):
+        raise RoadSurfacePatchError("runner is outside its queried outer memory Job")
     config_path = _assert_exact_config_path(args.transition_config)
     config = _read_config(config_path)
     _validate_static_bindings(config)

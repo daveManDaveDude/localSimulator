@@ -1,0 +1,4 @@
+{
+  "errorMessage": "chart does not cover candidate vertex [-140.0, -63.0]",
+  "errorType": "Float32CandidateError"
+}

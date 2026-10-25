@@ -1,0 +1,643 @@
+{
+  "absoluteDeadlineMonotonicSeconds": 305012.8092609,
+  "buildOrdinal": 3,
+  "candidateBuilt": false,
+  "candidateEligibleForServing": false,
+  "command": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\run_teignmouth_float32_build3.py",
+    "--self-check"
+  ],
+  "elapsedWallSeconds": 1.3183038999559358,
+  "error": {
+    "message": "post-wait inner Job snapshot contains an unexpected process",
+    "type": "RuntimeError"
+  },
+  "finallyTermination": {
+    "activeProcessCountAfterRequest": 0,
+    "deadlineReached": false,
+    "terminationConfirmed": true,
+    "terminationRequested": true,
+    "waitBudgetMilliseconds": 3000
+  },
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "mode": "self-check",
+  "modeBudgetSeconds": 10.0,
+  "monotonicStartSeconds": 305002.8092609,
+  "normalHelperCompletion": {
+    "drainError": null,
+    "drainIterations": 0,
+    "evidenceCheckpointErrors": [],
+    "exits": {
+      "interpreter": {
+        "code": 7,
+        "error": null,
+        "status": "observed"
+      },
+      "launcher": {
+        "code": 7,
+        "error": null,
+        "status": "observed"
+      }
+    },
+    "firstSnapshot": {
+      "accountingAfter": {
+        "error": null,
+        "status": "observed",
+        "value": 1
+      },
+      "accountingBefore": {
+        "error": null,
+        "status": "observed",
+        "value": 1
+      },
+      "complete": true,
+      "exitStates": {
+        "interpreter": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        },
+        "launcher": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        }
+      },
+      "knownNormalPairPids": [
+        7408,
+        16992
+      ],
+      "normalPairIdentities": {
+        "interpreter": {
+          "creationFileTime": 134373872580724306,
+          "imagePath": "C:\\Python313\\python.exe",
+          "imageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+          "pid": 16992
+        },
+        "launcher": {
+          "creationFileTime": 134373872580481919,
+          "imagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+          "imageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+          "pid": 7408
+        }
+      },
+      "observedEndMonotonicSeconds": 305004.1212835,
+      "observedStartMonotonicSeconds": 305004.1212331,
+      "phase": "post-wait",
+      "pidCensus": {
+        "attempts": 1,
+        "bufferBytes": 264,
+        "bufferCapacity": 32,
+        "complete": true,
+        "countAssigned": 1,
+        "countListed": 1,
+        "partialPids": [
+          33552
+        ],
+        "pids": [
+          33552
+        ],
+        "queryError": null,
+        "returnedBytes": 16,
+        "status": "complete"
+      },
+      "unexpectedMemberDetails": {
+        "attemptedPidCount": 1,
+        "deadlineReached": false,
+        "detailLimit": 8,
+        "eligiblePidCount": 1,
+        "endedMonotonicSeconds": 305004.1229252,
+        "errors": [],
+        "observations": [
+          {
+            "censusIdentityAssociation": "unproven",
+            "censusPid": 33552,
+            "censusSnapshotEndMonotonicSeconds": 305004.1212835,
+            "censusSnapshotStartMonotonicSeconds": 305004.1212331,
+            "creationAfter": {
+              "endedMonotonicSeconds": 305004.1229098,
+              "late": false,
+              "startedMonotonicSeconds": 305004.1228988,
+              "status": "observed",
+              "value": 134373872580578089
+            },
+            "creationBefore": {
+              "endedMonotonicSeconds": 305004.1213238,
+              "late": false,
+              "startedMonotonicSeconds": 305004.1213185,
+              "status": "observed",
+              "value": 134373872580578089
+            },
+            "detailEndedMonotonicSeconds": 305004.1229191,
+            "detailStartedMonotonicSeconds": 305004.1212928,
+            "errors": [],
+            "exitCode": {
+              "endedMonotonicSeconds": 305004.1213306,
+              "interpretation": "raw exit value observed; census association unproven",
+              "late": false,
+              "rawValue": 0,
+              "startedMonotonicSeconds": 305004.1213292,
+              "status": "observed"
+            },
+            "exitTimeAfter": {
+              "endedMonotonicSeconds": 305004.1229098,
+              "late": false,
+              "startedMonotonicSeconds": 305004.1228988,
+              "status": "observed",
+              "value": 134373872583509515
+            },
+            "exitTimeBefore": {
+              "endedMonotonicSeconds": 305004.1213238,
+              "late": false,
+              "startedMonotonicSeconds": 305004.1213185,
+              "status": "observed",
+              "value": 0
+            },
+            "handleClose": {
+              "closeAttempted": true,
+              "endedMonotonicSeconds": 305004.1229229,
+              "error": null,
+              "releaseStatus": "released",
+              "startedMonotonicSeconds": null,
+              "startedReason": "pre-close telemetry omitted for cleanup safety",
+              "status": "released"
+            },
+            "historicalProcessAssociation": {
+              "reason": "PID may have disappeared or been reused between census and open",
+              "status": "unknown"
+            },
+            "imagePath": {
+              "canonicalPath": "C:\\Windows\\System32\\conhost.exe",
+              "canonicalStatus": "observed",
+              "endedMonotonicSeconds": 305004.1213779,
+              "late": false,
+              "rawPath": "C:\\Windows\\System32\\conhost.exe",
+              "reportedCharacterCount": 31,
+              "startedMonotonicSeconds": 305004.121332,
+              "status": "observed"
+            },
+            "imageSha256": {
+              "candidateValue": null,
+              "hashEndedMonotonicSeconds": 305004.1225462,
+              "hashStartedMonotonicSeconds": 305004.1217675,
+              "status": "observed",
+              "value": "c86146188b78e484f32cc29e2331689659943b47689a85570342044f499938ac"
+            },
+            "imageStability": {
+              "canonicalAfter": "C:\\Windows\\System32\\conhost.exe",
+              "canonicalBefore": "C:\\Windows\\System32\\conhost.exe",
+              "comparison": "required and available optional metadata matched",
+              "endedMonotonicSeconds": 305004.1228981,
+              "errors": [],
+              "metadataAfterResolve": {
+                "canonicalPath": "C:\\Windows\\System32\\conhost.exe",
+                "endedMonotonicSeconds": 305004.122872,
+                "error": null,
+                "late": false,
+                "metadata": {
+                  "st_birthtime_ns": 1792396089164898000,
+                  "st_ctime_ns": 1792396089164898000,
+                  "st_dev": 9990850350046864005,
+                  "st_file_attributes": 32,
+                  "st_ino": 562949955646012,
+                  "st_mode": 33279,
+                  "st_mtime_ns": 1792396089189507300,
+                  "st_size": 1003520
+                },
+                "optionalAvailability": {
+                  "nofollow_file_attributes": true,
+                  "st_birthtime_ns": true,
+                  "st_file_attributes": true
+                },
+                "phase": "after-hash-resolved-path",
+                "regularFile": true,
+                "reparsePoint": false,
+                "requiredComparable": true,
+                "startedMonotonicSeconds": 305004.122805,
+                "status": "observed"
+              },
+              "metadataAfterSamePath": {
+                "canonicalPath": "C:\\Windows\\System32\\conhost.exe",
+                "endedMonotonicSeconds": 305004.1226319,
+                "error": null,
+                "late": false,
+                "metadata": {
+                  "st_birthtime_ns": 1792396089164898000,
+                  "st_ctime_ns": 1792396089164898000,
+                  "st_dev": 9990850350046864005,
+                  "st_file_attributes": 32,
+                  "st_ino": 562949955646012,
+                  "st_mode": 33279,
+                  "st_mtime_ns": 1792396089189507300,
+                  "st_size": 1003520
+                },
+                "optionalAvailability": {
+                  "nofollow_file_attributes": true,
+                  "st_birthtime_ns": true,
+                  "st_file_attributes": true
+                },
+                "phase": "after-hash-same-path",
+                "regularFile": true,
+                "reparsePoint": false,
+                "requiredComparable": true,
+                "startedMonotonicSeconds": 305004.1225488,
+                "status": "observed"
+              },
+              "metadataBeforeHash": {
+                "canonicalPath": "C:\\Windows\\System32\\conhost.exe",
+                "endedMonotonicSeconds": 305004.1217535,
+                "error": null,
+                "late": false,
+                "metadata": {
+                  "st_birthtime_ns": 1792396089164898000,
+                  "st_ctime_ns": 1792396089164898000,
+                  "st_dev": 9990850350046864005,
+                  "st_file_attributes": 32,
+                  "st_ino": 562949955646012,
+                  "st_mode": 33279,
+                  "st_mtime_ns": 1792396089189507300,
+                  "st_size": 1003520
+                },
+                "optionalAvailability": {
+                  "nofollow_file_attributes": true,
+                  "st_birthtime_ns": true,
+                  "st_file_attributes": true
+                },
+                "phase": "before-hash",
+                "regularFile": true,
+                "reparsePoint": false,
+                "requiredComparable": true,
+                "startedMonotonicSeconds": 305004.1216224,
+                "status": "observed"
+              },
+              "rawPath": "C:\\Windows\\System32\\conhost.exe",
+              "rawPathCanonicalMatch": true,
+              "resolveAfter": {
+                "endedMonotonicSeconds": 305004.1227971,
+                "startedMonotonicSeconds": 305004.1226432,
+                "status": "observed"
+              },
+              "resolveBefore": {
+                "endedMonotonicSeconds": 305004.1216119,
+                "startedMonotonicSeconds": 305004.1214124,
+                "status": "observed"
+              },
+              "startedMonotonicSeconds": 305004.1213801,
+              "status": "observed-metadata-match"
+            },
+            "membershipAfter": {
+              "endedMonotonicSeconds": 305004.1229172,
+              "late": false,
+              "startedMonotonicSeconds": 305004.1229139,
+              "status": "observed",
+              "value": true
+            },
+            "membershipBefore": {
+              "endedMonotonicSeconds": 305004.1213156,
+              "late": false,
+              "startedMonotonicSeconds": 305004.1213121,
+              "status": "observed",
+              "value": true
+            },
+            "open": {
+              "endedMonotonicSeconds": 305004.1213096,
+              "late": false,
+              "requestedAccessMask": 1053696,
+              "startedMonotonicSeconds": 305004.1213,
+              "status": "opened"
+            },
+            "parentOriginAndClass": {
+              "status": "unestablished",
+              "trustedClass": false,
+              "trustedParent": false
+            },
+            "zeroTimeWait": {
+              "endedMonotonicSeconds": 305004.121328,
+              "late": false,
+              "result": 258,
+              "startedMonotonicSeconds": 305004.1213266,
+              "status": "nonsignaled"
+            }
+          }
+        ],
+        "omittedDetailCount": 0,
+        "originalSnapshotPhase": "post-wait",
+        "sourceCensusComplete": true,
+        "sourceSnapshotEndMonotonicSeconds": 305004.1212835,
+        "sourceSnapshotStartMonotonicSeconds": 305004.1212331,
+        "startedMonotonicSeconds": 305004.1212864,
+        "status": "observed"
+      },
+      "unexpectedPids": [
+        33552
+      ],
+      "waitStates": {
+        "interpreter": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        },
+        "launcher": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        }
+      }
+    },
+    "handleOwnership": {
+      "interpreter": {
+        "owned": true,
+        "status": "owned"
+      },
+      "launcher": {
+        "owned": true,
+        "status": "owned"
+      }
+    },
+    "helperStart": {
+      "deadlineQpc": 3050128092609,
+      "launcherCreationFileTime": 134373872580481919,
+      "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+      "launcherPid": 7408,
+      "mode": "nonzero",
+      "nonce": "1d15569a5c5e4664933ca6df2c2779f0",
+      "qpcFrequency": 10000000,
+      "schema": "teignmouth-build3-helper-script-start-v1",
+      "scriptCreationFileTime": 134373872580724306,
+      "scriptImagePath": "C:\\Python313\\python.exe",
+      "scriptImageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "scriptPid": 16992,
+      "supervisorCreationFileTime": 134373872579162971,
+      "supervisorPid": 22204
+    },
+    "identities": {
+      "interpreter": {
+        "creationFileTime": 134373872580724306,
+        "imagePath": "C:\\Python313\\python.exe",
+        "imageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+        "pid": 16992
+      },
+      "launcher": {
+        "creationFileTime": 134373872580481919,
+        "imagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+        "imageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+        "pid": 7408
+      }
+    },
+    "latestSnapshot": {
+      "accountingAfter": {
+        "error": null,
+        "status": "observed",
+        "value": 0
+      },
+      "accountingBefore": {
+        "error": null,
+        "status": "observed",
+        "value": 0
+      },
+      "complete": true,
+      "exitStates": {
+        "interpreter": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        },
+        "launcher": {
+          "code": 7,
+          "error": null,
+          "status": "observed"
+        }
+      },
+      "knownNormalPairPids": [
+        7408,
+        16992
+      ],
+      "normalPairIdentities": {
+        "interpreter": {
+          "creationFileTime": 134373872580724306,
+          "imagePath": "C:\\Python313\\python.exe",
+          "imageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+          "pid": 16992
+        },
+        "launcher": {
+          "creationFileTime": 134373872580481919,
+          "imagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+          "imageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+          "pid": 7408
+        }
+      },
+      "observedEndMonotonicSeconds": 305004.1255506,
+      "observedStartMonotonicSeconds": 305004.1254957,
+      "phase": "exception-checkpoint",
+      "pidCensus": {
+        "attempts": 1,
+        "bufferBytes": 264,
+        "bufferCapacity": 32,
+        "complete": true,
+        "countAssigned": 0,
+        "countListed": 0,
+        "partialPids": [],
+        "pids": [],
+        "queryError": null,
+        "returnedBytes": 8,
+        "status": "complete"
+      },
+      "unexpectedPids": [],
+      "waitStates": {
+        "interpreter": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        },
+        "launcher": {
+          "signaled": true,
+          "status": "observed",
+          "telemetry": {
+            "lastSample": null,
+            "partialScope": false,
+            "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+            "peakPerProcessPeakWorkingSetBytes": {},
+            "sampleCount": 0,
+            "sampleIntervalTargetSeconds": 0.25,
+            "samplingErrors": [],
+            "successfulMemoryObservationCount": 0,
+            "telemetryStatus": "unavailable: no successful contained process samples",
+            "unavailableProcessObservationCount": 0
+          },
+          "timedOut": false
+        }
+      }
+    },
+    "phase": "exception-checkpoint",
+    "primaryError": {
+      "message": "post-wait inner Job snapshot contains an unexpected process",
+      "phase": "drain-inner-job",
+      "type": "RuntimeError"
+    },
+    "waits": {
+      "interpreter": {
+        "signaled": true,
+        "status": "observed",
+        "telemetry": {
+          "lastSample": null,
+          "partialScope": false,
+          "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+          "peakPerProcessPeakWorkingSetBytes": {},
+          "sampleCount": 0,
+          "sampleIntervalTargetSeconds": 0.25,
+          "samplingErrors": [],
+          "successfulMemoryObservationCount": 0,
+          "telemetryStatus": "unavailable: no successful contained process samples",
+          "unavailableProcessObservationCount": 0
+        },
+        "timedOut": false
+      },
+      "launcher": {
+        "signaled": true,
+        "status": "observed",
+        "telemetry": {
+          "lastSample": null,
+          "partialScope": false,
+          "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+          "peakPerProcessPeakWorkingSetBytes": {},
+          "sampleCount": 0,
+          "sampleIntervalTargetSeconds": 0.25,
+          "samplingErrors": [],
+          "successfulMemoryObservationCount": 0,
+          "telemetryStatus": "unavailable: no successful contained process samples",
+          "unavailableProcessObservationCount": 0
+        },
+        "timedOut": false
+      }
+    }
+  },
+  "normalHelperExitCode": 7,
+  "normalHelperScriptStart": {
+    "deadlineQpc": 3050128092609,
+    "launcherCreationFileTime": 134373872580481919,
+    "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "launcherPid": 7408,
+    "mode": "nonzero",
+    "nonce": "1d15569a5c5e4664933ca6df2c2779f0",
+    "qpcFrequency": 10000000,
+    "schema": "teignmouth-build3-helper-script-start-v1",
+    "scriptCreationFileTime": 134373872580724306,
+    "scriptImagePath": "C:\\Python313\\python.exe",
+    "scriptImageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+    "scriptPid": 16992,
+    "supervisorCreationFileTime": 134373872579162971,
+    "supervisorPid": 22204
+  },
+  "normalHelperTelemetry": {
+    "lastSample": null,
+    "partialScope": false,
+    "peakConcurrentSampledTreeWorkingSetSumBytes": null,
+    "peakPerProcessPeakWorkingSetBytes": {},
+    "sampleCount": 0,
+    "sampleIntervalTargetSeconds": 0.25,
+    "samplingErrors": [],
+    "successfulMemoryObservationCount": 0,
+    "telemetryStatus": "unavailable: no successful contained process samples",
+    "unavailableProcessObservationCount": 0
+  },
+  "normalHelperTimedOut": false,
+  "numericalCutoffMonotonicSeconds": null,
+  "numericalCutoffSeconds": null,
+  "outerCommandExitCode": 2,
+  "parentHandoff": {
+    "baseInterpreterPath": "C:\\Python313\\python.exe",
+    "baseInterpreterSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+    "budgetSeconds": 10.0,
+    "clockDomain": "windows-qpc",
+    "deadlineQpc": 3050128092609,
+    "expectedSupervisorScript": "C:\\vibe\\localSimulator\\pipeline\\scripts\\run_teignmouth_float32_build3.py",
+    "externalRuntimeManifestSha256": null,
+    "inputManifestSha256": null,
+    "launcherCreationFileTime": 134373872577916200,
+    "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "launcherPath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "launcherPid": 5144,
+    "launcherSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "mode": "self-check",
+    "nonce": "1d15569a5c5e4664933ca6df2c2779f0",
+    "oneUse": true,
+    "phase": "nonnumerical-self-check",
+    "qpcFrequency": 10000000,
+    "reservedLedgerSnapshotSha256": null,
+    "runtimeIdentitySha256": null,
+    "schema": "teignmouth-build3-parent-handoff-v2",
+    "scriptStartIdentity": {
+      "absoluteDeadlineMonotonicSeconds": 305012.8092609,
+      "launcherCreationFileTime": 134373872577916200,
+      "launcherImagePath": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "launcherImageSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+      "launcherPid": 5144,
+      "mode": "self-check",
+      "nonce": "1d15569a5c5e4664933ca6df2c2779f0",
+      "schema": "teignmouth-build3-script-start-v1",
+      "scriptCreationFileTime": 134373872579162971,
+      "scriptImagePath": "C:\\Python313\\python.exe",
+      "scriptImageSha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "scriptPath": "C:\\vibe\\localSimulator\\pipeline\\scripts\\run_teignmouth_float32_build3.py",
+      "scriptPid": 22204,
+      "wrapperCreationFileTime": 134373872566780974,
+      "wrapperImagePath": "C:\\Users\\david\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "wrapperImageSha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+      "wrapperPid": 19732
+    },
+    "standaloneAuthorizationSha256": null,
+    "standalonePurpose": null,
+    "startQpc": 3050028092609,
+    "status": "LAUNCHER_BOUND_BEFORE_RESUME",
+    "wrapperCreationFileTime": 134373872566780974,
+    "wrapperImagePath": "C:\\Users\\david\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+    "wrapperImageSha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+    "wrapperPid": 19732
+  },
+  "schema": "teignmouth-build3-supervisor-invocation-v1",
+  "startedUtc": "2026-10-25T07:34:18.045695+00:00",
+  "status": "BLOCKED_SELFCHECK",
+  "supervisorPid": 22204,
+  "wallLimitSeconds": 10.0
+}

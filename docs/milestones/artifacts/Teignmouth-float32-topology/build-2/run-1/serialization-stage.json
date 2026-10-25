@@ -1,0 +1,17 @@
+{
+  "coordinateOrder": "X,Y,Z",
+  "maximumAbsoluteDisplacementByAxisM": [
+    1.905247728473114e-06,
+    9.5367431640625e-07,
+    1.9068643553055153e-06
+  ],
+  "maximumEuclideanDisplacementM": 2.089147586011133e-06,
+  "maximumHorizontalDisplacementByAxisM": [
+    1.905247728473114e-06,
+    1.9068643553055153e-06
+  ],
+  "maximumVerticalDisplacementM": 9.5367431640625e-07,
+  "preSerializationCoordinates": "original construction world X/Z and unrounded candidate Y, ordered X,Y,Z",
+  "serializedCoordinates": "decoded stored local Float32 XYZ reconstructed in world Float64, ordered X,Y,Z",
+  "status": "COMPLETE"
+}

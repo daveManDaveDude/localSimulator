@@ -1,0 +1,1080 @@
+{
+  "attemptState": {
+    "candidateOutputExists": false,
+    "diagnostics": {
+      "reserved": 0,
+      "used": 1
+    },
+    "implementationBuilds": {
+      "reserved": 0,
+      "used": 1
+    },
+    "lunaCorrectionCycles": {
+      "reserved": 1,
+      "used": 2
+    }
+  },
+  "candidateEligibleForServing": false,
+  "changedFromCorrection2": [
+    {
+      "correction2Sha256": "82bbf23a4753d297da1e891e9d40f30713ee214c1434a5f1fd69a598243342ca",
+      "correction3Sha256": "5c72a2bc7f51fee50c976f3e4dc28c38c24427649b8dcc9d76ecbd391cd24e3b",
+      "path": "pipeline/scripts/build_teignmouth_float32_candidate.py"
+    },
+    {
+      "correction2Sha256": "e0796e14d18930947d8217afcf792333a04cb084b8d696947ce586ccbd2b1e3e",
+      "correction3Sha256": "000cd307929e69abd14ac85eef86dce343b16127c0e6909c87005aecdbd2dec8",
+      "path": "pipeline/tests/test_teignmouth_float32_candidate.py"
+    },
+    {
+      "correction2Sha256": "0f192dea809a08e61b3b15044745141407992ea9b9429869f14a3561ee82aec8",
+      "correction3Sha256": "3fde4ccd0f7f28ff71bab02d567b4f255e85c32b6cc5561a18d73df8cb76b617",
+      "path": "pipeline/torquay_pipeline/teignmouth_float32_candidate.py"
+    }
+  ],
+  "checks": {
+    "focusedPytest": "18 passed",
+    "gisFreeImportSmoke": "PASS_IMPORT_ONLY",
+    "pyCompile": "passed",
+    "ruff": "passed",
+    "ruffFormatCheck": "passed"
+  },
+  "correctionOrdinal": 3,
+  "fileCount": 199,
+  "files": [
+    {
+      "byteLength": 6528,
+      "path": "AGENTS.md",
+      "sha256": "4df1b59e6557fc069ec3861c541dcf4617442093ec0452b7e580c4fd23414db3"
+    },
+    {
+      "byteLength": 970,
+      "path": "config/aoi.torquay.json",
+      "sha256": "205aa50e58e807e0f54f7f74d9f546052da6fca627ae9c3411ec4af334a2a6e5"
+    },
+    {
+      "byteLength": 1589,
+      "path": "config/road-surface-teignmouth-corridor-continuation.json",
+      "sha256": "1c92f416a2d6c393709cbce68f7c4d6ab722da544b8941b54c061f55eb68dc9c"
+    },
+    {
+      "byteLength": 2390,
+      "path": "config/road-surface-teignmouth-float32.json",
+      "sha256": "e0e264a40f6b9dee334cb90b0ff76d366159bf49a0ca8bcdf3e4e65328f58228"
+    },
+    {
+      "byteLength": 5415,
+      "path": "docs/agent-workflow.md",
+      "sha256": "e120ed27b4cca8510fc8febc1c32dda02df79df68b9f3994a18a2111d811ef1b"
+    },
+    {
+      "byteLength": 9715,
+      "path": "docs/milestones/Teignmouth-corridor-prototype-continuation-spec.md",
+      "sha256": "bdad83800b974d4e9bc4db3acb0100bc6b30f528dcb98797781a907167d92818"
+    },
+    {
+      "byteLength": 11941,
+      "path": "docs/milestones/Teignmouth-corridor-prototype-spec.md",
+      "sha256": "5f535bccd00cc3ac3fad957babd9fe7a0fcd66a345bfbd63f8875501b002125d"
+    },
+    {
+      "byteLength": 34439,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/attempt-ledger.json",
+      "sha256": "24f518c568578d0de8b20904d89e8aa9f6fb95fe6a56f540539e08184b5f4ce0"
+    },
+    {
+      "byteLength": 140338,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/build-2/preservation-after.json",
+      "sha256": "1d4eac1984b62841bbac0d202870a8e722237b75b7c69066555b63d08820976e"
+    },
+    {
+      "byteLength": 140338,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/build-2/preservation-before.json",
+      "sha256": "1d4eac1984b62841bbac0d202870a8e722237b75b7c69066555b63d08820976e"
+    },
+    {
+      "byteLength": 1396,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/build-2/report.json",
+      "sha256": "406053d2cb2ef7e51ac9a2c2326d0a7de613d554c1bedfd04ce4ca1553bb72ca"
+    },
+    {
+      "byteLength": 1158,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/implementation-summary.json",
+      "sha256": "befbc63c5b45b87f4cf93dfd2389a76cc71f73dbf834ba9add5ea779a74b423e"
+    },
+    {
+      "byteLength": 2685,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-1/independent-sol-review.md",
+      "sha256": "d7933a332667db85f66687a70067ca501f3b16e291e24162b1fcce73d380fa3b"
+    },
+    {
+      "byteLength": 141267,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/build-3/preservation-after.json",
+      "sha256": "76ba716bef100fa97a0209b0018a9fcc01db9e68daf262c32a543ba33846afc7"
+    },
+    {
+      "byteLength": 141267,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/build-3/preservation-before.json",
+      "sha256": "76ba716bef100fa97a0209b0018a9fcc01db9e68daf262c32a543ba33846afc7"
+    },
+    {
+      "byteLength": 1511,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/build-3/report.json",
+      "sha256": "6b3174f0247b4a84e92f0f80153992c338a7e67cb5477b635e069a380831f639"
+    },
+    {
+      "byteLength": 1357,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/implementation-summary.json",
+      "sha256": "ed40bb7297892fb2a1bb96af834990a83e8e1ab1141e1ef07650cda85a96064f"
+    },
+    {
+      "byteLength": 2600,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-2/independent-sol-review.md",
+      "sha256": "b1298d65c8f2a9477bfc93b88ef4656ff58d1b4c1ea5074d9a914c2a2471b33b"
+    },
+    {
+      "byteLength": 1584,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/build-4/implementation-stop.json",
+      "sha256": "58e51e8dcaaab40958fc17aa5293bd98c39b883ff6c107ba403f851d1a698a09"
+    },
+    {
+      "byteLength": 142196,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/build-4/preservation-at-stop.json",
+      "sha256": "6315f3c8476632359419ba614f38e4f57d2d1e359bc95fbf9a1d1b93bc739fbd"
+    },
+    {
+      "byteLength": 2573,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/independent-sol-review.md",
+      "sha256": "7edbacdc91e5dabf43f39e394f9950e006ada0965b92ceeb15cd9aaeac0a1c71"
+    },
+    {
+      "byteLength": 463,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-3/preflight.json",
+      "sha256": "ed6b490d2ce0eb4c72bc22eddf4beb71ad51af4d37f32a569185a5bec009db13"
+    },
+    {
+      "byteLength": 31104,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/chart-indices.u32",
+      "sha256": "8ba1c505d505ab25ce69db419ebfac7d9d7f22de92f4defe206fcb397e42e911"
+    },
+    {
+      "byteLength": 23472,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/chart-station-lateral.f64",
+      "sha256": "422ca324ba995f82eadf136b7b0716e4265e3b84b4731eb3e971549cd44f29e8"
+    },
+    {
+      "byteLength": 23472,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/chart-xz.f64",
+      "sha256": "fd90cdeb162afd8232fbd03531341d02acd1210e315bfce4582afa1e9ac6379e"
+    },
+    {
+      "byteLength": 244,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/interpreter-identity.json",
+      "sha256": "07de239b4fad4124ab124321a961e22a1a5507cd60b4fd868d1917cb05b2f8ee"
+    },
+    {
+      "byteLength": 143109,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/preservation-after.json",
+      "sha256": "1cbb09b89488d995291dbcfac2bd4bd240f1f0d22fa3598b363a800057d30408"
+    },
+    {
+      "byteLength": 143109,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/preservation-before.json",
+      "sha256": "1cbb09b89488d995291dbcfac2bd4bd240f1f0d22fa3598b363a800057d30408"
+    },
+    {
+      "byteLength": 25981,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/report.json",
+      "sha256": "27aaef3724930f55f10adadfe7aa3c277e4da27297adfb41970d1c42938d29bd"
+    },
+    {
+      "byteLength": 2965,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/implementation-summary.json",
+      "sha256": "ad6ce91a45cbe048402d56955de379bb2cf307a2aac9fd5531b18c86f4de7f9a"
+    },
+    {
+      "byteLength": 2487,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/independent-sol-review.md",
+      "sha256": "639b65c060ff655fa1902a45220f502669a8fb07228ea72cc746e410e8cc3ab8"
+    },
+    {
+      "byteLength": 750,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/preflight.json",
+      "sha256": "8bdc99246e40843283f66b64e125fd42653e479a698cf57121a92b85e966b834"
+    },
+    {
+      "byteLength": 8038267,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/full-field-earthwork.json",
+      "sha256": "0dea4598e429bffd12038bb401c00f922130e5c1fc0d243acb20be59ef4cd56f"
+    },
+    {
+      "byteLength": 890,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/build-1/implementation-stop.json",
+      "sha256": "8170df878a259e3c34d469581ddaa6aede00699cf098715e603af48efbd8b860"
+    },
+    {
+      "byteLength": 135167,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/build-1/preservation-before.json",
+      "sha256": "7820844daa5b653fa8e601e8b58d718dfc3f7ce06c4dbe462eec719359fee462"
+    },
+    {
+      "byteLength": 3410,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/initial/independent-sol-review.md",
+      "sha256": "26dfd4617f762d4c71b219482f3c6cac16d36dedf65ba796b05bb2d11d881158"
+    },
+    {
+      "byteLength": 2550,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/limit-decision-1.md",
+      "sha256": "a6e21834ab30b4152d53a9afe7c2928c39dfff1f3cba9fce49e344f26cb57cfe"
+    },
+    {
+      "byteLength": 3018,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/authorization-bindings.json",
+      "sha256": "7c35f320e8f12303d55aa6862c2af76da645fa205a0bb262487181569efa8688"
+    },
+    {
+      "byteLength": 9715,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/Teignmouth-corridor-prototype-continuation-spec.md",
+      "sha256": "bdad83800b974d4e9bc4db3acb0100bc6b30f528dcb98797781a907167d92818"
+    },
+    {
+      "byteLength": 32346,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/attempt-ledger.json",
+      "sha256": "311b9723662ee5452d92267a003fed9cb571f7bd3c4a55372fe5474721bb113e"
+    },
+    {
+      "byteLength": 10173,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/build_teignmouth_corridor_continuation.py",
+      "sha256": "fd967f88390a786d52f174c13aa9116cfb13980f5c35a202b899bfd7c08a09fa"
+    },
+    {
+      "byteLength": 1589,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/road-surface-teignmouth-corridor-continuation.json",
+      "sha256": "d279769ce6e14b2082d962d4b36149f9a971059948b5a776b6de504d5be1d4f0"
+    },
+    {
+      "byteLength": 31271,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/teignmouth_corridor_continuation.py",
+      "sha256": "05c30f8a40a8f29857546b351c0e497c1e1452504d2f09e212353ae1377cf849"
+    },
+    {
+      "byteLength": 10013,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/test_teignmouth_corridor_continuation.py",
+      "sha256": "303ee835f4afa01f4a32fd6de3efc3e359cf11b69da5c839dad37335a8bb4f86"
+    },
+    {
+      "byteLength": 31104,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/chart-indices.u32",
+      "sha256": "8ba1c505d505ab25ce69db419ebfac7d9d7f22de92f4defe206fcb397e42e911"
+    },
+    {
+      "byteLength": 23472,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/chart-station-lateral.f64",
+      "sha256": "422ca324ba995f82eadf136b7b0716e4265e3b84b4731eb3e971549cd44f29e8"
+    },
+    {
+      "byteLength": 23472,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/chart-xz.f64",
+      "sha256": "fd90cdeb162afd8232fbd03531341d02acd1210e315bfce4582afa1e9ac6379e"
+    },
+    {
+      "byteLength": 244,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/interpreter-identity.json",
+      "sha256": "07de239b4fad4124ab124321a961e22a1a5507cd60b4fd868d1917cb05b2f8ee"
+    },
+    {
+      "byteLength": 146846,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/preservation-after.json",
+      "sha256": "6b54d426e3e857548aa36532ff0a092901e3a888a811b40fd82500a29133f695"
+    },
+    {
+      "byteLength": 146846,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/preservation-before.json",
+      "sha256": "6b54d426e3e857548aa36532ff0a092901e3a888a811b40fd82500a29133f695"
+    },
+    {
+      "byteLength": 2588,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/report.json",
+      "sha256": "233394937d2735b503ebb155f8f29a8fd46a2647bac1cc4fb43d2017433c7eef"
+    },
+    {
+      "byteLength": 6588,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/handback.md",
+      "sha256": "f29abeff999441b2dd195f589aa58250d958df46061428574f53262735f22569"
+    },
+    {
+      "byteLength": 6425,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/implementation.diff",
+      "sha256": "9ecb686950d57e582585e2a2c317f1cf3bfd90662242a352e9f9b56ced51e968"
+    },
+    {
+      "byteLength": 7329,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/independent-sol-review.md",
+      "sha256": "55b498dda292518f94d361fa402d55d92c4bbcb6b5dee8cf24332451419c8f08"
+    },
+    {
+      "byteLength": 2795,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/preflight.json",
+      "sha256": "be15a1e651616c2226b3eaa83eb03c6c8898fe24f24ea238474096769a5a61ac"
+    },
+    {
+      "byteLength": 5205,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/stage-observations.json",
+      "sha256": "7b4006b0038981b48b0b8467f8a3b9148a2876f6449b4e775de48fd72f92f1a2"
+    },
+    {
+      "byteLength": 6950,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/submission-hashes.json",
+      "sha256": "79cc32effd0dceac3eb3f150c9a63594ce10aef5a9fc42a3c856d0e210ad1e4a"
+    },
+    {
+      "byteLength": 2291,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/verification.json",
+      "sha256": "a9d49852c9756475ad25eb45b7b907d14a7b1abc9412d6ecba3e10019f08a698"
+    },
+    {
+      "byteLength": 3383,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-plan.md",
+      "sha256": "99ff4419aaa779b1090c782effd91ec242a27be8419607aa295e9a2d967f7981"
+    },
+    {
+      "byteLength": 4828,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/attempt-ledger-before-diagnostic-1.json",
+      "sha256": "fd1abad37bb44044ca5c90757651759caffffeaa828b438517e3ce848db046f7"
+    },
+    {
+      "byteLength": 3309,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/attempt-ledger-proposed.json",
+      "sha256": "a3e9e9a4808411270c250ff463d633ca692d4e955ebd9e1a72946a759958b15f"
+    },
+    {
+      "byteLength": 2232,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-acceptance-1.md",
+      "sha256": "aeb8dedbbf63ebaa98b00d319a6040f74d917610131bf1d7ef64e5919ab36a31"
+    },
+    {
+      "byteLength": 1487,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-2.md",
+      "sha256": "0fcfa5bb44ec08cfa902241fb0399be3cb02127c4ff2dbf44a385aee234a7498"
+    },
+    {
+      "byteLength": 1271,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-3.md",
+      "sha256": "2de9104e0d5b438a2052aaed27170310a062635c167eb78eaf4b8b07abf4e5b1"
+    },
+    {
+      "byteLength": 1423,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-4.md",
+      "sha256": "49c00e8af057c6de45da57264b1140eee8ee26e132fb2b01c44fafc1a20d2067"
+    },
+    {
+      "byteLength": 1103,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-8.md",
+      "sha256": "ad11bf326c809820960aaf793c64e507ee31089a9a585f43c1c1bdb7a17eeb56"
+    },
+    {
+      "byteLength": 1519,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-9.md",
+      "sha256": "f6fe7e7580ecfc08613e817db18958e1f296f1d490524a96a0e835fb06b45b4b"
+    },
+    {
+      "byteLength": 3428,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-1/evidence-plan.md",
+      "sha256": "ad410ced7e230f6897f6d873cc0d96514a8c6b1b5f5d906dc73b4b9785e59356"
+    },
+    {
+      "byteLength": 42747,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-1/input-manifest.json",
+      "sha256": "9b7157e870bec871106ad676a6201e89a039cfd24dcaf5d3917b77d98c8c7fe9"
+    },
+    {
+      "byteLength": 2269,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/evidence-plan.md",
+      "sha256": "f5bcc16639da261498e6aef3f79a334e10754969f6329783015549fd2606a4de"
+    },
+    {
+      "byteLength": 43627,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/input-manifest.json",
+      "sha256": "4f3c61472f6dad9e5de1f9a945fe391a5388f6b6f92adb2827790b70f19cc185"
+    },
+    {
+      "byteLength": 3265,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-1.md",
+      "sha256": "a84d8e3ea9b517b985560506b2d5ab6d3ee9118800b44ab025d525b76213f50e"
+    },
+    {
+      "byteLength": 2515,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-2.md",
+      "sha256": "d3e6734c50d15b4019b7e865833a60afa2d66d2375065dc9689f29f3b08476cd"
+    },
+    {
+      "byteLength": 2272,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-4.md",
+      "sha256": "2b4b0acb689e73996bddfe1739ed941bbee77883c4a503b5a038b548a9c28094"
+    },
+    {
+      "byteLength": 2189,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/prebuild-1/evidence-plan.md",
+      "sha256": "e047b3df952845cbdbc5b90a6d7acd7b066f546480b712942e741e2de970377c"
+    },
+    {
+      "byteLength": 40961,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/prebuild-1/input-manifest.json",
+      "sha256": "ea13d2209e79f0128b3304c76ea3f240ac26d5e3f8aa679c3335af5ed5a5308b"
+    },
+    {
+      "byteLength": 749,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/python-environment-preflight.json",
+      "sha256": "eaca09906e9578e60a6092d272232037414f12c72108f0454500487c8ada735f"
+    },
+    {
+      "byteLength": 3401,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-3.md",
+      "sha256": "62cdb1930b484af528c48cb3e65da54866fa0d37a6a5bcd9d7d4db370d3b2ee6"
+    },
+    {
+      "byteLength": 7328,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan.md",
+      "sha256": "677fd973fcbd5f44641242931959a1202ab7edc291f99e17ceabd60701f25dcf"
+    },
+    {
+      "byteLength": 18116,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/spec.md",
+      "sha256": "745ede84ddf95ed697992514f0318bb9e512ce7069ceb9d495ef7d2cf133e208"
+    },
+    {
+      "byteLength": 3672,
+      "path": "node_modules/three/package.json",
+      "sha256": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de"
+    },
+    {
+      "byteLength": 33866,
+      "path": "node_modules/three/src/math/Matrix4.js",
+      "sha256": "d942c20d95e0864246aa6794934656f6a2871a6e863ce7b096581837810fb555"
+    },
+    {
+      "byteLength": 111481,
+      "path": "node_modules/three/src/renderers/WebGLRenderer.js",
+      "sha256": "9e8740aad691246b31b3704014e8f3bbd38a8e7bf4b1b4d23868541b023cc63a"
+    },
+    {
+      "byteLength": 312,
+      "path": "node_modules/three/src/renderers/shaders/ShaderChunk/project_vertex.glsl.js",
+      "sha256": "74632caa5cc4a9812b1bb423aac7574748e648613c18898c6bf57d26b85600d3"
+    },
+    {
+      "byteLength": 439,
+      "path": "node_modules/three/src/renderers/shaders/ShaderChunk/worldpos_vertex.glsl.js",
+      "sha256": "d291ca05988f57312c060b33fa271472b3756b6a6b737934f5a04f882bf4f17f"
+    },
+    {
+      "byteLength": 96295,
+      "path": "package-lock.json",
+      "sha256": "b36c47b7e0a0d4f231c3032f35c3be899c5ae09c73a2d54b4d83f124f0bffc39"
+    },
+    {
+      "byteLength": 2349,
+      "path": "package.json",
+      "sha256": "37bbc7d962be1df3cdfb6530ed15f89017f5a915c44c163f23a76182a02f5983"
+    },
+    {
+      "byteLength": 6635,
+      "path": "pipeline/.venv/Lib/site-packages/numpy-2.5.4.dist-info/METADATA",
+      "sha256": "e2b909d6a37d76c2bc130f528d7fed0c517322bce16dc7846b6a6df30e200403"
+    },
+    {
+      "byteLength": 40762,
+      "path": "pipeline/.venv/Lib/site-packages/pyproj-3.8.0.dist-info/METADATA",
+      "sha256": "f664f37727107c93b25535a15382f58c69ea0352bdaa5b1aa66be31317453cda"
+    },
+    {
+      "byteLength": 6774,
+      "path": "pipeline/.venv/Lib/site-packages/shapely-2.2.0.dist-info/METADATA",
+      "sha256": "f4fef957712e3a9e731434b4213dc72fd80b116cbd49f50f0d956c2237efb203"
+    },
+    {
+      "byteLength": 255320,
+      "path": "pipeline/.venv/Scripts/python.exe",
+      "sha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e"
+    },
+    {
+      "byteLength": 196,
+      "path": "pipeline/.venv/pyvenv.cfg",
+      "sha256": "7c7f90f4ba8ae4a712a80c08d90d1ef89f296f22315d26ed668d5d96b45e323f"
+    },
+    {
+      "byteLength": 704,
+      "path": "pipeline/pyproject.toml",
+      "sha256": "a8aeac0d23c1ae0fe02d4530e3567f27255b561c51c812fd7ce60da4b8549c21"
+    },
+    {
+      "byteLength": 10189,
+      "path": "pipeline/scripts/build_teignmouth_corridor_continuation.py",
+      "sha256": "85178bbeedd540dc8f330223d8e9bd95507bec18c90f2df085ba623bacf28dc7"
+    },
+    {
+      "byteLength": 22918,
+      "path": "pipeline/scripts/build_teignmouth_float32_candidate.py",
+      "sha256": "5c72a2bc7f51fee50c976f3e4dc28c38c24427649b8dcc9d76ecbd391cd24e3b"
+    },
+    {
+      "byteLength": 28728,
+      "path": "pipeline/scripts/diagnose_teignmouth_float32_frame.py",
+      "sha256": "821914a737112382907cbaea6265cc3716fcc08b9275077733b85478a53186d2"
+    },
+    {
+      "byteLength": 2813,
+      "path": "pipeline/tests/test_road_surface_float32_frame.py",
+      "sha256": "ba35cec9557b6dd15b6e670d432dc927dcc6102e7fe1036715f4a9349f6126dd"
+    },
+    {
+      "byteLength": 14774,
+      "path": "pipeline/tests/test_teignmouth_float32_candidate.py",
+      "sha256": "000cd307929e69abd14ac85eef86dce343b16127c0e6909c87005aecdbd2dec8"
+    },
+    {
+      "byteLength": 80,
+      "path": "pipeline/torquay_pipeline/__init__.py",
+      "sha256": "bfa102ef837f56640bb3ac344d7a68fb8638133330f1d330678d1dce763a42c5"
+    },
+    {
+      "byteLength": 108202,
+      "path": "pipeline/torquay_pipeline/alignment_report.py",
+      "sha256": "6fd5afcab66ae2f500767ba49ac0526c3f3031df7bd475676e0526035593853d"
+    },
+    {
+      "byteLength": 12999,
+      "path": "pipeline/torquay_pipeline/aoi.py",
+      "sha256": "13209fe3e35fee22b34d8cc902860936c2addfe31fcc065cae39e75c503ff398"
+    },
+    {
+      "byteLength": 58455,
+      "path": "pipeline/torquay_pipeline/building_export.py",
+      "sha256": "18ac9abd0da77c1209af8784ce7717bb4cdedc6ee4cf999655c8194e202360c2"
+    },
+    {
+      "byteLength": 6013,
+      "path": "pipeline/torquay_pipeline/building_heights.py",
+      "sha256": "2b72ea58dd66220e0c94f80abfd258d0b2cc112d651a6f77108a317cc02397df"
+    },
+    {
+      "byteLength": 6337,
+      "path": "pipeline/torquay_pipeline/building_preview.py",
+      "sha256": "646c1b6e7cb8673467144f39b9baa7507b3fc99574a48e73b67bf16b37f34446"
+    },
+    {
+      "byteLength": 4991,
+      "path": "pipeline/torquay_pipeline/building_publish.py",
+      "sha256": "14a6864c7edd710a49593da7b0108acfb343322ecaba6294a7a8e004a8626ef4"
+    },
+    {
+      "byteLength": 5451,
+      "path": "pipeline/torquay_pipeline/building_sources.py",
+      "sha256": "4c499ddba8738a587ea21f7a5a228f5d22cfac6616369683c814c83221dbac31"
+    },
+    {
+      "byteLength": 32258,
+      "path": "pipeline/torquay_pipeline/buildings.py",
+      "sha256": "65fa3367c5bdcb283217c12adc8ab82f888cd9a41c2bbb82f66afa2a10e39e11"
+    },
+    {
+      "byteLength": 47325,
+      "path": "pipeline/torquay_pipeline/cli.py",
+      "sha256": "2e342c840c34efb4f44e010410fd5777ff97e56ccde830b36409bf0d0354a942"
+    },
+    {
+      "byteLength": 20818,
+      "path": "pipeline/torquay_pipeline/comparison_sources.py",
+      "sha256": "21266bb8370beb4b640d59eaa8f245e421623437fb8cbb70735e9bb715785832"
+    },
+    {
+      "byteLength": 10285,
+      "path": "pipeline/torquay_pipeline/config.py",
+      "sha256": "ed9cef1cef8d2d5477e2839e3f742c1f72b8518cabc67625e1cd2d80aa0c3bee"
+    },
+    {
+      "byteLength": 8291,
+      "path": "pipeline/torquay_pipeline/coordinates.py",
+      "sha256": "642e544a6c12592f01093899199663ffb325e1437ecef3163f223a6f40ef378f"
+    },
+    {
+      "byteLength": 37521,
+      "path": "pipeline/torquay_pipeline/elevation_index.py",
+      "sha256": "f9f2f5d7d2d7aec841faae6e14739319c75d26e0b1eb8eaaf75ceb887b0646fc"
+    },
+    {
+      "byteLength": 47668,
+      "path": "pipeline/torquay_pipeline/overview_export.py",
+      "sha256": "ba93bd6572cd637d3afbe921ad21ed24b0bde1d3a7456ab57a552c2a6be7f901"
+    },
+    {
+      "byteLength": 5486,
+      "path": "pipeline/torquay_pipeline/overview_publish.py",
+      "sha256": "8259eb22c463710ce734395be3e6b1da2f69969f2b8243aab066129d31b1fed1"
+    },
+    {
+      "byteLength": 79154,
+      "path": "pipeline/torquay_pipeline/road_alignment.py",
+      "sha256": "49343fd7acb6558861b5df2f638dc6bf11bd81c1fdfb52305874652c016a9ee1"
+    },
+    {
+      "byteLength": 6386,
+      "path": "pipeline/torquay_pipeline/road_config.py",
+      "sha256": "f1a3898251bd506a88e71db4a9ba9e640001fccd34bbd3083463b960109c5430"
+    },
+    {
+      "byteLength": 41244,
+      "path": "pipeline/torquay_pipeline/road_export.py",
+      "sha256": "563036720833f8905ac569c12c3af985b143cc5452dd273cbe641063284af0d1"
+    },
+    {
+      "byteLength": 14379,
+      "path": "pipeline/torquay_pipeline/road_geometry.py",
+      "sha256": "856720dc14830533422798ad900276781a63add4928238e761a72ff3d39f8af5"
+    },
+    {
+      "byteLength": 9128,
+      "path": "pipeline/torquay_pipeline/road_preview.py",
+      "sha256": "f2a7d3c5c65df1a0307729c244dadc65cbc06c044cc0573dfd80d97dba230768"
+    },
+    {
+      "byteLength": 4562,
+      "path": "pipeline/torquay_pipeline/road_publish.py",
+      "sha256": "dd0d3a36626db1ca538dd0726c9675b00752a1edce93f32523718d69837dc9b7"
+    },
+    {
+      "byteLength": 270523,
+      "path": "pipeline/torquay_pipeline/road_surface.py",
+      "sha256": "ef26431929a2f44b1f739a11bdd9962530f25b8c029f7f8dbf46f5ef6dfcdd7a"
+    },
+    {
+      "byteLength": 7766,
+      "path": "pipeline/torquay_pipeline/road_surface_float32_frame.py",
+      "sha256": "11148926afd79d7047161c9057c432a16788b4cf4c1a2b91221dc5b1b2077a52"
+    },
+    {
+      "byteLength": 6879,
+      "path": "pipeline/torquay_pipeline/road_surface_memory_admission.py",
+      "sha256": "14004bd9de5c05534769da7db97e697cecdecb8b673a04fa601c55e3426b53a3"
+    },
+    {
+      "byteLength": 231112,
+      "path": "pipeline/torquay_pipeline/road_surface_patch.py",
+      "sha256": "fb153a57c845fc09bb3c4de4e38b5b713710399a1fb8e444640c223ed443e825"
+    },
+    {
+      "byteLength": 9215,
+      "path": "pipeline/torquay_pipeline/road_surface_study.py",
+      "sha256": "e62cd3b1dd597cd67fe4f1dbdbac7613390da15ce67d81ce54cc79c07be24cce"
+    },
+    {
+      "byteLength": 22551,
+      "path": "pipeline/torquay_pipeline/road_surface_study_reconciliation.py",
+      "sha256": "f60d62b9ddd95d43e7892c66864643689caa53888454a9eea000e012bc9e113e"
+    },
+    {
+      "byteLength": 41243,
+      "path": "pipeline/torquay_pipeline/road_surface_topology.py",
+      "sha256": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880"
+    },
+    {
+      "byteLength": 57439,
+      "path": "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+      "sha256": "0470dc2a16f822580b762875aae54a5b866ce7dfeddaca0022111ad127344f98"
+    },
+    {
+      "byteLength": 26955,
+      "path": "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py",
+      "sha256": "2a2d09041f74cf5bf0389fab7203e5fad94d113a27ebe725a0784c80c5b1941b"
+    },
+    {
+      "byteLength": 40428,
+      "path": "pipeline/torquay_pipeline/road_surface_validation_v1.py",
+      "sha256": "50f97a2b7fb09f10094de8932eeb05a4858f978edfec35e3e51a3682071c501a"
+    },
+    {
+      "byteLength": 26079,
+      "path": "pipeline/torquay_pipeline/road_surface_validation_v2.py",
+      "sha256": "4b8182f9c584d4ca4b7b67017cce7374e607f75476628d3d0d40d6b28eafe587"
+    },
+    {
+      "byteLength": 16215,
+      "path": "pipeline/torquay_pipeline/roads.py",
+      "sha256": "7f37e57579b9783958094a0d92bfb267ece85319e81e03febb82db0118ed0771"
+    },
+    {
+      "byteLength": 23362,
+      "path": "pipeline/torquay_pipeline/scene_build.py",
+      "sha256": "79f8d16177d5d3021e634c721e9fb23441b267807dd047b7b8b00a6c2a9c8ebf"
+    },
+    {
+      "byteLength": 21301,
+      "path": "pipeline/torquay_pipeline/scene_release.py",
+      "sha256": "fa44cb835836f1158c2341098a3bbdc2ec4e091e25510b43606ac351e6ff53aa"
+    },
+    {
+      "byteLength": 31279,
+      "path": "pipeline/torquay_pipeline/teignmouth_corridor_continuation.py",
+      "sha256": "e345e48e7c1c6c4e05e9c6d5b25ac550502a10841f5f585bf7134fc167f49d16"
+    },
+    {
+      "byteLength": 20162,
+      "path": "pipeline/torquay_pipeline/teignmouth_corridor_continuous.py",
+      "sha256": "62a13aaa4f605c325d70ac7cc2b07a0ae8f55d39115d66455448626d387de7f6"
+    },
+    {
+      "byteLength": 14345,
+      "path": "pipeline/torquay_pipeline/teignmouth_corridor_prototype.py",
+      "sha256": "ca2e57728a248034b4375a16b2e42b3aea8d3429daa4ce18efcd459e545e1007"
+    },
+    {
+      "byteLength": 52782,
+      "path": "pipeline/torquay_pipeline/teignmouth_float32_candidate.py",
+      "sha256": "3fde4ccd0f7f28ff71bab02d567b4f255e85c32b6cc5561a18d73df8cb76b617"
+    },
+    {
+      "byteLength": 13315,
+      "path": "pipeline/torquay_pipeline/terrain_coverage.py",
+      "sha256": "1b40569ed71fc2e3d9a438c0053d286c1e9e323dc7aa8ec18ff98f94206cbdea"
+    },
+    {
+      "byteLength": 40908,
+      "path": "pipeline/torquay_pipeline/terrain_export.py",
+      "sha256": "7058f8d3265675557a83004ff7b863a51d61a6e861a3c37305ea9ced76cfd7bf"
+    },
+    {
+      "byteLength": 6630,
+      "path": "pipeline/torquay_pipeline/terrain_preview.py",
+      "sha256": "d68cdeeabbddd22f113023c84f356b961d3834bfdf0ebade5614b4454882bc6c"
+    },
+    {
+      "byteLength": 22661,
+      "path": "pipeline/torquay_pipeline/terrain_sources.py",
+      "sha256": "755fd9ecec77dfa8d7c926fad4c0d222c059c3e6f004ba6665324b4995bf3a82"
+    },
+    {
+      "byteLength": 375,
+      "path": "public/worlds/torquay-poc-001-2km/ready.json",
+      "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4"
+    },
+    {
+      "byteLength": 6015566,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+      "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+    },
+    {
+      "byteLength": 7240,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/manifest.json",
+      "sha256": "fb0d53261eda18d801b9ccc56f74a7d2aee04d8d6453e836fd850b2576b1f92d"
+    },
+    {
+      "byteLength": 14484,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/qa.json",
+      "sha256": "dd694c25b0de57a8f869048ae160441778964ab218ae23f319add0609693c828"
+    },
+    {
+      "byteLength": 4008004,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+      "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+    },
+    {
+      "byteLength": 1399,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/inventory.json",
+      "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0"
+    },
+    {
+      "byteLength": 7835,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+      "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+    },
+    {
+      "byteLength": 8326,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/qa.json",
+      "sha256": "1750d65f87b3e7bf1a63ed2a19ecbc6293a218cdca9137e0af731711c5820c64"
+    },
+    {
+      "byteLength": 10832,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+      "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+    },
+    {
+      "byteLength": 11911,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/qa.json",
+      "sha256": "9d2afc8a18fd3dcbc9a9ec3ef14857416a173bb92ef77192125833af3511d3cc"
+    },
+    {
+      "byteLength": 87338409,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+      "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+    },
+    {
+      "byteLength": 3779,
+      "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/scene-qa.json",
+      "sha256": "7e24d240866bff24b0be7c87656f66b646e4433109bf54b7fe03b96418276c9c"
+    },
+    {
+      "byteLength": 1431,
+      "path": "src/app/alignmentQaCamera.test.ts",
+      "sha256": "7659586e8a08422caf012afe8351155b9d0367597ef57e8813abbd3cf09177d1"
+    },
+    {
+      "byteLength": 1542,
+      "path": "src/app/alignmentQaCamera.ts",
+      "sha256": "b8cb1e6a967f2c4413bb2d23d611533eee8103ea70530b5b7c58b015036928a3"
+    },
+    {
+      "byteLength": 10232,
+      "path": "src/app/buildingLoader.ts",
+      "sha256": "f79647338a55971a9de3b89f027577a00a37454c62cd5e3af6513345317b9b67"
+    },
+    {
+      "byteLength": 92476,
+      "path": "src/app/createApp.ts",
+      "sha256": "ff671cc36d3e0380c0c0e8aa6a0869f33387c708d980dadf7b9b2f950674537b"
+    },
+    {
+      "byteLength": 12283,
+      "path": "src/app/createOverview.ts",
+      "sha256": "1a59f1cf20b9fb4dbc30b06c9a64d2ea586ea18341153e62ce066a51a9de9173"
+    },
+    {
+      "byteLength": 4995,
+      "path": "src/app/createOverviewMap.ts",
+      "sha256": "6985cb6c009b920ec50112b2b680d2f909fe993f112c5d44b7028e50ece9d986"
+    },
+    {
+      "byteLength": 9154,
+      "path": "src/app/createRoadLabels.ts",
+      "sha256": "f1f1a73eb12695801186e5f42588f8f6024f09791e4503e5a98d79d0b52e6204"
+    },
+    {
+      "byteLength": 8450,
+      "path": "src/app/overviewLoader.ts",
+      "sha256": "a25ca86b9e7132dc12ca0b00724f508cb0df03de2c1ae791df86f649fe1e833d"
+    },
+    {
+      "byteLength": 2194,
+      "path": "src/app/realSceneProfiles.ts",
+      "sha256": "b86f610715c6e108df23853883e01f8496bafcc65c26a0be708b3f50198e2261"
+    },
+    {
+      "byteLength": 9941,
+      "path": "src/app/roadLoader.ts",
+      "sha256": "94f0978aef5e290d50beeaaef30a8d18c39838b45340bd3f4fa5c469b995c0a5"
+    },
+    {
+      "byteLength": 9021,
+      "path": "src/app/roadSurfaceLoader.ts",
+      "sha256": "0885c724006e60779458498265b477ddc9a077efe3a59d6d0e2a21f6ece8c7c8"
+    },
+    {
+      "byteLength": 15647,
+      "path": "src/app/sceneRelease.ts",
+      "sha256": "2ba5b8ed9a469a797af5ec5011895cf174b4a429dd4f06c37022061b4353a68f"
+    },
+    {
+      "byteLength": 12822,
+      "path": "src/app/worldLoader.ts",
+      "sha256": "62d9e6da6b73ab99db69433b7430f818e35b0ae8fd8ff52f6b240505e672f00e"
+    },
+    {
+      "byteLength": 15660,
+      "path": "src/camera/FreeFlyController.ts",
+      "sha256": "7ce83f7b2d83c5b2641f564a950148ef3216fa3a6222a006a5d96638f769a475"
+    },
+    {
+      "byteLength": 4714,
+      "path": "src/camera/movement.test.ts",
+      "sha256": "fa2305fa5a5ade478e89de10c135d336966cac18ad0dfe32481efdb23630ed55"
+    },
+    {
+      "byteLength": 4327,
+      "path": "src/camera/movement.ts",
+      "sha256": "6fb53b2bf880d089fc1fdff13de58d03d9e48fc2f9decc936b94f03d628adf96"
+    },
+    {
+      "byteLength": 1580,
+      "path": "src/camera/navigationLifecycle.test.ts",
+      "sha256": "ca3cbffb5661bb6456ed20826894a0bf98878725b5424fe463c9c13c5c9255c9"
+    },
+    {
+      "byteLength": 1196,
+      "path": "src/camera/navigationLifecycle.ts",
+      "sha256": "5ce618a5c74e1cbfbb7748651949e11b169967ea368efa3e80d8a01fcc28c87e"
+    },
+    {
+      "byteLength": 8221,
+      "path": "src/camera/walkMovement.test.ts",
+      "sha256": "30d275cd99be6625ca20cd662170f5c86a1e31f98b8fabd717df6e344a9fbb29"
+    },
+    {
+      "byteLength": 7468,
+      "path": "src/camera/walkMovement.ts",
+      "sha256": "c35ad8c7a1fb27ce8964de3ef3c3feb49b2f40f1ed0dc681e991ebb4cc8b644b"
+    },
+    {
+      "byteLength": 8568,
+      "path": "src/geo/buildingGeometry.ts",
+      "sha256": "8082d8f6bdb6ccb3965a40062984c0b79766d0b20545af529703d7f96cb542e0"
+    },
+    {
+      "byteLength": 61822,
+      "path": "src/geo/buildingSchema.ts",
+      "sha256": "468a085bab633d32e21c33fae4fd7c3ce3e91bc80259dddb4c3c5b6eb988c07f"
+    },
+    {
+      "byteLength": 2839,
+      "path": "src/geo/heightfield.test.ts",
+      "sha256": "7b3119f64bea1219d6f8081dc2b1543c171963a0f868ec48e77e3697470d0518"
+    },
+    {
+      "byteLength": 2352,
+      "path": "src/geo/heightfield.ts",
+      "sha256": "a9d2c2ed8e15bf48a57013e627215dc5913c0bc8a23e4990a24f4d06b7196e20"
+    },
+    {
+      "byteLength": 4177,
+      "path": "src/geo/overviewLayerState.ts",
+      "sha256": "ed3e453879c19d15a54a20ee5b8193dd1d68764f152a144b9c3d4bcc14653151"
+    },
+    {
+      "byteLength": 34615,
+      "path": "src/geo/overviewSchema.ts",
+      "sha256": "2009fadd08b8b89aa59b5271a81fd1ff16a1c66c27cbcaa9edff93583956c804"
+    },
+    {
+      "byteLength": 7043,
+      "path": "src/geo/roadLabelCandidates.ts",
+      "sha256": "3692a2e88bac0cd4c3f30be52c5bf3b4d6d55b79b48a7c2b5d41a12ab6e99741"
+    },
+    {
+      "byteLength": 49729,
+      "path": "src/geo/roadSchema.ts",
+      "sha256": "a6bc3a0ca03f6ccc6e33b5a4855466ea83b7f6f63cc16237ba95e452f7b5001e"
+    },
+    {
+      "byteLength": 10428,
+      "path": "src/geo/roadSurfaceSchema.ts",
+      "sha256": "083560435c89b536c83deb913f4fa11176e9bca294d6ab0f23d0477a19909108"
+    },
+    {
+      "byteLength": 57418,
+      "path": "src/geo/sceneSchema.ts",
+      "sha256": "07a82a74aaa711e3e855848e9f2dcbea07684a640e3aacd30739c2b491e9dd2a"
+    },
+    {
+      "byteLength": 6391,
+      "path": "src/geo/terrainGrid.ts",
+      "sha256": "d678df09eabecaee16370527c30e9e2923c817451d6e2453165b82d928dea39a"
+    },
+    {
+      "byteLength": 313,
+      "path": "src/main.ts",
+      "sha256": "67b1dcfc29fce2de13750aa35ff5d91dd047f3555156d83a358a68acfb031130"
+    },
+    {
+      "byteLength": 16074,
+      "path": "src/progress/main.ts",
+      "sha256": "fe451741adc239f5e9e84537a3b276a80f68b7851f8881f3a70abbc4fbee83de"
+    },
+    {
+      "byteLength": 16841,
+      "path": "src/progress/progress.css",
+      "sha256": "7192cf0046a65387d81f24d61e8dd4638281e9a6d8609efab254a38fc79f8539"
+    },
+    {
+      "byteLength": 8840,
+      "path": "src/scene/createBuildings.test.ts",
+      "sha256": "8516517d035aebeae303e6b1d3f9acfccfe683d895f86f5ba0543231fe0678ac"
+    },
+    {
+      "byteLength": 13190,
+      "path": "src/scene/createBuildings.ts",
+      "sha256": "e26244d5f75f785b503160ee40f13c33b9437f3b79aaab5ad227035329e49cd4"
+    },
+    {
+      "byteLength": 4177,
+      "path": "src/scene/createHeightfieldWorld.ts",
+      "sha256": "0d3d53b4ee803414a5898fbec305218b46c187d23ed47b96fa462e8b51074449"
+    },
+    {
+      "byteLength": 9764,
+      "path": "src/scene/createRoads.ts",
+      "sha256": "8de01917d0b98e6ce2224d5c65c1ddc3181934b9cd8a0276ba2e19bd296e5e75"
+    },
+    {
+      "byteLength": 385,
+      "path": "src/scene/createScene.ts",
+      "sha256": "40d7a4739087158110be577f3e6b32fecd528deeed456ab2e8e47fa4e2042d7e"
+    },
+    {
+      "byteLength": 4152,
+      "path": "src/scene/createSyntheticWorld.ts",
+      "sha256": "6362fa0b8b3952a7de6df5ba413b3df4b85874774a52847f9fa7747fb15e48e7"
+    },
+    {
+      "byteLength": 5478,
+      "path": "src/scene/createTerrain.test.ts",
+      "sha256": "295baa27666dc2f73aead16784a277a702e77596f563df36e04a5728429b9ec8"
+    },
+    {
+      "byteLength": 6217,
+      "path": "src/scene/createTerrain.ts",
+      "sha256": "f898e07511c88263ff55dfcfc91346ecf645034ae64318d9aa80ce8ac1dee433"
+    },
+    {
+      "byteLength": 4166,
+      "path": "src/scene/debugHelpers.ts",
+      "sha256": "689f707ebd162d14417fba048a865899291ebd8e98c4a5b16af09d678595b061"
+    },
+    {
+      "byteLength": 771,
+      "path": "src/scene/disposeSceneResources.ts",
+      "sha256": "7bc453800bddd7bfc09a0f96ced53c74278db0eb6fee74d87183df9498fde5a6"
+    },
+    {
+      "byteLength": 22346,
+      "path": "src/style.css",
+      "sha256": "88c7c3614d72b533a8e4d44448b0869a7beb9b6664cffd74c5b8934a5e6f34bb"
+    }
+  ],
+  "frozenAtUtc": "2026-10-24T12:44:55.227967+00:00",
+  "interpreter": {
+    "command": "pipeline/.venv/Scripts/python.exe",
+    "implementation": "CPython",
+    "packages": {
+      "numpy": "2.5.4",
+      "pyproj": "3.8.0",
+      "pytest": "9.1.1",
+      "rasterio": "1.5.2",
+      "ruff": "0.17.1",
+      "shapely": "2.2.0"
+    },
+    "platform": "Windows-11-10.0.26300-SP0",
+    "resolvedExecutable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "mutableRecords": [
+    {
+      "byteLength": 27156,
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/attempt-ledger.json",
+      "role": "coordinator-managed mutable attempt ledger; excluded from protected input list",
+      "sha256": "b0088180356616cd3e3dd4021b05faa99176b5ad25d5d05dcb73181092c0a313"
+    }
+  ],
+  "outputs": {
+    "existsAtFreeze": false,
+    "expectedCandidatePath": "data/generated/teignmouth-float32-topology"
+  },
+  "previousEvidencePlanSha256": "f5bcc16639da261498e6aef3f79a334e10754969f6329783015549fd2606a4de",
+  "previousImmutableManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/input-manifest.json",
+  "previousImmutableManifestSha256": "4f3c61472f6dad9e5de1f9a945fe391a5388f6b6f92adb2827790b70f19cc185",
+  "prohibitedExecutions": {
+    "browser": false,
+    "candidateBuild": false,
+    "diagnostic": false,
+    "sourceLoad": false
+  },
+  "schema": "teignmouth-float32-correction-input-v1"
+}

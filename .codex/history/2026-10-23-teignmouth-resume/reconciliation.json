@@ -1,0 +1,19 @@
+{
+  "classification": "resume_reconciliation_not_acceptance",
+  "head": "a0cfb99",
+  "protectedDifferences": {
+    "protected:.codex/torquay-plan-implementation.md": {
+      "historical": "83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814",
+      "current": "73a47fd8ec2ce852eb22603fcb4b3ca26d7e846f0daeaee5cd038c793d330594"
+    },
+    "protected:AGENTS.md": {
+      "historical": "b4c1c15a75d34d8ba9cb12366ca1442bd709f692e7d7eccba66eab3f74732267",
+      "current": "0fe9529152210561e385c0e2a3116c59c5df55b2e07fe9fa1b6ae00ef541a855"
+    }
+  },
+  "consumedRawInventoryMatches": true,
+  "allCodeProfileExists": false,
+  "activationEnabled": false,
+  "checkpointBeforeSha256": "73a47fd8ec2ce852eb22603fcb4b3ca26d7e846f0daeaee5cd038c793d330594",
+  "historicalMetadataArchive": ".codex/history/2026-10-23-workflow-update/manifest.json"
+}

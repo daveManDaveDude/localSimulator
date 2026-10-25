@@ -1,0 +1,70 @@
+{
+  "authorizationStatus": {
+    "activationAllowed": false,
+    "currentPhase2TimingQualified": false,
+    "implementationAuthorizedByThisReview": false,
+    "ordinaryProductionTimingQualified": false,
+    "proposalOnly": true,
+    "trialSolverReplayProfileAuthorizedByThisReview": false
+  },
+  "bindings": {
+    "AGENTS.md": "0fe9529152210561e385c0e2a3116c59c5df55b2e07fe9fa1b6ae00ef541a855",
+    "config/road-surface-teignmouth-topology-transition-v2.json": "6c685c1746e01786ebe19a027c51235abbfda71fe58e4bc959cb60604964ccf3",
+    "docs/agent-workflow.md": "88a605214ec8783157df337c2d6f6adc993f69b779df33881b151cd65d2d93eb",
+    "docs/milestones/Teignmouth-timing-bootstrap-proposal.md": "63cc4ca3a01906b71514d10590da4692399e91aa4e8ecefbc955cad627f2640f",
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md": "16358db4e1dd40349fb9d7550f80e80cbeac4489bb263e56aa7f38949af26b45",
+    "docs/milestones/Teignmouth-unicode-timing.md": "7292dda5a732b788eb5f540163c8e4fb9aab675210ff18989db9061df73d9676",
+    "docs/milestones/artifacts/Teignmouth-unicode-timing/independent-bootstrap-proposal-review.json": "0e1f137200601122fdb25d72d03a5918486f5fab3204f793b3b3ac090fd1bd24",
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py": "fd32e553e4fe9e832312274c698a463f15545933bcd1b57b5a98122612aaa55e"
+  },
+  "findings": [],
+  "formatVersion": 1,
+  "personallyChecked": [
+    "Read entire corrected proposal and actual _approval_payload/ensure_transition_activated code plus current v2 approval specification.",
+    "Compared claimed geographic/numeric/collar scope to frozen study config, patch constants and pending AOI config.",
+    "Independently hashed all23 baseline files listed in the proposal: every hash matches.",
+    "Verified mandatory_corridor_station_union and validate_reconciled_stage_order named contracts exist.",
+    "Verified live activation=false, collar-05 raw directory absent and both genuine ordinary receipt files absent."
+  ],
+  "priorFindingDisposition": {
+    "BP-1": "RESOLVED. Exact existing receipt schemas have no timing_qualified field; exact-dictionary validation rejects extras. They approve the hash-bound spec/config/runtime contract. A genuine PASS can approve the limited exception only after explicit user authorization and an amended reviewed spec. The proposal correctly identifies the current disabled-config refusal, enabled-config/accepted-marker requirements and timing prerequisites; no current route admits the proposed work with activation=false. New entrypoint/shared-verifier extraction and one-use permit require implementation review. Ordinary activation retains its false-state refusal. Evidence-only document verification is measured separately; ordinary enabled preflight and production timing remain unmeasured/unqualified and need a separately authorized exact later stage.",
+    "BP-2": "RESOLVED. Successful actual collar-05 aggregate and all ten files, output maps, constraints/station union, source/environment/code/config/receipt/permit chain and timing ledger are sealed as the sole reference. P_B=bs-bp is the actual preparation/sole-solver interval. A_i measures preflight/input/attempt creation and retained restoration; V_i measures all post-solver evidence IO, worker gates and genuine conditional assembly/validation/hash/return verification; F_i measures final preservation/shared aggregate commit and remaining cleanup. E_i_projected=A_i+P_B+V_i+F_i is explicitly a same-witness policy amendment, not a newly measured solve. Extra restoration/profiling overhead is charged and cleanup is not double-counted. Projected <120 preparation/solver and <125 validation cutoffs, <135 finalization and <=125 total are explicit; the worker cannot receive a fresh full125 seconds. Actual Stage B duration remains separate.",
+    "BP-3": "RESOLVED. Exact way78455395 part0 stations140-155m/full6m width,84x82m replacement domain,42x41 original2m cells at column409/row432, unchanged influence/fixed nodes/source planes/outer boundary and0.5->1->2m collar are stated. Numeric headroom, all twelve gates, station union/3613 footprints, source/release/preview/AOI and resource limits are preserved. Existing reconciled stage/input guards, absent unconsumed directories, exclusive ten-file contract and protected maps are required. All23 table hashes match actual current bytes; future implementation/permit/station/reference hashes must be real and reviewed before use."
+  },
+  "receiptSemanticsVerifiedAgainstCode": {
+    "approvalPayloadFields": [
+      "transition_id",
+      "config_path",
+      "config_sha256",
+      "spec_path",
+      "spec_sha256",
+      "runtime_code_hashes",
+      "runtime_code_sha256"
+    ],
+    "coordinatorSchema": "teignmouth-validation-v2-coordinator-acceptance-v1",
+    "disabledConfigRefusedBeforeReceiptRead": true,
+    "exactDictionaryComparison": true,
+    "ordinaryAcceptedMarkerRequired": true,
+    "proposedFalseActivationEvidenceAdmissionAlreadyImplemented": false,
+    "solSchema": "teignmouth-validation-v2-sol-review-v1",
+    "timingQualifiedFieldInCurrentSchemas": false
+  },
+  "remainingConditionsNotFindings": [
+    "Explicit user approval must separately cover the trial-before-qualification exception/false-activation entrypoint, same-collar historical preparation/solver projection policy, and exact implementation/review/trial/profile budget.",
+    "Actual future implementation/config/spec/receipt/permit/resource representability and timestamp/reference instrumentation must receive independent readiness PASS before any dispatch.",
+    "The one unchanged-limit collar-05 trial may fail; no numerical feasibility or <=125-second throughput is established by this proposal. Any prescribed failure stops without another trial/probe/profile variant.",
+    "Evidence-only qualification will not satisfy ordinary production timing. A later enabled-config/preflight stage remains outside this budget and requires a separately reviewed admission/qualification order."
+  ],
+  "reviewActions": "Read-only code/spec/hash inspection only. No tests, probes, numerical validation, solver, trial, profile/replay, candidate build, browser or activation ran. Only this separate review artifact was written.",
+  "reviewDate": "2026-10-24",
+  "reviewer": {
+    "actualModel": "unknown; not exposed",
+    "actualReasoningEffort": "unknown; not exposed",
+    "agent": "/root/review_sol_escalation",
+    "independentOfImplementation": true,
+    "requestedModel": "gpt-6.1-sol",
+    "requestedReasoningEffort": "medium"
+  },
+  "scope": "Corrected bootstrap proposal policy review only; not implementation/readiness/timing/activation approval",
+  "verdict": "PASS"
+}

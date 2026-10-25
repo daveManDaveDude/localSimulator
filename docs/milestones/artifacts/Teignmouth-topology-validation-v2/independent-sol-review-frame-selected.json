@@ -1,0 +1,121 @@
+{
+  "activationDisposition": "Does not satisfy the independent-sol-review.json PASS receipt required for activation; activation must remain disabled.",
+  "additionalEvidenceChecks": [
+    "Both consumed raw trial inventories independently reconstructed from all ten files per trial and compared with profile before/after maps and canonical inventory bytes.",
+    "Exact workflow metadata old/new AGENTS hashes, retained before-images, archive manifest and authorization document validated.",
+    "Current static and runtime code/config bindings compared with retained profile identities.",
+    "Protected source/release/accepted-preview and evidence-tree snapshots independently recomputed through frozen snapshot methods and compared with retained profile before/after maps.",
+    "Current and prior metadata reconciliation results independently recomputed and matched retained profile."
+  ],
+  "budgetDisposition": "The same reserved Sol correction was submitted for this final review and is unsuccessful/incomplete. The issue correction budget is exhausted. Stop dependent work with NEEDS USER DECISION; no further correction or trial is recommended or authorized.",
+  "capRecommendation": null,
+  "checksActuallyRun": [
+    {
+      "command": "pipeline/.venv/Scripts/python.exe -B -m pytest -p no:cacheprovider tests/test_road_surface_validation_v2.py tests/test_road_surface_validation_transition_v2.py tests/test_teignmouth_cached_supervisor.py tests/test_teignmouth_complete_profile.py -q",
+      "result": "57 passed in 4.43s; exit code 0",
+      "workingDirectory": "C:/vibe/localSimulator/pipeline"
+    },
+    {
+      "command": "Ruff check --no-cache and format --check --no-cache on run_teignmouth_topology_validation_v2.py, road_surface_validation_transition_v2.py, profile_teignmouth_frame_selected_sol.py, test_road_surface_validation_transition_v2.py, test_teignmouth_cached_supervisor.py, test_teignmouth_complete_profile.py",
+      "result": "All checks passed; six files already formatted"
+    },
+    {
+      "command": "git diff --check",
+      "result": "Passed; existing checkpoint LF-to-CRLF warning only"
+    },
+    {
+      "command": "Read-only Python hash/map/metadata/report verification; no validator, topology reconstruction, profile or solver dispatch",
+      "result": "All assertions passed, including current code/profile/hash identities, all twelve unavailable reports, source/release/preview/protected trees, canonical consumed inventory and candidate absence"
+    },
+    {
+      "command": "Compare current config with git HEAD config and inspect focused git diffs",
+      "result": "Timing and activation unchanged; changed config keys limited to extension_code_hashes, extension_code_paths, input_state_transition, pinned_inputs; original study/candidate configs and numeric validator/patch files unchanged"
+    }
+  ],
+  "dispatchAssessment": {
+    "externalFrames": "Global call tracing retains workspace descendant supervision through external frames without local line hooks.",
+    "nativeCallLimitation": "GEOS/NumPy/native calls cannot be preempted by Python line tracing; late results are rejected after control returns.",
+    "relativeFrames": "Per-line membership cache invalidates on CWD changes.",
+    "reparseFrames": "Fallback remains uncached with repeated membership resolution.",
+    "safeAbsoluteFrames": "Workspace frame entry selection retains deadline polling on every workspace line.",
+    "traceRestoration": "Focused regression tests passed for deadline and ordinary exceptions."
+  },
+  "evidenceReviewed": {
+    "docs/milestones/artifacts/Road-surface-treatment/teignmouth-topology-study/profiles/consumed-trials-inventory-v2.json": "9e9c9d083014dd2649fc2b4d284a235423358466b6e91b3d07959c2369f5d8d6",
+    "docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-complete-traced-report-sol-optimized.json": "9329f309bd4778262c9b721f250886adaba61c71528d5c1ab8b2d86ba3751a71",
+    "docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-process-sol.json": "922c56f531d732fe4bd626f73f494e47445cefcda519ce0865fb4076807383d2",
+    "docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-profile-sol.json": "87907ef5a938906523203724892c7b26bb644455d3ec1d24a298faf3e9e8670a",
+    "docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-report-sol.json": "88f99c00f26dd6dbcf63dc1ba1adcd82b0f1cb48a89c02c2f7ec5f3db4c8591a",
+    "docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-performance-profile-fix4.json": "c55954145cc1c8f0d0e481cf7794c050a9120b7a5dd0c410342c2edfee2622c6"
+  },
+  "filesReviewed": [
+    "AGENTS.md",
+    "docs/agent-workflow.md",
+    ".codex/torquay-plan-implementation.md",
+    "C:/Users/david/.codex/skills/torquay-plan-implementation/SKILL.md",
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py",
+    "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py",
+    "pipeline/tests/test_road_surface_validation_transition_v2.py",
+    "pipeline/tests/test_teignmouth_cached_supervisor.py",
+    "pipeline/tests/test_teignmouth_complete_profile.py",
+    "pipeline/scripts/profile_teignmouth_frame_selected_sol.py",
+    "config/road-surface-teignmouth-topology-transition-v2.json",
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md"
+  ],
+  "findings": [
+    {
+      "category": "missing mandatory evidence",
+      "detail": "The single bounded diagnostic hit its 80 second validation cutoff. All twelve reports are unavailable/failed and full report equivalence is not established. The 122.873856 second incomplete mixed proxy omits unfinished work and cannot demonstrate the mandatory complete projected end-to-end <=125 seconds in implementer and independent profiles. This is an unsuccessful/incomplete correction, not an activation PASS.",
+      "priority": 1,
+      "title": "Complete validation and timing qualification not established"
+    }
+  ],
+  "formatVersion": 1,
+  "notActivationPassArtifact": true,
+  "preservedFacts": {
+    "activationEnabled": false,
+    "browserRunByReviewer": false,
+    "candidateOutputAbsent": true,
+    "finalizationDeadlineSeconds": 135,
+    "geographicNumericResourceGatesUnchanged": true,
+    "implementationOrCheckpointEditedByReviewer": false,
+    "maximumSolverIterations": 2000,
+    "profileRerunByReviewer": false,
+    "qualificationProjectedEndToEndLimitSeconds": 125,
+    "solverPreparationDeadlineSeconds": 120,
+    "solverRunByReviewer": false,
+    "sourceReleaseAcceptedPreviewAndConsumedInventoriesUnchanged": true,
+    "trialRunByReviewer": false,
+    "validationDeadlineSeconds": 125
+  },
+  "recordingAction": "Only this new review artifact is written by this recording operation. No checks were rerun and no implementation, config, spec, checkpoint, prior evidence or consumed trial files were changed.",
+  "reviewDate": "2026-10-24",
+  "reviewer": {
+    "actualModel": "unknown; runtime model identifier not exposed",
+    "actualReasoningEffort": "unknown; runtime setting not exposed",
+    "agent": "/root/review_sol_escalation",
+    "requestedModel": "gpt-6.1-sol",
+    "requestedReasoningEffort": "medium",
+    "role": "independent reviewer; did not implement the correction"
+  },
+  "scope": "Completed independent review of the resumed SAME reserved Sol correction; recorded without rerunning checks, profile, solver or trial.",
+  "timingEvidence": {
+    "allTwelveGateReportsUnavailableFailed": true,
+    "allTwelveReferenceEquivalenceComparisonsFalse": true,
+    "classification": "timing_only_no_gate_acceptance",
+    "completeDispatchMeasured": false,
+    "completeProjectedEndToEndMeasured": false,
+    "diagnosticValidationBudgetSeconds": 80.0,
+    "directReplayPerformed": false,
+    "externalProcessLimitSeconds": 150,
+    "externalTimeout": false,
+    "incompleteMixedProxySeconds": 122.87385579996044,
+    "processElapsedSeconds": 92.2761844000197,
+    "processExitCode": 2,
+    "proxyIsQualificationEvidence": false,
+    "qualifiesForNextTrialTiming": false,
+    "tracedDispatchSeconds": 80.00019839999732,
+    "unmeasured": "Unfinished numerical/road/walk gate work, conditional assembly, production activation-receipt preflight and exact trial finalization remain unavailable."
+  },
+  "verdict": "FIX REQUIRED"
+}

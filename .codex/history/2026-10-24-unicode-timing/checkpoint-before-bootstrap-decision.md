@@ -1,0 +1,51 @@
+# Torquay plan implementation checkpoint
+
+## Current state and next action — 2026-10-24
+
+- **Status:** PHASE 1 PASS; PHASE 2 TIMING EVIDENCE BLOCKED pending a concrete approval/evidence sequence. The user authorized a fresh retry budget to fix Unicode sizing and resolve timing. The prior process-validation issue remains terminal and immutable.
+- **Workspace:** `C:\vibe\localSimulator`, branch `main`; preserve all legacy edits/artifacts. Exact pre-review checkpoint/spec: `.codex/history/2026-10-24-unicode-timing/phase1-review/` (checkpoint SHA-256 `8938a19a32b2d7845636fe14bb5a6e87d122a7eba87c45e1feb902028603070f`; issue-spec SHA-256 `7792ea3aea152d6976b237901efb7f6d9fb6905d1afde118eda37484147bc10e`).
+- **Active issue:** `docs/milestones/Teignmouth-unicode-timing.md`. Phase 1 independent review PASS: `docs/milestones/artifacts/Teignmouth-unicode-timing/independent-sol-review-phase1.json`, SHA-256 `ac5b8ea4653fd4bddccb54bd347942dfcedaaf225fcf5584436630c8b797193a`.
+- **Phase 1:** non-BMP JSON bounds fixed for strings/Paths/keys/nested values; `ensure_ascii=True`, canonical bytes and 64 MiB ceiling unchanged. Focused checks 129 passed, 1 privilege skip; Ruff, pins and diff passed. Existing passing containment evidence was reused only after byte-exact lifecycle/probe comparison.
+- **Phase 2 evidence gap:** all five retained witnesses fail offline gates and lack successful assembly; exact production review/acceptance receipts are absent. No legitimate all-gates successful witness or receipt-preflight path is available in the repository. No retained replay has run.
+- **Next action:** Sol to specify a concrete, staged approval/evidence sequence that could close Phase 2 without fabricating receipts. No bootstrap code, solver, candidate trial, retained replay, activation or limit change until its prerequisites and required user authorization are explicit.
+- **Fresh budget ledger:** initial Sol implementation used for Phase 1; one Sol correction remains available in the new issue, zero Luna corrections. No new correction is reserved. Phase 2 profile/solver/trial/probe allowances are not yet defined or authorized.
+- **Fixed constraints:** keep 120/125/135 s deadlines, complete projected <=125 s, 2,000 iterations, all twelve gates, geography/source/resource/provenance constraints, pending AOI, consumed trial inventory and activation=false.
+- **Prior issues:** prior process validation remains NEEDS_USER_DECISION (old correction and both probe attempts spent). Older topology issue remains exhausted. No old attempt or trial inventory was reset.
+- **Roles:** `/root/timing_plan` provided the read-only Sol plan and initial implementation, requested gpt-6.1-sol / medium; actual runtime settings unknown. `/root/review_sol_escalation` independently reviewed Phase 1 PASS and has not implemented Phase 2.
+- **Transition marker:** `TEIGNMOUTH_VALIDATION_V2_REVIEW_PENDING` remains present exactly once.
+- **Browser:** not relevant to offline validation; no browser work occurred.
+## Evidence and role pointers
+
+- Resume audit: tracked tree at a0cfb99 was clean; only sites/torquay-virtual-world/ untracked. Prior work is committed, not lost. Accessible roster contained only this coordinator before diagnosis; no Python/project Vite process remained. Old Sol final response confirms the interrupted replay wrote neither output. Coordinator model/effort not exposed; unchanged by this workflow.
+- Exact pre-resume checkpoint and machine-readable audit: .codex/history/2026-10-23-teignmouth-resume/. Historical profile/config/runtime bytes remain untouched. Audit compares protected inputs and consumed inventories; metadata differences require explicit review before bound execution.
+- Diagnosis: completing interrupted all-code proxy omits production preflight/finalization and cannot qualify. A synthetic 500,003-line-poll probe measured 0.321 s current / 0.214 s frame-selected; this is optimization evidence only. Known prior costs leave <=80.290 s for validation before unmeasured costs. Coordinator accepted one bounded continuation, with no acceptance changes.
+- Current baseline checks: 50 focused tests passed in 2.06 s; Ruff check and format check passed for ten timing/validator files; diff check passed. No browser run at this offline-only stage. Issue usage unavailable; coordinator model/effort unknown.
+- Coordinator chat: 01a14904-3b61-7460-80e8-faba7cf92ef8, “Implement Torquay browser M0”; paused/idle.
+- Sol correction implementer: /root/road_alignment_planner; chat 01a15fff-b9cc-7aa2-a3a6-f69eff3e2cf8; gpt-6.1-sol / medium; completed its diagnostic before the pause. Independent reviewer: /root/review_sol_escalation; requested gpt-6.1-sol / medium, actual runtime model/effort not exposed; completed FIX REQUIRED review without implementing the correction.
+- Luna implementer: /root/road_surface_implementation; chat 01a16474-fb36-7582-b7eb-a49b7f08f197; gpt-6-luna / xhigh for the legacy work; idle after fix 4. IDs are recovery references; confirm accessible roster/status before reuse.
+- Original supervisor replay reached its 1,800 s diagnostic cutoff; direct untraced dispatch took 70.043 s. The diagnostic cap was not a trial-policy change.
+- Absolute-code-cache replay completed: traced dispatch 288.097 s, untraced 69.632 s; all 12 reports recorded byte-identical. It exceeds the qualification window and is not a collar candidate or acceptance result.
+- Completed profile: docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-complete-traced-profile-sol-optimized.json; SHA-256 2730006637c7e303bcdefb2d5bfff3215a54ec4219f9fa5a532bb6db717351ce.
+- Completed report: docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-complete-traced-report-sol-optimized.json; SHA-256 9329f309bd4778262c9b721f250886adaba61c71528d5c1ab8b2d86ba3751a71.
+- All-code/CWD-aware replay was stopped after about 149 s; its agent reported no profile/report written. Reconcile partial work; do not label it passed or independently reviewed.
+- Resumed frame-selected diagnostic: profile `docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-profile-sol.json` SHA-256 `87907ef5a938906523203724892c7b26bb644455d3ec1d24a298faf3e9e8670a`; report SHA-256 `88f99c00f26dd6dbcf63dc1ba1adcd82b0f1cb48a89c02c2f7ec5f3db4c8591a`; process record SHA-256 `922c56f531d732fe4bd626f73f494e47445cefcda519ce0865fb4076807383d2`. It reached the 80 s validation cutoff; all twelve gate reports are unavailable/failed. The 122.873856 s mixed proxy is incomplete and does not qualify; no direct replay, solver or trial ran.
+- Independent review ran 57 focused tests (passed in 4.43 s), Ruff check/format and `git diff --check`; independently verified maps, identities, all twelve unavailable reports, and preservation. Tracing polls every workspace line, but native-call preemption and complete timing qualification remain unavailable. See the FIX REQUIRED review artifact above.
+- Interrupted entry: pipeline/scripts/profile_teignmouth_complete_dispatch_sol_all_codes.py; reported SHA-256 a13338a43b6a5d1b9db32e7abb7eb16318c1ce69c09ecfc2622e69de42726421. Supervisor: pipeline/scripts/run_teignmouth_topology_validation_v2.py; reported SHA-256 efcce688abcf119d9996628e40a3fdf71a2ba8c98c7ff5055656af4f68eddc27.
+- The paused Sol agent reported 50 focused tests, Ruff and diff checks passed, with preservation snapshots unchanged at its pause. These are historical agent-reported results; the metadata update did not rerun or independently certify them.
+
+## Preserved baseline and consumed work
+
+- Accepted baseline: 2 km source-draped default viewer and opt-in Correction 2 preview; geometry bafb17d, acceptance 741b272. See docs/milestones/Road-surface-treatment.md. Preserve source GIS, current/historical packages, accepted preview, default and public Site.
+- Keep TQ1 4HN center and AOI selected_pending_coverage / not_checked. Feature completeness remains unverified; TVW-016 and later remain unauthorized.
+- Previous exact 0.5 m formulation exhausted four Luna fixes and its Sol fix; independent review accepted its infeasibility certificate only. It did not accept a candidate or prove every topology infeasible. That old budget stays exhausted.
+- Consumed topology trials flip-05 and road-05 remain unresolved, write-once and ineligible for retry. Their aggregates are c8546b9c5bf410118386a2574c5e4aae5b7398e73fbace72ec3c4919b5d3525c and a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352. The later authorized study is distinct from the exhausted original formulation.
+- Remaining trial order and resource/approval gates stay in the active specifications/config; no trial dispatch is authorized by this checkpoint migration.
+
+## History and metadata migration
+
+- Post-profile checkpoint reconciliation (2026-10-24): the frame-selected profile bound the then-current checkpoint SHA-256 `c78c4b2b67e1bb6111cf2d65b8dd3459204a8f877b91d0aaf0b289cc28a5dbf5`. Its exact before-image is retained at `.codex/history/2026-10-24-teignmouth-review/checkpoint-before-review.md` with that hash. This checkpoint update records the final FIX REQUIRED disposition only; it does not rewrite or rehash prior evidence. Future execution must explicitly reconcile this later metadata transition first.
+
+- Exact pre-update checkpoint: .codex/history/2026-10-23-workflow-update/checkpoint-before.md, 82,257 bytes, SHA-256 83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814. Read only for a specific historical question; its former “current” sections are superseded.
+- The same archive's manifest.json preserves before-images of AGENTS.md, both skills and their UI metadata. Full milestone history remains in docs/milestones/.
+- This checkpoint compaction and AGENTS.md amendment are authorized metadata changes. They do not alter existing code, profile evidence, frozen inputs/configuration or approvals. Historical metadata hashes apply to the retained before-images, not these new bytes.
+- Before execution that binds checkpoint/project metadata, explicitly reconcile this documented transition through the existing review/approval mechanism. Do not silently rehash prior reports or activate the transition. Skills and checkpoint updates do not replenish attempts or restart paused work.

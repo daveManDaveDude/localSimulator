@@ -1,0 +1,21 @@
+{
+  "wrapperCreationFileTime": 134373761782256416,
+  "budgetSeconds": 10.0,
+  "phase": "nonnumerical-self-check",
+  "wrapperChosenExitCode": null,
+  "wrapperPid": 41760,
+  "candidateEligibleForServing": false,
+  "consumedHandoffPath": "C:\\vibe\\localSimulator\\.codex\\build3-supervisor-selfcheck\\self-check-handoff.consumed.json",
+  "startQpc": 2939227575196,
+  "mode": "self-check",
+  "nativeLauncherExitCode": null,
+  "supervisorScriptExitCode": null,
+  "nativeProcessLaunched": false,
+  "candidateBuildExecuted": false,
+  "startedUtc": "2026-10-25T04:29:38.5683777Z",
+  "deadlineQpc": 2939327575196,
+  "qpcFrequency": 10000000,
+  "schema": "teignmouth-build3-caller-record-v2",
+  "handoffPath": "C:\\vibe\\localSimulator\\.codex\\build3-supervisor-selfcheck\\self-check-handoff.json",
+  "status": "CALLER_SETUP_STARTED"
+}

@@ -1,0 +1,19 @@
+ M .codex/torquay-plan-implementation.md
+ M config/road-surface-teignmouth-topology-transition-v2.json
+ M docs/milestones/Teignmouth-topology-validation-v2-spec.md
+ M pipeline/scripts/run_teignmouth_topology_validation_v2.py
+ M pipeline/tests/test_road_surface_validation_transition_v2.py
+ M pipeline/tests/test_teignmouth_cached_supervisor.py
+ M pipeline/tests/test_teignmouth_complete_profile.py
+ M pipeline/torquay_pipeline/road_surface_validation_transition_v2.py
+?? .codex/history/2026-10-23-teignmouth-resume/
+?? .codex/history/2026-10-24-process-validation/
+?? .codex/history/2026-10-24-teignmouth-review/
+?? docs/milestones/Teignmouth-process-validation.md
+?? docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-process-sol.json
+?? docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-profile-sol.json
+?? docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-report-sol.json
+?? docs/milestones/artifacts/Teignmouth-topology-validation-v2/independent-sol-review-frame-selected.json
+?? docs/milestones/artifacts/Teignmouth-topology-validation-v2/sol-frame-resume-before/
+?? pipeline/scripts/profile_teignmouth_frame_selected_sol.py
+?? sites/torquay-virtual-world/

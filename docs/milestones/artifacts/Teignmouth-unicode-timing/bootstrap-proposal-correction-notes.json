@@ -1,0 +1,36 @@
+{
+  "additionalCoordinatorClarification": "The schema itself does not cause an intrinsic timing-receipt cycle. Existing spec/order and false-activation guard block unchanged execution. New readiness receipt schema/policy is unnecessary; exact bootstrap/trial/profile permissions remain required.",
+  "afterProposalSha256": "63cc4ca3a01906b71514d10590da4692399e91aa4e8ecefbc955cad627f2640f",
+  "baselinePinCount": 23,
+  "baselinePinMapCanonicalSha256": "1c1d45b3e478b3fc19798da5843e6bb05893981ea09dc35065b2d7ddd728fe1a",
+  "baselinePinsLocation": "Exact geographic/source/code pins inspected for this draft (BP-3), in corrected proposal",
+  "beforeImagePath": "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap-proposal-before-correction.md",
+  "beforeProposalSha256": "62f6d9771d3afee7d2fcf6cc2dd34971f03dc8e7d2911f150a9ef2fd922ddb70",
+  "findingsAddressed": {
+    "BP-1": "Existing exact PASS/ACCEPTED schemas contain no timing assertion; reuse them for a genuinely approved limited bootstrap spec without a new readiness schema. Current false-activation code guard and explicit trial-before-qualification spec order still require a narrow user-approved exception/admission mode. Stage C measures genuine shared document verification only; full ordinary enabled preflight and production timing require a separately authorized later exact stage.",
+    "BP-2": "Actual successful Stage B collar reference and conditional outputs must be sealed; E_projected=A_i+(bs-bp)+V_i+F_i with disjoint boundaries; Stage B actual E_B separately retained; no cross-topology proxy or missing cost.",
+    "BP-3": "Actual byte hashes and exact collar geography/numerics/resources/order/ten-file/path guards pinned; future union/maps/runtime/timing/reference values explicitly required later."
+  },
+  "futureRequiredBindings": [
+    "Full reviewed bootstrap config/spec/runtime hashes, genuine existing exact Sol/coordinator receipt hashes and one-use user-authorized permit hash before dispatch",
+    "Exact ordered station/offset union and digest before Stage A permit",
+    "Current complete protected maps and admitted metadata transitions before/after Stage B",
+    "All ten genuine successful Stage B file hashes/lengths and twelve report reference bytes",
+    "Stage B monotonic phase ledger bp/bs/b0/bv/bf, complete E_B and external process record",
+    "Both genuine independent Stage B asset hash maps and validation/resource reports",
+    "Exact profile environment and all A_i/P_B/V_i/F_i ledgers and comparisons"
+  ],
+  "intermediateDraftSha256BeforeAdditionalSchemaClarification": "fbe3470a11f4fb5a436efca75d82649c74fc2fe93e86990321c84a19464f3753",
+  "reviewArtifact": "docs/milestones/artifacts/Teignmouth-unicode-timing/independent-bootstrap-proposal-review.json",
+  "reviewSha256": "0e1f137200601122fdb25d72d03a5918486f5fab3204f793b3b3ac090fd1bd24",
+  "scope": "proposal-document-only correction; no policy or execution approval",
+  "settings": {
+    "actualModel": "unknown",
+    "actualReasoningEffort": "unknown",
+    "requestedModel": "gpt-6.1-sol",
+    "requestedReasoningEffort": "medium"
+  },
+  "sourceConfigCheckpointEdited": false,
+  "testsProbesProfilesReplaysSolverTrialsCandidatesBrowserRun": false,
+  "unchangedBaselineFilesVerifiedAtFinalRead": true
+}

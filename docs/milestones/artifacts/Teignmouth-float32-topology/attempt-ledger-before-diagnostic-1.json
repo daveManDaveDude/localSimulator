@@ -1,0 +1,141 @@
+{
+  "schema": "torquay-attempt-ledger-v1",
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "status": "diagnostic-1-reserved-input-freeze-pending",
+  "authorization": "User replied Continue to the explicit separate bounded Float32 topology follow-on proposal; current dispatch authorizes planning documents only.",
+  "specification": "docs/milestones/artifacts/Teignmouth-float32-topology/spec.md",
+  "solPlan": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan.md",
+  "sourceBindingsStatus": "Must freeze actual source/config/code/spec/chart/evidence hashes before first executable dispatch; historical evidence hashes must not be rewritten.",
+  "predecessor": {
+    "issueId": "Teignmouth-corridor-prototype-continuation-1",
+    "status": "exhausted-NEEDS-USER-DECISION",
+    "immutableLedger": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/attempt-ledger.json",
+    "lunaCorrectionsConsumed": 4,
+    "solCorrectionsConsumed": 1,
+    "implementationBuildsConsumed": 6,
+    "diagnosticsConsumed": 1,
+    "confirmationBuildsConsumed": 0,
+    "countersResetOrTransferred": false
+  },
+  "roles": {
+    "orchestration": "gpt-6-luna medium",
+    "planningDiagnosisReview": "gpt-6.1-sol medium",
+    "initialImplementationAndLunaCorrections": "gpt-6-luna high",
+    "escalatedCorrection": "gpt-6.1-sol medium only after four Luna corrections reviewed",
+    "independence": "Sol reviewer must not implement this issue; a Sol implementer requires another Sol session for review.",
+    "actualCoordinatorSettings": "unknown"
+  },
+  "candidateOnlyLimits": {
+    "absoluteTerrainChangeM": "<6.5",
+    "positiveAddedGradientMPerM": "<1.0",
+    "crossSlopePercent": "<=5",
+    "fullWidthSpanM": "<=0.30",
+    "centerlineDeviationM": "<=2.0",
+    "absoluteLongitudinalGradePercent": "<=10",
+    "otherInheritedLimitsUnchanged": true,
+    "globalProductPolicyChanged": false
+  },
+  "proposedSingleFrame": {
+    "originXYZM": [
+      -140,
+      0,
+      -95
+    ],
+    "selectedAsProvenFix": false,
+    "originSweepAllowed": false,
+    "collisionGuardRelaxationAllowed": false,
+    "boundsGlobalXZ": [
+      -182,
+      -136,
+      -98,
+      -54
+    ]
+  },
+  "budget": {
+    "initialImplementation": {
+      "used": 0,
+      "reserved": 0
+    },
+    "diagnostics": {
+      "maximum": 2,
+      "used": 0,
+      "reserved": 1,
+      "maximumSecondsEach": 120
+    },
+    "lunaCorrectionCycles": {
+      "maximum": 4,
+      "used": 0,
+      "reserved": 0
+    },
+    "solCorrections": {
+      "maximum": 1,
+      "used": 0,
+      "reserved": 0,
+      "eligibleAfterLunaCyclesReviewed": 4
+    },
+    "implementationBuilds": {
+      "maximum": 6,
+      "used": 0,
+      "reserved": 0,
+      "maximumSecondsEach": 180
+    },
+    "independentConfirmationBuilds": {
+      "maximum": 1,
+      "used": 0,
+      "reserved": 0,
+      "maximumSecondsEach": 180,
+      "eligibleOnlyAfterAllOfflineGatesPass": true
+    },
+    "totalFullBuilds": {
+      "maximum": 7,
+      "used": 0,
+      "reserved": 0
+    },
+    "parameterSweeps": false,
+    "arbitraryMemoryCap": false
+  },
+  "servingEligible": false,
+  "executionAuthorizedByPlanningDispatch": false,
+  "events": [
+    {
+      "event": "separate-follow-on-planning-authorized",
+      "date": "2026-10-24",
+      "actor": "user",
+      "priorIssueReopened": false
+    },
+    {
+      "event": "sol-planning-documents-submitted",
+      "date": "2026-10-24",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "numericalAttemptsSpent": 0,
+      "codeOrPackagesEdited": false
+    },
+    {
+      "event": "coordinator-accepted-and-diagnostic-1-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "authorization": "user replied Continue after being asked to authorize a separate bounded Float32 topology representation issue",
+      "diagnosticOrdinal": 1,
+      "diagnosticLimitSeconds": 120,
+      "implementationOrBuildAuthorized": false,
+      "fixedOriginXYZM": [
+        -140,
+        0,
+        -95
+      ],
+      "collisionGuardRelaxationAllowed": false,
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-acceptance-1.md"
+    }
+  ],
+  "coordinatorAccepted": true,
+  "coordinatorAcceptanceEvidence": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-acceptance-1.md",
+    "sha256": "AEB8DEDBBF63EBAA98B00D319A6040F74D917610131BF1D7EF64E5919AB36A31"
+  },
+  "boundPlanHashes": {
+    "specificationSha256": "745EDE84DDF95ED697992514F0318BB9E512CE7069CEB9D495EF7D2CF133E208",
+    "solPlanSha256": "677FD973FCBD5F44641242931959A1202AB7EDC291F99E17CEABD60701F25DCF"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "exitCode": 2,
+  "stdout": "{\"capRecommendation\": null, \"completeDispatchMeasured\": false, \"completeProjectedEndToEndMeasured\": false, \"directReplayPerformed\": false, \"path\": \"docs/milestones/artifacts/Teignmouth-topology-validation-v2/flip-05-frame-selected-profile-sol.json\", \"proxySeconds\": 122.87385579996044, \"qualifiesForNextTrialTiming\": false, \"sha256\": \"87907ef5a938906523203724892c7b26bb644455d3ec1d24a298faf3e9e8670a\", \"tracedSeconds\": 80.00019839999732}\n",
+  "stderr": "",
+  "externalTimeout": false,
+  "classification": "single_bounded_diagnostic_not_trial",
+  "command": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "pipeline/scripts/profile_teignmouth_frame_selected_sol.py"
+  ],
+  "elapsedSeconds": 92.2761844000197,
+  "externalProcessLimitSeconds": 150,
+  "validationLimitSeconds": 80,
+  "retryPerformed": false
+}

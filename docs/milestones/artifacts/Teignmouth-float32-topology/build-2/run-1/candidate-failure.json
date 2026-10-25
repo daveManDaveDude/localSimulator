@@ -1,0 +1,4 @@
+{
+  "errorMessage": "patch face is not covered by the verified source triangle partition: face=19669, faceArea=0.020639419555664062, expectedOverlayArea=1.1028883815799223e-12, coveredArea=0",
+  "errorType": "TopologyError"
+}

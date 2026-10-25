@@ -22,6 +22,7 @@ from torquay_pipeline.road_surface_validation_transition_v2 import (
     CHECKPOINT_KEY,
     ELIGIBLE_TRIALS,
     EVIDENCE_TREE_KEY,
+    WORKFLOW_METADATA_TRANSITION,
     TransitionDeadlineExceeded,
     TransitionDeadlines,
     admit_remaining_trial,
@@ -32,6 +33,7 @@ from torquay_pipeline.road_surface_validation_transition_v2 import (
     validate_consumed_trial_inventory,
     validate_prior_input_transition,
     validate_transition_inputs,
+    validate_workflow_metadata,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -138,6 +140,7 @@ def test_current_named_input_transition_and_consumed_maps_are_exact() -> None:
     current_map[EVIDENCE_TREE_KEY] = config["input_state_transition"][
         "current_evidence_tree_sha256"
     ]
+    current_map["protected:AGENTS.md"] = file_digest(ROOT / "AGENTS.md")
     transition = validate_transition_inputs(ROOT, current_map, config=config)
     assert transition["passed"] is True
     assert transition["checkpointSha256"] == file_digest(checkpoint)
@@ -158,7 +161,9 @@ def test_current_named_input_transition_and_consumed_maps_are_exact() -> None:
 
     tampered = deepcopy(current_map)
     tampered["protected:AGENTS.md"] = "0" * 64
-    with pytest.raises(RoadSurfacePatchError, match="unapproved protected-input differences"):
+    with pytest.raises(
+        RoadSurfacePatchError, match="workflow metadata current protected AGENTS binding differs"
+    ):
         validate_prior_input_transition(
             RAW_TRIALS,
             "collar-05",
@@ -690,30 +695,12 @@ def test_patched_offline_validator_dispatch_supervises_and_discards_late_pass(
     )
     observed: dict[str, bool] = {}
 
-    # Give this synthetic validator a filename outside the workspace so it
-    # returns after advancing time. The supervisor must reject that late result
-    # in its post-call deadline check and synthesize unavailable gate records.
-    validator_globals: dict[str, object] = {
-        "clock": clock,
-        "sys": sys,
-        "observed": observed,
-        "_complete_success_aggregate": _complete_success_aggregate,
-    }
-    exec(
-        compile(
-            "def late_validator(surface, influence, constraints, solver_report, "
-            "accepted_preview_hashes, *, context, **kwargs):\n"
-            "    observed['trace_installed'] = sys.gettrace() is not None\n"
-            "    clock.now = 226.0\n"
-            "    return _complete_success_aggregate(), context\n",
-            str(tmp_path.parent / "late_offline_validator_probe.py"),
-            "exec",
-        ),
-        validator_globals,
-    )
-    monkeypatch.setattr(
-        wrapper, "validate_offline_candidate_v2", validator_globals["late_validator"]
-    )
+    def late_process(*args, **kwargs):
+        observed["trace_installed"] = sys.gettrace() is not None
+        clock.now = 226.0
+        return {"report": _complete_success_aggregate(), "gateSeconds": {}}
+
+    monkeypatch.setattr(wrapper, "supervise", late_process)
 
     globals_dict = _runner_globals()
     base_run = globals_dict["run_one_trial"]
@@ -726,15 +713,17 @@ def test_patched_offline_validator_dispatch_supervises_and_discards_late_pass(
     )
     namespace = base_run.__globals__
 
+    surface = _small_patch_surface()
+    surface.inputs.manifest_sha256 = "synthetic-manifest"
     report = namespace["validate_offline_candidate"](
-        _small_patch_surface(),
+        surface,
         Polygon(),
         [],
         {"converged": True, "candidateFloat32Sha256": "a" * 64},
         patch.ACCEPTED_PREVIEW_HASHES,
     )
 
-    assert observed["trace_installed"] is True
+    assert observed["trace_installed"] is False
     assert sys.gettrace() is None
     assert report["passes"] is False
     assert report["validationComplete"] is False
@@ -744,3 +733,81 @@ def test_patched_offline_validator_dispatch_supervises_and_discards_late_pass(
         assert report[gate]["passes"] is False
         assert report[gate]["available"] is False
         assert report[gate]["status"] == "unavailable_deadline"
+
+
+def test_workflow_metadata_transition_rejects_changed_authorization_or_archive(tmp_path):
+    config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    policy = WORKFLOW_METADATA_TRANSITION
+    for key in (
+        "agents_path",
+        "agents_before_path",
+        "checkpoint_before_path",
+        "archive_manifest_path",
+        "authorization_path",
+    ):
+        relative = policy[key]
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, destination)
+    current = {"protected:AGENTS.md": policy["current_agents_sha256"]}
+    assert validate_workflow_metadata(tmp_path, current, config=config)["passed"]
+    tampered = deepcopy(config)
+    tampered["input_state_transition"]["workflow_metadata_transition"]["current_agents_sha256"] = (
+        "0" * 64
+    )
+    with pytest.raises(RoadSurfacePatchError, match="exact authorization"):
+        validate_workflow_metadata(tmp_path, current, config=tampered)
+    archive = tmp_path / policy["agents_before_path"]
+    archive.write_bytes(archive.read_bytes() + b"changed")
+    with pytest.raises(RoadSurfacePatchError, match="bound bytes changed"):
+        validate_workflow_metadata(tmp_path, current, config=config)
+
+
+def test_process_transaction_hooks_consume_each_verified_operation_once(monkeypatch):
+    wrapper = _load_wrapper()
+    config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    surface = _small_patch_surface()
+    surface.inputs.manifest_sha256 = "synthetic-only"
+    first, second = {"synthetic": b"one"}, {"synthetic": b"one"}
+    report = _complete_success_aggregate()
+    report["candidateFloat32Sha256"] = hashlib.sha256(surface.patch_heights.tobytes()).hexdigest()
+    response = {
+        "report": report,
+        "gateSeconds": {},
+        "firstAssets": first,
+        "secondAssets": second,
+        "firstValidation": {"passes": True},
+        "secondValidation": {"passes": True},
+        "deterministic": {"passes": True},
+        "resources": {"passes": True},
+    }
+    dispatches = []
+
+    def synthetic_supervisor(*args, **kwargs):
+        dispatches.append((args, kwargs))
+        return response
+
+    monkeypatch.setattr(wrapper, "supervise", synthetic_supervisor)
+    namespace = _runner_globals()
+    wrapper._patch_runner(
+        {"run_one_trial": namespace["run_one_trial"], "road_surface": road_surface},
+        config,
+        invocation_start=100,
+        real_time=SimpleNamespace(monotonic=lambda: 100),
+    )
+    result = namespace["validate_offline_candidate"](
+        surface, Polygon(), [], {}, patch.ACCEPTED_PREVIEW_HASHES
+    )
+    clipped = result["roadPathReclip"]
+    assert namespace["assemble_deterministic_candidate_assets"](surface, clipped, result)[:2] == (
+        first,
+        second,
+    )
+    for assets in (first, second):
+        assert namespace["validate_candidate_patch_assets"](
+            assets, surface, report["candidateFloat32Sha256"], clipped
+        )["passes"]
+    assert namespace["_resource_report"](surface.mesh, clipped, first, second)["passes"]
+    assert len(dispatches) == 1
+    with pytest.raises(RoadSurfacePatchError, match="reused or out of order"):
+        namespace["assemble_deterministic_candidate_assets"](surface, clipped, result)

@@ -1,0 +1,23 @@
+# Torquay plan implementation checkpoint
+
+## Current state and next action — 2026-10-24
+
+- **Status:** Unicode safety Phase 1 PASS. The user approved the exact, independently reviewed timing-bootstrap proposal. Start Stage A implementation/readiness only; trial dispatch remains gated on Stage A PASS and a bound coordinator permit.
+- **Workspace:** `C:\vibe\localSimulator`, branch `main`. Preserve the existing dirty Teignmouth v2 changes, historical evidence and untracked Site; no commit/push is authorized.
+- **Approval record:** `docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/user-approval.json` binds the response to proposal SHA-256 `63cc4ca3a01906b71514d10590da4692399e91aa4e8ecefbc955cad627f2640f`.
+- **Approved proposal:** `docs/milestones/Teignmouth-timing-bootstrap-proposal.md`; independent corrected-proposal review PASS at `docs/milestones/artifacts/Teignmouth-unicode-timing/independent-bootstrap-proposal-rereview.json`, SHA-256 `4b6f6d96ec7df4d6affde28db5cbb4b7057c737bd2394f56580b26a4e98fddab`.
+- **Authorized sequence:** implement the false-activation evidence-only path, reusable authentic receipt-document verifier, exact one-use permit and same-witness timing instrumentation/profile; independent Stage A review; then bind the genuine receipts/permit before the single `collar-05` attempt. Only a complete genuine success unlocks the two profiles. Stop on any failed/incomplete gate.
+- **Trial/profile budget:** exactly one write-once `collar-05` trial, at most 2,000 iterations under unchanged 120/125/135-second deadlines and resources; no retry. If and only if successful, one implementer and one independent solver-free profile, each <=135 seconds, both projected <=125 seconds. Use only the actual successful collar witness and the approved `E_i_projected = A_i + P_B + V_i + F_i` formula.
+- **Scope exclusions:** no candidate promotion, ordinary production timing qualification, viewer/browser/publication, live activation, source/GIS change, new measured elevations, relaxed gates or other trial IDs. Ordinary enabled-config preflight and production timing remain unqualified after the evidence-only sequence.
+- **Phase 1 Unicode fix:** `json_string_bound()` in `pipeline/torquay_pipeline/road_surface_validation_process_v1.py` counts 6 bytes per BMP and 12 per supplementary code point before allocation; `ensure_ascii=True` and 64 MiB remain unchanged. Independent safety review PASS: `docs/milestones/artifacts/Teignmouth-unicode-timing/independent-sol-review-phase1.json`, SHA-256 `ac5b8ea4653fd4bddccb54bd347942dfcedaaf225fcf5584436630c8b797193a`.
+- **Phase 1 recorded checks:** 129 passed, 1 skipped (Windows directory-symlink privilege); Ruff check/format, static pins and diff check passed. Containment evidence reused only after exact source/probe hash verification.
+- **Current Stage A budget:** initial Sol 6.1 / medium implementation authorized, at most one Sol correction, zero Luna corrections; one independent Sol readiness review and a separate post-profile qualification review. Actual runtime model/effort are unknown. No Stage A correction reserved yet.
+- **Inputs to freeze before trial:** active transition/source/release/preview/AOI hashes, exact station/offset union, current protected maps and unchanged resource/gate policies. Keep all future values actual and hash-bound.
+- **Geography/product:** preserve Teignmouth 84 x 82 m study scope and TQ1 4HN 2 km AOI `selected_pending_coverage` / `not_checked`; source provenance, default/preview viewer, historical package and public Site unchanged. TVW-016+ remains unauthorized.
+- **Activation:** live transition currently remains false. The evidence-only path is not yet implemented; ordinary false-activation refusal must remain intact.
+- **Previous trial inventory:** `flip-05` and `road-05` remain consumed/immutable; `collar-05` output directory was absent at approval. `local-025`/`local-0125` stay gated.
+- **Prior process-validation issue:** terminal; its correction/replacement-probe budgets are spent. Preserve its spec/review/evidence; this approval does not reopen it.
+- **Next action:** Sol 6.1 / medium implements Stage A against the approved proposal; no trial starts before code/test gates, independent PASS, exact current receipts and one-use permit.
+- **Browser:** not applicable; no browser run for this offline work.
+- **Prior checkpoint before approval:** `.codex/history/2026-10-24-unicode-timing/checkpoint-before-bootstrap-approval.md`; exact hash/marker count in adjacent JSON. Earlier checkpoint snapshot before proposal review is `checkpoint-before-bootstrap-decision.md`.
+- **Transition marker:** `TEIGNMOUTH_VALIDATION_V2_REVIEW_PENDING` remains exactly once.

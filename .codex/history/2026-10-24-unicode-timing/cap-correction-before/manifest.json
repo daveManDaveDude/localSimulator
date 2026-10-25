@@ -1,0 +1,46 @@
+{
+  ".codex/torquay-plan-implementation.md": {
+    "byteLength": 4294,
+    "sha256": "ba74d316e0a9810cf32137aa465f0febbbe8c52b82d1ca7a43d8481603feeff8"
+  },
+  "config/road-surface-teignmouth-topology-transition-v2.json": {
+    "byteLength": 14794,
+    "sha256": "dde0e573b71cba27b3346fcc494ee59c5dcf96bc51454528ddaf86615d42cbe1"
+  },
+  "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/assessment-command.json": {
+    "byteLength": 648,
+    "sha256": "14fbb43b46559c4f68f3a396e0e41ec9edb661e6973955088424e831d81373f3"
+  },
+  "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/checks.json": {
+    "byteLength": 2930,
+    "sha256": "0ae34d3f97f6c4f80b49258262564ed7b494842756e3c0f279c0f549519e4112"
+  },
+  "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/implementation-handback.md": {
+    "byteLength": 6381,
+    "sha256": "17194f03e95cbfd58a391f6fcc5ed38b7353e7e363265e5ba4c29332c1418cf1"
+  },
+  "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/preservation-and-pins.json": {
+    "byteLength": 4525,
+    "sha256": "654a74bfe70ef35fb776ef2436b07a8e947692d421365d56183e20650a1398d5"
+  },
+  "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/source-assessment.child.json": {
+    "byteLength": 5943,
+    "sha256": "24d224a05202a27ce38eca27c9e6f4ac1c308dd729a27119e982e6e5e53aabe5"
+  },
+  "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/source-assessment.json": {
+    "byteLength": 2102,
+    "sha256": "c138eb5b984e4e6d61929b92ccbb4969bfa77de2eee83d8132e5733ef89181a1"
+  },
+  "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/submission-manifest.json": {
+    "byteLength": 6675,
+    "sha256": "5c7daf21874d0bc25abe8d7c3340390e565df7dd4674b4617328e8a6498cfd3a"
+  },
+  "pipeline/scripts/assess_teignmouth_memory_admission.py": {
+    "byteLength": 8598,
+    "sha256": "edb8343213e37e1a189fc20764f947fb242a45fa78cdca59d161f2e4de5f83aa"
+  },
+  "pipeline/tests/test_teignmouth_memory_admission.py": {
+    "byteLength": 4972,
+    "sha256": "b5dab8e1bc82a01fb07540876d43f7b3003728d6737893e969a6101f0b3fa265"
+  }
+}

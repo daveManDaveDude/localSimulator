@@ -1,0 +1,40 @@
+{
+  "schema": "teignmouth-operational-memory-quality-gates-v1",
+  "recordedOn": "2026-10-24",
+  "gates": [
+    {
+      "name": "focused pytest suite",
+      "command": "pipeline/.venv/Scripts/python.exe -m pytest tests/test_teignmouth_validation_process.py tests/test_teignmouth_memory_admission.py tests/test_teignmouth_guardian.py tests/test_road_surface_validation_transition_v2.py tests/test_road_surface_validation_v2.py tests/test_teignmouth_complete_profile.py tests/test_teignmouth_cached_supervisor.py -q",
+      "result": "PASS",
+      "summary": "135 passed in 4.99 seconds"
+    },
+    {
+      "name": "Ruff lint",
+      "result": "PASS",
+      "summary": "All checks passed on seven changed Python modules"
+    },
+    {
+      "name": "Ruff format",
+      "result": "PASS",
+      "summary": "Seven changed Python modules already formatted"
+    },
+    {
+      "name": "git diff --check",
+      "result": "PASS",
+      "summary": "Exit code 0; Git emitted only configured LF-to-CRLF working-copy notices"
+    },
+    {
+      "name": "static bindings and preservation",
+      "result": "PASS",
+      "summary": "Extension hashes, source/release hashes, prior proposal/approval, legacy maps, trial IDs, timing policy, AOI and no-permit/no-collar05 checks passed"
+    },
+    {
+      "name": "browser/trial verification",
+      "result": "NOT RUN",
+      "summary": "No real candidate or browser build was produced; no collar trial, solver run or profile was started during implementation"
+    }
+  ],
+  "proposalReview": "PASS; reviewed the architecture proposal only",
+  "actualCodeReview": "PENDING",
+  "correctionAllowanceRemaining": 0
+}

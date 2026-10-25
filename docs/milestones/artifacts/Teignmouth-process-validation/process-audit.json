@@ -1,0 +1,6 @@
+{
+  "noneRemain": true,
+  "observedAtUtc": "2026-10-24T04:32:56.5623721Z",
+  "filter": "Python processes whose command line mentions teignmouth, kernel32.Sleep or WindowsJob",
+  "matchingProcesses": []
+}

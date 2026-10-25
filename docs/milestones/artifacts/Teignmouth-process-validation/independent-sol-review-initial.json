@@ -1,0 +1,230 @@
+{
+  "acceptanceDecision": {
+    "activationEnabled": false,
+    "canAcceptDespiteIncompleteTiming": false,
+    "canAcceptDespiteUnprovedContainment": false,
+    "candidateOutputAbsent": true,
+    "geographicNumericResourceLimitsChanged": false,
+    "retainedProfilesRerunByReviewer": false,
+    "solverTrialBuildBrowserRunByReviewer": false,
+    "sourceReleasePreviewConsumedHistoryPreserved": true
+  },
+  "activationPassArtifact": false,
+  "budgetDisposition": {
+    "containmentProbeMaximum": 1,
+    "containmentProbeUsed": 1,
+    "implementerReplayUsed": 0,
+    "independentReplayUsed": 0,
+    "initialImplementationSubmitted": true,
+    "lunaCorrectionsMaximum": 0,
+    "reason": "A correction allowance alone cannot replenish the consumed containment probe, provide missing legitimate fixture/receipt evidence or authorize unbudgeted replay. Preserve the old exhausted line-tracing issue separately.",
+    "solCorrectionsMaximum": 1,
+    "solCorrectionsUsed": 0,
+    "state": "NEEDS USER DECISION"
+  },
+  "checksReusedNotRerun": {
+    "limitation": "Synthetic tests use fake lifecycle backends and do not prove actual Windows Job containment. Reviewer did not rerun tests or static commands; exact logs and current implementation hashes were inspected.",
+    "qualityArtifact": "quality-checks-initial.json",
+    "results": [
+      "Checkpoint-marker regression: 1 passed in 0.91 s.",
+      "Focused validator/transition/process/profile/cached-supervisor/study tests plus frozen patch resource boundary: 101 passed, 1 skipped in 3.08 s.",
+      "Skip: Windows directory-symlink creation privilege, WinError 1314.",
+      "Ruff check passed; seven current files passed format --check; git diff --check passed."
+    ]
+  },
+  "findings": [
+    {
+      "category": "failed mandatory behavior evidence and diagnostic gap",
+      "detail": "The only real containment probe exited 1 and provides no per-case observations. No supported conclusion can identify which guard failed or attribute it to the environment. Job containment, native-block timeout, descendant kill and abort kill-on-close remain unproved.",
+      "file": "pipeline/scripts/profile_teignmouth_process_validation_v1.py",
+      "id": "PV-1",
+      "line": 117,
+      "priority": 1,
+      "requiredDisposition": "Do not accept or activate. Preserve the consumed failure. Any authorized later diagnostic must retain case label, status, active/leader observations, API error and cleanup outcome, including on failure; another probe requires an explicit execution-budget decision.",
+      "title": "Windows containment acceptance prerequisite failed"
+    },
+    {
+      "category": "behavior defect",
+      "detail": "WindowsJob.__init__ ignores the return values from TerminateProcess and the fixed 1000 ms WaitForSingleObject, then closes the process handle. Its constructor receives no remaining finalization deadline. If it raises, supervise has no job handle and retains exited=True, so its finally can delete scratch without an independently confirmed process exit. This does not meet the explicit terminate/wait and no-cleanup-before-confirmed-exit contract.",
+      "file": "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+      "id": "PV-2",
+      "line": 393,
+      "priority": 1,
+      "requiredDisposition": "A correction, if separately authorized within the remaining correction allowance, must make startup cleanup deadline-aware, check termination/wait outcomes and retain ownership/scratch on unconfirmed exit. This review authorizes no execution.",
+      "title": "Startup-failure cleanup does not confirm exit within the remaining budget"
+    },
+    {
+      "category": "resource enforcement defect",
+      "detail": "The parent decodes the entire result before calculating base_peak + transfer_peak. Worker result encoding has a separate fresh 64 MiB codec budget and no simultaneous request/base-assets budget. Thus individually permitted request/result buffers and existing construction buffers can exceed the unchanged combined 64 MiB ceiling before the post-hoc rejection. The oversize fake test proves rejection, not bounded peak allocation.",
+      "file": "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+      "id": "PV-3",
+      "line": 505,
+      "priority": 2,
+      "requiredDisposition": "Any authorized correction must account/enforce live request, worker construction, response and envelope copies before allocation/encoding/decoding, retaining the existing ceiling. No real execution or increased ceiling is approved.",
+      "title": "Combined construction/transfer ceiling is checked after allocating the buffers"
+    },
+    {
+      "category": "missing mandatory timing/fixture evidence",
+      "detail": "No implementer or independent retained replay ran. Both immutable witnesses fail offline gates and lack successful studyAssemblyAndResources; genuine production review/receipt artifacts are absent. The profiling script implements only the probe and eligibility assessment, not the required complete replay/accounting path. Neither complete twelve-report equivalence nor legitimate successful assembly, both independent validations, resource/hash/finalization and activation-preflight timing is covered.",
+      "file": "pipeline/scripts/profile_teignmouth_process_validation_v1.py",
+      "id": "PV-4",
+      "line": 40,
+      "priority": 1,
+      "requiredDisposition": "Stop NEEDS USER DECISION on the specific legitimate fixture/read-only preflight and execution-budget gaps. Missing receipts must not be fabricated, bypassed or replaced by forced gate flags. A synthetic test or mixed proxy cannot satisfy qualification.",
+      "title": "Complete timing qualification cannot be established from the available fixtures"
+    }
+  ],
+  "formatVersion": 1,
+  "inspected": [
+    "Current issue specification and initial-implementation handback",
+    "Actual working-tree diff and exact preserved initial before-images",
+    "Transition wrapper/config/spec and unchanged transition module",
+    "Process protocol, codec, WindowsJob, supervision and worker transaction",
+    "Fixed worker entrypoint and evidence-assessment/probe script",
+    "Synthetic process protocol/lifecycle tests and affected wrapper/profile tests",
+    "Every one of the seven retained issue JSON artifacts, including raw quality-check stdout/stderr and containment failure traceback"
+  ],
+  "issue": "Teignmouth process-isolated offline validation and complete timing evidence",
+  "personallyPerformed": [
+    "Read-only code/diff and evidence inspection; no behavior, containment, profile, solver, trial, build or browser execution.",
+    "Compared every current file/evidence entry in implementation-manifest.json by SHA-256 and length: no mismatches.",
+    "Verified exact bytes of all eight initial before-images against their manifest.",
+    "Recomputed all 8164 preservation-before records: no drift except the explicitly authorized transition config.",
+    "Verified every extension code hash against actual bytes, exact consumed trial file maps, unchanged activation/timing policy and absent candidate output."
+  ],
+  "positiveSafetyFindings": [
+    "Fixed child entrypoint and allowlisted dataclass/value codec avoid pickle and caller-selected callable execution.",
+    "Request and response envelopes bind protocol/invocation/request SHA; sidecars bind lengths/dtype/shape/hashes; ordered WKB/STRtree reconstruction and worker-local validation context are implemented.",
+    "Worker code/runtime/environment and data-source manifest checks are present; release terrain manifest has a distinct binding.",
+    "Windows creation requests CREATE_SUSPENDED with hidden window, assigns to kill-on-close Job before ResumeThread, and provides no uncontained fallback or breakaway flag. These code properties do not substitute for the failed real probe.",
+    "Normal supervisor finally terminates the Job, checks leader/Job-empty and retains scratch on unconfirmed exit; late results and incomplete envelopes cannot produce aggregate PASS through the wrapper.",
+    "Production wrapper uses one worker post-solver transaction; frozen numeric modules and runner are unchanged; parent retains T0 and 120/125/135 offsets, 2000 iterations and disabled activation."
+  ],
+  "probeAssessment": {
+    "allowed": 1,
+    "casePassClaimsPermitted": false,
+    "classification": "Observed behavior/probe failure with missing diagnostic evidence; root cause indeterminate, not an established environment blocker.",
+    "elapsedSeconds": 0.41801110000233166,
+    "error": "ProcessValidationError: synthetic containment observation failed",
+    "exitCode": 1,
+    "explanation": "The generic guard combines leader exit, active Job state, expected timeout and success exit status. On failure the per-case records are discarded, so neither the failed case nor any preceding passing case is retained. The recorded traceback is not an API creation/assignment failure. The post-probe filtered process audit cannot establish Job kill-on-close or descendant cleanup.",
+    "externalLimitSeconds": 15,
+    "passes": false,
+    "used": 1
+  },
+  "reviewDate": "2026-10-24",
+  "reviewWriteScope": "Only this separate review artifact is written; implementation/config/spec/checkpoint/consumed evidence are untouched. This is not an activation PASS receipt.",
+  "reviewedBindings": {
+    "configSha256": "804113be00f5bb744aec0cdb3c26ee8bb253e6d4feda5eace7370fcbb64b1485",
+    "evidence": {
+      "containment-probe-process.json": "a25e99564a594d2f2d9dd94b4df53dc281a57d61350e2b7150b652506ef7817b",
+      "containment-probe.json": "64fd88315a38b8ec019de5a58e8027581bb1e69b845040cad78930296cbc9e48",
+      "implementation-manifest.json": "409907b4a0d8c2f777e691cd7cc655f77a3f54c9846e09958f85faaa60d08312",
+      "preservation.json": "5858d9493251453eb543404698fd9c086b7a6bd232b4d20472565d308f4cf177",
+      "process-audit.json": "900fd6e7d3be1b4413604c398cb5f76bedfe4bb052c6d568fbe697831cc5f8a6",
+      "quality-checks-initial.json": "d0f4f4219c248b4e1b20c15c7c3d2cd4ed574b8b6fe587ac28bac36d5623186f",
+      "retained-evidence-assessment.json": "fbef1b239710f6a900a3de353a66dc9fa19174175577f20e049b6c90c5148844"
+    },
+    "files": {
+      ".codex/torquay-plan-implementation.md": {
+        "byteLength": 11253,
+        "sha256": "42acf9134583e39ecb88f662ffca0edfc2c986eeb5cd76fa4d47c9f8c3d46c1c"
+      },
+      "config/road-surface-teignmouth-topology-transition-v2.json": {
+        "byteLength": 14014,
+        "sha256": "804113be00f5bb744aec0cdb3c26ee8bb253e6d4feda5eace7370fcbb64b1485"
+      },
+      "docs/milestones/Teignmouth-process-validation.md": {
+        "byteLength": 14590,
+        "sha256": "456834c20bad3ca2b6f16f8143b163ba05f181f62f7c9fd997178fee4ebee9f9"
+      },
+      "docs/milestones/Teignmouth-topology-validation-v2-spec.md": {
+        "byteLength": 14854,
+        "sha256": "16358db4e1dd40349fb9d7550f80e80cbeac4489bb263e56aa7f38949af26b45"
+      },
+      "pipeline/scripts/profile_teignmouth_complete_dispatch_sol.py": {
+        "byteLength": 16024,
+        "sha256": "666f71781fa3e76552a9fb841ea921b4971045c745144c3cb3d653e30829c312"
+      },
+      "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_all_codes.py": {
+        "byteLength": 873,
+        "sha256": "a13338a43b6a5d1b9db32e7abb7eb16318c1ce69c09ecfc2622e69de42726421"
+      },
+      "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_optimized.py": {
+        "byteLength": 847,
+        "sha256": "c49b40f52968e951a2d707e39918b7f9547af97f115e38b4c685f57f50f82240"
+      },
+      "pipeline/scripts/profile_teignmouth_flip05_performance_v2.py": {
+        "byteLength": 17846,
+        "sha256": "890a071c6ff25091d6c4171bac33266fdf5d560ac581c3904c3c95ad7fce7545"
+      },
+      "pipeline/scripts/profile_teignmouth_frame_selected_sol.py": {
+        "byteLength": 17469,
+        "sha256": "f257d652cedc79335e6e29e89fc5e52beb43ecbba4c307b1ccf7c49f46df5b2a"
+      },
+      "pipeline/scripts/profile_teignmouth_process_validation_v1.py": {
+        "byteLength": 8115,
+        "sha256": "996c2c97af9e59fd6658c30a172f2878fe2ab15d1a233bddebf5985dc6c69afe"
+      },
+      "pipeline/scripts/profile_teignmouth_validation_v2.py": {
+        "byteLength": 28954,
+        "sha256": "215d0a7407964e20a64562f56e111ff1ec330ba47edfd5196fb7d4558ba02480"
+      },
+      "pipeline/scripts/run_teignmouth_topology_validation_v2.py": {
+        "byteLength": 47794,
+        "sha256": "fd32e553e4fe9e832312274c698a463f15545933bcd1b57b5a98122612aaa55e"
+      },
+      "pipeline/scripts/run_teignmouth_validation_worker_v1.py": {
+        "byteLength": 608,
+        "sha256": "33c4ae829b3e67262e73a0b30e0c24d22b3ac159f001e2c485049622848fd611"
+      },
+      "pipeline/tests/test_road_surface_validation_transition_v2.py": {
+        "byteLength": 35556,
+        "sha256": "43d59da23e3fd1fae5e094228d2fbba81d51867886da5980dfbb91ab22923f2a"
+      },
+      "pipeline/tests/test_road_surface_validation_v2.py": {
+        "byteLength": 6274,
+        "sha256": "04e12c629e3d27c9c875bf4a024223c82c8b4d56fcd0562da076bdb819796f01"
+      },
+      "pipeline/tests/test_teignmouth_cached_supervisor.py": {
+        "byteLength": 8211,
+        "sha256": "3174170724031c4882e2c84ea078dce13e9fe54a0cb8fb01595d34fc502422b1"
+      },
+      "pipeline/tests/test_teignmouth_complete_profile.py": {
+        "byteLength": 3313,
+        "sha256": "4175abd0f6ccf91f07093cf622e1d187a71b771fc4450d4ceaa31f9787432575"
+      },
+      "pipeline/tests/test_teignmouth_validation_process.py": {
+        "byteLength": 9526,
+        "sha256": "d527dbbb34b52bdfa722798cbbe5654be509758ab59c496ad9bce32276b5af4a"
+      },
+      "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": {
+        "byteLength": 28460,
+        "sha256": "8d00e3b994b1ef5915cf9bf1faceda3adad8b8477dce01fb28e7535863d5b4dc"
+      },
+      "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py": {
+        "byteLength": 26955,
+        "sha256": "2a2d09041f74cf5bf0389fab7203e5fad94d113a27ebe725a0784c80c5b1941b"
+      },
+      "pipeline/torquay_pipeline/road_surface_validation_v1.py": {
+        "byteLength": 40428,
+        "sha256": "50f97a2b7fb09f10094de8932eeb05a4858f978edfec35e3e51a3682071c501a"
+      },
+      "pipeline/torquay_pipeline/road_surface_validation_v2.py": {
+        "byteLength": 26079,
+        "sha256": "4b8182f9c584d4ca4b7b67017cce7374e607f75476628d3d0d40d6b28eafe587"
+      }
+    },
+    "implementationManifestSha256": "409907b4a0d8c2f777e691cd7cc655f77a3f54c9846e09958f85faaa60d08312",
+    "specSha256": "456834c20bad3ca2b6f16f8143b163ba05f181f62f7c9fd997178fee4ebee9f9"
+  },
+  "reviewer": {
+    "actualModel": "unknown; runtime identifier not exposed",
+    "actualReasoningEffort": "unknown; runtime setting not exposed",
+    "agent": "/root/review_sol_escalation",
+    "independentOfImplementation": true,
+    "requestedModel": "gpt-6.1-sol",
+    "requestedReasoningEffort": "medium"
+  },
+  "verdict": "FIX REQUIRED"
+}

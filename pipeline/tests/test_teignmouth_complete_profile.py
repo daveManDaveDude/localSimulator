@@ -7,11 +7,14 @@ from types import SimpleNamespace
 import pytest
 
 
-@pytest.fixture
-def profile_module():
-    return runpy.run_path(
-        str(Path(__file__).parents[1] / "scripts/profile_teignmouth_complete_dispatch_sol.py")
-    )
+@pytest.fixture(
+    params=[
+        "profile_teignmouth_complete_dispatch_sol.py",
+        "profile_teignmouth_frame_selected_sol.py",
+    ]
+)
+def profile_module(request):
+    return runpy.run_path(str(Path(__file__).parents[1] / "scripts" / request.param))
 
 
 def test_projection_is_explicitly_a_proxy_not_qualification(profile_module) -> None:
@@ -60,3 +63,19 @@ def test_existing_profile_prevents_any_dispatch(profile_module, tmp_path) -> Non
     with pytest.raises(RuntimeError, match="absent"):
         function()
     assert target.read_bytes() == b"previous evidence"
+
+
+def test_process_qualification_requires_legitimate_success_and_actual_receipts(tmp_path):
+    module = runpy.run_path(
+        str(Path(__file__).parents[1] / "scripts/profile_teignmouth_process_validation_v1.py")
+    )
+    import json
+
+    for trial in ("flip-05", "road-05"):
+        directory = tmp_path / ".codex/evidence/teignmouth-topology-study" / trial
+        directory.mkdir(parents=True)
+        (directory / "offline-aggregate.json").write_text(json.dumps({"passes": False}))
+    result = module["assess_evidence"](tmp_path)
+    assert result["retainedReplayPermitted"] is False
+    assert len(result["missingEvidence"]) == 2
+    assert result["qualifiesForNextTrialTiming"] is False

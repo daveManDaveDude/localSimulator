@@ -1,0 +1,105 @@
+[
+  {
+    "argv": [
+      "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_teignmouth_memory_admission.py",
+      "tests/test_teignmouth_validation_process.py",
+      "tests/test_road_surface_validation_transition_v2.py",
+      "tests/test_road_surface_validation_v2.py",
+      "tests/test_teignmouth_complete_profile.py",
+      "tests/test_teignmouth_cached_supervisor.py",
+      "-k",
+      "not native_outer_job"
+    ],
+    "cwd": "C:\\vibe\\localSimulator\\pipeline",
+    "elapsedSeconds": 3.941338500007987,
+    "exitCode": 1,
+    "name": "focused-tests",
+    "stderr": "",
+    "stdout": "........................................................................ [ 59%]\nF.................................................                       [100%]\n================================== FAILURES ===================================\n_______ test_current_named_input_transition_and_consumed_maps_are_exact _______\n\n    def test_current_named_input_transition_and_consumed_maps_are_exact() -> None:\n        config = json.loads(CONFIG_PATH.read_text(encoding=\"utf-8\"))\n        road_attempt = json.loads((RAW_TRIALS / \"road-05/attempt.json\").read_text(encoding=\"utf-8\"))\n        current_map = deepcopy(road_attempt[\"protectedHashesBefore\"])\n        checkpoint = ROOT / \".codex/torquay-plan-implementation.md\"\n        current_map[CHECKPOINT_KEY] = file_digest(checkpoint)\n        current_map[EVIDENCE_TREE_KEY] = config[\"input_state_transition\"][\n            \"current_evidence_tree_sha256\"\n        ]\n        current_map[\"protected:AGENTS.md\"] = file_digest(ROOT / \"AGENTS.md\")\n>       transition = validate_transition_inputs(ROOT, current_map, config=config)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_road_surface_validation_transition_v2.py:144: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntorquay_pipeline\\road_surface_validation_transition_v2.py:430: in validate_transition_inputs\n    checkpoint_text = checkpoint_path.read_text(encoding=\"utf-8\")\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nC:\\Python313\\Lib\\pathlib\\_local.py:546: in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nC:\\Python313\\Lib\\pathlib\\_abc.py:633: in read_text\n    return f.read()\n           ^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = <encodings.utf_8.IncrementalDecoder object at 0x0000015AA01A1250>\ninput = b'# Torquay plan implementation checkpoint\\r\\n\\r\\n## Current state and next action \\x97 2026-10-24\\r\\n\\r\\n- **Status:*...Stage B automatically.\\r\\n- **Transition marker:** `TEIGNMOUTH_VALIDATION_V2_REVIEW_PENDING` remains exactly once.\\r\\n'\nfinal = True\n\n>   ???\nE   UnicodeDecodeError: 'utf-8' codec can't decode byte 0x97 in position 77: invalid start byte\n\n<frozen codecs>:325: UnicodeDecodeError\n=========================== short test summary info ===========================\nFAILED tests/test_road_surface_validation_transition_v2.py::test_current_named_input_transition_and_consumed_maps_are_exact\n1 failed, 121 passed, 1 deselected in 3.53s\n"
+  },
+  {
+    "argv": [
+      "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "pipeline/scripts/assess_teignmouth_memory_admission.py",
+      "pipeline/tests/test_teignmouth_memory_admission.py"
+    ],
+    "cwd": "C:\\vibe\\localSimulator",
+    "elapsedSeconds": 0.08409380001830868,
+    "exitCode": 0,
+    "name": "ruff-check",
+    "stderr": "",
+    "stdout": "All checks passed!\n"
+  },
+  {
+    "argv": [
+      "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "pipeline/scripts/assess_teignmouth_memory_admission.py",
+      "pipeline/tests/test_teignmouth_memory_admission.py"
+    ],
+    "cwd": "C:\\vibe\\localSimulator",
+    "elapsedSeconds": 0.07866389999981038,
+    "exitCode": 0,
+    "name": "format-check",
+    "stderr": "",
+    "stdout": "2 files already formatted\n"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "cwd": "C:\\vibe\\localSimulator",
+    "elapsedSeconds": 0.06098979999660514,
+    "exitCode": 0,
+    "name": "diff-check",
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "argv": [
+      "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_teignmouth_memory_admission.py",
+      "tests/test_teignmouth_validation_process.py",
+      "tests/test_road_surface_validation_transition_v2.py",
+      "tests/test_road_surface_validation_v2.py",
+      "tests/test_teignmouth_complete_profile.py",
+      "tests/test_teignmouth_cached_supervisor.py",
+      "-k",
+      "not native_outer_job"
+    ],
+    "cwd": "C:\\vibe\\localSimulator\\pipeline",
+    "elapsedSeconds": 3.5664275999879465,
+    "exitCode": 0,
+    "name": "focused-tests-final",
+    "stderr": "",
+    "stdout": "........................................................................ [ 59%]\n..................................................                       [100%]\n122 passed, 1 deselected in 3.15s\n"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "cwd": "C:\\vibe\\localSimulator",
+    "elapsedSeconds": 0.05749629999627359,
+    "exitCode": 0,
+    "name": "final-diff-check",
+    "stderr": "warning: in the working copy of '.codex/torquay-plan-implementation.md', LF will be replaced by CRLF the next time Git touches it\n",
+    "stdout": ""
+  }
+]

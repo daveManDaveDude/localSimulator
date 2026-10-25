@@ -1,0 +1,48 @@
+{
+  "format_version": 1,
+  "release_id": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "output_directory": "data/generated/teignmouth-corridor-continuation",
+  "transition_distance_factor": 1.0,
+  "ambiguity_distance_m": 2.0,
+  "ambiguity_height_difference_m": 1.0,
+  "maximum_changed_height_m": 10.0,
+  "fallback_absolute_change_m": 5.0,
+  "fallback_added_gradient_m_per_m": 1.0,
+  "fallback_minimum_region_area_m2": 8.0,
+  "fallback_fade_distance_m": 32.0,
+  "treatment_variant": "teignmouth-circled-segment",
+  "candidate_local_limits": {
+    "absolute_terrain_change_m_strict": 6.5,
+    "positive_added_edge_gradient_m_per_m_strict": 1.0,
+    "full_width_cross_slope_percent_max": 5.0,
+    "full_width_height_span_m_max": 0.3,
+    "centerline_source_height_deviation_m_max": 2.0,
+    "absolute_longitudinal_grade_percent_max": 10.0
+  },
+  "source": {
+    "release_id": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+    "osm_way_id": 78455395,
+    "part_index": 0
+  },
+  "recipe": {
+    "width_m": 6.0,
+    "shoulder_m": 1.0,
+    "blend_min_m": 2.0,
+    "blend_max_m": 12.0,
+    "slope_horizontal_per_vertical": 2.0,
+    "longitudinal_fade_m": 32.0,
+    "gaussian_sigma_m": 12.0,
+    "profile_step_m": 2.0,
+    "assessment_station_start_m": 140.0,
+    "assessment_station_end_m": 155.0,
+    "registered_anchor_station_m": 148.15104603556912,
+    "bounds_xz_m": [
+      -182.0,
+      -136.0,
+      -98.0,
+      -54.0
+    ],
+    "influence_buffer_m": 35.0,
+    "fine_mesh_spacing_m": 0.5
+  }
+}

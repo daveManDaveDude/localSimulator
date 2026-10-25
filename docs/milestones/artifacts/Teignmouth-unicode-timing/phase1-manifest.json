@@ -1,0 +1,54 @@
+{
+  "actualModel": "unknown; runtime identity not exposed",
+  "actualReasoningEffort": "unknown; runtime setting not exposed",
+  "beforeImageManifest": ".codex/history/2026-10-24-unicode-timing/initial-before/manifest.json",
+  "evidence": {
+    "docs/milestones/artifacts/Teignmouth-unicode-timing/containment-evidence-reuse.json": {
+      "byteLength": 1460,
+      "sha256": "77f7a7852ba73633cc5d99f0543a6d5e3ac2dfbcbf56297d1e50b96cfaf0cd72"
+    },
+    "docs/milestones/artifacts/Teignmouth-unicode-timing/phase2-prerequisites.json": {
+      "byteLength": 2113,
+      "sha256": "d5e39f9e1e0791e0dba71456e1655ef4563d7c8ead281d834125f34ddbdc9bd5"
+    },
+    "docs/milestones/artifacts/Teignmouth-unicode-timing/preservation-phase1.json": {
+      "byteLength": 566,
+      "sha256": "9c5c65547dd98ee19761a87c1eafd31dc99976d548fd0fd079b982004b67cddb"
+    },
+    "docs/milestones/artifacts/Teignmouth-unicode-timing/quality-checks-phase1-initial.json": {
+      "byteLength": 3273,
+      "sha256": "cdc190dd0701055f14e1b129b352cde38dcdbcd316630dffb947abf6a3846534"
+    }
+  },
+  "files": {
+    ".codex/torquay-plan-implementation.md": {
+      "byteLength": 11450,
+      "sha256": "8938a19a32b2d7845636fe14bb5a6e87d122a7eba87c45e1feb902028603070f"
+    },
+    "config/road-surface-teignmouth-topology-transition-v2.json": {
+      "byteLength": 14014,
+      "sha256": "6c685c1746e01786ebe19a027c51235abbfda71fe58e4bc959cb60604964ccf3"
+    },
+    "docs/milestones/Teignmouth-unicode-timing.md": {
+      "byteLength": 11857,
+      "sha256": "7792ea3aea152d6976b237901efb7f6d9fb6905d1afde118eda37484147bc10e"
+    },
+    "pipeline/tests/test_teignmouth_validation_process.py": {
+      "byteLength": 22063,
+      "sha256": "84b68cbe9ed34f03bd2462e028d4dadb877e6c7d498959057d19c1e2343072d8"
+    },
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": {
+      "byteLength": 37738,
+      "sha256": "5ce9d549eca7c789df9244967f0555886559145a10b3f84c073cd4537fd426b2"
+    }
+  },
+  "fullTimingQualified": false,
+  "initialImplementationSubmitted": true,
+  "lunaCorrectionsMaximum": 0,
+  "phase1Disposition": "INITIAL_IMPLEMENTATION_SUBMITTED_FOR_INDEPENDENT_SAFETY_REVIEW",
+  "phase2Executable": false,
+  "probeSolverTrialReplayProfileCandidateActivationBrowserCommitRuns": 0,
+  "solCorrectionMaximum": 1,
+  "solFixReserved": false,
+  "solFixUsed": false
+}

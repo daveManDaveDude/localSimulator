@@ -1,0 +1,35 @@
+{
+  "ProcessStartupError": {
+    "afterSha256": "ddeda13ef5c4b45a0a6cdfebe16185d43650135a08149622aa5c225da85900de",
+    "beforeSha256": "ddeda13ef5c4b45a0a6cdfebe16185d43650135a08149622aa5c225da85900de",
+    "byteIdentical": true
+  },
+  "WindowsJob": {
+    "afterSha256": "391ed6fbab6c63df40c003b65d830cc9b08c28bb50f889a7915512a3335572e6",
+    "beforeSha256": "391ed6fbab6c63df40c003b65d830cc9b08c28bb50f889a7915512a3335572e6",
+    "byteIdentical": true
+  },
+  "probeScript": {
+    "actualSha256": "3be62e0f09a6296358657b4cb7199198ef84e0f15d8f1b315391a892e06e528e",
+    "byteIdentical": true,
+    "recordedAtProbeSha256": "3be62e0f09a6296358657b4cb7199198ef84e0f15d8f1b315391a892e06e528e"
+  },
+  "retainedProbe": {
+    "hashMatches": true,
+    "passes": true,
+    "rerun": false,
+    "reviewedSha256": "ed1fa94f6f39fdc3adc9f0ff7eca04d7eaaab3765be8130645d19df1d46d14c3",
+    "sha256": "ed1fa94f6f39fdc3adc9f0ff7eca04d7eaaab3765be8130645d19df1d46d14c3"
+  },
+  "reusable": true,
+  "supervise": {
+    "afterSha256": "09dae88d22c532301a2948364893021df79486f8eb898e563efee01fd61c6aa3",
+    "beforeSha256": "09dae88d22c532301a2948364893021df79486f8eb898e563efee01fd61c6aa3",
+    "byteIdentical": true
+  },
+  "wait_worker": {
+    "afterSha256": "c60923f77822d1fca259da77e73b095bc9318fb8f005fd1acf4a725f2e110599",
+    "beforeSha256": "c60923f77822d1fca259da77e73b095bc9318fb8f005fd1acf4a725f2e110599",
+    "byteIdentical": true
+  }
+}

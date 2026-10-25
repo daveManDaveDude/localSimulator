@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\profile_teignmouth_process_validation_v1.py",
+    "--replacement-containment-probe"
+  ],
+  "cwd": "C:\\vibe\\localSimulator",
+  "elapsedSeconds": 0.7525050000112969,
+  "exitCode": 0,
+  "externalLimitSeconds": 15,
+  "stderr": "",
+  "stdout": "{\"cases\": [{\"case\": \"immediate-success\", \"cleanupConfirmed\": true, \"elapsedSeconds\": 0.047312799986684695, \"exitCode\": 0, \"exitCodeBeforeCleanup\": 0, \"jobEmptyBeforeCleanup\": true, \"leaderExitedBeforeCleanup\": true, \"outcome\": \"pass\", \"pid\": 40584}, {\"case\": \"native-like-blocking\", \"cleanupConfirmed\": true, \"elapsedSeconds\": 0.07124390001990832, \"exitCodeBeforeCleanup\": 259, \"jobEmptyBeforeCleanup\": false, \"leaderExitedBeforeCleanup\": false, \"nativeEntryObserved\": true, \"outcome\": \"pass\", \"pid\": 21232}, {\"case\": \"timeout\", \"cleanupConfirmed\": true, \"elapsedSeconds\": 0.25687710000784136, \"exitCodeBeforeCleanup\": 259, \"jobEmptyBeforeCleanup\": false, \"leaderExitedBeforeCleanup\": false, \"outcome\": \"pass\", \"pid\": 40100, \"reason\": \"validation process deadline reached\", \"timeoutObserved\": true}, {\"case\": \"descendant-containment\", \"cleanupConfirmed\": true, \"descendantPid\": 38488, \"descendantStarted\": true, \"elapsedSeconds\": 0.07625820001703687, \"exitCodeBeforeCleanup\": 259, \"jobEmptyBeforeCleanup\": false, \"leaderExitedBeforeCleanup\": false, \"outcome\": \"pass\", \"pid\": 41700}, {\"abortChildPid\": 34744, \"case\": \"parent-abort-kill-on-close\", \"cleanupConfirmed\": true, \"elapsedSeconds\": 0.12512149999383837, \"exitCodeBeforeCleanup\": 0, \"helperExitCode\": 0, \"jobEmptyBeforeCleanup\": true, \"jobEmptyWithoutParentTermination\": true, \"leaderExitedBeforeCleanup\": true, \"outcome\": \"pass\", \"pid\": 38224}], \"elapsedSeconds\": 0.5875402999809012, \"error\": null, \"limitSeconds\": 15, \"passes\": true, \"platform\": \"Windows-11-10.0.26300-SP0\", \"projectGeometryUsed\": false, \"python\": \"3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]\", \"solverInvoked\": false, \"trialInvoked\": false}\n"
+}

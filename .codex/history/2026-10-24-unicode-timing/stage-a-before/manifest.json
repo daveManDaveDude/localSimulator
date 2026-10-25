@@ -1,0 +1,30 @@
+{
+  ".codex/torquay-plan-implementation.md": {
+    "byteLength": 4709,
+    "sha256": "4d8d6c2a63479ca9755746609a2b2c9b617bcb7abf865dda7771ef88ccbfc3df"
+  },
+  "config/road-surface-teignmouth-topology-transition-v2.json": {
+    "byteLength": 14014,
+    "sha256": "6c685c1746e01786ebe19a027c51235abbfda71fe58e4bc959cb60604964ccf3"
+  },
+  "docs/milestones/Teignmouth-topology-validation-v2-spec.md": {
+    "byteLength": 14854,
+    "sha256": "16358db4e1dd40349fb9d7550f80e80cbeac4489bb263e56aa7f38949af26b45"
+  },
+  "docs/milestones/Teignmouth-unicode-timing.md": {
+    "byteLength": 12895,
+    "sha256": "7292dda5a732b788eb5f540163c8e4fb9aab675210ff18989db9061df73d9676"
+  },
+  "pipeline/scripts/run_teignmouth_topology_validation_v2.py": {
+    "byteLength": 47794,
+    "sha256": "fd32e553e4fe9e832312274c698a463f15545933bcd1b57b5a98122612aaa55e"
+  },
+  "pipeline/tests/test_teignmouth_validation_process.py": {
+    "byteLength": 22063,
+    "sha256": "84b68cbe9ed34f03bd2462e028d4dadb877e6c7d498959057d19c1e2343072d8"
+  },
+  "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": {
+    "byteLength": 37738,
+    "sha256": "5ce9d549eca7c789df9244967f0555886559145a10b3f84c073cd4537fd426b2"
+  }
+}

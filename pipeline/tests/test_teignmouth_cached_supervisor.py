@@ -203,7 +203,7 @@ def test_external_negative_membership_cached(wrapper, tmp_path, monkeypatch):
         metrics=metrics,
     )
     assert len(calls) == 2
-    assert metrics["cacheHits"] >= 100
+    assert metrics["lineEvents"] < 100
 
 
 def test_reparse_membership_remains_uncached(wrapper, monkeypatch):
@@ -239,3 +239,54 @@ def test_reparse_membership_remains_uncached(wrapper, monkeypatch):
     assert metrics["uncachedReparseResolutions"] >= 3
     assert metrics["cacheHits"] == 0
     assert metrics["clockPolls"] >= 3
+
+
+def test_workspace_descendant_called_through_untraced_external_frame(wrapper, tmp_path):
+    clock = SimpleNamespace(now=100.0)
+    observed = {}
+    workspace = {"clock": clock, "observed": observed}
+    exec(
+        compile(
+            "def child():\n    clock.now=225.0\n    observed['late']=True\n",
+            str(wrapper["ROOT"] / "child.py"),
+            "exec",
+        ),
+        workspace,
+    )
+    external = {"child": workspace["child"]}
+    exec(
+        compile("def work():\n    return child()\n", str(tmp_path / "outside.py"), "exec"), external
+    )
+    with pytest.raises(TransitionDeadlineExceeded):
+        wrapper["_run_validation_phase"](
+            external["work"],
+            (),
+            {},
+            deadlines=TransitionDeadlines(100.0),
+            clock=lambda: clock.now,
+            label="descendant",
+        )
+    assert observed == {}
+    assert sys.gettrace() is None
+
+
+def test_frame_selected_trace_restores_after_exception(wrapper):
+    namespace = {}
+    exec(
+        compile(
+            "def work():\n    raise ValueError('probe')\n",
+            str(wrapper["ROOT"] / "raises.py"),
+            "exec",
+        ),
+        namespace,
+    )
+    with pytest.raises(ValueError, match="probe"):
+        wrapper["_run_validation_phase"](
+            namespace["work"],
+            (),
+            {},
+            deadlines=TransitionDeadlines(100.0),
+            clock=lambda: 100.0,
+            label="exception",
+        )
+    assert sys.gettrace() is None

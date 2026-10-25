@@ -1,0 +1,16 @@
+{
+  "status": "STOP",
+  "issueId": "Teignmouth-corridor-prototype-continuation-1",
+  "buildOrdinal": 1,
+  "result": "Runtime instrumentation failure; initial build attempt consumed.",
+  "exception": "ctypes.ArgumentError: argument 1: OverflowError: int too long to convert",
+  "reportWrittenByBuilder": false,
+  "evidenceFiles": [
+    "preservation-before.json"
+  ],
+  "geometryBuffersWritten": false,
+  "candidateRuntimeBuffersWritten": false,
+  "candidateEligibleForServing": false,
+  "browserRun": false,
+  "nextFixSuggestion": "Correct Windows PROCESS_MEMORY_COUNTERS handle binding in peak_working_set (explicit ctypes argtypes/restype or use psutil if already present), ensure failures are persisted before optional resource telemetry, then submit one bounded Luna correction after independent review. Do not rerun the initial build or treat geometry as evaluated."
+}

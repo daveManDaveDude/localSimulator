@@ -1,0 +1,7 @@
+{
+  "source": ".codex/torquay-plan-implementation.md",
+  "beforeImage": ".codex/history/2026-10-24-unicode-timing/checkpoint-before-bootstrap-decision.md",
+  "sha256": "7973f846acd83ae562e45044105c9a683498f4b24e6cf25c2ee8f7331a187051",
+  "markerCountBefore": 1,
+  "purpose": "Exact checkpoint before recording the independently reviewed timing-bootstrap proposal; no execution authority."
+}

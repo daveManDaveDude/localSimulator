@@ -1,0 +1,98 @@
+{
+  "frozenCodeAndArchiveBindings": [
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/teignmouth_corridor_prototype.py"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/build_teignmouth_corridor_prototype.py"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/test_teignmouth_corridor_prototype.py"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/spec-authorized-correction.md"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/initial-submission-hashes.json"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "pipeline/torquay_pipeline/teignmouth_corridor_continuous.py"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "pipeline/scripts/build_teignmouth_corridor_continuous.py"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "pipeline/tests/test_teignmouth_corridor_continuous.py"
+    },
+    {
+      "matchesFrozenBeforeBuild2": true,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/spec-before-correction.md"
+    }
+  ],
+  "note": "Metadata/profile-array comparison only; no terrain rebuild, numerical probe or source geometry execution.",
+  "originalSubmissionFiles": [
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "pipeline/torquay_pipeline/teignmouth_corridor_prototype.py",
+      "verifiedPath": "pipeline/torquay_pipeline/teignmouth_corridor_prototype.py"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "pipeline/scripts/build_teignmouth_corridor_prototype.py",
+      "verifiedPath": "pipeline/scripts/build_teignmouth_corridor_prototype.py"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "pipeline/tests/test_teignmouth_corridor_prototype.py",
+      "verifiedPath": "pipeline/tests/test_teignmouth_corridor_prototype.py"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "docs/milestones/Teignmouth-corridor-prototype.md",
+      "verifiedPath": "docs/milestones/Teignmouth-corridor-prototype.md"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "docs/milestones/Teignmouth-corridor-prototype-spec.md",
+      "verifiedPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/spec-before-correction.md"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/initial-diagnostic/failure.json",
+      "verifiedPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/initial-diagnostic/failure.json"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/verification.json",
+      "verifiedPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/verification.json"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/report.json",
+      "verifiedPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/report.json"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/preservation-before.json",
+      "verifiedPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/preservation-before.json"
+    },
+    {
+      "matchesOriginalSubmission": true,
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/preservation-after.json",
+      "verifiedPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/preservation-after.json"
+    }
+  ],
+  "profileExactlyUnchangedFromBuild1": {
+    "smoothedY": true,
+    "sourceY": true,
+    "stationsM": true
+  }
+}

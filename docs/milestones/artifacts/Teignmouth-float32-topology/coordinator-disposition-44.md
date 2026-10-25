@@ -1,0 +1,11 @@
+# Coordinator disposition 44 — record finite-profile choice and authorize plan addendum
+
+Date: 2026-10-25
+
+**Decision: GO for one Sol 6.1 medium plan addendum defining the finite trusted startup/import profile selected by the user.** The user selected: “Finite trusted profile (Recommended): trust the pinned CPython/OS loader and reviewed code; bind every executable source in a defined profile and refuse unknown paths.”
+
+This resolves the trust-boundary choice in disposition 43 at the requirements level. Amend the accepted correction-3 plan with a finite, testable supported startup/import profile. The addendum must state the exact trusted interpreter/OS-loader assumptions, startup/config/search locations, executable/cache/archive/native source classes to bind before process launch, treatment of code that changes paths or loads additional sources, unsupported configurations that fail closed, and the limits of the trust claim. It must preserve the existing commands/environment unless the user-selected profile proves a narrow change necessary; if so, return the boundary before implementation. Preserve the original 30-second standalone deadline, existing manifests/roots/modes/schemas and all process/identity/candidate gates. Retain Finding A's independent inventory correction. Any concurrent-replacement guarantee remains explicitly out of scope.
+
+This is a plan addendum only: no code changes, static gates, import/test/script execution, runtime modes, self-check, GIS, numerical work, candidate build, browser action, or new manifest preparation is authorized during planning. If the profile cannot be stated concretely and safely inside the current boundary, report STOP and the exact minimum additional decision needed.
+
+After the addendum, the user's build-until-working authorization in disposition 40 remains active, with the existing four-Luna-cycle/one-Sol-after-four policy. Luna cycle 1 remains consumed (1/4); cycle 2 is not reserved by this disposition. No previous submission or candidate counter is reset. The next implementation may proceed under disposition 40 after the addendum is reconciled, subject to its scope and gates. Candidate remains NO-GO; build 3 remains unreserved.

@@ -24,6 +24,20 @@ ELIGIBLE_TRIALS = ("collar-05", "local-025", "local-0125")
 CONSUMED_TRIALS = ("flip-05", "road-05")
 EVIDENCE_TREE_KEY = "studyEvidenceTree:docs/milestones/artifacts/Road-surface-treatment"
 CHECKPOINT_KEY = "protected:.codex/torquay-plan-implementation.md"
+AGENTS_KEY = "protected:AGENTS.md"
+WORKFLOW_METADATA_TRANSITION = {
+    "id": "authorized-agent-workflow-2026-10-23",
+    "agents_path": "AGENTS.md",
+    "legacy_agents_sha256": "b4c1c15a75d34d8ba9cb12366ca1442bd709f692e7d7eccba66eab3f74732267",
+    "current_agents_sha256": "0fe9529152210561e385c0e2a3116c59c5df55b2e07fe9fa1b6ae00ef541a855",
+    "agents_before_path": ".codex/history/2026-10-23-workflow-update/AGENTS-before.md",
+    "checkpoint_before_path": ".codex/history/2026-10-23-workflow-update/checkpoint-before.md",
+    "checkpoint_before_sha256": "83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814",
+    "archive_manifest_path": ".codex/history/2026-10-23-workflow-update/manifest.json",
+    "archive_manifest_sha256": "aca7ce0ee9951fc15e99f358720c8af7c9ca6883aae0d985d3e0c2fcc4010301",
+    "authorization_path": "docs/agent-workflow.md",
+    "authorization_sha256": "88a605214ec8783157df337c2d6f6adc993f69b779df33881b151cd65d2d93eb",
+}
 
 
 class TransitionDeadlineExceeded(RoadSurfacePatchError):
@@ -85,6 +99,31 @@ def admit_remaining_trial(trial_id: str) -> None:
         raise RoadSurfacePatchError(f"trial {trial_id!r} is not eligible under transition v2")
 
 
+def validate_workflow_metadata(
+    project_root: Path, current_map: dict[str, str], *, config: dict[str, Any]
+) -> dict[str, Any]:
+    """Verify only the authorized exact AGENTS migration and retained before-images."""
+    policy = config["input_state_transition"].get("workflow_metadata_transition")
+    if policy != WORKFLOW_METADATA_TRANSITION:
+        raise RoadSurfacePatchError("workflow metadata transition differs from exact authorization")
+    root = project_root.resolve(strict=True)
+    bindings = {
+        policy["agents_path"]: policy["current_agents_sha256"],
+        policy["agents_before_path"]: policy["legacy_agents_sha256"],
+        policy["checkpoint_before_path"]: policy["checkpoint_before_sha256"],
+        policy["archive_manifest_path"]: policy["archive_manifest_sha256"],
+        policy["authorization_path"]: policy["authorization_sha256"],
+    }
+    for relative, digest in bindings.items():
+        path = root / relative
+        road_surface._assert_no_reparse_components(path)
+        if not path.is_file() or file_digest(path) != digest:
+            raise RoadSurfacePatchError(f"workflow metadata bound bytes changed: {relative}")
+    if current_map.get(AGENTS_KEY) != policy["current_agents_sha256"]:
+        raise RoadSurfacePatchError("workflow metadata current protected AGENTS binding differs")
+    return {"passed": True, **policy}
+
+
 def validate_prior_input_transition(
     raw_root: Path,
     trial_id: str,
@@ -110,6 +149,7 @@ def validate_prior_input_transition(
             "transition config eligibility differs from the fixed allowlist"
         )
 
+    metadata = validate_workflow_metadata(raw_root.parents[2], current_map, config=config)
     checkpoint_policy = config["input_state_transition"]
     old_checkpoint = checkpoint_policy["legacy_checkpoint_sha256"]
     old_tree = checkpoint_policy["legacy_evidence_tree_sha256"]
@@ -204,7 +244,9 @@ def validate_prior_input_transition(
                     "flip-05 invocation checkpoint differs from the pinned interruption source"
                 )
             differences = {key for key in current_map if previous_map[key] != current_map[key]}
-            if differences != {CHECKPOINT_KEY, EVIDENCE_TREE_KEY}:
+            if previous_map.get(AGENTS_KEY) != metadata["legacy_agents_sha256"]:
+                raise RoadSurfacePatchError(f"{previous_id} legacy AGENTS metadata differs")
+            if differences != {CHECKPOINT_KEY, EVIDENCE_TREE_KEY, AGENTS_KEY}:
                 raise RoadSurfacePatchError(
                     f"{previous_id} has unapproved protected-input differences: "
                     f"{sorted(differences)}"
@@ -345,6 +387,7 @@ def validate_transition_inputs(
 ) -> dict[str, Any]:
     """Verify the pinned source, evidence-inventory and named checkpoint transition."""
     root = project_root.resolve(strict=True)
+    metadata = validate_workflow_metadata(root, current_map, config=config)
     expected = config["input_state_transition"]
     inventory = config["consumed_inventory"]
     inventory_path = root / inventory["path"]
@@ -433,6 +476,7 @@ def validate_transition_inputs(
     return {
         "passed": True,
         "checkpointSha256": checkpoint_hash,
+        "workflowMetadataTransition": metadata,
         "checkpointBaselineAtImplementationStartSha256": pinned[
             "implementation_start_checkpoint_sha256"
         ],

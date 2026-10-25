@@ -1,0 +1,514 @@
+{
+  "build2Failure": {
+    "message": "patch face is not covered by the verified source triangle partition: face=19669, faceArea=0.020639419555664062, expectedOverlayArea=1.1028883815799223e-12, coveredArea=0",
+    "recordedExpectedClipAreaM2": 1.1028883815799223e-12,
+    "recordedFaceAreaM2": 0.020639419555664062,
+    "recordedFilteredCoveredAreaM2": 0.0,
+    "type": "TopologyError"
+  },
+  "candidateBuilt": false,
+  "candidateEligibleForServing": false,
+  "candidateMinusSourcePlaneExtrema": {
+    "candidateFacePlaneCoefficients": [
+      -0.15473619317980788,
+      -0.20267772674560314,
+      -40.799138760756115
+    ],
+    "candidateFacePlaneConditionNumber": 966491.8568736154,
+    "candidateMinusSourcePlaneVertexCount": 7,
+    "first": {
+      "absoluteDeltaM": 2.816597390875586e-07,
+      "candidatePlaneConditionNumber": 966491.8568736154,
+      "candidateY": 7.890341572988646,
+      "polygonIndex": 0,
+      "ring": "exterior",
+      "ringVertexIndex": 0,
+      "signedDeltaM": -2.816597390875586e-07,
+      "sourcePlaneConditionNumber": 62506.09478248594,
+      "sourceTriangleId": 894822,
+      "sourceY": 7.890341854648385,
+      "worldXZ": [
+        -176.5825575207567,
+        -105.41744247924332
+      ]
+    },
+    "maximumAbsolute": {
+      "absoluteDeltaM": 2.816597444166291e-07,
+      "candidatePlaneConditionNumber": 966491.8568736154,
+      "candidateY": 7.890341572988646,
+      "polygonIndex": 0,
+      "ring": "exterior",
+      "ringVertexIndex": 0,
+      "signedDeltaM": -2.816597444166291e-07,
+      "sourcePlaneConditionNumber": 61941.972704864325,
+      "sourceTriangleId": 894823,
+      "sourceY": 7.8903418546483906,
+      "worldXZ": [
+        -176.5825575207567,
+        -105.41744247924332
+      ]
+    },
+    "maximumSigned": {
+      "absoluteDeltaM": 1.529312960713014e-07,
+      "candidatePlaneConditionNumber": 966491.8568736154,
+      "candidateY": 7.890341828370708,
+      "polygonIndex": 0,
+      "ring": "exterior",
+      "ringVertexIndex": 2,
+      "signedDeltaM": -1.529312960713014e-07,
+      "sourcePlaneConditionNumber": 62506.09478248594,
+      "sourceTriangleId": 894822,
+      "sourceY": 7.890341981302004,
+      "worldXZ": [
+        -176.58255622549305,
+        -105.4174447281645
+      ]
+    },
+    "minimumAbsolute": {
+      "absoluteDeltaM": 1.529312960713014e-07,
+      "candidatePlaneConditionNumber": 966491.8568736154,
+      "candidateY": 7.890341828370708,
+      "polygonIndex": 0,
+      "ring": "exterior",
+      "ringVertexIndex": 2,
+      "signedDeltaM": -1.529312960713014e-07,
+      "sourcePlaneConditionNumber": 62506.09478248594,
+      "sourceTriangleId": 894822,
+      "sourceY": 7.890341981302004,
+      "worldXZ": [
+        -176.58255622549305,
+        -105.4174447281645
+      ]
+    },
+    "minimumSigned": {
+      "absoluteDeltaM": 2.816597444166291e-07,
+      "candidatePlaneConditionNumber": 966491.8568736154,
+      "candidateY": 7.890341572988646,
+      "polygonIndex": 0,
+      "ring": "exterior",
+      "ringVertexIndex": 0,
+      "signedDeltaM": -2.816597444166291e-07,
+      "sourcePlaneConditionNumber": 61941.972704864325,
+      "sourceTriangleId": 894823,
+      "sourceY": 7.8903418546483906,
+      "worldXZ": [
+        -176.5825575207567,
+        -105.41744247924332
+      ]
+    },
+    "zeroAreaContacts": []
+  },
+  "candidateOutputChanged": false,
+  "clipReconstruction": {
+    "influenceAreaM2": 4892.271900918776,
+    "outsideClipBounds": [
+      -182.0,
+      -136.0,
+      -98.0,
+      -54.0
+    ],
+    "outsideClipGeometryType": "Polygon",
+    "passesBoundsAndSourceIdentity": true,
+    "sourceBreakCountInsideWindow": 0,
+    "targetFeatureCounts": {
+      "featuresSeen": 1044,
+      "targetWayMatches": 1,
+      "topLevelMembers": 5
+    }
+  },
+  "completedSourceTriangles": 2,
+  "currentSourceTriangleId": 894823,
+  "currentStage": "source-fragment-enumeration",
+  "diagnosticClassification": "SOURCE_PARTITION_GAP_OR_OVERLAP",
+  "diagnosticOrdinal": 2,
+  "environment": {
+    "geosVersion": "3.14.1",
+    "interpreterSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "numpyVersion": "2.5.4",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "resolvedExecutable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "schema": "teignmouth-overlay-runtime-identity-v1",
+    "shapelyVersion": "2.2.0"
+  },
+  "exactFaceClipAndFilteredFailureReproduced": true,
+  "expectedClipMinusPositiveUnion": {
+    "areaM2": 0.0,
+    "finiteCoordinatesAndMeasures": true,
+    "geometryType": "Polygon",
+    "isEmpty": true,
+    "isValid": true,
+    "lengthM": 0.0,
+    "wkbHex": "010300000000000000",
+    "wkt": "POLYGON EMPTY"
+  },
+  "face": {
+    "candidateHeightsF32": [
+      7.7929606437683105,
+      7.894299507141113,
+      7.890341758728027
+    ],
+    "candidateYBuffersMatch": true,
+    "constructionWorldXZSecondaryOnly": [
+      [
+        -176.5,
+        -105.0
+      ],
+      [
+        -176.5,
+        -105.5
+      ],
+      [
+        -176.58255698046835,
+        -105.41744301953166
+      ]
+    ],
+    "decodedWorldXYZF64": [
+      [
+        -176.5,
+        7.7929606437683105,
+        -105.0
+      ],
+      [
+        -176.5,
+        7.894299507141113,
+        -105.5
+      ],
+      [
+        -176.58255767822266,
+        7.890341758728027,
+        -105.41744327545166
+      ]
+    ],
+    "exactDecodedWorldMatchesSaved": true,
+    "expectedClipAreaM2": 1.1028883815799223e-12,
+    "expectedClipAreaMatchesBuild2": true,
+    "expectedFaceAreaMatchesBuild2": true,
+    "expectedOutsideClip": {
+      "areaM2": 1.1028883815799223e-12,
+      "finiteCoordinatesAndMeasures": true,
+      "geometryType": "Polygon",
+      "isEmpty": false,
+      "isValid": true,
+      "lengthM": 6.320782577126313e-06,
+      "wkbHex": "0103000000010000000400000000000050A41266C000000064B75A5AC04567794FA41266C01CDBAE5EB75A5AC05D12F44CA41266C0AAD6176AB75A5AC000000050A41266C000000064B75A5AC0",
+      "wkt": "POLYGON ((-176.58255767822266 -105.41744327545166, -176.58255742751695 -105.41744200778743, -176.58255622549305 -105.4174447281645, -176.58255767822266 -105.41744327545166))"
+    },
+    "faceCount": 129362,
+    "faceId": 19669,
+    "geometry": {
+      "areaM2": 0.020639419555664062,
+      "finiteCoordinatesAndMeasures": true,
+      "geometryType": "Polygon",
+      "isEmpty": false,
+      "isValid": true,
+      "lengthM": 1.0422821949900651,
+      "wkbHex": "0103000000010000000400000000000000001066C00000000000405AC000000000001066C00000000000605AC000000050A41266C000000064B75A5AC000000000001066C00000000000405AC0",
+      "wkt": "POLYGON ((-176.5 -105, -176.5 -105.5, -176.58255767822266 -105.41744327545166, -176.5 -105))"
+    },
+    "savedWorldXYZF64": [
+      [
+        -176.5,
+        7.7929606437683105,
+        -105.0
+      ],
+      [
+        -176.5,
+        7.894299507141113,
+        -105.5
+      ],
+      [
+        -176.58255767822266,
+        7.890341758728027,
+        -105.41744327545166
+      ]
+    ],
+    "sourceHeightsF32": [
+      7.7929606437683105,
+      7.894299507141113,
+      7.890341758728027
+    ],
+    "sourceYFromSerializedBufferOnly": true,
+    "storedLocalXYZF32": [
+      [
+        -36.5,
+        7.7929606437683105,
+        -10.0
+      ],
+      [
+        -36.5,
+        7.894299507141113,
+        -10.5
+      ],
+      [
+        -36.582557678222656,
+        7.890341758728027,
+        -10.41744327545166
+      ]
+    ],
+    "storedWorldXZ": [
+      [
+        -176.5,
+        -105.0
+      ],
+      [
+        -176.5,
+        -105.5
+      ],
+      [
+        -176.58255767822266,
+        -105.41744327545166
+      ]
+    ],
+    "vertexCount": 64765,
+    "vertexIds": [
+      6359,
+      6361,
+      51721
+    ]
+  },
+  "fragmentCount": 2,
+  "fragmentEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1/source-fragments.jsonl",
+  "frame": {
+    "candidateConfigExactParserPassed": true,
+    "continuationConfigExactParserPassed": true,
+    "frameVersion": "teignmouth-float32-local-v1",
+    "originXYZM": [
+      -140.0,
+      0.0,
+      -95.0
+    ]
+  },
+  "frozenInputCount": 291,
+  "importedLocalHelperBindings": [
+    "pipeline/torquay_pipeline/__init__.py",
+    "pipeline/torquay_pipeline/alignment_report.py",
+    "pipeline/torquay_pipeline/aoi.py",
+    "pipeline/torquay_pipeline/building_sources.py",
+    "pipeline/torquay_pipeline/comparison_sources.py",
+    "pipeline/torquay_pipeline/config.py",
+    "pipeline/torquay_pipeline/coordinates.py",
+    "pipeline/torquay_pipeline/road_alignment.py",
+    "pipeline/torquay_pipeline/road_config.py",
+    "pipeline/torquay_pipeline/road_geometry.py",
+    "pipeline/torquay_pipeline/road_surface.py",
+    "pipeline/torquay_pipeline/road_surface_float32_frame.py",
+    "pipeline/torquay_pipeline/road_surface_topology.py",
+    "pipeline/torquay_pipeline/roads.py",
+    "pipeline/torquay_pipeline/teignmouth_corridor_continuation.py",
+    "pipeline/torquay_pipeline/teignmouth_corridor_prototype.py",
+    "pipeline/torquay_pipeline/teignmouth_float32_candidate.py",
+    "pipeline/torquay_pipeline/terrain_export.py",
+    "pipeline/torquay_pipeline/terrain_sources.py"
+  ],
+  "inputManifestSha256": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+  "inputProvenance": {
+    "buildReportSha256": "2ca021df1d61debe7e9408271718060a36eccb5b406711846d263e292a6ac3db",
+    "heightfieldReadScope": "read-only memmap nodes for envelope cells whose source triangles intersect face",
+    "inputManifestSha256": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+    "sourceTriangleIds": [
+      894822,
+      894823
+    ]
+  },
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "omissions": [
+    "No full candidate loader, assembly, mesh build, all-face scan, new source acquisition, buildings, product or browser work.",
+    "The observation does not authorize a filter/tolerance change, candidate correction, or serving eligibility."
+  ],
+  "partialEvidence": {
+    "clipReconstruction": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1/clip-reconstruction.json",
+    "faceReconstruction": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1/face-reconstruction.json",
+    "fragmentJsonl": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1/source-fragments.jsonl",
+    "sourceQuery": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1/source-query.json"
+  },
+  "positiveFragmentUnion": {
+    "areaM2": 1.1028884220496235e-12,
+    "finiteCoordinatesAndMeasures": true,
+    "geometryType": "Polygon",
+    "isEmpty": false,
+    "isValid": true,
+    "lengthM": 6.320782631004956e-06,
+    "wkbHex": "010300000001000000060000005D12F44CA41266C0AAD6176AB75A5AC000000050A41266C000000064B75A5AC00B76AB4FA41266C0EB13A960B75A5AC04567794FA41266C01ADBAE5EB75A5AC06065894EA41266C04035ED62B75A5AC05D12F44CA41266C0AAD6176AB75A5AC0",
+    "wkt": "POLYGON ((-176.58255622549305 -105.4174447281645, -176.58255767822266 -105.41744327545166, -176.5825575207567 -105.41744247924332, -176.58255742751695 -105.4174420077874, -176.58255698046833 -105.41744301953167, -176.58255622549305 -105.4174447281645))"
+  },
+  "positiveUnionMinusExpectedClip": {
+    "areaM2": 4.046970140728338e-20,
+    "finiteCoordinatesAndMeasures": true,
+    "geometryType": "Polygon",
+    "isEmpty": false,
+    "isValid": true,
+    "lengthM": 8.532649100365153e-06,
+    "wkbHex": "010300000001000000070000000B76AB4FA41266C0EB13A960B75A5AC04567794FA41266C01ADBAE5EB75A5AC06065894EA41266C04035ED62B75A5AC05D12F44CA41266C0AAD6176AB75A5AC04567794FA41266C01CDBAE5EB75A5AC000000050A41266C000000064B75A5AC00B76AB4FA41266C0EB13A960B75A5AC0",
+    "wkt": "POLYGON ((-176.5825575207567 -105.41744247924332, -176.58255742751695 -105.4174420077874, -176.58255698046833 -105.41744301953167, -176.58255622549305 -105.4174447281645, -176.58255742751695 -105.41744200778743, -176.58255767822266 -105.41744327545166, -176.5825575207567 -105.41744247924332))"
+  },
+  "positiveUnionSymmetricDifferenceExpectedClip": {
+    "areaM2": 4.046970140728338e-20,
+    "finiteCoordinatesAndMeasures": true,
+    "geometryType": "Polygon",
+    "isEmpty": false,
+    "isValid": true,
+    "lengthM": 8.532649100365153e-06,
+    "wkbHex": "010300000001000000070000000B76AB4FA41266C0EB13A960B75A5AC04567794FA41266C01ADBAE5EB75A5AC06065894EA41266C04035ED62B75A5AC05D12F44CA41266C0AAD6176AB75A5AC04567794FA41266C01CDBAE5EB75A5AC000000050A41266C000000064B75A5AC00B76AB4FA41266C0EB13A960B75A5AC0",
+    "wkt": "POLYGON ((-176.5825575207567 -105.41744247924332, -176.58255742751695 -105.4174420077874, -176.58255698046833 -105.41744301953167, -176.58255622549305 -105.4174447281645, -176.58255742751695 -105.41744200778743, -176.58255767822266 -105.41744327545166, -176.5825575207567 -105.41744247924332))"
+  },
+  "productionExpectedClipAreaM2": 1.1028883815799223e-12,
+  "productionFilteredAccumulatedAreaM2": 0.0,
+  "productionFilteredResidualM2": -1.1028883815799223e-12,
+  "productionVersusAlternativeClipOrder": {
+    "allSourceTriangleResultsPersisted": true,
+    "alternative": "face.intersection(outside_geometry).intersection(source_triangle)",
+    "notAnAcceptanceAlternative": true,
+    "positiveAreaAlternativeUnion": {
+      "areaM2": 1.1028884013354611e-12,
+      "finiteCoordinatesAndMeasures": true,
+      "geometryType": "Polygon",
+      "isEmpty": false,
+      "isValid": true,
+      "lengthM": 6.320782577126314e-06,
+      "wkbHex": "010300000001000000060000005D12F44CA41266C0AAD6176AB75A5AC000000050A41266C000000064B75A5AC00B76AB4FA41266C0EB13A960B75A5AC04567794FA41266C01CDBAE5EB75A5AC06165894EA41266C03D35ED62B75A5AC05D12F44CA41266C0AAD6176AB75A5AC0",
+      "wkt": "POLYGON ((-176.58255622549305 -105.4174447281645, -176.58255767822266 -105.41744327545166, -176.5825575207567 -105.41744247924332, -176.58255742751695 -105.41744200778743, -176.58255698046835 -105.41744301953163, -176.58255622549305 -105.4174447281645))"
+    },
+    "production": "face.intersection(source_triangle).intersection(outside_geometry)",
+    "productionPositiveUnionSymmetricDifferenceAlternative": {
+      "areaM2": 2.0714162387705586e-20,
+      "finiteCoordinatesAndMeasures": true,
+      "geometryType": "Polygon",
+      "isEmpty": false,
+      "isValid": true,
+      "lengthM": 6.909389108712803e-06,
+      "wkbHex": "010300000001000000070000004567794FA41266C01ADBAE5EB75A5AC06065894EA41266C04035ED62B75A5AC05D12F44CA41266C0AAD6176AB75A5AC06165894EA41266C03D35ED62B75A5AC04567794FA41266C01CDBAE5EB75A5AC00B76AB4FA41266C0EB13A960B75A5AC04567794FA41266C01ADBAE5EB75A5AC0",
+      "wkt": "POLYGON ((-176.58255742751695 -105.4174420077874, -176.58255698046833 -105.41744301953167, -176.58255622549305 -105.4174447281645, -176.58255698046835 -105.41744301953163, -176.58255742751695 -105.41744200778743, -176.5825575207567 -105.41744247924332, -176.58255742751695 -105.4174420077874))"
+    }
+  },
+  "releaseIdentity": {
+    "checkedInventoryPaths": [
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/manifest.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/qa.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/qa.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/qa.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/scene-qa.json"
+    ],
+    "grid": {
+      "columns": 1001,
+      "rows": 1001,
+      "spacingM": 2.0
+    },
+    "passes": true,
+    "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+    "sceneProfile": "current_2km",
+    "sourceIdentities": {
+      "buildings/buildings.json": {
+        "byteLength": 6015566,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+        "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+      },
+      "heightfield.f32": {
+        "byteLength": 4008004,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+        "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+      },
+      "inventory.json": {
+        "byteLength": 1399,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/inventory.json",
+        "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0"
+      },
+      "manifest.json": {
+        "byteLength": 7835,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+        "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+      },
+      "ready.json": {
+        "byteLength": 375,
+        "path": "public/worlds/torquay-poc-001-2km/ready.json",
+        "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4"
+      },
+      "roads/manifest.json": {
+        "byteLength": 10832,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+        "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+      },
+      "roads/roads.json": {
+        "byteLength": 87338409,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+        "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+      }
+    },
+    "worldId": "torquay-poc-001"
+  },
+  "runtimeIdentity": {
+    "actual": {
+      "geosVersion": "3.14.1",
+      "interpreterSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+      "numpyVersion": "2.5.4",
+      "pythonImplementation": "CPython",
+      "pythonVersion": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+      "resolvedExecutable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "schema": "teignmouth-overlay-runtime-identity-v1",
+      "shapelyVersion": "2.2.0"
+    },
+    "frozen": {
+      "geosVersion": "3.14.1",
+      "interpreterSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+      "numpyVersion": "2.5.4",
+      "pythonImplementation": "CPython",
+      "pythonVersion": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+      "resolvedExecutable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "schema": "teignmouth-overlay-runtime-identity-v1",
+      "shapelyVersion": "2.2.0"
+    },
+    "matches": true
+  },
+  "sourcePartitionWithinExpectedClip": {
+    "expectedClipMinusSourceCoverageGap": {
+      "areaM2": 0.0,
+      "finiteCoordinatesAndMeasures": true,
+      "geometryType": "Polygon",
+      "isEmpty": true,
+      "isValid": true,
+      "lengthM": 0.0,
+      "wkbHex": "010300000000000000",
+      "wkt": "POLYGON EMPTY"
+    },
+    "pairwiseOverlapCount": 0,
+    "positiveAreaPairwiseSourceOverlaps": [],
+    "queriedSourceCoverageWithinExpectedClip": {
+      "areaM2": 1.1028883815799223e-12,
+      "finiteCoordinatesAndMeasures": true,
+      "geometryType": "Polygon",
+      "isEmpty": false,
+      "isValid": true,
+      "lengthM": 6.320782577126313e-06,
+      "wkbHex": "010300000001000000040000004567794FA41266C01CDBAE5EB75A5AC05D12F44CA41266C0AAD6176AB75A5AC000000050A41266C000000064B75A5AC04567794FA41266C01CDBAE5EB75A5AC0",
+      "wkt": "POLYGON ((-176.58255742751695 -105.41744200778743, -176.58255622549305 -105.4174447281645, -176.58255767822266 -105.41744327545166, -176.58255742751695 -105.41744200778743))"
+    },
+    "queriedSourceTriangleUnion": {
+      "areaM2": 4.0,
+      "finiteCoordinatesAndMeasures": true,
+      "geometryType": "Polygon",
+      "isEmpty": false,
+      "isValid": true,
+      "lengthM": 8.0,
+      "wkbHex": "0103000000010000000500000000000000004066C00000000000805AC000000000004066C00000000000005AC000000000000066C00000000000005AC000000000000066C00000000000805AC000000000004066C00000000000805AC0",
+      "wkt": "POLYGON ((-178 -106, -178 -104, -176 -104, -176 -106, -178 -106))"
+    },
+    "sourceTriangleIntersectionAreaSumWithinClipM2": 1.1028884013354613e-12,
+    "sourceUnionAreaWithinClipM2": 1.1028883815799223e-12,
+    "summedSourceAreaMinusUnionWithinClipM2": 1.9755539019577796e-20
+  },
+  "stageStatus": "IN_PROGRESS",
+  "status": "COMPLETE_DIAGNOSTIC_OBSERVATION",
+  "sumOfDiscardedPositiveAreaM2": 1.1028884220496237e-12,
+  "summedPositiveAreaMinusUnionAreaM2": 2.0194839173657902e-28,
+  "targetFaceId": 19669,
+  "unchangedProductionResidualToleranceM2": 1e-12,
+  "unchangedProductionResidualWithinTolerance": false,
+  "unfilteredFsumPositiveAreaM2": 1.1028884220496237e-12,
+  "unfilteredOrdinaryPositiveAreaSumM2": 1.1028884220496237e-12,
+  "workerElapsedSeconds": 59.494137900008354
+}

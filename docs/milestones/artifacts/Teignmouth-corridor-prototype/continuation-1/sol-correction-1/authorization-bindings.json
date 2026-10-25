@@ -1,0 +1,51 @@
+{
+  "scope": "Single Sol correction: candidate-only strict <6.5m, frozen remaining recipe/limits; fresh reserved build6 only",
+  "files": [
+    {
+      "originalPath": "pipeline/torquay_pipeline/teignmouth_corridor_continuation.py",
+      "archivePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/teignmouth_corridor_continuation.py",
+      "byteLength": 31271,
+      "sha256": "05c30f8a40a8f29857546b351c0e497c1e1452504d2f09e212353ae1377cf849"
+    },
+    {
+      "originalPath": "pipeline/scripts/build_teignmouth_corridor_continuation.py",
+      "archivePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/build_teignmouth_corridor_continuation.py",
+      "byteLength": 10173,
+      "sha256": "fd967f88390a786d52f174c13aa9116cfb13980f5c35a202b899bfd7c08a09fa"
+    },
+    {
+      "originalPath": "pipeline/tests/test_teignmouth_corridor_continuation.py",
+      "archivePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/test_teignmouth_corridor_continuation.py",
+      "byteLength": 10013,
+      "sha256": "303ee835f4afa01f4a32fd6de3efc3e359cf11b69da5c839dad37335a8bb4f86"
+    },
+    {
+      "originalPath": "config/road-surface-teignmouth-corridor-continuation.json",
+      "archivePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/road-surface-teignmouth-corridor-continuation.json",
+      "byteLength": 1589,
+      "sha256": "d279769ce6e14b2082d962d4b36149f9a971059948b5a776b6de504d5be1d4f0"
+    },
+    {
+      "originalPath": "docs/milestones/Teignmouth-corridor-prototype-continuation-spec.md",
+      "archivePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/Teignmouth-corridor-prototype-continuation-spec.md",
+      "byteLength": 9715,
+      "sha256": "bdad83800b974d4e9bc4db3acb0100bc6b30f528dcb98797781a907167d92818"
+    },
+    {
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/attempt-ledger.json",
+      "archivePath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/before-implementation/attempt-ledger.json",
+      "byteLength": 32346,
+      "sha256": "311b9723662ee5452d92267a003fed9cb571f7bd3c4a55372fe5474721bb113e"
+    },
+    {
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/full-field-earthwork.json",
+      "byteLength": 8038267,
+      "sha256": "0dea4598e429bffd12038bb401c00f922130e5c1fc0d243acb20be59ef4cd56f"
+    },
+    {
+      "originalPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/limit-decision-1.md",
+      "byteLength": 2550,
+      "sha256": "a6e21834ab30b4152d53a9afe7c2928c39dfff1f3cba9fce49e344f26cb57cfe"
+    }
+  ]
+}

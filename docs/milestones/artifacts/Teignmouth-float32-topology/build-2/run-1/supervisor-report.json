@@ -1,0 +1,22 @@
+{
+  "actualChildExitCode": 2,
+  "elapsedSeconds": 33.19761470000958,
+  "externalCommandExitCode": null,
+  "logicalWorkerReturnCode": 2,
+  "logicalWorkerStatus": "BLOCKED_EXCEPTION",
+  "maximumSeconds": 180.0,
+  "peakWorkingSetBytes": 609505280,
+  "peakWorkingSetStatus": "measured via GetProcessMemoryInfo",
+  "postRunPreservation": {
+    "changed": [],
+    "checkedFileCount": 225,
+    "passes": true
+  },
+  "preRunPreservation": {
+    "changed": [],
+    "checkedFileCount": 225,
+    "passes": true
+  },
+  "runnerChosenExitCode": 2,
+  "timedOut": false
+}

@@ -1,0 +1,72 @@
+{
+  "schema": "teignmouth-float32-candidate-config-v1",
+  "issue_id": "Teignmouth-float32-topology-representation-1",
+  "release_id": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+  "source": {
+    "osm_way_id": 78455395,
+    "part_index": 0,
+    "estimated_width_m": 6.0,
+    "ground_assumption": "ground_assumed_from_absent_or_explicit_no_vertical_tags"
+  },
+  "output_directory": "data/generated/teignmouth-float32-topology",
+  "frame": {
+    "schema": "teignmouth-display-frame-v1",
+    "version": "teignmouth-float32-local-v1",
+    "originXYZM": [
+      -140.0,
+      0.0,
+      -95.0
+    ],
+    "units": "metres",
+    "axisConvention": "X east, Y up unchanged, Z south; world=origin+decoded_local_XZ",
+    "storedPosition": "local XYZ Float32; local X/Z, unrebased Y",
+    "worldReconstruction": "origin X/Z + decoded local X/Z in Float64; Y unchanged",
+    "immutable": true
+  },
+  "bounds_global_xz_m": [
+    -182.0,
+    -136.0,
+    -98.0,
+    -54.0
+  ],
+  "recipe": {
+    "shoulder_m": 1.0,
+    "blend_min_m": 2.0,
+    "blend_max_m": 12.0,
+    "slope_horizontal_per_vertical": 2.0,
+    "gaussian_sigma_m": 12.0,
+    "profile_step_m": 2.0,
+    "longitudinal_fade_m": 32.0,
+    "influence_buffer_m": 35.0,
+    "fine_mesh_spacing_m": 0.5,
+    "assessment_station_start_m": 140.0,
+    "assessment_station_end_m": 155.0,
+    "registered_anchor_station_m": 148.15104603556912
+  },
+  "candidate_only_limits": {
+    "absolute_terrain_change_m_strict": 6.5,
+    "positive_added_edge_gradient_m_per_m_strict": 1.0,
+    "full_width_cross_slope_percent_max": 5.0,
+    "full_width_height_span_m_max": 0.3,
+    "centerline_source_height_deviation_m_max": 2.0,
+    "absolute_longitudinal_grade_percent_max": 10.0,
+    "building_p95_displacement_m_max": 0.183,
+    "building_max_displacement_m_max": 2.424,
+    "newton_legacy_base_displacement_m_max": 0.05,
+    "road_drape_error_m_max": 0.001,
+    "walk_eye_clearance_m": [
+      1.65,
+      1.75
+    ]
+  },
+  "preview_config": {
+    "transition_distance_factor": 1.0,
+    "ambiguity_distance_m": 2.0,
+    "ambiguity_height_difference_m": 1.0,
+    "maximum_changed_height_m": 10.0,
+    "fallback_absolute_change_m": 5.0,
+    "fallback_added_gradient_m_per_m": 1.0,
+    "fallback_minimum_region_area_m2": 8.0,
+    "fallback_fade_distance_m": 32.0
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "teignmouth-float32-correction-4-implementation-summary-v1",
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "correctionOrdinal": 4,
+  "implementer": "/root/corridor_continuation_luna",
+  "plan": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-4.md",
+  "planSha256": "9d8b2671632a222d16641b83439e5717916eb5517432a26a9305c6c671a922b3",
+  "status": "IMPLEMENTED_FOCUSED_CHECKS_PASS_AWAITING_INDEPENDENT_REVIEW",
+  "changedFiles": [
+    {
+      "path": "pipeline/torquay_pipeline/teignmouth_float32_candidate.py",
+      "sha256": "a6ecafc012efb425b04d36826f744db925cf47f07fc4b5c2498f2884b77fa61b"
+    },
+    {
+      "path": "pipeline/tests/test_teignmouth_float32_candidate.py",
+      "sha256": "26e293446b2dfcbbf35fba5a1227d1a9d53db6366a1336997003cfb3f2f51352"
+    },
+    {
+      "path": "pipeline/tests/fixtures/teignmouth_overlay_face_19669.json",
+      "sha256": "b95b6c2e68ffd5b280798a124e2d6fe1b40e6b4a70ffba3ee3994234096d80f7"
+    }
+  ],
+  "preservedSharedHelper": {
+    "path": "pipeline/torquay_pipeline/road_surface_topology.py",
+    "sha256": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880",
+    "matchesFrozenDiagnosticManifest": true
+  },
+  "implementationSummary": "Prototype-local overlay retains positive finite polygon fragments, uses math.fsum for area accounting, verifies coverage gap/excess and pairwise positive-area source overlap, evaluates extrema over exterior/interior ring vertices, and returns explicit empty assessed-region state. All three prototype assessments use the local helper. Production clipping order and exact-zero checks remain unchanged.",
+  "checks": [
+    {
+      "command": "from pipeline/: .venv/Scripts/python.exe -m pytest tests/test_teignmouth_float32_candidate.py tests/test_road_surface_float32_frame.py",
+      "result": "PASS: 27 passed in 2.60s"
+    },
+    {
+      "command": "from pipeline/: .venv/Scripts/python.exe -m ruff check torquay_pipeline/teignmouth_float32_candidate.py tests/test_teignmouth_float32_candidate.py",
+      "result": "PASS: All checks passed!"
+    },
+    {
+      "command": "from pipeline/: .venv/Scripts/python.exe -m ruff format --check torquay_pipeline/teignmouth_float32_candidate.py tests/test_teignmouth_float32_candidate.py",
+      "result": "PASS: 2 files already formatted"
+    }
+  ],
+  "initialWrongWorkingDirectoryAttempt": {
+    "result": "FAILED_COLLECTION",
+    "observedError": "ModuleNotFoundError: No module named torquay_pipeline",
+    "workingDirectory": "repository root",
+    "exactCommandCaptured": false,
+    "supersededBySuccessfulPipelineWorkingDirectoryRuns": true
+  },
+  "candidateBuildRun": false,
+  "browserRun": false,
+  "candidateServingEligible": false,
+  "independentSolReview11Sha256": "13e1efe92dddf5b0d67949382a3266b6d320312eaeefb4a4f49c309bf5b5c3bb",
+  "remainingLimitations": [
+    "No candidate build or offline end-to-end gates run",
+    "No browser/runtime integration run",
+    "The unchanged exact source-plane-zero requirement may remain a candidate blocker"
+  ]
+}

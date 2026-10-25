@@ -1,0 +1,13 @@
+{
+  "lateralRangeM": [
+    -4.0,
+    4.0
+  ],
+  "lateralSampleCount": 33,
+  "missingCount": 0,
+  "missingSamples": [],
+  "passes": true,
+  "requiredSampleCount": 2046,
+  "stationCount": 62,
+  "status": "MEASURED_REQUIRED_TARGET_SUPPORT"
+}

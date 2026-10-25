@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\profile_teignmouth_process_validation_v1.py",
+    "--containment-probe"
+  ],
+  "cwd": "C:\\vibe\\localSimulator",
+  "elapsedSeconds": 0.41801110000233166,
+  "exitCode": 1,
+  "externalLimitSeconds": 15,
+  "stderr": "Traceback (most recent call last):\n  File \"C:\\vibe\\localSimulator\\pipeline\\scripts\\profile_teignmouth_process_validation_v1.py\", line 205, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"C:\\vibe\\localSimulator\\pipeline\\scripts\\profile_teignmouth_process_validation_v1.py\", line 185, in main\n    report = containment_probe(ROOT)\n  File \"C:\\vibe\\localSimulator\\pipeline\\scripts\\profile_teignmouth_process_validation_v1.py\", line 117, in containment_probe\n    raise ProcessValidationError(\"synthetic containment observation failed\")\ntorquay_pipeline.road_surface_validation_process_v1.ProcessValidationError: synthetic containment observation failed\n",
+  "stdout": ""
+}

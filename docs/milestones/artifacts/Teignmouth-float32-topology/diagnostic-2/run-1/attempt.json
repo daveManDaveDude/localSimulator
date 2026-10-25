@@ -1,0 +1,86 @@
+{
+  "candidateBuildExecuted": false,
+  "command": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\diagnose_teignmouth_overlay_face.py",
+    "--input-manifest",
+    "C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Teignmouth-float32-topology\\diagnostic-2\\input-manifest.json"
+  ],
+  "diagnosticOrdinal": 2,
+  "frozenRuntimeIdentity": {
+    "geosVersion": "3.14.1",
+    "interpreterSha256": "200d001707ed494066ef00e31e38330e32490c2a74a450ca5d66d2179396fd0e",
+    "numpyVersion": "2.5.4",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "resolvedExecutable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "schema": "teignmouth-overlay-runtime-identity-v1",
+    "shapelyVersion": "2.2.0"
+  },
+  "inputManifestSha256": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+  "interpreter": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "preflightReleaseIdentity": {
+    "checkedInventoryPaths": [
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/manifest.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/qa.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/qa.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/qa.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+      "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/scene-qa.json"
+    ],
+    "grid": {
+      "columns": 1001,
+      "rows": 1001,
+      "spacingM": 2.0
+    },
+    "passes": true,
+    "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+    "sceneProfile": "current_2km",
+    "sourceIdentities": {
+      "buildings/buildings.json": {
+        "byteLength": 6015566,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+        "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+      },
+      "heightfield.f32": {
+        "byteLength": 4008004,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+        "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+      },
+      "inventory.json": {
+        "byteLength": 1399,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/inventory.json",
+        "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0"
+      },
+      "manifest.json": {
+        "byteLength": 7835,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+        "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+      },
+      "ready.json": {
+        "byteLength": 375,
+        "path": "public/worlds/torquay-poc-001-2km/ready.json",
+        "sha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4"
+      },
+      "roads/manifest.json": {
+        "byteLength": 10832,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+        "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+      },
+      "roads/roads.json": {
+        "byteLength": 87338409,
+        "path": "public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+        "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+      }
+    },
+    "worldId": "torquay-poc-001"
+  },
+  "startedUtc": "2026-10-24T17:04:38.897092+00:00",
+  "wallLimitSeconds": 120.0,
+  "workerTokenSha256": "9accb14c3b481652f127eceb4a4d9ca4541dff64860d3a649ace658cb8fd428b"
+}

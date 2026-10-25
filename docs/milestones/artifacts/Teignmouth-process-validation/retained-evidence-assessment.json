@@ -1,0 +1,27 @@
+{
+  "activationEnabled": false,
+  "missingEvidence": [
+    "Production activation review/receipt artifacts are absent; no genuine successful receipt preflight can be measured.",
+    "Both retained witnesses fail base offline gates; no legitimate retained successful assembly/independent validation/finalization path is available."
+  ],
+  "qualifiesForNextTrialTiming": false,
+  "receipts": {
+    "coordinator-acceptance.json": false,
+    "independent-sol-review.json": false
+  },
+  "retainedReplayPermitted": false,
+  "retainedWitnesses": {
+    "flip-05": {
+      "passes": false,
+      "sha256": "c8546b9c5bf410118386a2574c5e4aae5b7398e73fbace72ec3c4919b5d3525c",
+      "successfulAssemblyPresent": false
+    },
+    "road-05": {
+      "passes": false,
+      "sha256": "a956204c7734ccd75eb50befd7dca2e3819bc003acff5253d9dd88e1712e9352",
+      "successfulAssemblyPresent": false
+    }
+  },
+  "solverInvoked": false,
+  "trialInvoked": false
+}

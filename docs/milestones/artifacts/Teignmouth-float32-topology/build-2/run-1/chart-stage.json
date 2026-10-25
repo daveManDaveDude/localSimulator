@@ -1,0 +1,24 @@
+{
+  "chartArrays": {
+    "chart-fields.station-lateral.f64": {
+      "byteLength": 23472,
+      "sha256": "422ca324ba995f82eadf136b7b0716e4265e3b84b4731eb3e971549cd44f29e8"
+    },
+    "chart-indices.u32": {
+      "byteLength": 31104,
+      "sha256": "8ba1c505d505ab25ce69db419ebfac7d9d7f22de92f4defe206fcb397e42e911"
+    },
+    "chart-points.xz.f64": {
+      "byteLength": 23472,
+      "sha256": "fd90cdeb162afd8232fbd03531341d02acd1210e315bfce4582afa1e9ac6379e"
+    },
+    "chart-stations.f64": {
+      "byteLength": 1304,
+      "sha256": "c5b30ebb60adc2076da97bb2f4abea456efde5a8e77186c52b5e55fde10471f1"
+    }
+  },
+  "pointCount": 1467,
+  "stationCount": 163,
+  "status": "COMPLETE",
+  "triangleCount": 2592
+}

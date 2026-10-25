@@ -1,0 +1,125 @@
+{
+  "activationEnabled": false,
+  "allExtensionPinsMatch": true,
+  "approvalUnchanged": true,
+  "exactMetadataAndCodeTransitions": {
+    ".codex/torquay-plan-implementation.md": {
+      "after": {
+        "byteLength": 4294,
+        "sha256": "ba74d316e0a9810cf32137aa465f0febbbe8c52b82d1ca7a43d8481603feeff8"
+      },
+      "before": {
+        "byteLength": 9481,
+        "sha256": "0ccc44357ecb81b93fabda129bfb7531221625e97c6d744b35114fc4b5beecd0"
+      }
+    },
+    "config/road-surface-teignmouth-topology-transition-v2.json": {
+      "after": {
+        "byteLength": 14794,
+        "sha256": "dde0e573b71cba27b3346fcc494ee59c5dcf96bc51454528ddaf86615d42cbe1"
+      },
+      "before": {
+        "byteLength": 14014,
+        "sha256": "6c685c1746e01786ebe19a027c51235abbfda71fe58e4bc959cb60604964ccf3"
+      }
+    },
+    "docs/milestones/Teignmouth-timing-bootstrap-proposal.md": {
+      "after": {
+        "byteLength": 27737,
+        "sha256": "63cc4ca3a01906b71514d10590da4692399e91aa4e8ecefbc955cad627f2640f"
+      },
+      "before": {
+        "byteLength": 27737,
+        "sha256": "63cc4ca3a01906b71514d10590da4692399e91aa4e8ecefbc955cad627f2640f"
+      }
+    },
+    "docs/milestones/Teignmouth-timing-bootstrap.md": {
+      "after": {
+        "byteLength": 1091,
+        "sha256": "137cd1c2e1b70a388a885fd2bdf13f197c713d1557d80f90ec02d6204407fa1a"
+      },
+      "before": {
+        "byteLength": 4251,
+        "sha256": "85b035b1dc4e7b816d977e6f1c36ed6d350e8c64e265e3fb91eb873e0a7250ae"
+      }
+    },
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md": {
+      "after": {
+        "byteLength": 15481,
+        "sha256": "b7603f9fdac02e1bc67badbdbc35b0e6a3ca7bf8176bea5b648071280555c3bd"
+      },
+      "before": {
+        "byteLength": 14854,
+        "sha256": "16358db4e1dd40349fb9d7550f80e80cbeac4489bb263e56aa7f38949af26b45"
+      }
+    },
+    "docs/milestones/Teignmouth-unicode-timing.md": {
+      "after": {
+        "byteLength": 13875,
+        "sha256": "3ef1c45316508e304158175458d8cdb794291fd412f19d5bd32a75a25b4ab524"
+      },
+      "before": {
+        "byteLength": 12895,
+        "sha256": "7292dda5a732b788eb5f540163c8e4fb9aab675210ff18989db9061df73d9676"
+      }
+    },
+    "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/user-approval.json": {
+      "after": {
+        "byteLength": 1451,
+        "sha256": "dd5ea5f78f0cb6c6d255be20fe903a5f3a288c14bad32873a1c68dae08b26089"
+      },
+      "before": {
+        "byteLength": 1451,
+        "sha256": "dd5ea5f78f0cb6c6d255be20fe903a5f3a288c14bad32873a1c68dae08b26089"
+      }
+    },
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py": {
+      "after": {
+        "byteLength": 48048,
+        "sha256": "56a395b5941b301db0c42ac791785c4408d2619c33f26b9b4c0b2e67e1facb0e"
+      },
+      "before": {
+        "byteLength": 47794,
+        "sha256": "fd32e553e4fe9e832312274c698a463f15545933bcd1b57b5a98122612aaa55e"
+      }
+    },
+    "pipeline/tests/test_teignmouth_validation_process.py": {
+      "after": {
+        "byteLength": 22063,
+        "sha256": "84b68cbe9ed34f03bd2462e028d4dadb877e6c7d498959057d19c1e2343072d8"
+      },
+      "before": {
+        "byteLength": 22063,
+        "sha256": "84b68cbe9ed34f03bd2462e028d4dadb877e6c7d498959057d19c1e2343072d8"
+      }
+    },
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": {
+      "after": {
+        "byteLength": 40717,
+        "sha256": "8a7de40ba5c2c2950c03c93e784651e507fb04d246f6a0841256fbcc1069868a"
+      },
+      "before": {
+        "byteLength": 37738,
+        "sha256": "5ce9d549eca7c789df9244967f0555886559145a10b3f84c073cd4537fd426b2"
+      }
+    }
+  },
+  "extensionPinCount": 24,
+  "pendingMarkerCount": 1,
+  "pinMismatches": [],
+  "priorIssueAuthorizedActiveMetadataTransitions": {
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md": "Active spec amended under explicit user cap-removal authority; exact cap-before byte image retained; historical evidence files unchanged."
+  },
+  "priorIssueMismatches": [
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md"
+  ],
+  "priorIssueRecords": 88,
+  "priorIssueUnchangedRecords": 87,
+  "priorIssueUnexpectedMismatches": [],
+  "proposalUnchanged": true,
+  "protectedMapExplicitMetadataExclusions": [
+    "config/road-surface-teignmouth-topology-transition-v2.json"
+  ],
+  "protectedMismatches": [],
+  "protectedRecordsChecked": 8163
+}

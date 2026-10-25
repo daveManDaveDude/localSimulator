@@ -1,0 +1,17 @@
+{
+  "activationEnabled": false,
+  "allOtherConfigValuesUnchanged": true,
+  "baselineProtectedRecords": 8164,
+  "candidateAbsent": true,
+  "elapsedSeconds": 2.0493855999957304,
+  "explicitlyAuthorizedCurrentConfigPinChanges": [
+    "docs/milestones/Teignmouth-process-validation.md",
+    "pipeline/tests/test_teignmouth_validation_process.py",
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py"
+  ],
+  "mismatches": [],
+  "passes": true,
+  "pendingMarkerCount": 1,
+  "priorIssueHistoryRecords": 88,
+  "staticCodePinsValid": true
+}

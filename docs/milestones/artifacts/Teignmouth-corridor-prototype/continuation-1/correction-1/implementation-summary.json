@@ -1,0 +1,36 @@
+{
+  "correctionCycle": 1,
+  "reviewFindingsAddressedInCode": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "tests": "18 passed",
+  "ruffCheck": "passed",
+  "ruffFormat": "passed",
+  "pyCompile": "passed",
+  "builderHelp": "passed",
+  "gitDiffCheck": "passed",
+  "build": {
+    "ordinal": 2,
+    "status": "STOP",
+    "primaryError": "ModuleNotFoundError: No module named torquay_pipeline",
+    "tracebackPath": "build-2/report.json"
+  },
+  "preservation": {
+    "passes": true,
+    "comparedPaths": 910,
+    "changedPaths": [],
+    "includesHistoricalCorridorEvidence": true
+  },
+  "candidateGeometryEvaluated": false,
+  "roadBuildingWalkGates": {
+    "roadDrapeAndOwnership": false,
+    "completeBuildingContact": false,
+    "sharedWalkSurface": false
+  },
+  "candidateEligibleForServing": false,
+  "browserRun": false,
+  "nextFixSuggestion": "Submit a new authorized Luna correction to make the script import the pipeline package from a repository-root launch (for example by adding root/pipeline to sys.path), then run only its newly reserved build ordinal. This correction build invocation is consumed and must not be rerun."
+}

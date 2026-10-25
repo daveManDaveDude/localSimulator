@@ -1,0 +1,9 @@
+{
+  "activationEnabled": false,
+  "authorizedChangedFile": "config/road-surface-teignmouth-topology-transition-v2.json",
+  "candidateAbsent": true,
+  "mismatches": [],
+  "passes": true,
+  "protectedFilesCompared": 8164,
+  "staticPinsValid": true
+}

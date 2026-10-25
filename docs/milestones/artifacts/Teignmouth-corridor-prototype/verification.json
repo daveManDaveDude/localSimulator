@@ -1,0 +1,60 @@
+{
+  "issue": "Teignmouth-corridor-prototype",
+  "stage": "Initial implementation stopped before browser integration",
+  "attempts": {
+    "diagnosticsConsumed": 1,
+    "fullBuildsConsumed": 1,
+    "fullBuild2Run": false,
+    "correctionsConsumed": 0,
+    "parameterSweeps": 0
+  },
+  "commands": [
+    {
+      "command": "pipeline/.venv/Scripts/python.exe -m pytest pipeline/tests/test_teignmouth_corridor_prototype.py -q",
+      "result": "Initial invocation from repository root failed collection because PYTHONPATH was missing; no geographic diagnostic or build ran."
+    },
+    {
+      "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe -m pytest pipeline/tests/test_teignmouth_corridor_prototype.py -q",
+      "result": "7 passed in 2.05s before diagnostic; 8 passed in 0.85s after the NumPy compatibility regression was added."
+    },
+    {
+      "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_prototype.py --diagnostic --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/initial-diagnostic",
+      "result": "Implementation error before geometry verdict. Invocation consumed; not retried. See initial-diagnostic/failure.json."
+    },
+    {
+      "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_prototype.py --build 1 --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1",
+      "result": "STOP: global safety ceiling violation. No candidate output. Actual process report and source/profile/geometry hash witnesses saved."
+    },
+    {
+      "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe -m pytest pipeline/tests/test_teignmouth_corridor_prototype.py pipeline/tests/test_road_surface.py pipeline/tests/test_road_surface_topology.py pipeline/tests/test_roads.py pipeline/tests/test_road_alignment.py pipeline/tests/test_terrain_export.py pipeline/tests/test_terrain_preview.py pipeline/tests/test_terrain_coverage.py pipeline/tests/test_terrain_sources.py -q",
+      "result": "123 passed, 1 skipped in 3.66s. Skip: test_road_surface.py:826, Windows account lacks symlink privilege (WinError 1314). No v2 runner/config/guardian/permit/profile/activation tests invoked."
+    },
+    {
+      "command": "pipeline/.venv/Scripts/python.exe -m ruff check pipeline/torquay_pipeline/teignmouth_corridor_prototype.py pipeline/scripts/build_teignmouth_corridor_prototype.py pipeline/tests/test_teignmouth_corridor_prototype.py",
+      "result": "PASS: all checks passed."
+    },
+    {
+      "command": "pipeline/.venv/Scripts/python.exe -m ruff format --check pipeline/torquay_pipeline/teignmouth_corridor_prototype.py pipeline/scripts/build_teignmouth_corridor_prototype.py pipeline/tests/test_teignmouth_corridor_prototype.py",
+      "result": "PASS: 3 files already formatted."
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS (exit 0), with existing CRLF conversion warnings on pre-existing modified files. New Python paths are untracked and separately Ruff-formatted."
+    }
+  ],
+  "notRunAfterSafetyStop": [
+    "Full build 2 / determinism",
+    "Road ownership, bridge/tunnel exclusion across nearby roads, junction acceptance",
+    "Complete building contact, local full-width and composite walking QA",
+    "Road reclip and 1 mm road/terrain agreement",
+    "Standalone DEV page/config on 4213",
+    "TypeScript/lint/Prettier/Vitest for a prototype harness",
+    "Chromium paired images, camera matrices, screenshot hashes and visual inspection",
+    "Accepted-preview third comparison",
+    "Malformed/missing candidate runtime fallback",
+    "Product/default/preview/historical/synthetic/share browser regressions"
+  ],
+  "sourcePreservationEvidence": "build-1/preservation-before.json and build-1/preservation-after.json: 868 compared paths; zero changes; explicit exclusions are coordinator checkpoint, active prototype specification and new prototype evidence.",
+  "rawSourcePreservationLimitation": "Snapshots hash repository files and public packages, not all ignored raw GIS downloads. The implementation reads pinned release files and writes only new prototype evidence; no raw GIS writer is invoked.",
+  "geometryEvidenceLimitation": "Failed mesh buffers remained in memory and were not saved after the safety stop. The report records their SHA-256 witnesses and exact counts/topology measurements; no independent reproduction is claimed."
+}

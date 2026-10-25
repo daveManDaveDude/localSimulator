@@ -1,0 +1,101 @@
+{
+  "status": "STOP; awaiting separate independent Sol review",
+  "report": "docs\\milestones\\artifacts\\Teignmouth-corridor-prototype\\continuation-1\\sol-correction-1\\build-6\\report.json",
+  "correctionConsumed": 1,
+  "implementationBuildOrdinalConsumed": 6,
+  "fullFinalMeshCompleted": false,
+  "failure": {
+    "message": "distinct Float64 topology vertices collide after Float32 conversion: (-164.2316811012587, -85.5) and (-164.23167542853238, -85.5)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\vibe\\localSimulator\\pipeline\\scripts\\build_teignmouth_corridor_continuation.py\", line 185, in main\n    report = build_continuation(root, evidence)\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\teignmouth_corridor_continuation.py\", line 408, in build_continuation\n    report.update(assemble_corrected(corridor, chart, evidence))\n                  ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\teignmouth_corridor_continuation.py\", line 443, in assemble_corrected\n    mesh = build_constrained_mesh(domain, lines)\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\road_surface_topology.py\", line 566, in build_constrained_mesh\n    raise TopologyError(\n    ...<2 lines>...\n    )\ntorquay_pipeline.road_surface_topology.TopologyError: distinct Float64 topology vertices collide after Float32 conversion: (-164.2316811012587, -85.5) and (-164.23167542853238, -85.5)\n",
+    "type": "TopologyError"
+  },
+  "firstTopologyFailureWitness": {
+    "firstFloat64XZ": [
+      -164.2316811012587,
+      -85.5
+    ],
+    "secondFloat64XZ": [
+      -164.23167542853238,
+      -85.5
+    ],
+    "meaning": "Distinct source-bound construction vertices map to one Float32 coordinate; existing topology guard rejects; no merge or tolerance change attempted."
+  },
+  "earthwork": {
+    "candidateLocalStrictLimitM": 6.5,
+    "preflightPassed": "inferred from reaching assemble_corrected after the explicit preflight early-return branch; intermediate result discarded by runner exception handler",
+    "retainedBuild6PreflightMaximum": null,
+    "reusedDiagnosticMaximumM": 6.397848390875038,
+    "reusedDiagnosticWitness": {
+      "absoluteChangeM": 6.397848390875038,
+      "candidateY": -2.8195255034543836,
+      "lateralM": -4.688700566001199,
+      "rule": "source vertex inside chart",
+      "signedChangeM": -6.397848390875038,
+      "sourceY": 3.5783228874206543,
+      "stationM": 145.59737994751274,
+      "xz": [
+        -144.0,
+        -98.0
+      ]
+    },
+    "reusedDiagnosticSampleCount": 21336,
+    "reusedDiagnosticMaxFillM": 3.107435071671972,
+    "diagnosticSha256": "0dea4598e429bffd12038bb401c00f922130e5c1fc0d243acb20be59ef4cd56f",
+    "bindingBasis": "Actual build6 chart buffers equal build5/diagnostic-bound chart bytes; fixed field, loader, ownership and sampler function ASTs unchanged. Code differs only in approved cap checks/text and expected limit constant."
+  },
+  "gates": {
+    "chart": "constructed; actual buffers persisted",
+    "necessaryEarthworkPreflight": "passed by control-flow inference; complete prior diagnostic reused, not a new probe",
+    "nearbyRoadCoreOwnership": "passed by control-flow inference; detailed result discarded, not separately certified",
+    "Float32Topology": "FAIL during construction, before final mesh exists",
+    "finalSourceOverlayEarthwork": "not reached",
+    "finalAddedGradient": "not reached",
+    "finalTargetCrossSlopeSpanCenterlineGrade": "not reached",
+    "completeBuildingContact": "not implemented/evidenced",
+    "roadReclipDrape": "not implemented/evidenced",
+    "sharedWalkSurface": "not implemented/evidenced",
+    "candidateEligibleForServing": false,
+    "determinismConfirmation": "not run; confirmation build unused",
+    "browser": "not run"
+  },
+  "chartBuffers": [
+    {
+      "path": "chart-xz.f64",
+      "byteLength": 23472,
+      "sha256": "fd90cdeb162afd8232fbd03531341d02acd1210e315bfce4582afa1e9ac6379e",
+      "identicalToBoundBuild5": true
+    },
+    {
+      "path": "chart-station-lateral.f64",
+      "byteLength": 23472,
+      "sha256": "422ca324ba995f82eadf136b7b0716e4265e3b84b4731eb3e971549cd44f29e8",
+      "identicalToBoundBuild5": true
+    },
+    {
+      "path": "chart-indices.u32",
+      "byteLength": 31104,
+      "sha256": "8ba1c505d505ab25ce69db419ebfac7d9d7f22de92f4defe206fcb397e42e911",
+      "identicalToBoundBuild5": true
+    }
+  ],
+  "preservation": {
+    "beforeAfterEntries": 944,
+    "beforeAfterExactlyEqual": true,
+    "currentRehashMismatches": [],
+    "rawGISFullyRehashed": false,
+    "sourceAndPriorEvidencePreservedWithinSnapshotScope": true
+  },
+  "changedFunctions": [
+    "preflight",
+    "build_continuation",
+    "assemble_corrected"
+  ],
+  "resources": {
+    "candidateRuntimeBuffersWritten": false,
+    "peakWorkingSetBytes": 564113408,
+    "peakWorkingSetStatus": "measured",
+    "wallLimitSeconds": 180,
+    "wallSeconds": 7.373759900016012
+  },
+  "noSelfReview": "Implementer observations only; separate independent Sol reviewer required."
+}

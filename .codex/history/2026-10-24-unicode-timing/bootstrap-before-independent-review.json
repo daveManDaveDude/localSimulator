@@ -1,0 +1,16 @@
+{
+  "after": {
+    "byteLength": 1516,
+    "sha256": "87834a0c44b64c7fc0ca17bfe97b806e56ad5997f2bdb017f29c6b1cf61efdb6"
+  },
+  "before": {
+    "byteLength": 1091,
+    "sha256": "137cd1c2e1b70a388a885fd2bdf13f197c713d1557d80f90ec02d6204407fa1a"
+  },
+  "beforeImage": ".codex/history/2026-10-24-unicode-timing/bootstrap-before-independent-review.md",
+  "malformedHeaderByte": {
+    "after": "ASCII hyphen",
+    "before": "0x97"
+  },
+  "reason": "Preserve the stopped milestone handback before recording independent correction review and final stop state."
+}

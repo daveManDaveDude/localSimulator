@@ -1,0 +1,12 @@
+{
+  "candidateOutputAbsent": true,
+  "elapsedSeconds": 2.078084700013278,
+  "explicitlyAuthorizedChangedFiles": [
+    "config/road-surface-teignmouth-topology-transition-v2.json"
+  ],
+  "historicalEvidenceBytesUnchanged": true,
+  "legacyNumericalAndRunnerBytesUnchanged": true,
+  "mismatches": [],
+  "passes": true,
+  "protectedFilesCompared": 8164
+}

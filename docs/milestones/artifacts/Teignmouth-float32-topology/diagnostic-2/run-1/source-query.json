@@ -1,0 +1,209 @@
+{
+  "boundaryTouchingNeighborCellsIncluded": true,
+  "cellsExamined": [
+    {
+      "cellId": 446410,
+      "column": 410,
+      "row": 446
+    },
+    {
+      "cellId": 446411,
+      "column": 411,
+      "row": 446
+    },
+    {
+      "cellId": 446412,
+      "column": 412,
+      "row": 446
+    },
+    {
+      "cellId": 447410,
+      "column": 410,
+      "row": 447
+    },
+    {
+      "cellId": 447411,
+      "column": 411,
+      "row": 447
+    },
+    {
+      "cellId": 447412,
+      "column": 412,
+      "row": 447
+    },
+    {
+      "cellId": 448410,
+      "column": 410,
+      "row": 448
+    },
+    {
+      "cellId": 448411,
+      "column": 411,
+      "row": 448
+    },
+    {
+      "cellId": 448412,
+      "column": 412,
+      "row": 448
+    }
+  ],
+  "closedEnvelopeCellRangeInclusive": {
+    "columns": [
+      410,
+      412
+    ],
+    "rows": [
+      446,
+      448
+    ]
+  },
+  "faceEnvelopeWorldXZ": [
+    -176.58255767822266,
+    -105.5,
+    -176.5,
+    -105.0
+  ],
+  "gridContract": {
+    "columns": 1001,
+    "depthM": 2000.0,
+    "indexColumns": [
+      409,
+      451
+    ],
+    "indexRows": [
+      432,
+      473
+    ],
+    "rows": 1001,
+    "spacingM": 2.0,
+    "widthM": 2000.0
+  },
+  "heightfieldNodesRead": [
+    {
+      "column": 411,
+      "heightY": 7.957795143127441,
+      "row": 447
+    },
+    {
+      "column": 412,
+      "heightY": 7.918267726898193,
+      "row": 447
+    },
+    {
+      "column": 411,
+      "heightY": 7.822394371032715,
+      "row": 448
+    },
+    {
+      "column": 412,
+      "heightY": 7.512912273406982,
+      "row": 448
+    }
+  ],
+  "heightfieldSha256VerifiedBeforeAccess": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af",
+  "noOtherSourceTriangleCanIntersect": "all cells intersecting or touching the face closed envelope were enumerated inside the production SourceOverlapIndex row/column bounds; STRtree predicate=intersects selected the exact source triangle set",
+  "queriedSourceTriangleIds": [
+    894822,
+    894823
+  ],
+  "queriedSourceTriangles": [
+    {
+      "column": 411,
+      "coordinatesXZ": [
+        [
+          -178.0,
+          -106.0
+        ],
+        [
+          -176.0,
+          -106.0
+        ],
+        [
+          -178.0,
+          -104.0
+        ]
+      ],
+      "geometry": {
+        "areaM2": 2.0,
+        "finiteCoordinatesAndMeasures": true,
+        "geometryType": "Polygon",
+        "isEmpty": false,
+        "isValid": true,
+        "lengthM": 6.82842712474619,
+        "wkbHex": "0103000000010000000400000000000000004066C00000000000805AC000000000000066C00000000000805AC000000000004066C00000000000005AC000000000004066C00000000000805AC0",
+        "wkt": "POLYGON ((-178 -106, -176 -106, -178 -104, -178 -106))"
+      },
+      "heightsY": [
+        7.957795143127441,
+        7.918267726898193,
+        7.822394371032715
+      ],
+      "nodeIndices": [
+        [
+          447,
+          411
+        ],
+        [
+          447,
+          412
+        ],
+        [
+          448,
+          411
+        ]
+      ],
+      "row": 447,
+      "sourceTriangleId": 894822
+    },
+    {
+      "column": 411,
+      "coordinatesXZ": [
+        [
+          -176.0,
+          -104.0
+        ],
+        [
+          -178.0,
+          -104.0
+        ],
+        [
+          -176.0,
+          -106.0
+        ]
+      ],
+      "geometry": {
+        "areaM2": 2.0,
+        "finiteCoordinatesAndMeasures": true,
+        "geometryType": "Polygon",
+        "isEmpty": false,
+        "isValid": true,
+        "lengthM": 6.82842712474619,
+        "wkbHex": "0103000000010000000400000000000000000066C00000000000005AC000000000004066C00000000000005AC000000000000066C00000000000805AC000000000000066C00000000000005AC0",
+        "wkt": "POLYGON ((-176 -104, -178 -104, -176 -106, -176 -104))"
+      },
+      "heightsY": [
+        7.512912273406982,
+        7.822394371032715,
+        7.918267726898193
+      ],
+      "nodeIndices": [
+        [
+          448,
+          412
+        ],
+        [
+          448,
+          411
+        ],
+        [
+          447,
+          412
+        ]
+      ],
+      "row": 447,
+      "sourceTriangleId": 894823
+    }
+  ],
+  "queriedTriangleCount": 2,
+  "sourceReadScope": "read-only memmap nodes for envelope cells whose source triangles intersect face"
+}

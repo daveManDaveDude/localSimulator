@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Teignmouth-unicode-timing\\bootstrap\\source-request-readiness-assessment.py"
+  ],
+  "cwd": "C:\\vibe\\localSimulator",
+  "elapsedSeconds": 4.313511999993352,
+  "exitCode": 2,
+  "externalLimitSeconds": 30,
+  "scriptSha256": "78a3a3804b1a45e47fc603e6e958452a4e8679b6e1798560f298640b88f812d6",
+  "stderr": "",
+  "stdout": "{\"status\": \"BLOCKED_SOURCE_REQUEST_UNREPRESENTABLE\", \"observedEstimatorChecks\": {\"requireMemoryCalls\": 2658443, \"largestCheckedBytes\": 114744396, \"firstRejectedBytes\": 114744396}, \"completeSourceSubgraphBound\": null, \"limitBytes\": 67108864, \"error\": \"ProcessValidationError: combined construction/transfer preallocation ceiling exceeded\", \"sourceLoadingSeconds\": 0.4703224999830127, \"boundInspectionSeconds\": 2.720697399985511, \"protectedBindingsUnchanged\": true, \"collar05DirectoryAbsent\": true, \"forbiddenCallAttempts\": []}\n"
+}

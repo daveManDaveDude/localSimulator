@@ -1,0 +1,65 @@
+{
+  "authorizationDisposition": "No current authority to implement the bootstrap or execute Stage B/C. Resolve the draft policy/scope/accounting points and obtain explicit user approval of both staged receipt semantics and the exact one-trial/execution budget. Keep the existing production/activation chain unchanged and activation=false.",
+  "bindings": {
+    "AGENTS.md": "0fe9529152210561e385c0e2a3116c59c5df55b2e07fe9fa1b6ae00ef541a855",
+    "config/road-surface-teignmouth-candidate.json": "0616b0584cfc2d9043dd0b0e8c81926a45487e456855ab9375ce0878c6412140",
+    "config/road-surface-teignmouth-topology-study.json": "5c292d2afb43f6f67b83d34a663494a138506bee18ea00d33b61f88569a1a26d",
+    "docs/agent-workflow.md": "88a605214ec8783157df337c2d6f6adc993f69b779df33881b151cd65d2d93eb",
+    "docs/milestones/Teignmouth-timing-bootstrap-proposal.md": "62f6d9771d3afee7d2fcf6cc2dd34971f03dc8e7d2911f150a9ef2fd922ddb70",
+    "docs/milestones/Teignmouth-topology-refinement-spec.md": "03bc2ce6e5927307245aa0470cf8cc404838b5517efec5bf5e5db689e74416a1",
+    "docs/milestones/Teignmouth-unicode-timing.md": "7292dda5a732b788eb5f540163c8e4fb9aab675210ff18989db9061df73d9676"
+  },
+  "feasibility": "The sequence can obtain a genuine successful witness only if the single unchanged-limit collar-05 trial succeeds. Neither success nor <=125 second complete projected timing has been demonstrated. If it fails, stop; no extra topology/refinement/probe/replacement profile follows. Evidence-only mode itself needs exact implementation safety/stage-order/write-once review before any permit can be issued.",
+  "findings": [
+    {
+      "detail": "Stage C measures the new evidence-only readiness/permit verifier, while the current Unicode/timing acceptance prerequisite calls for real production receipt-preflight cost. Stage D scopes its result to the evidence-only config, but leaves unspecified how a later different enabled production config/verifier becomes timing-qualified. A fresh production receipt review alone does not measure its different preflight cost or preserve the exact timed code/config identity.",
+      "file": "docs/milestones/Teignmouth-timing-bootstrap-proposal.md",
+      "id": "BP-1",
+      "line": 45,
+      "priority": 2,
+      "requiredClarification": "State explicitly that evidence-only qualification covers only that mode/config. Decide before user approval whether production must later receive separately authorized exact timing qualification, or specify a reviewed conservative delta/shared-verifier argument that includes genuine production receipt verification. Do not imply that readiness verification establishes the ordinary production preflight requirement; no fabricated receipts or current bypass.",
+      "title": "Resolve the qualification boundary between evidence-only and ordinary production preflight"
+    },
+    {
+      "detail": "Stage C profiles are solver-free but require complete projected end-to-end <=125 seconds and prohibit mixed proxies. The proposal does not identify the solver/preparation contribution or its exact accounting boundary, so a profile might omit it or double-count loading/preflight. A compatible immutable reference is also unnamed.",
+      "file": "docs/milestones/Teignmouth-timing-bootstrap-proposal.md",
+      "id": "BP-2",
+      "line": 47,
+      "priority": 2,
+      "requiredClarification": "Bind the reference to the actual successful Stage B collar-05 report/witness/topology/constraints/source/environment/code/config hashes. Define one accounting formula using that same collar attempt historical preparation/solver cost plus each completely measured replay path, with disjoint boundaries and no omitted launch/transfer/verification/finalization cost. Label it a projection, not a newly measured solve, and record Stage B actual end-to-end time separately. If this is inconsistent with the no-mixed-proxy policy, resolve that policy explicitly before authorizing execution.",
+      "title": "Define the solver-free end-to-end accounting and immutable reference"
+    },
+    {
+      "detail": "The proposal names collar-05 and refers to existing limits, but does not directly bind the accepted topology specification/study/base-config hashes or spell out the target/domain/collar restriction. A user decision should approve a reviewable fixed candidate scope, rather than an ambiguous current-existing configuration.",
+      "file": "docs/milestones/Teignmouth-timing-bootstrap-proposal.md",
+      "id": "BP-3",
+      "line": 28,
+      "priority": 2,
+      "requiredClarification": "Reference/pin the accepted topology-refinement spec, frozen study config and base candidate config; state way 78455395 part0 stations140-155 m, full6 m width, original84x82 m domain/replacement cells/influence and conforming0.5->1->2 m collar, with no expansion/sample removal. Bind release/accepted-preview/station-union/consumed-inventory/protected maps and reuse the existing reconciled stage gate, ten-file write-once contract and exact output guards. The current frozen study SHA is 5c292d2afb43f6f67b83d34a663494a138506bee18ea00d33b61f88569a1a26d; base config SHA is 0616b0584cfc2d9043dd0b0e8c81926a45487e456855ab9375ce0878c6412140.",
+      "title": "Make the single collar-05 authorization geographically and numerically exact"
+    }
+  ],
+  "formatVersion": 1,
+  "phase2TimingQualified": false,
+  "positiveFindings": [
+    "The document explicitly remains a proposal and grants no implementation, trial, solver, replay or activation authority.",
+    "Readiness and evidence-only permit semantics truthfully state timing_qualified=false and activation_allowed=false. Separate filenames/verifier avoid labeling a readiness receipt as the ordinary production PASS receipt.",
+    "Order is readiness implementation/review, exact coordinator permit, one unused collar-05 attempt, complete successful witness, implementer profile, independent profile, then scoped qualification. Existing consumed trials stay consumed; failures stop and no refinement follows automatically.",
+    "Existing 120/125/135 second windows, 2000 iterations, quality/resource limits, default/preview/source preservation and disabled activation are retained. New budget is expressly proposed for separate user authorization and does not reset old counters.",
+    "No success is guaranteed: collar-05 may fail numerical convergence or any unchanged gate. The passing containment/safety evidence supports a prerequisite only, not real throughput or numerical feasibility."
+  ],
+  "reviewActions": "Read proposal, current project workflow, Unicode issue requirements, frozen study config, base candidate config and accepted topology spec. No implementation was edited and no checks or execution probes ran. Only this separate review artifact was written.",
+  "reviewDate": "2026-10-24",
+  "reviewer": {
+    "actualModel": "unknown; not exposed",
+    "actualReasoningEffort": "unknown; not exposed",
+    "agent": "/root/review_sol_escalation",
+    "independentOfDraftImplementation": true,
+    "requestedModel": "gpt-6.1-sol",
+    "requestedReasoningEffort": "medium"
+  },
+  "scope": "Independent read-only review of draft bootstrap policy; no implementation or execution approval",
+  "solverTrialReplayCandidateActivationBrowserRun": false,
+  "testsOrProbesRun": false,
+  "verdict": "FIX REQUIRED"
+}

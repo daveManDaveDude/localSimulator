@@ -1,0 +1,51 @@
+{
+  "actualEffort": "unknown",
+  "actualModel": "unknown",
+  "admittedJobCommitLimitBytes": 5491163136,
+  "argv": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\assess_teignmouth_memory_admission.py",
+    "--child",
+    "--limit",
+    "5491163136",
+    "--output",
+    "C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Teignmouth-unicode-timing\\bootstrap\\cap-removal\\source-assessment.child.json"
+  ],
+  "availability": {
+    "available_physical_bytes": 18197139456,
+    "current_process_commit_available_bytes": 10982326272
+  },
+  "availabilityMeaning": "ullAvailPageFile is current-process commit availability; volatile, not reserved",
+  "childEvidenceSha256": "24d224a05202a27ce38eca27c9e6f4ac1c308dd729a27119e982e6e5e53aabe5",
+  "childExitCode": 2,
+  "cwd": "C:\\vibe\\localSimulator",
+  "deadlineSeconds": 30,
+  "elapsedSeconds": 6.573617199988803,
+  "implementationHashes": {
+    "pipeline/scripts/assess_teignmouth_memory_admission.py": "edb8343213e37e1a189fc20764f947fb242a45fa78cdca59d161f2e4de5f83aa",
+    "pipeline/torquay_pipeline/road_surface_memory_admission.py": "134d64c31af152d91dbf30cad49868f0a5028af0c6eeb813ede56952caa4e69d",
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": "8a7de40ba5c2c2950c03c93e784651e507fb04d246f6a0841256fbcc1069868a"
+  },
+  "job": {
+    "breakawayDisabled": true,
+    "jobCommitLimitBytes": 5491163136,
+    "killOnClose": true,
+    "limitQueried": true,
+    "membershipBeforeResume": true
+  },
+  "jobMemoryObservationAfterExit": {
+    "peakJobCommitBytes": 990683136,
+    "peakProcessCommitBytes": 988557312
+  },
+  "jobMemoryObservationBeforeCleanup": {
+    "peakJobCommitBytes": 990683136,
+    "peakProcessCommitBytes": 988557312
+  },
+  "limitBehavior": "prevents further commits; does not automatically terminate",
+  "requestedEffort": "medium",
+  "requestedModel": "gpt-6.1-sol",
+  "schema": "teignmouth-outer-assessment-v1",
+  "wholeTreeExitConfirmed": true,
+  "withinDeadline": true
+}

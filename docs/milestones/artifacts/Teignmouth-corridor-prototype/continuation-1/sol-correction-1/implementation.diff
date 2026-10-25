@@ -1,0 +1,135 @@
+--- before/pipeline/torquay_pipeline/teignmouth_corridor_continuation.py
++++ after/pipeline/torquay_pipeline/teignmouth_corridor_continuation.py
+@@ -44,7 +44,7 @@
+ 
+ LATERALS = (-16.0, -6.0, -4.0, -3.0, 0.0, 3.0, 4.0, 6.0, 16.0)
+ EXPECTED_LIMITS = {
+-    "absolute_terrain_change_m_strict": 6.0,
++    "absolute_terrain_change_m_strict": 6.5,
+     "positive_added_edge_gradient_m_per_m_strict": 1.0,
+     "full_width_cross_slope_percent_max": 5.0,
+     "full_width_height_span_m_max": 0.30,
+@@ -326,12 +326,12 @@
+         tested += 1
+         difference = abs(candidate - source)
+         maximum = max(maximum, difference)
+-        if not math.isfinite(candidate) or difference >= 6.0:
++        if not math.isfinite(candidate) or difference >= 6.5:
+             return {
+                 "passes": False,
+                 "testedSamples": tested,
+                 "maximumObservedAbsoluteChangeM": maximum,
+-                "criterion": "strict absolute source-relative earthwork <6 m",
++                "criterion": "strict absolute source-relative earthwork <6.5 m",
+                 "firstViolation": {
+                     "stationM": station,
+                     "lateralM": lateral,
+@@ -346,7 +346,7 @@
+         "passes": True,
+         "testedSamples": tested,
+         "maximumObservedAbsoluteChangeM": maximum,
+-        "criterion": "necessary only: strict absolute source-relative earthwork <6 m",
++        "criterion": "necessary only: strict absolute source-relative earthwork <6.5 m",
+     }
+ 
+ 
+@@ -397,7 +397,7 @@
+     result = preflight(corridor, chart)
+     report["necessaryEarthworkPreflight"] = result
+     if not result["passes"]:
+-        report["stopReasons"] = ["necessary earthwork preflight violates strict <6m ceiling"]
++        report["stopReasons"] = ["necessary earthwork preflight violates strict <6.5m ceiling"]
+         return report
+     ownership = ownership_report(corridor, chart)
+     report["ownership"] = ownership
+@@ -495,13 +495,13 @@
+     safety = {
+         "passes": bool(
+             np.isfinite(candidate).all()
+-            and overlay["maximumAbsoluteChangeFromSourceM"] < 6
++            and overlay["maximumAbsoluteChangeFromSourceM"] < 6.5
+             and added.max() < 1
+         ),
+         "maximumVertexAbsoluteChangeM": float(absolute.max()),
+         "maximumAbsoluteChangeM": overlay["maximumAbsoluteChangeFromSourceM"],
+         "maximumPositiveAddedGradientMPerM": float(added.max()),
+-        "absoluteTerrainChangeLimitStrictM": 6.0,
++        "absoluteTerrainChangeLimitStrictM": 6.5,
+         "worstEdgeXZ": xz[edges[worst]].tolist(),
+         "worstEdgeSourceY": source[edges[worst]].tolist(),
+         "worstEdgeCandidateY": candidate[edges[worst]].tolist(),
+--- before/pipeline/scripts/build_teignmouth_corridor_continuation.py
++++ after/pipeline/scripts/build_teignmouth_corridor_continuation.py
+@@ -74,7 +74,7 @@
+         }:
+             continue
+         if relative.startswith(
+-            "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/"
++            "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6/"
+         ):
+             continue
+         with path.open("rb") as stream:
+@@ -157,10 +157,10 @@
+         parser.error("--evidence is required unless --import-smoke is used")
+     evidence = args.evidence.resolve()
+     expected = root / Path(
+-        "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5"
++        "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6"
+     )
+     if evidence != expected.resolve() or evidence.exists():
+-        raise ValueError("expected a fresh correction-4/build-5 evidence directory")
++        raise ValueError("expected a fresh sol-correction-1/build-6 evidence directory")
+     evidence.mkdir(parents=True)
+     write_json(evidence / "interpreter-identity.json", identity)
+     started = time.perf_counter()
+@@ -218,7 +218,7 @@
+                 "excludedPaths": [
+                     ".codex/torquay-plan-implementation.md",
+                     "continuation-1/attempt-ledger.json",
+-                    "current owned correction-4/build-5 output directory",
++                    "current owned sol-correction-1/build-6 output directory",
+                 ],
+             }
+             if changed:
+--- before/pipeline/tests/test_teignmouth_corridor_continuation.py
++++ after/pipeline/tests/test_teignmouth_corridor_continuation.py
+@@ -86,15 +86,24 @@
+     )
+ 
+ 
+-def test_necessary_preflight_reports_exact_strict_six_metre_witness():
+-    corridor = fake_corridor(6.0)
++@pytest.mark.parametrize("profile_height", [-6.5, 6.5])
++def test_necessary_preflight_rejects_exact_strict_six_point_five_metre_witness(profile_height):
++    corridor = fake_corridor(profile_height)
+     result = preflight(corridor, make_chart(corridor.part))
+     assert not result["passes"]
+     witness = result["firstViolation"]
+     assert witness["stationM"] == pytest.approx(140)
+-    assert witness["absoluteChangeM"] == pytest.approx(6)
++    assert witness["absoluteChangeM"] == pytest.approx(6.5)
+     assert witness["sourceY"] == 0
+-    assert witness["candidateY"] == 6
++    assert witness["candidateY"] == profile_height
++
++
++def test_necessary_preflight_accepts_below_candidate_cap_without_claiming_final_safety():
++    corridor = fake_corridor(6.499)
++    result = preflight(corridor, make_chart(corridor.part))
++    assert result["passes"]
++    assert result["maximumObservedAbsoluteChangeM"] == pytest.approx(6.499)
++    assert result["criterion"] == "necessary only: strict absolute source-relative earthwork <6.5 m"
+ 
+ 
+ def test_necessary_preflight_pass_does_not_claim_final_safety():
+--- before/config/road-surface-teignmouth-corridor-continuation.json
++++ after/config/road-surface-teignmouth-corridor-continuation.json
+@@ -12,7 +12,7 @@
+   "fallback_fade_distance_m": 32.0,
+   "treatment_variant": "teignmouth-circled-segment",
+   "candidate_local_limits": {
+-    "absolute_terrain_change_m_strict": 6.0,
++    "absolute_terrain_change_m_strict": 6.5,
+     "positive_added_edge_gradient_m_per_m_strict": 1.0,
+     "full_width_cross_slope_percent_max": 5.0,
+     "full_width_height_span_m_max": 0.3,

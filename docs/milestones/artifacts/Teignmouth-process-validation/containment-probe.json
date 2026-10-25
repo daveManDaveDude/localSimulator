@@ -1,0 +1,5 @@
+{
+  "error": "ProcessValidationError: synthetic containment observation failed",
+  "passes": false,
+  "probeAllowanceConsumed": true
+}

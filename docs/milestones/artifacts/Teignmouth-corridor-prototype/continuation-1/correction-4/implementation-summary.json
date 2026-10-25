@@ -1,0 +1,72 @@
+{
+  "correctionCycle": 4,
+  "reviewFindingsAddressed": "narrow fresh output guard, exclusion and invocation path update",
+  "changedCodePaths": [
+    "pipeline/scripts/build_teignmouth_corridor_continuation.py"
+  ],
+  "changedEvidencePaths": [
+    "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/preflight.json",
+    "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5/"
+  ],
+  "changedLedgerPath": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/attempt-ledger.json",
+  "commands": [
+    "pipeline/.venv/Scripts/python.exe -m pytest -q tests/test_teignmouth_corridor_continuation.py (cwd pipeline)",
+    "pipeline/.venv/Scripts/ruff.exe check ... (cwd pipeline)",
+    "pipeline/.venv/Scripts/ruff.exe format --check ... (cwd pipeline)",
+    "pipeline/.venv/Scripts/python.exe -m py_compile ... (cwd pipeline)",
+    "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --import-smoke",
+    "git diff --check -- pipeline/... config/...",
+    "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/correction-4/build-5"
+  ],
+  "results": {
+    "pytest": "20 passed",
+    "ruffCheck": "passed",
+    "ruffFormat": "passed",
+    "pyCompile": "passed",
+    "exactVenvImportSmoke": "passed; no GIS data read",
+    "gitDiffCheck": "passed"
+  },
+  "build": {
+    "ordinal": 5,
+    "status": "STOP",
+    "wallSeconds": 3.1328547000011895,
+    "peakWorkingSetBytes": 512458752,
+    "interpreter": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe"
+  },
+  "sourceLoaded": true,
+  "continuousChartConstructed": true,
+  "geometry": "full mesh not assembled; necessary earthwork preflight stopped first",
+  "preflight": {
+    "criterion": "strict absolute source-relative earthwork <6 m",
+    "firstViolation": {
+      "absoluteChangeM": 6.05682075734589,
+      "candidateY": -2.7285011821391274,
+      "lateralM": -4.728539723370747,
+      "rule": "chart/source-plane edge intersection",
+      "sourceY": 3.3283195752067627,
+      "stationM": 144.0,
+      "xz": [
+        -145.09527317325922,
+        -96.90472682674081
+      ]
+    },
+    "maximumObservedAbsoluteChangeM": 6.05682075734589,
+    "passes": false,
+    "testedSamples": 8920
+  },
+  "preservation": {
+    "passes": true,
+    "paths": 925,
+    "changedPaths": [],
+    "build4FilesUnchangedAgainstPreflight": true
+  },
+  "gates": {
+    "geometrySafetyBeyondPreflight": "not reached",
+    "roadDrapeAndOwnership": false,
+    "completeBuildingContact": false,
+    "sharedWalkSurface": false,
+    "candidateEligibleForServing": false,
+    "browser": "not run"
+  },
+  "nextAction": "Independent Sol review; do not start another correction without coordinator direction."
+}

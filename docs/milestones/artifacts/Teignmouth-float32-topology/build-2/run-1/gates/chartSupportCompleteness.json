@@ -1,0 +1,20 @@
+{
+  "expectedPointCount": 1467,
+  "expectedStationCount": 163,
+  "expectedSupportAreaM2": 2528.0,
+  "expectedTriangleCount": 2592,
+  "lateralRangeM": [
+    -16.0,
+    16.0
+  ],
+  "ownerFailureCount": 0,
+  "ownerFailures": [],
+  "passes": true,
+  "reasons": [],
+  "stationRangeM": [
+    108.0,
+    187.0
+  ],
+  "status": "MEASURED_FROZEN_CHART_SUPPORT",
+  "triangleOverlapAreaM2": 0.0
+}

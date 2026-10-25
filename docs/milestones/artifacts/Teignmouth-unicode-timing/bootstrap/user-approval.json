@@ -1,0 +1,23 @@
+{
+  "schema": "teignmouth-timing-bootstrap-user-approval-v1",
+  "approvalDate": "2026-10-24",
+  "userResponse": "I approve",
+  "approvalContext": "The response followed a request to approve the exact reviewed proposal and its three listed scopes.",
+  "approvedProposalPath": "docs/milestones/Teignmouth-timing-bootstrap-proposal.md",
+  "approvedProposalSha256": "63cc4ca3a01906b71514d10590da4692399e91aa4e8ecefbc955cad627f2640f",
+  "approvedScope": [
+    "One trial-before-qualification evidence-only admission while live activation remains false.",
+    "Same-successful-collar historical preparation/solver interval P_B projection with the exact stated disjoint ledgers and cutoffs.",
+    "Exactly one write-once collar-05 solver/trial, followed only on complete genuine success by one implementer and one independent solver-free profile, each externally capped at 135 seconds and each projected total at most 125 seconds.",
+    "Fresh Stage A implementation/review budget stated in the proposal."
+  ],
+  "excludedScope": [
+    "No candidate promotion",
+    "No ordinary production timing qualification",
+    "No viewer/browser/publication",
+    "No live activation",
+    "No retry, replacement trial or replacement profile",
+    "No relaxed numeric/geographic/source/resource gate"
+  ],
+  "currentState": "Approval is recorded; implementation/readiness review must pass before any coordinator permit or collar-05 dispatch."
+}

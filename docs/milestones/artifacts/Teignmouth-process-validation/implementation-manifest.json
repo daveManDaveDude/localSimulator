@@ -1,0 +1,131 @@
+{
+  "activationEnabled": false,
+  "beforeImageManifest": ".codex/history/2026-10-24-process-validation/initial-implementation-before/manifest.json",
+  "browserRun": false,
+  "commitCreated": false,
+  "completeQualification": false,
+  "evidence": {
+    "docs/milestones/artifacts/Teignmouth-process-validation/containment-probe-process.json": {
+      "byteLength": 1101,
+      "sha256": "a25e99564a594d2f2d9dd94b4df53dc281a57d61350e2b7150b652506ef7817b"
+    },
+    "docs/milestones/artifacts/Teignmouth-process-validation/containment-probe.json": {
+      "byteLength": 140,
+      "sha256": "64fd88315a38b8ec019de5a58e8027581bb1e69b845040cad78930296cbc9e48"
+    },
+    "docs/milestones/artifacts/Teignmouth-process-validation/preservation.json": {
+      "byteLength": 363,
+      "sha256": "5858d9493251453eb543404698fd9c086b7a6bd232b4d20472565d308f4cf177"
+    },
+    "docs/milestones/artifacts/Teignmouth-process-validation/process-audit.json": {
+      "byteLength": 210,
+      "sha256": "900fd6e7d3be1b4413604c398cb5f76bedfe4bb052c6d568fbe697831cc5f8a6"
+    },
+    "docs/milestones/artifacts/Teignmouth-process-validation/quality-checks-initial.json": {
+      "byteLength": 4450,
+      "sha256": "d0f4f4219c248b4e1b20c15c7c3d2cd4ed574b8b6fe587ac28bac36d5623186f"
+    },
+    "docs/milestones/artifacts/Teignmouth-process-validation/retained-evidence-assessment.json": {
+      "byteLength": 968,
+      "sha256": "fbef1b239710f6a900a3de353a66dc9fa19174175577f20e049b6c90c5148844"
+    }
+  },
+  "files": {
+    ".codex/torquay-plan-implementation.md": {
+      "byteLength": 11253,
+      "sha256": "42acf9134583e39ecb88f662ffca0edfc2c986eeb5cd76fa4d47c9f8c3d46c1c"
+    },
+    "config/road-surface-teignmouth-topology-transition-v2.json": {
+      "byteLength": 14014,
+      "sha256": "804113be00f5bb744aec0cdb3c26ee8bb253e6d4feda5eace7370fcbb64b1485"
+    },
+    "docs/milestones/Teignmouth-process-validation.md": {
+      "byteLength": 14590,
+      "sha256": "456834c20bad3ca2b6f16f8143b163ba05f181f62f7c9fd997178fee4ebee9f9"
+    },
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md": {
+      "byteLength": 14854,
+      "sha256": "16358db4e1dd40349fb9d7550f80e80cbeac4489bb263e56aa7f38949af26b45"
+    },
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol.py": {
+      "byteLength": 16024,
+      "sha256": "666f71781fa3e76552a9fb841ea921b4971045c745144c3cb3d653e30829c312"
+    },
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_all_codes.py": {
+      "byteLength": 873,
+      "sha256": "a13338a43b6a5d1b9db32e7abb7eb16318c1ce69c09ecfc2622e69de42726421"
+    },
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_optimized.py": {
+      "byteLength": 847,
+      "sha256": "c49b40f52968e951a2d707e39918b7f9547af97f115e38b4c685f57f50f82240"
+    },
+    "pipeline/scripts/profile_teignmouth_flip05_performance_v2.py": {
+      "byteLength": 17846,
+      "sha256": "890a071c6ff25091d6c4171bac33266fdf5d560ac581c3904c3c95ad7fce7545"
+    },
+    "pipeline/scripts/profile_teignmouth_frame_selected_sol.py": {
+      "byteLength": 17469,
+      "sha256": "f257d652cedc79335e6e29e89fc5e52beb43ecbba4c307b1ccf7c49f46df5b2a"
+    },
+    "pipeline/scripts/profile_teignmouth_process_validation_v1.py": {
+      "byteLength": 8115,
+      "sha256": "996c2c97af9e59fd6658c30a172f2878fe2ab15d1a233bddebf5985dc6c69afe"
+    },
+    "pipeline/scripts/profile_teignmouth_validation_v2.py": {
+      "byteLength": 28954,
+      "sha256": "215d0a7407964e20a64562f56e111ff1ec330ba47edfd5196fb7d4558ba02480"
+    },
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py": {
+      "byteLength": 47794,
+      "sha256": "fd32e553e4fe9e832312274c698a463f15545933bcd1b57b5a98122612aaa55e"
+    },
+    "pipeline/scripts/run_teignmouth_validation_worker_v1.py": {
+      "byteLength": 608,
+      "sha256": "33c4ae829b3e67262e73a0b30e0c24d22b3ac159f001e2c485049622848fd611"
+    },
+    "pipeline/tests/test_road_surface_validation_transition_v2.py": {
+      "byteLength": 35556,
+      "sha256": "43d59da23e3fd1fae5e094228d2fbba81d51867886da5980dfbb91ab22923f2a"
+    },
+    "pipeline/tests/test_road_surface_validation_v2.py": {
+      "byteLength": 6274,
+      "sha256": "04e12c629e3d27c9c875bf4a024223c82c8b4d56fcd0562da076bdb819796f01"
+    },
+    "pipeline/tests/test_teignmouth_cached_supervisor.py": {
+      "byteLength": 8211,
+      "sha256": "3174170724031c4882e2c84ea078dce13e9fe54a0cb8fb01595d34fc502422b1"
+    },
+    "pipeline/tests/test_teignmouth_complete_profile.py": {
+      "byteLength": 3313,
+      "sha256": "4175abd0f6ccf91f07093cf622e1d187a71b771fc4450d4ceaa31f9787432575"
+    },
+    "pipeline/tests/test_teignmouth_validation_process.py": {
+      "byteLength": 9526,
+      "sha256": "d527dbbb34b52bdfa722798cbbe5654be509758ab59c496ad9bce32276b5af4a"
+    },
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": {
+      "byteLength": 28460,
+      "sha256": "8d00e3b994b1ef5915cf9bf1faceda3adad8b8477dce01fb28e7535863d5b4dc"
+    },
+    "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py": {
+      "byteLength": 26955,
+      "sha256": "2a2d09041f74cf5bf0389fab7203e5fad94d113a27ebe725a0784c80c5b1941b"
+    },
+    "pipeline/torquay_pipeline/road_surface_validation_v1.py": {
+      "byteLength": 40428,
+      "sha256": "50f97a2b7fb09f10094de8932eeb05a4858f978edfec35e3e51a3682071c501a"
+    },
+    "pipeline/torquay_pipeline/road_surface_validation_v2.py": {
+      "byteLength": 26079,
+      "sha256": "4b8182f9c584d4ca4b7b67017cce7374e607f75476628d3d0d40d6b28eafe587"
+    }
+  },
+  "implementerReplayUsed": 0,
+  "independentReplayUsed": 0,
+  "newIssueDisposition": "INITIAL_IMPLEMENTATION_INCOMPLETE_STOPPED_PENDING_INDEPENDENT_REVIEW",
+  "pendingMarkerCount": 1,
+  "probeUsed": 1,
+  "solverInvoked": false,
+  "staticBindingsValidatedAfterHandbackMetadata": true,
+  "trialInvoked": false
+}

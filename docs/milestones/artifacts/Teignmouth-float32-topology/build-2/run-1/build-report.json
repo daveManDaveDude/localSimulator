@@ -1,0 +1,83 @@
+{
+  "actualChildExitCode": 2,
+  "candidateEligibleForServing": false,
+  "candidateOutput": "C:\\vibe\\localSimulator\\data\\generated\\teignmouth-float32-topology",
+  "elapsedSeconds": 33.19761470000958,
+  "externalCommandExitCapture": "not observable by runner; caller records it if available",
+  "externalCommandExitCode": null,
+  "finishedUtc": "2026-10-24T12:52:05.494402+00:00",
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "logicalWorkerReturnCode": 2,
+  "logicalWorkerStatus": "BLOCKED_EXCEPTION",
+  "maximumSeconds": 180.0,
+  "partialOutputArchivedToEvidence": "C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Teignmouth-float32-topology\\build-2\\run-1\\partial-candidate-output",
+  "peakWorkingSetBytes": 609505280,
+  "peakWorkingSetStatus": "measured via GetProcessMemoryInfo",
+  "postRunPreservation": {
+    "changed": [],
+    "checkedFileCount": 225,
+    "passes": true
+  },
+  "primaryError": {
+    "message": "patch face is not covered by the verified source triangle partition: face=19669, faceArea=0.020639419555664062, expectedOverlayArea=1.1028883815799223e-12, coveredArea=0",
+    "type": "TopologyError"
+  },
+  "runnerChosenExitCode": 2,
+  "schema": "teignmouth-float32-build-report-v1",
+  "stages": {
+    "config": {
+      "passes": true
+    },
+    "frozenInputs": {
+      "passes": true,
+      "releaseId": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+      "sourceHashes": {
+        "buildings/buildings.json": {
+          "byteLength": 6015566,
+          "path": "C:/vibe/localSimulator/public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/buildings/buildings.json",
+          "sha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58"
+        },
+        "heightfield.f32": {
+          "byteLength": 4008004,
+          "path": "C:/vibe/localSimulator/public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/heightfield.f32",
+          "sha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af"
+        },
+        "inventory.json": {
+          "byteLength": 1399,
+          "path": "C:/vibe/localSimulator/public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/inventory.json",
+          "sha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0"
+        },
+        "manifest.json": {
+          "byteLength": 7835,
+          "path": "C:/vibe/localSimulator/public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/manifest.json",
+          "sha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a"
+        },
+        "ready.json": {
+          "inventoryByteLength": "1399",
+          "inventorySha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+          "path": "public/worlds/torquay-poc-001-2km/ready.json",
+          "readySha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4"
+        },
+        "roads/manifest.json": {
+          "byteLength": 10832,
+          "path": "C:/vibe/localSimulator/public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/manifest.json",
+          "sha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6"
+        },
+        "roads/roads.json": {
+          "byteLength": 87338409,
+          "path": "C:/vibe/localSimulator/public/worlds/torquay-poc-001-2km/releases/616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a/roads/roads.json",
+          "sha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+        }
+      }
+    },
+    "localConstruction": {
+      "constraintEdgeCount": 136656,
+      "passes": true,
+      "triangleCount": 129362,
+      "vertexCount": 64765
+    }
+  },
+  "startedUtc": "2026-10-24T12:51:32.896166+00:00",
+  "status": "BLOCKED_EXCEPTION",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\vibe\\localSimulator\\pipeline\\scripts\\build_teignmouth_float32_candidate.py\", line 216, in _worker_build\n    candidate = assemble_candidate(corridor, config.frame, mesh, chart, evidence)\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\teignmouth_float32_candidate.py\", line 1070, in assemble_candidate\n    return _serialize_candidate(corridor, frame, mesh, chart, evidence)\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\teignmouth_float32_candidate.py\", line 973, in _serialize_candidate\n    outside_overlay = affine_surface_overlay_extrema(\n        world_mesh, candidate_y_f32, source_index, clip_geometry=outside_geometry\n    )\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\road_surface_topology.py\", line 858, in affine_surface_overlay_extrema\n    raise TopologyError(\n    ...<3 lines>...\n    )\ntorquay_pipeline.road_surface_topology.TopologyError: patch face is not covered by the verified source triangle partition: face=19669, faceArea=0.020639419555664062, expectedOverlayArea=1.1028883815799223e-12, coveredArea=0\n"
+}

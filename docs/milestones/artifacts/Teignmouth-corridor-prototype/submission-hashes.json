@@ -1,0 +1,56 @@
+{
+  "issue": "Teignmouth-corridor-prototype",
+  "stage": "initial safety stop",
+  "files": [
+    {
+      "path": "pipeline/torquay_pipeline/teignmouth_corridor_prototype.py",
+      "bytes": 14345,
+      "sha256": "ca2e57728a248034b4375a16b2e42b3aea8d3429daa4ce18efcd459e545e1007"
+    },
+    {
+      "path": "pipeline/scripts/build_teignmouth_corridor_prototype.py",
+      "bytes": 5839,
+      "sha256": "2a079d632bc9d0f857e495ae9abbf50dc1bb6f433decf7feaf932c354fde4c93"
+    },
+    {
+      "path": "pipeline/tests/test_teignmouth_corridor_prototype.py",
+      "bytes": 2730,
+      "sha256": "cb9571e717adc670e99e307e549a8c6e0e475d8563f3ea9b7b9ad1fa4b390f1b"
+    },
+    {
+      "path": "docs/milestones/Teignmouth-corridor-prototype.md",
+      "bytes": 7705,
+      "sha256": "0d9e3d6616eb7a9ef179fcb9a00cd77635e3f95b8a3f197871258e399dc7f24a"
+    },
+    {
+      "path": "docs/milestones/Teignmouth-corridor-prototype-spec.md",
+      "bytes": 8010,
+      "sha256": "b99ef20c065bd0ebefa597c110e98a9c336ab56c7bba464a5db2e1b8024c9f5b"
+    },
+    {
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/initial-diagnostic/failure.json",
+      "bytes": 1266,
+      "sha256": "db0d1c0e0549a7d7b2f59b40265097b0c678de4a65f94ce50412300461c0f79b"
+    },
+    {
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/verification.json",
+      "bytes": 4505,
+      "sha256": "b11577302209c98c21f446bf54c08118ba8556b0c3c2029c2e4835b2ab764577"
+    },
+    {
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/report.json",
+      "bytes": 25323,
+      "sha256": "d0f05866421db637ea0c787f35f467f0480cee315660a3c18d84989d3d94342a"
+    },
+    {
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/preservation-before.json",
+      "bytes": 133560,
+      "sha256": "524d45f733aee1ddca8a689fbde8dc9f34ae43c00cab3e1a9eb56c53fc87e0fa"
+    },
+    {
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/build-1/preservation-after.json",
+      "bytes": 133560,
+      "sha256": "524d45f733aee1ddca8a689fbde8dc9f34ae43c00cab3e1a9eb56c53fc87e0fa"
+    }
+  ]
+}

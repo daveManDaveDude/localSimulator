@@ -1,0 +1,48 @@
+{
+  "schema": "teignmouth-operational-memory-submission-v1",
+  "status": "awaiting_independent_review_of_actual_code",
+  "recordedOn": "2026-10-24",
+  "implementationBudget": "one submission; zero corrections",
+  "reviewedProposal": "PASS by /root/review_sol_escalation; not a review of implementation code",
+  "activation": {
+    "enabled": false,
+    "status": "pending_independent_sol_review_and_coordinator_approval"
+  },
+  "transitionConfigSha256": "d73ff3db33cf28d3c23c1abae0784f413bb2863a75b6223403faa32a90a3bf95",
+  "transitionSpecSha256": "2765303ce7b87f484778963d06ceb4b3b9446852d3df335775d4c66a3e4402de",
+  "files": {
+    "config/road-surface-teignmouth-topology-transition-v2.json": "d73ff3db33cf28d3c23c1abae0784f413bb2863a75b6223403faa32a90a3bf95",
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md": "2765303ce7b87f484778963d06ceb4b3b9446852d3df335775d4c66a3e4402de",
+    "docs/milestones/Teignmouth-operational-memory-containment.md": "5479d9d46591395b4d5ef764dc97c8ce47cf2f14695d9a3bdfcd96ae811fcf76",
+    "docs/milestones/Teignmouth-operational-memory-handback.md": "eee2061585ceb06c4729fd98e7d25a8c4f981210206ccb7b65b8bc3ddd8e5177",
+    "docs/milestones/Teignmouth-timing-bootstrap.md": "3a4ada698bb200dff389e4988ff5b453c54d4ebc1dd820fff4d50f8e90ab1745",
+    ".codex/torquay-plan-implementation.md": "30a07c8edc73e1dafe8224be07e5b2d952f009851bc3d9cf28dffaa5099e0f5f",
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py": "fba2352189f0ba4f27215e4c54a4dcbf0463142b70ea2c0f41acfa794aded712",
+    "pipeline/scripts/run_teignmouth_topology_guardian.py": "3a20e065d8e7689819909c1d53732270baba49d981dfaebe30fab01979db047c",
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": "0470dc2a16f822580b762875aae54a5b866ce7dfeddaca0022111ad127344f98",
+    "pipeline/torquay_pipeline/road_surface_memory_admission.py": "14004bd9de5c05534769da7db97e697cecdecb8b673a04fa601c55e3426b53a3",
+    "pipeline/tests/test_teignmouth_validation_process.py": "25f496dc44130b284fea7f33db74e71dabeaa3b8bb7c1b0652cc029ee2d39154",
+    "pipeline/tests/test_teignmouth_memory_admission.py": "d54bbbb8a5ebd1fbddb76198275ae9224071bdbf3fdc4215e07d20e4e7a48bd6",
+    "pipeline/tests/test_teignmouth_guardian.py": "17903bff1ce4e23fc030d472b43c8cbc158582fce241c89b61bcf0cde1428d49"
+  },
+  "checks": "docs\\milestones\\artifacts\\Teignmouth-operational-memory\\quality-gates.json",
+  "preservation": "docs\\milestones\\artifacts\\Teignmouth-operational-memory\\preservation-and-pins.json",
+  "handback": "docs/milestones/Teignmouth-operational-memory-handback.md",
+  "reviewScope": [
+    "pipeline/scripts/run_teignmouth_topology_guardian.py",
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py",
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+    "pipeline/torquay_pipeline/road_surface_memory_admission.py",
+    "pipeline/tests/test_teignmouth_validation_process.py",
+    "pipeline/tests/test_teignmouth_memory_admission.py",
+    "pipeline/tests/test_teignmouth_guardian.py",
+    "config/road-surface-teignmouth-topology-transition-v2.json",
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md",
+    "docs/milestones/Teignmouth-operational-memory-containment.md",
+    "docs/milestones/Teignmouth-operational-memory-handback.md",
+    "docs/milestones/Teignmouth-timing-bootstrap.md"
+  ],
+  "trialOrProfileRun": false,
+  "browserRun": false,
+  "dispatchPermitCreated": false
+}

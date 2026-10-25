@@ -1,0 +1,63 @@
+{
+  "scope": "candidate-only strict <6.5m; all other limits/recipe fixed",
+  "reservedSolCorrectionOrdinal": 1,
+  "reservedBuildOrdinal": 6,
+  "evidenceLeafAbsent": true,
+  "interpreter": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+  "priorProtectedPathsChecked": 925,
+  "authorizedChangedPaths": [
+    "config/road-surface-teignmouth-corridor-continuation.json",
+    "docs/milestones/Teignmouth-corridor-prototype-continuation-spec.md",
+    "pipeline/scripts/build_teignmouth_corridor_continuation.py",
+    "pipeline/tests/test_teignmouth_corridor_continuation.py",
+    "pipeline/torquay_pipeline/teignmouth_corridor_continuation.py"
+  ],
+  "unexpectedPreservationChanges": [],
+  "bindings": [
+    {
+      "path": "config/road-surface-teignmouth-corridor-continuation.json",
+      "sha256": "1c92f416a2d6c393709cbce68f7c4d6ab722da544b8941b54c061f55eb68dc9c",
+      "byteLength": 1589
+    },
+    {
+      "path": "docs/milestones/Teignmouth-corridor-prototype-continuation-spec.md",
+      "sha256": "bdad83800b974d4e9bc4db3acb0100bc6b30f528dcb98797781a907167d92818",
+      "byteLength": 9715
+    },
+    {
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/diagnostic-1/full-field-earthwork.json",
+      "sha256": "0dea4598e429bffd12038bb401c00f922130e5c1fc0d243acb20be59ef4cd56f",
+      "byteLength": 8038267
+    },
+    {
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/limit-decision-1.md",
+      "sha256": "a6e21834ab30b4152d53a9afe7c2928c39dfff1f3cba9fce49e344f26cb57cfe",
+      "byteLength": 2550
+    },
+    {
+      "path": "pipeline/scripts/build_teignmouth_corridor_continuation.py",
+      "sha256": "85178bbeedd540dc8f330223d8e9bd95507bec18c90f2df085ba623bacf28dc7",
+      "byteLength": 10189
+    },
+    {
+      "path": "pipeline/tests/test_teignmouth_corridor_continuation.py",
+      "sha256": "ab9e6efbf8063809035ec4f1339c67b2dbc3e2056d874331ebae519f39a81176",
+      "byteLength": 10522
+    },
+    {
+      "path": "pipeline/torquay_pipeline/teignmouth_corridor_continuation.py",
+      "sha256": "e345e48e7c1c6c4e05e9c6d5b25ac550502a10841f5f585bf7134fc167f49d16",
+      "byteLength": 31279
+    }
+  ],
+  "checks": {
+    "focusedPytest": "38 passed in 7.24s",
+    "ruffCheck": "passed",
+    "ruffFormat": "3 files already formatted",
+    "exactVenvImportSmoke": "passed; no GIS read",
+    "gitDiffCheck": "passed; pre-existing CRLF warnings"
+  },
+  "nextCommand": "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/sol-correction-1/build-6",
+  "wallLimitSeconds": 180,
+  "runtimeServingAuthorized": false
+}

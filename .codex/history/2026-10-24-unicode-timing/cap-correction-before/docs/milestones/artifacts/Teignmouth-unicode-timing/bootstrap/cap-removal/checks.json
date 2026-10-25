@@ -1,0 +1,88 @@
+{
+  "finalDiffCheck": {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "cwd": "C:\\vibe\\localSimulator",
+    "exitCode": 0,
+    "externalSeconds": 0.08890500001143664,
+    "stderr": "",
+    "stdout": ""
+  },
+  "finalFocusedTests": {
+    "argv": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_teignmouth_memory_admission.py",
+      "tests/test_teignmouth_validation_process.py",
+      "tests/test_road_surface_validation_transition_v2.py",
+      "tests/test_road_surface_validation_v2.py",
+      "tests/test_teignmouth_complete_profile.py",
+      "tests/test_teignmouth_cached_supervisor.py"
+    ],
+    "cwd": "C:\\vibe\\localSimulator\\pipeline",
+    "exitCode": 0,
+    "externalSeconds": 5.1716722,
+    "passed": 116,
+    "pytestSeconds": 4.61
+  },
+  "formatApplied": true,
+  "formatCheck": {
+    "argv": [
+      "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "pipeline/torquay_pipeline/road_surface_memory_admission.py",
+      "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+      "pipeline/scripts/assess_teignmouth_memory_admission.py",
+      "pipeline/tests/test_teignmouth_memory_admission.py",
+      "pipeline/scripts/run_teignmouth_topology_validation_v2.py"
+    ],
+    "cwd": "C:\\vibe\\localSimulator",
+    "exitCode": 0,
+    "externalSeconds": 0.11800779998884536,
+    "stderr": "",
+    "stdout": "5 files already formatted\n"
+  },
+  "initialIterations": [
+    {
+      "command": "python -m pytest -q pipeline/tests/test_teignmouth_memory_admission.py pipeline/tests/test_teignmouth_validation_process.py",
+      "cwd": "C:\\vibe\\localSimulator",
+      "externalSeconds": 0.7285613,
+      "result": "collection error: pipeline package not on sys.path; no tests executed"
+    },
+    {
+      "command": "pytest -q tests/test_teignmouth_memory_admission.py tests/test_teignmouth_validation_process.py",
+      "cwd": "C:\\vibe\\localSimulator\\pipeline",
+      "externalSeconds": 2.1587653,
+      "failed": 2,
+      "failures": [
+        "native queried limit page rounding (before process creation)",
+        "runtime code map stale before explicit amendment transition"
+      ],
+      "passed": 55
+    },
+    {
+      "command": "pytest -q tests/test_teignmouth_memory_admission.py -k native --tb=short",
+      "externalSeconds": 0.5858937,
+      "result": "startup refused before process creation: actual 5474643968 expected 5474646016 (2048-byte page rounding)"
+    },
+    {
+      "command": "pytest -q tests/test_teignmouth_memory_admission.py --tb=short",
+      "externalSeconds": 0.9242317,
+      "passed": 4,
+      "pytestSeconds": 0.47
+    }
+  ],
+  "noStandaloneProbe": true,
+  "ruffCheck": {
+    "externalSeconds": 3.2063402,
+    "result": "PASS"
+  }
+}

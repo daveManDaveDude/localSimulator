@@ -1,0 +1,41 @@
+{
+  "additionalOfflineGates": {
+    "candidateEligibleForServing": false,
+    "completeBuildingContact": false,
+    "reason": "required coherence gates are not implemented and evidenced",
+    "roadDrapeAndOwnership": false,
+    "sharedWalkSurface": false
+  },
+  "interpreterIdentity": {
+    "executable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "prefix": "C:\\vibe\\localSimulator\\pipeline\\.venv",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "preservation": {
+    "changedPaths": [],
+    "comparedPaths": 944,
+    "excludedPaths": [
+      ".codex/torquay-plan-implementation.md",
+      "continuation-1/attempt-ledger.json",
+      "current owned sol-correction-1/build-6 output directory"
+    ],
+    "passes": true,
+    "rawDataHashing": "raw GIS excluded; packaged source hashes reported by loader"
+  },
+  "primaryError": {
+    "message": "distinct Float64 topology vertices collide after Float32 conversion: (-164.2316811012587, -85.5) and (-164.23167542853238, -85.5)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\vibe\\localSimulator\\pipeline\\scripts\\build_teignmouth_corridor_continuation.py\", line 185, in main\n    report = build_continuation(root, evidence)\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\teignmouth_corridor_continuation.py\", line 408, in build_continuation\n    report.update(assemble_corrected(corridor, chart, evidence))\n                  ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\teignmouth_corridor_continuation.py\", line 443, in assemble_corrected\n    mesh = build_constrained_mesh(domain, lines)\n  File \"C:\\vibe\\localSimulator\\pipeline\\torquay_pipeline\\road_surface_topology.py\", line 566, in build_constrained_mesh\n    raise TopologyError(\n    ...<2 lines>...\n    )\ntorquay_pipeline.road_surface_topology.TopologyError: distinct Float64 topology vertices collide after Float32 conversion: (-164.2316811012587, -85.5) and (-164.23167542853238, -85.5)\n",
+    "type": "TopologyError"
+  },
+  "resources": {
+    "candidateRuntimeBuffersWritten": false,
+    "peakWorkingSetBytes": 564113408,
+    "peakWorkingSetStatus": "measured",
+    "wallLimitSeconds": 180,
+    "wallSeconds": 7.373759900016012
+  },
+  "status": "STOP",
+  "stopReasons": [
+    "TopologyError: distinct Float64 topology vertices collide after Float32 conversion: (-164.2316811012587, -85.5) and (-164.23167542853238, -85.5)"
+  ]
+}

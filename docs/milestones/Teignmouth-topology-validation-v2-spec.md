@@ -1,7 +1,9 @@
 # Teignmouth topology study: validation transition v2
 
-Status: fix 3 is under implementation and independent review. The v2 timing
-policy remains **inactive**. No topology trial is authorized by this document.
+Status: the legacy line-tracing correction finished with independent FIX REQUIRED
+review and its correction budget is exhausted. A separately authorized process-isolated
+validation issue is under implementation; see `Teignmouth-process-validation.md`.
+The v2 timing policy remains **inactive**. No topology trial is authorized by this document.
 
 ## Scope
 
@@ -174,3 +176,74 @@ outputs are `flip-05-complete-traced-profile-sol-all-codes.json` and correspondi
 `flip-05-complete-traced-report-sol-all-codes.json`. This changes no cap, source,
 trial inventory, activation, numerical gate or accepted package. Independent
 review is required; timings remain diagnostic proxies rather than qualification.
+
+
+### Reserved Sol correction resumed after authorized workflow metadata migration
+
+The same reserved Sol correction continues; the four Luna corrections remain
+used. Activation stays disabled. Before-images of the interrupted supervisor,
+config, specification, transition module and affected tests are retained under
+`sol-frame-resume-before/` in the v2 evidence directory, with their exact hashes.
+
+Safe absolute Python code membership is selected at frame entry. Workspace
+frames retain a deadline poll on every line; absolute external frames omit
+local line events while global call tracing still observes workspace descendants.
+Relative filenames and reparse/unknown paths retain per-line membership checks,
+including CWD invalidation. This reduces tracing overhead without changing gate
+calculations, timing offsets, cutoff behavior, or the native-call limitation.
+
+The named `authorized-agent-workflow-2026-10-23` metadata exception admits only
+the exact old/new AGENTS.md hashes, verifies the retained old AGENTS/checkpoint
+bytes and archive manifest, and binds the authorization document. Historical
+maps and evidence are unchanged. Current checkpoint bytes remain snapshot-bound
+and marker-governed; arbitrary AGENTS changes or before-image corruption fail.
+This exception itself requires independent review before activation.
+
+One new retained diagnostic (`profile_teignmouth_frame_selected_sol.py`) uses an
+80 second traced-validation ceiling and an external 150 second process limit.
+It compares the twelve gates with the immutable optimized report rather than
+repeating the untraced validator. It measures actual static/input-transition
+preflight and conditional assembly where available. Missing activation-receipt
+preflight and exact trial finalization remain explicitly unavailable; therefore
+it cannot claim complete end-to-end qualification. If validation cannot complete
+inside its bound, or the measured projection exceeds 125 seconds, stop without
+another variant/replay or trial. No cap amendment follows from this diagnostic.
+
+
+## Separately authorized process validation issue - 24 October 2026
+
+The current production wrapper routes the complete post-solver transaction through
+one fixed versioned Windows Job-contained worker. Per-line tracing remains only in
+historical diagnostic helpers. The worker starts suspended, enters a kill-on-close
+Job before resume, and executes the unchanged v2 numerical gates with fresh local
+cache identity. The parent verifies the request-bound full response before T0+125;
+launch, transfer, verification and cleanup count. Conditional double assembly,
+both independent asset validations, resource checks and deterministic hashes share
+the same process boundary. No missing worker operation is retried in the parent.
+Failure or timeout without a complete response yields twelve unavailable/failed
+reports. A cooperative incomplete result is diagnostic only. Transfer buffer copies
+are charged conservatively against the unchanged 64 MiB construction ceiling.
+
+This architectural issue retains every old limit, hash-bound history and consumed
+trial. Activation stays false. Successful-path retained fixtures and genuine receipt
+preflight are required before any retained replay; synthetic tests cannot qualify.
+The new issue's finite budget and evidence live in `Teignmouth-process-validation.md`.
+Old code maps remain frozen; current extension hashes identify only the new bytes.
+
+
+## Operational memory containment amendment - 24 October 2026
+
+The single implementation amendment replaces predictive full-tree B/P admission
+and fixed construction/transport byte ceilings with a finite Windows Job commit
+limit around the complete v2 computation process tree. See
+`Teignmouth-operational-memory-containment.md`. The guardian starts the runner
+suspended, verifies the rounded limit and membership before resume, preserves
+one T0, and requires an exact one-use permit before process creation. The v2
+transport retains typed payload validation, exact sidecar lengths, hashes and
+byte telemetry. The construction estimate is recorded but no longer gates v2
+acceptance; all other resource and numeric limits remain active.
+
+This submission does not create the Sol review, coordinator receipt or dispatch
+permit, and does not run a trial/profile. Activation remains false unless the
+existing exact approval chain is completed. Historical proposals, source and
+approval bytes remain intact.

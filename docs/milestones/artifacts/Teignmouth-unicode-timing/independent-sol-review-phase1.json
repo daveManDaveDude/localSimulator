@@ -1,0 +1,83 @@
+{
+  "bindings": {
+    "configSha256": "6c685c1746e01786ebe19a027c51235abbfda71fe58e4bc959cb60604964ccf3",
+    "evidenceSha256": {
+      "containment-evidence-reuse.json": "77f7a7852ba73633cc5d99f0543a6d5e3ac2dfbcbf56297d1e50b96cfaf0cd72",
+      "phase1-manifest.json": "a4d6f19d26b8610e39ebc673a5cdf0373e27c247d852ddad992995a43d6b1bc3",
+      "phase2-prerequisites.json": "d5e39f9e1e0791e0dba71456e1655ef4563d7c8ead281d834125f34ddbdc9bd5",
+      "preservation-phase1.json": "9c5c65547dd98ee19761a87c1eafd31dc99976d548fd0fd079b982004b67cddb",
+      "quality-checks-phase1-initial.json": "cdc190dd0701055f14e1b129b352cde38dcdbcd316630dffb947abf6a3846534"
+    },
+    "issueSpecSha256": "7792ea3aea152d6976b237901efb7f6d9fb6905d1afde118eda37484147bc10e",
+    "manifestSha256": "a4d6f19d26b8610e39ebc673a5cdf0373e27c247d852ddad992995a43d6b1bc3",
+    "priorCorrectionReviewSha256": "cde56e7e3e47c57bfbf8b20fb8a35668e189c623bbacc0cfe3f06b75806bf83e",
+    "processModuleSha256": "5ce9d549eca7c789df9244967f0555886559145a10b3f84c073cd4537fd426b2",
+    "testsSha256": "84b68cbe9ed34f03bd2462e028d4dadb877e6c7d498959057d19c1e2343072d8"
+  },
+  "budget": "Phase 1 initial implementation passes; its one Sol correction remains unused. Previous issues retain their spent budgets and historical FIX REQUIRED verdicts. Phase 2 has no execution budget.",
+  "containmentEvidenceReuse": {
+    "attemptScriptAndReportHashesExact": true,
+    "method": "Independently compared raw CRLF source lines for ProcessStartupError, WindowsJob, wait_worker and supervise with exact before-images and their retained region hashes. Only canonical, new json_string_bound and value_bound process regions differ.",
+    "passingReplacementProbeSha256": "ed1fa94f6f39fdc3adc9f0ff7eca04d7eaaab3765be8130645d19df1d46d14c3",
+    "probeRerun": false,
+    "probeScriptSha256": "3be62e0f09a6296358657b4cb7199198ef84e0f15d8f1b315391a892e06e528e",
+    "regions": [
+      "ProcessStartupError",
+      "WindowsJob",
+      "wait_worker",
+      "supervise"
+    ],
+    "reusable": true,
+    "wholeModuleHashReused": false
+  },
+  "findings": [],
+  "formatVersion": 1,
+  "issue": "Teignmouth Unicode safety and timing qualification",
+  "notFullTimingQualificationOrActivationPass": true,
+  "personallyChecked": [
+    "Inspected actual narrow before/current process diff, tests, issue specification, transition pins and every Phase 1 artifact.",
+    "All phase1-manifest file/evidence lengths and hashes match; all five archived before-images match their manifest.",
+    "All 8164 original protected records match except the authorized current transition config; all 88 prior-issue preservation records match, including old artifacts/config/history.",
+    "Only extension_code_hashes changed in the current config: process module, test module and the explicitly recorded preexisting old-issue document metadata pin. Other config fields and activation=false are unchanged; every extension pin matches actual bytes.",
+    "Lifecycle region raw-byte hashes, unchanged probe script, original attempt script hash and passing replacement report hash independently match reuse evidence.",
+    "Five retained aggregate hashes and failing statuses verified; both exact production receipt files remain absent; candidate output is absent."
+  ],
+  "phase2": {
+    "disposition": "Stop after Phase 1 safety fix. No profile/replay/solver/trial/candidate/activation/browser is authorized. Receipts must not be fabricated or bypassed.",
+    "executable": false,
+    "fullIssuePass": false,
+    "genuineSuccessWitnessFound": false,
+    "missing": [
+      "Compatible genuine all-gates-successful witness and successful assembly/validation/finalization evidence",
+      "Authentic appropriately scoped production preflight receipts",
+      "Separately reviewed staged bootstrap/approval specification and explicit execution authorization"
+    ],
+    "productionReceiptsPresent": false,
+    "qualified": false
+  },
+  "qualityEvidenceReused": {
+    "result": "129 passed, 1 Windows symlink-privilege skip in 3.46s; Ruff check and format passed on two changed files; git diff --check passed with existing LF/CRLF warning.",
+    "reviewerRerun": false,
+    "source": "quality-checks-phase1-initial.json"
+  },
+  "reviewActions": "No tests, containment probes, profiles/replays, numerical validation, solver, trial, build, activation or browser were run. Read-only source/hash checks only; the sole write is this separate review artifact.",
+  "reviewDate": "2026-10-24",
+  "reviewer": {
+    "actualModel": "unknown; not exposed",
+    "actualReasoningEffort": "unknown; not exposed",
+    "agent": "/root/review_sol_escalation",
+    "independentOfImplementation": true,
+    "requestedModel": "gpt-6.1-sol",
+    "requestedReasoningEffort": "medium"
+  },
+  "safetyAssessment": {
+    "limitations": "This is allocation-bound safety review, not a measurement of total Python/GEOS RSS or real-data throughput.",
+    "limits": "64 MiB construction and 16 MiB envelope ceilings, 120/125/135 second offsets, <=125 complete qualification threshold, 2000 solver iterations, twelve numerical gates, geography/resource/source limits and trial order are unchanged.",
+    "preallocationOrdering": "Unchanged supervise computes value_bound/baseline and checks 64 MiB before Codec.encode/canonical/backend launch. Worker request checks encoded lengths and the baseline before decode. Successful assembly and result encoding have combined reservations before allocation; parent response sidecar/combined checks precede decode. The Unicode change strengthens the inputs to these unchanged guards.",
+    "recursiveCoverage": "Strings, Paths and dataclass field names use json_string_bound. Dictionary traversal counts both keys and values; tuple/list traversal recursively includes nested strings and mixed key types while retaining structural/tag overhead.",
+    "regressionCoverage": "Recorded tests cover ASCII, controls/quoting, BMP/combining, non-BMP emoji and U+10FFFF, lone surrogates, Paths, nested mixed-key structures and an allowlisted mesh record. The 64 MiB non-BMP boundary regression spies on encoding/decoding/blob/asset/backend paths to prove rejection without escaped allocation or process launch.",
+    "unicodeBound": "Sound for admitted strings: two quote bytes plus six per BMP code point, including lone surrogates, and twelve per supplementary code point upper-bound ASCII JSON escaping. Controls, quotes, backslashes and ordinary ASCII are conservatively covered. canonical() explicitly retains ensure_ascii=True and unchanged serialized bytes."
+  },
+  "scope": "Phase 1 safety only",
+  "verdict": "PASS"
+}

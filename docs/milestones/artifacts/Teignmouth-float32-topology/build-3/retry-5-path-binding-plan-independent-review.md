@@ -1,0 +1,35 @@
+# Independent plan review — retry-5 path binding
+
+2026-10-25. Independent Sol reviewer `/root/sol_review_face_diag`, disposition 103. **PASS for the plan only.** The proposed four-literal binding is consistent with current accepted source and the separate preservation, implementation-review and one-use invocation gates. No implementation, root creation or self-check is authorized by this report.
+
+Reviewed the full plan against disposition 102, accepted retry-4 plan/review, current source and S implementation PASS. Independently recalculated plan SHA-256 `1983a1559598766bb280c67546af1b4350e6959039c2cdf0c0edd36b98a5db0e`; reusable retry-4 plan/review hashes match `249ebefbca3a6ffa4a65245e5c543ad12aab506876b7e4be910883a8d2a6e74b` / `960d85541339265c7b952f3d9e8bddf905ca755e707839a992120da56a551630`. Current S acceptance report matches `bd74dc0b7fe5bfa82df604bc7ee3b5b3c57554be3a2cc02e3a6802faabc7131d`.
+
+## Verified current baselines
+
+| File | Independently recalculated SHA-256 |
+| --- | --- |
+| W `pipeline/scripts/invoke_teignmouth_float32_build3.ps1` | `6ed89a17b769b15069c9ee47ca85f1bf72adf36e43b362772b0bf7749906049b` |
+| S `pipeline/scripts/run_teignmouth_float32_build3.py` | `28c92cc60e38ae23dcf58874eca67b8308b22772eee03b36d69471624fcdb089` |
+| H `pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py` | `13188dc1bfb10c5e7e3e92da91274f1529b7771ea735e8675df8caff5ad4b501` |
+| P `pipeline/scripts/teignmouth_build3_runtime_preflight.py` | `aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b` |
+
+The required future inverses correctly bind these current W/S/H bytes, particularly S with accepted console/stdio/secondary-note/direct-return behavior rather than pre-correction S. An in-memory prospective replacement and reversal of only the proposed root spans round-trips exactly to all three current hashes. This proves feasibility of the specified reversible spans, not that a future implementation passed. No prospective/reconstructed source was written or executed; no final future hash is asserted. No Git index proof is claimed for untracked operational files.
+
+## Criteria
+
+| Criterion | Static plan assessment |
+| --- | --- |
+| Four exact consumers | **PASS.** Current W lines 23 and 344 each contain one retry-4 parent literal, S 39 contains one parent literal, and H 17 contains one full `run-1` leaf. Counts are W/S/H 2/1/1; current retry-5 count is zero. Search of scripts/tests/configuration found only these four active consumers. Future new/old counts and inverse comparison are mandatory; unexpected additional consumers stop the change. P remains untouched. |
+| Cross-file authority | **PASS.** The plan traces W base parent and independent terminal-fallback allowlist, caller/update, separate Handoff ownership/PREPARED transition, parent handoff/start/stdio, S-owned exclusive leaf, S↔H auth/consumption and matching marker/log derivatives. It preserves exact existing destination/identity/nonce/clock authority; no old-root records can authenticate retry-5. |
+| Point-in-time path safety | **PASS.** Independently observed retry-5 absent. Force enumeration of `.codex` found zero case-insensitive equals and zero equals after trailing-dot/space normalization. `C:\`, `C:\vibe`, workspace and `.codex` are directories without ReparsePoint; LinkType/Target are empty and Resolve-Path returns their exact expected spellings. No inaccessible check was treated as absence. The fixed child is within the inspected workspace `.codex`. These are observations, not reservation or concurrent-replacement guarantees. |
+| One-use and root creation | **PASS.** Occupied/empty/stale/unsafe/ambiguous paths refuse. No adoption, cleanup, alternate root or numbering fallback. Repeat path checks at implementation handback/review and invocation gate. No parent or leaf is created during planning/patch/review; only a separately gated W call creates its fixed parent, and S creates its leaf after authenticated handoff. Exclusive operations remain necessary against races. |
+| Preservation inventory | **PASS as a future required gate, not current rehash evidence.** The plan correctly identifies original/retry-1/2/3 counts 2/2/11/11 (26 total), plus all 11 retry-4 files: 37 total. Disposition 89's full eleven-row matrix was read and agrees with the retry-4 count/reference. Required later checks compare every filename/count/hash against accepted matrices, including pending/consumed/empty logs; anchor hashes cannot substitute. Protected source/config/test bindings must also match. |
+| Preservation authorization | **PASS.** The plan honestly states it did not rehash prior roots. A later explicit release must include the complete read-only preservation comparison; if absent/unavailable, the plan requires reporting the missing gate and stopping before invocation. That conditional authorization is not an optional preservation waiver. This plan-only review did not access or independently rehash old evidence roots. |
+| Accepted behavior and authority | **PASS.** No S semantic change is proposed: exact console precondition/two opt-ins/defaults, close accounting, suspended-child cleanup, bounded persisted notes/immediate fallback, identities/Jobs/deadlines, actual exit7/7, complete census/unconditional unexpected-member rejection and zero/empty/zero/tree gates remain inverse-bound. Continuing user authority is stated through disposition 102 without granting extra attempts, resetting counters or claiming runtime/build authority. |
+| Gates and stop criteria | **PASS.** Independent plan review → coordinator release → four-span implementation/authorized static checks → independent actual-byte implementation review → separate one-use invocation gate. Proposed Ruff/AST checks remain specifically future-authorized static gates, not execution of source/modes. Any drift, inverse/preservation mismatch, safety ambiguity or need for broader edits stops; no automatic retry-6. |
+
+No residual plan blocker was found. The future implementation review must independently prove final bytes, all 37 preservation bindings and fresh absence; this prospective plan review cannot replace it.
+
+Work was static document/source reads/searches, hashes, in-memory prospective round-trip and existing parent/path/alias/ancestor inspection, plus this report. No source/checkpoint/ledger/evidence edit, old-root content access, new root, tests/imports/scripts/parsers/linters/compilers, process inspection/probes, wrapper/self-check/preflight/runtime/collection, manifest preparation, GIS/numerical/build or browser action ran. No runtime evidence was created.
+
+Native efficacy/persistence/containment, 10-second fit and **30-second runtime-profile fit remain unmeasured**. Outer exit1/internal2, historical census uncertainty and unsaved `957157…` provenance remain unresolved. All consumed roots/counters remain intact. PASS grants no next action. Candidate remains **NO-GO and unservable**, build 3 **unreserved**; fixed constraints and pending AOI remain unchanged.

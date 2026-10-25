@@ -1,0 +1,111 @@
+{
+  "schema": "teignmouth-operational-memory-preservation-v1",
+  "recordedOn": "2026-10-24",
+  "checks": {
+    "activation_disabled": true,
+    "unchanged_timing_policy": true,
+    "unchanged_eligible_consumed_trials": true,
+    "unchanged_legacy_code_maps": true,
+    "extension_paths_match_runner": true,
+    "all_extension_hashes_match_files": true,
+    "source_manifest_matches_pin": true,
+    "release_assets_match_pins": true,
+    "aoi_stays_pending_2km_tq1_4hn": true,
+    "bootstrap_proposal_unchanged": true,
+    "original_user_approval_unchanged": true,
+    "collar05_directory_absent": true,
+    "dispatch_and_consumed_permits_absent": true,
+    "codex_trial_evidence_untouched": true
+  },
+  "current": {
+    "activation": {
+      "enabled": false,
+      "status": "pending_independent_sol_review_and_coordinator_approval"
+    },
+    "transitionConfigSha256": "d73ff3db33cf28d3c23c1abae0784f413bb2863a75b6223403faa32a90a3bf95",
+    "transitionSpecSha256": "2765303ce7b87f484778963d06ceb4b3b9446852d3df335775d4c66a3e4402de",
+    "sourceManifestSha256": "e2a5237d99fd8b0b0dd0174430ba18b58f2d778f498275c609c24bed5c3ccf8c",
+    "aoi": {
+      "postcode": "TQ1 4HN",
+      "selectionStatus": "selected_pending_coverage",
+      "coverageStatus": "not_checked",
+      "widthM": 2000.0,
+      "heightM": 2000.0,
+      "bbox": [
+        290108.9018176432,
+        64353.48350844931,
+        292108.9018176432,
+        66353.48350844931
+      ]
+    },
+    "releaseFiles": {
+      "buildings/buildings.json": {
+        "path": "public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\buildings\\buildings.json",
+        "expectedSha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58",
+        "actualSha256": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58",
+        "passes": true
+      },
+      "heightfield.f32": {
+        "path": "public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\heightfield.f32",
+        "expectedSha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af",
+        "actualSha256": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af",
+        "passes": true
+      },
+      "inventory.json": {
+        "path": "public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\inventory.json",
+        "expectedSha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+        "actualSha256": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+        "passes": true
+      },
+      "manifest.json": {
+        "path": "public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\manifest.json",
+        "expectedSha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a",
+        "actualSha256": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a",
+        "passes": true
+      },
+      "ready.json": {
+        "path": "public\\worlds\\torquay-poc-001-2km\\ready.json",
+        "expectedSha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+        "actualSha256": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+        "passes": true
+      },
+      "roads/manifest.json": {
+        "path": "public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\roads\\manifest.json",
+        "expectedSha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6",
+        "actualSha256": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6",
+        "passes": true
+      },
+      "roads/roads.json": {
+        "path": "public\\worlds\\torquay-poc-001-2km\\releases\\616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a\\roads\\roads.json",
+        "expectedSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+        "actualSha256": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986",
+        "passes": true
+      }
+    },
+    "collar05DirectoryCreated": false,
+    "permitCreated": false
+  },
+  "beforeImages": {
+    "transitionConfig": {
+      "path": ".codex\\history\\2026-10-24-operational-memory\\config-before.json",
+      "sha256": "06e040b0018c89abc629963a86735704ae0a2343bac947393ca9a28139429e20"
+    },
+    "transitionSpec": {
+      "path": ".codex/history/2026-10-24-operational-memory/spec-before/Teignmouth-topology-validation-v2-spec.md",
+      "sha256": "b7603f9fdac02e1bc67badbdbc35b0e6a3ca7bf8176bea5b648071280555c3bd"
+    },
+    "checkpoint": {
+      "path": ".codex/history/2026-10-24-operational-memory/checkpoint-before.md",
+      "sha256": "01ad4ea74ed54f4e1f769d61a7fc27d33e9b02fc32ffd684c5f4e1d68d2db6ee"
+    },
+    "sourceFiles": "Some source files were already dirty when this task resumed; their earlier byte copies could not be reconstructed. The pre-turn extension hashes remain in config-before.json, and this limitation is disclosed in the handback."
+  },
+  "immutableHistoricalHashes": {
+    "approvedBootstrapProposalSha256": "63cc4ca3a01906b71514d10590da4692399e91aa4e8ecefbc955cad627f2640f",
+    "originalUserApprovalSha256": "dd5ea5f78f0cb6c6d255be20fe903a5f3a288c14bad32873a1c68dae08b26089",
+    "legacyRoad05CodeHashesUnchanged": true,
+    "legacyFlip05CodeHashesUnchanged": true,
+    "consumedTrialIdsUnchanged": true
+  },
+  "changedEvidenceRootStatus": ""
+}

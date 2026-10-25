@@ -1,0 +1,71 @@
+{
+  "activationEnabled": false,
+  "approvalUnchanged": true,
+  "checkpointUtf8Valid": true,
+  "exactTransitions": {
+    ".codex/torquay-plan-implementation.md": {
+      "after": {
+        "byteLength": 5108,
+        "sha256": "b3c9cbce44db6d55980a2cadf1549f223aeb6348f0986b62ce25350b917302ee"
+      },
+      "before": {
+        "byteLength": 4294,
+        "sha256": "ba74d316e0a9810cf32137aa465f0febbbe8c52b82d1ca7a43d8481603feeff8"
+      }
+    },
+    "config/road-surface-teignmouth-topology-transition-v2.json": {
+      "after": {
+        "byteLength": 14794,
+        "sha256": "06e040b0018c89abc629963a86735704ae0a2343bac947393ca9a28139429e20"
+      },
+      "before": {
+        "byteLength": 14794,
+        "sha256": "dde0e573b71cba27b3346fcc494ee59c5dcf96bc51454528ddaf86615d42cbe1"
+      }
+    },
+    "docs/milestones/artifacts/Teignmouth-unicode-timing/bootstrap/cap-removal/implementation-handback.md": {
+      "after": {
+        "byteLength": 6865,
+        "sha256": "14ac9f8c3c89d76a32ff68223b6e7ea7047e222998686dd9602f992e1d4b2127"
+      },
+      "before": {
+        "byteLength": 6381,
+        "sha256": "17194f03e95cbfd58a391f6fcc5ed38b7353e7e363265e5ba4c29332c1418cf1"
+      }
+    },
+    "pipeline/scripts/assess_teignmouth_memory_admission.py": {
+      "after": {
+        "byteLength": 9579,
+        "sha256": "84433a96e01d047ee57f781a01251b1d7a1126fdb11efc6087f3b4f693c196dd"
+      },
+      "before": {
+        "byteLength": 8598,
+        "sha256": "edb8343213e37e1a189fc20764f947fb242a45fa78cdca59d161f2e4de5f83aa"
+      }
+    },
+    "pipeline/tests/test_teignmouth_memory_admission.py": {
+      "after": {
+        "byteLength": 8117,
+        "sha256": "3518887935dc5d4a1b5baa3e245ad3d215f09d14a29d1cdb1e5dd950f8572878"
+      },
+      "before": {
+        "byteLength": 4972,
+        "sha256": "b5dab8e1bc82a01fb07540876d43f7b3003728d6737893e969a6101f0b3fa265"
+      }
+    }
+  },
+  "extensionPinCount": 24,
+  "nativeTestFunctionUnchanged": true,
+  "pendingMarkerCount": 1,
+  "pinMismatches": [],
+  "processModuleUnchanged": true,
+  "proposalUnchanged": true,
+  "protectedCount": 8163,
+  "protectedMismatches": [],
+  "rawInitialEvidenceUnchanged": {
+    "assessment-command.json": true,
+    "checks.json": true,
+    "source-assessment.child.json": true,
+    "source-assessment.json": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "-B",
+    "C:\\vibe\\localSimulator\\pipeline\\scripts\\assess_teignmouth_memory_admission.py",
+    "--output",
+    "C:\\vibe\\localSimulator\\docs\\milestones\\artifacts\\Teignmouth-unicode-timing\\bootstrap\\cap-removal\\source-assessment.json"
+  ],
+  "cwd": "C:\\vibe\\localSimulator",
+  "exitCode": 2,
+  "externalElapsedSeconds": 6.688328299991554,
+  "externalGuardSeconds": 35,
+  "internalGuardianDeadlineSeconds": 30,
+  "scriptSha256": "edb8343213e37e1a189fc20764f947fb242a45fa78cdca59d161f2e4de5f83aa",
+  "stderr": "",
+  "stdout": ""
+}

@@ -1,0 +1,37 @@
+{
+  "correctionCycle": 2,
+  "reviewFindingsAddressedInCode": [
+    1,
+    2
+  ],
+  "tests": "20 passed",
+  "ruffCheck": "passed",
+  "ruffFormat": "passed",
+  "pyCompile": "passed",
+  "repositoryRootImportSmoke": "passed under pipeline virtual environment; no GIS data read",
+  "combinedPrimaryAndTelemetryErrorRegression": "passed",
+  "gitDiffCheck": "passed",
+  "build": {
+    "ordinal": 3,
+    "status": "STOP",
+    "primaryError": "ModuleNotFoundError: No module named numpy",
+    "tracebackPath": "build-3/report.json"
+  },
+  "preservation": {
+    "passes": true,
+    "comparedPaths": 915,
+    "changedPaths": [],
+    "includesCorrection1Evidence": true,
+    "includesHistoricalCorridorEvidence": true
+  },
+  "peakWorkingSetBytes": 26271744,
+  "candidateGeometryEvaluated": false,
+  "roadBuildingWalkGates": {
+    "roadDrapeAndOwnership": false,
+    "completeBuildingContact": false,
+    "sharedWalkSurface": false
+  },
+  "candidateEligibleForServing": false,
+  "browserRun": false,
+  "nextFixSuggestion": "A new authorized Luna correction should make the documented root-level system-Python entry point use the already-present pipeline/.venv interpreter (or otherwise load its existing site-packages) before attempting the next uniquely reserved build ordinal; build ordinal 3 is consumed and must not be rerun."
+}

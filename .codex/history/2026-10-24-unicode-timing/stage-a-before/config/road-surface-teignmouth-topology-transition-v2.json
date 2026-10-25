@@ -1,0 +1,184 @@
+{
+  "activation": {
+    "enabled": false,
+    "status": "pending_independent_sol_review_and_coordinator_approval"
+  },
+  "approval_chain": {
+    "accepted_checkpoint_marker_prefix": "TEIGNMOUTH_VALIDATION_V2_ACCEPTED receipt_sha256=",
+    "coordinator_disposition": "ACCEPTED",
+    "coordinator_receipt_path": "docs/milestones/artifacts/Teignmouth-topology-validation-v2/coordinator-acceptance.json",
+    "independent_sol_review_path": "docs/milestones/artifacts/Teignmouth-topology-validation-v2/independent-sol-review.json",
+    "review_disposition": "PASS"
+  },
+  "consumed_inventory": {
+    "byte_length": 2411,
+    "path": "docs/milestones/artifacts/Road-surface-treatment/teignmouth-topology-study/profiles/consumed-trials-inventory-v2.json",
+    "raw_trial_directory": ".codex/evidence/teignmouth-topology-study",
+    "sha256": "9e9c9d083014dd2649fc2b4d284a235423358466b6e91b3d07959c2369f5d8d6",
+    "tree_relative_path": "teignmouth-topology-study/profiles/consumed-trials-inventory-v2.json"
+  },
+  "consumed_trial_ids": [
+    "flip-05",
+    "road-05"
+  ],
+  "eligible_trial_ids": [
+    "collar-05",
+    "local-025",
+    "local-0125"
+  ],
+  "extension_code_hashes": {
+    "docs/milestones/Teignmouth-process-validation.md": "c338472a4889808bb00017575035d264f673c5fd5eddcb27496ce2936138ac20",
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md": "16358db4e1dd40349fb9d7550f80e80cbeac4489bb263e56aa7f38949af26b45",
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol.py": "666f71781fa3e76552a9fb841ea921b4971045c745144c3cb3d653e30829c312",
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_all_codes.py": "a13338a43b6a5d1b9db32e7abb7eb16318c1ce69c09ecfc2622e69de42726421",
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_optimized.py": "c49b40f52968e951a2d707e39918b7f9547af97f115e38b4c685f57f50f82240",
+    "pipeline/scripts/profile_teignmouth_flip05_performance_v2.py": "890a071c6ff25091d6c4171bac33266fdf5d560ac581c3904c3c95ad7fce7545",
+    "pipeline/scripts/profile_teignmouth_frame_selected_sol.py": "f257d652cedc79335e6e29e89fc5e52beb43ecbba4c307b1ccf7c49f46df5b2a",
+    "pipeline/scripts/profile_teignmouth_process_validation_v1.py": "3be62e0f09a6296358657b4cb7199198ef84e0f15d8f1b315391a892e06e528e",
+    "pipeline/scripts/profile_teignmouth_validation_v2.py": "215d0a7407964e20a64562f56e111ff1ec330ba47edfd5196fb7d4558ba02480",
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py": "fd32e553e4fe9e832312274c698a463f15545933bcd1b57b5a98122612aaa55e",
+    "pipeline/scripts/run_teignmouth_validation_worker_v1.py": "33c4ae829b3e67262e73a0b30e0c24d22b3ac159f001e2c485049622848fd611",
+    "pipeline/tests/test_road_surface_validation_transition_v2.py": "43d59da23e3fd1fae5e094228d2fbba81d51867886da5980dfbb91ab22923f2a",
+    "pipeline/tests/test_road_surface_validation_v2.py": "04e12c629e3d27c9c875bf4a024223c82c8b4d56fcd0562da076bdb819796f01",
+    "pipeline/tests/test_teignmouth_cached_supervisor.py": "3174170724031c4882e2c84ea078dce13e9fe54a0cb8fb01595d34fc502422b1",
+    "pipeline/tests/test_teignmouth_complete_profile.py": "4175abd0f6ccf91f07093cf622e1d187a71b771fc4450d4ceaa31f9787432575",
+    "pipeline/tests/test_teignmouth_validation_process.py": "84b68cbe9ed34f03bd2462e028d4dadb877e6c7d498959057d19c1e2343072d8",
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py": "5ce9d549eca7c789df9244967f0555886559145a10b3f84c073cd4537fd426b2",
+    "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py": "2a2d09041f74cf5bf0389fab7203e5fad94d113a27ebe725a0784c80c5b1941b",
+    "pipeline/torquay_pipeline/road_surface_validation_v1.py": "50f97a2b7fb09f10094de8932eeb05a4858f978edfec35e3e51a3682071c501a",
+    "pipeline/torquay_pipeline/road_surface_validation_v2.py": "4b8182f9c584d4ca4b7b67017cce7374e607f75476628d3d0d40d6b28eafe587"
+  },
+  "extension_code_paths": [
+    "config/road-surface-teignmouth-topology-transition-v2.json",
+    "docs/milestones/Teignmouth-topology-validation-v2-spec.md",
+    "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py",
+    "pipeline/torquay_pipeline/road_surface_validation_v2.py",
+    "pipeline/torquay_pipeline/road_surface_validation_v1.py",
+    "pipeline/scripts/run_teignmouth_topology_validation_v2.py",
+    "pipeline/scripts/profile_teignmouth_validation_v2.py",
+    "pipeline/scripts/profile_teignmouth_flip05_performance_v2.py",
+    "pipeline/tests/test_road_surface_validation_transition_v2.py",
+    "pipeline/tests/test_road_surface_validation_v2.py",
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol.py",
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_optimized.py",
+    "pipeline/scripts/profile_teignmouth_complete_dispatch_sol_all_codes.py",
+    "pipeline/scripts/profile_teignmouth_frame_selected_sol.py",
+    "pipeline/tests/test_teignmouth_complete_profile.py",
+    "pipeline/tests/test_teignmouth_cached_supervisor.py",
+    "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+    "pipeline/scripts/run_teignmouth_validation_worker_v1.py",
+    "pipeline/scripts/profile_teignmouth_process_validation_v1.py",
+    "pipeline/tests/test_teignmouth_validation_process.py",
+    "docs/milestones/Teignmouth-process-validation.md"
+  ],
+  "format_version": 2,
+  "input_state_transition": {
+    "checkpoint_path": ".codex/torquay-plan-implementation.md",
+    "current_evidence_tree_sha256": "4413d4fc79adcf846d578e51fa2d65ee46b674721b1e1e61759fae1a0214f94a",
+    "evidence_tree_path": "docs/milestones/artifacts/Road-surface-treatment",
+    "flip05_interrupted_checkpoint_sha256": "eb5a4ddac059abdbfff1dd9006412e07396028362e5cd9ced4185f173154bf7f",
+    "implementation_start_checkpoint_sha256": "5b0cfb793f3780b9ee2af6087d643a22cde32b43c9b7442ed9940306b09a17a6",
+    "legacy_checkpoint_sha256": "a75afe6f29d99e35e78f58bbc70ffe005d1245823ad643cbc90d453a1cfe3e75",
+    "legacy_evidence_inventory_exclusion_path": "docs/milestones/artifacts/Road-surface-treatment/teignmouth-topology-study/profiles/consumed-trials-inventory-v2.json",
+    "legacy_evidence_tree_sha256": "a83f7f30ebd3fba437364a570ee3349e72bec7b62e5bc9304708b1d50512c688",
+    "required_checkpoint_marker": "TEIGNMOUTH_VALIDATION_V2_REVIEW_PENDING",
+    "workflow_metadata_transition": {
+      "agents_before_path": ".codex/history/2026-10-23-workflow-update/AGENTS-before.md",
+      "agents_path": "AGENTS.md",
+      "archive_manifest_path": ".codex/history/2026-10-23-workflow-update/manifest.json",
+      "archive_manifest_sha256": "aca7ce0ee9951fc15e99f358720c8af7c9ca6883aae0d985d3e0c2fcc4010301",
+      "authorization_path": "docs/agent-workflow.md",
+      "authorization_sha256": "88a605214ec8783157df337c2d6f6adc993f69b779df33881b151cd65d2d93eb",
+      "checkpoint_before_path": ".codex/history/2026-10-23-workflow-update/checkpoint-before.md",
+      "checkpoint_before_sha256": "83c734c06760708b6b5ea737f861a234b3b46833aeec55c2a3abe609c0532814",
+      "current_agents_sha256": "0fe9529152210561e385c0e2a3116c59c5df55b2e07fe9fa1b6ae00ef541a855",
+      "id": "authorized-agent-workflow-2026-10-23",
+      "legacy_agents_sha256": "b4c1c15a75d34d8ba9cb12366ca1442bd709f692e7d7eccba66eab3f74732267"
+    }
+  },
+  "legacy_flip05_code_hashes": {
+    ".gitignore": "aeb27922fd21425787432be5d930a879271095967b04c37bf5b6dc1e928509e1",
+    "config/road-surface-teignmouth-candidate.json": "0616b0584cfc2d9043dd0b0e8c81926a45487e456855ab9375ce0878c6412140",
+    "config/road-surface-teignmouth-topology-study.json": "5c292d2afb43f6f67b83d34a663494a138506bee18ea00d33b61f88569a1a26d",
+    "docs/milestones/Teignmouth-topology-refinement-spec.md": "03bc2ce6e5927307245aa0470cf8cc404838b5517efec5bf5e5db689e74416a1",
+    "pipeline/scripts/run_teignmouth_topology_study.py": "1f33704b6e9103a84429097b0f6c7d153647b7092dac2d7f6e49ec97c46a141f",
+    "pipeline/tests/test_road_surface_patch.py": "676d0e01af86fee069e3e5a9ef1a4fceead54754880f4a8fd4ef48eb0480823c",
+    "pipeline/tests/test_road_surface_study.py": "3817788ce0e1b0682722fee2be8fa3b56af8905fdf8ec30ce1bb7f82320a542c",
+    "pipeline/tests/test_road_surface_topology.py": "388a83cfa0b1034fd4546155a5d812a2cc980937b9eed9ea360b6c8e8b730009",
+    "pipeline/torquay_pipeline/road_surface.py": "ef26431929a2f44b1f739a11bdd9962530f25b8c029f7f8dbf46f5ef6dfcdd7a",
+    "pipeline/torquay_pipeline/road_surface_patch.py": "fb153a57c845fc09bb3c4de4e38b5b713710399a1fb8e444640c223ed443e825",
+    "pipeline/torquay_pipeline/road_surface_study.py": "e62cd3b1dd597cd67fe4f1dbdbac7613390da15ce67d81ce54cc79c07be24cce",
+    "pipeline/torquay_pipeline/road_surface_topology.py": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880"
+  },
+  "legacy_road05_code_hashes": {
+    ".gitignore": "aeb27922fd21425787432be5d930a879271095967b04c37bf5b6dc1e928509e1",
+    "config/road-surface-teignmouth-candidate.json": "0616b0584cfc2d9043dd0b0e8c81926a45487e456855ab9375ce0878c6412140",
+    "config/road-surface-teignmouth-topology-study.json": "5c292d2afb43f6f67b83d34a663494a138506bee18ea00d33b61f88569a1a26d",
+    "docs/milestones/Teignmouth-topology-refinement-spec.md": "03bc2ce6e5927307245aa0470cf8cc404838b5517efec5bf5e5db689e74416a1",
+    "pipeline/scripts/run_teignmouth_topology_after_reconciliation.py": "e357a96def7b9ba8be83d88b14c99b029bdb0ab638f56c6570cc7ce85a3452c6",
+    "pipeline/scripts/run_teignmouth_topology_study.py": "1f33704b6e9103a84429097b0f6c7d153647b7092dac2d7f6e49ec97c46a141f",
+    "pipeline/tests/test_road_surface_patch.py": "676d0e01af86fee069e3e5a9ef1a4fceead54754880f4a8fd4ef48eb0480823c",
+    "pipeline/tests/test_road_surface_study.py": "3817788ce0e1b0682722fee2be8fa3b56af8905fdf8ec30ce1bb7f82320a542c",
+    "pipeline/tests/test_road_surface_study_reconciliation.py": "34e94ef5ea8d98fd6d7479918516922ca460591f9e5416c6b6e3c55eb40fcf75",
+    "pipeline/tests/test_road_surface_topology.py": "388a83cfa0b1034fd4546155a5d812a2cc980937b9eed9ea360b6c8e8b730009",
+    "pipeline/torquay_pipeline/road_surface.py": "ef26431929a2f44b1f739a11bdd9962530f25b8c029f7f8dbf46f5ef6dfcdd7a",
+    "pipeline/torquay_pipeline/road_surface_patch.py": "fb153a57c845fc09bb3c4de4e38b5b713710399a1fb8e444640c223ed443e825",
+    "pipeline/torquay_pipeline/road_surface_study.py": "e62cd3b1dd597cd67fe4f1dbdbac7613390da15ce67d81ce54cc79c07be24cce",
+    "pipeline/torquay_pipeline/road_surface_study_reconciliation.py": "f60d62b9ddd95d43e7892c66864643689caa53888454a9eea000e012bc9e113e",
+    "pipeline/torquay_pipeline/road_surface_topology.py": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880"
+  },
+  "pinned_inputs": {
+    "accepted_preview": {
+      "heightfield.f32": "037a74320557088135e0885386c24fdcdea6171469db1d6329c3e82997f5c1e9",
+      "manifest.json": "9a3cb6c08fb57a19f94e1215ac526b1baf28634d38be1ffc7d4ed61f2de7c6f7",
+      "qa.json": "43d7058a339416d308be09292598949d3d97f4b764a147ccc2d5fb771d434f20"
+    },
+    "base_candidate_config_path": "config/road-surface-teignmouth-candidate.json",
+    "base_candidate_config_sha256": "0616b0584cfc2d9043dd0b0e8c81926a45487e456855ab9375ce0878c6412140",
+    "implementation_start_checkpoint_sha256": "5b0cfb793f3780b9ee2af6087d643a22cde32b43c9b7442ed9940306b09a17a6",
+    "release_files": {
+      "buildings/buildings.json": "8c63da52a578207c2a11afa881fd56524df47e787bf6213d68c77b1784003a58",
+      "heightfield.f32": "c61bd03d4172bffb07be596c4f63cc11a0681d0cacd884bb7dfcf3411be815af",
+      "inventory.json": "a66d56fdc38133e0243904dc842f6a79b08c5e3075d73b83515f7c4709c90cb0",
+      "manifest.json": "588cbcb682d7e723f915cf627c15c0e641e5adf019b60cfb4d0814caccb90b3a",
+      "ready.json": "08399e71ba3a0c6d421982b5cd47973114a48060ddb4c0931378663faf07b3b4",
+      "roads/manifest.json": "ff6b46acc6ddb667e6d20a0c5d7cd88faebc754e7c7c8dfe76f33fcee5f0e8d6",
+      "roads/roads.json": "cd44d5c9aa4f8ef107176b31b86dbfe4ad5f98271ccbcbc5a05d677a38385986"
+    },
+    "release_id": "616e5f069acd6faa633a5ace3e04e1fee9d3d0fdb68c20e5ed0c29bb921a588a",
+    "source_manifest_path": "data/source-manifest.json",
+    "source_manifest_sha256": "e2a5237d99fd8b0b0dd0174430ba18b58f2d778f498275c609c24bed5c3ccf8c",
+    "study_config_path": "config/road-surface-teignmouth-topology-study.json",
+    "study_config_sha256": "5c292d2afb43f6f67b83d34a663494a138506bee18ea00d33b61f88569a1a26d",
+    "study_id": "teignmouth-topology-refinement-2026-10-23",
+    "study_spec_path": "docs/milestones/Teignmouth-topology-refinement-spec.md",
+    "study_spec_sha256": "03bc2ce6e5927307245aa0470cf8cc404838b5517efec5bf5e5db689e74416a1",
+    "transition_spec_path": "docs/milestones/Teignmouth-topology-validation-v2-spec.md",
+    "transition_spec_sha256": "16358db4e1dd40349fb9d7550f80e80cbeac4489bb263e56aa7f38949af26b45"
+  },
+  "purpose": "Additive, disabled transition for remaining Teignmouth topology trials; exact existing gate arithmetic and 2,000-iteration limit retained.",
+  "reconciliation_code_paths": [
+    "pipeline/torquay_pipeline/road_surface_study_reconciliation.py",
+    "pipeline/scripts/run_teignmouth_topology_after_reconciliation.py",
+    "pipeline/tests/test_road_surface_study_reconciliation.py"
+  ],
+  "timing_policy": {
+    "automatic_limit_escalation": false,
+    "finalization_cutoff_seconds": 135.0,
+    "finalization_window_for": [
+      "protected-input after-snapshot",
+      "serialization",
+      "aggregate write"
+    ],
+    "finalization_window_seconds": 10.0,
+    "invocation_clock": "monotonic T0 captured before per-trial preparation",
+    "maximum_iterations": 2000,
+    "preparation_and_solver_deadline_seconds": 120.0,
+    "qualification_projected_end_to_end_seconds": 125.0,
+    "retry_allowed": false,
+    "timeout_consumes_write_once_trial": true,
+    "validation_cutoff_seconds": 125.0,
+    "validation_includes_assembly_and_resource_determinism": true
+  },
+  "transition_id": "teignmouth-validation-window-120-125-135-v2"
+}

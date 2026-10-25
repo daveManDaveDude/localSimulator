@@ -1,0 +1,2738 @@
+{
+  "schema": "torquay-attempt-ledger-v1",
+  "issueId": "Teignmouth-float32-topology-representation-1",
+  "status": "post-review9-single-luna-correction-sol-plan-in-progress",
+  "authorization": "User explicitly authorized one further bounded operational-supervisor correction. Disposition 34 reserves a Sol remediation plan and one Luna submission in the existing four files only; candidate budgets unchanged; no runtime execution.",
+  "specification": "docs/milestones/artifacts/Teignmouth-float32-topology/spec.md",
+  "solPlan": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan.md",
+  "sourceBindingsStatus": "Initial implementation completed and reviewed; prebuild-1 manifest is immutable history. Freeze a fresh correction-1 manifest before correction execution, then a fresh build manifest after correction acceptance.",
+  "predecessor": {
+    "issueId": "Teignmouth-corridor-prototype-continuation-1",
+    "status": "exhausted-NEEDS-USER-DECISION",
+    "immutableLedger": "docs/milestones/artifacts/Teignmouth-corridor-prototype/continuation-1/attempt-ledger.json",
+    "lunaCorrectionsConsumed": 4,
+    "solCorrectionsConsumed": 1,
+    "implementationBuildsConsumed": 6,
+    "diagnosticsConsumed": 1,
+    "confirmationBuildsConsumed": 0,
+    "countersResetOrTransferred": false
+  },
+  "roles": {
+    "orchestration": "gpt-6-luna medium",
+    "planningDiagnosisReview": "gpt-6.1-sol medium",
+    "initialImplementationAndLunaCorrections": "gpt-6-luna high",
+    "escalatedCorrection": "gpt-6.1-sol medium only after four Luna corrections reviewed",
+    "independence": "Sol reviewer must not implement this issue; a Sol implementer requires another Sol session for review.",
+    "actualCoordinatorSettings": "unknown"
+  },
+  "candidateOnlyLimits": {
+    "absoluteTerrainChangeM": "<6.5",
+    "positiveAddedGradientMPerM": "<1.0",
+    "crossSlopePercent": "<=5",
+    "fullWidthSpanM": "<=0.30",
+    "centerlineDeviationM": "<=2.0",
+    "absoluteLongitudinalGradePercent": "<=10",
+    "otherInheritedLimitsUnchanged": true,
+    "globalProductPolicyChanged": false
+  },
+  "proposedSingleFrame": {
+    "originXYZM": [
+      -140,
+      0,
+      -95
+    ],
+    "selectedAsProvenFix": false,
+    "originSweepAllowed": false,
+    "collisionGuardRelaxationAllowed": false,
+    "boundsGlobalXZ": [
+      -182,
+      -136,
+      -98,
+      -54
+    ]
+  },
+  "budget": {
+    "initialImplementation": {
+      "used": 1,
+      "reserved": 0
+    },
+    "diagnostics": {
+      "maximum": 2,
+      "used": 2,
+      "reserved": 0,
+      "maximumSecondsEach": 120
+    },
+    "lunaCorrectionCycles": {
+      "maximum": 4,
+      "used": 4,
+      "reserved": 0
+    },
+    "solCorrections": {
+      "maximum": 1,
+      "used": 1,
+      "reserved": 0,
+      "eligibleAfterLunaCyclesReviewed": 4
+    },
+    "implementationBuilds": {
+      "maximum": 6,
+      "used": 2,
+      "reserved": 0,
+      "maximumSecondsEach": 180
+    },
+    "independentConfirmationBuilds": {
+      "maximum": 1,
+      "used": 0,
+      "reserved": 0,
+      "maximumSecondsEach": 180,
+      "eligibleOnlyAfterAllOfflineGatesPass": true
+    },
+    "totalFullBuilds": {
+      "maximum": 7,
+      "used": 2,
+      "reserved": 0
+    },
+    "parameterSweeps": false,
+    "arbitraryMemoryCap": false
+  },
+  "servingEligible": false,
+  "executionAuthorizedByPlanningDispatch": false,
+  "events": [
+    {
+      "event": "separate-follow-on-planning-authorized",
+      "date": "2026-10-24",
+      "actor": "user",
+      "priorIssueReopened": false
+    },
+    {
+      "event": "sol-planning-documents-submitted",
+      "date": "2026-10-24",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "numericalAttemptsSpent": 0,
+      "codeOrPackagesEdited": false
+    },
+    {
+      "event": "coordinator-accepted-and-diagnostic-1-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "authorization": "user replied Continue after being asked to authorize a separate bounded Float32 topology representation issue",
+      "diagnosticOrdinal": 1,
+      "diagnosticLimitSeconds": 120,
+      "implementationOrBuildAuthorized": false,
+      "fixedOriginXYZM": [
+        -140,
+        0,
+        -95
+      ],
+      "collisionGuardRelaxationAllowed": false,
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-acceptance-1.md"
+    },
+    {
+      "event": "diagnostic-1-consumed-GO-for-coordinator-contract-review",
+      "date": "2026-10-24",
+      "actor": "/root/beamng_corridor_plan",
+      "model": "gpt-6.1-sol",
+      "diagnosticOrdinal": 1,
+      "diagnosticsUsed": 1,
+      "diagnosticsReserved": 0,
+      "implementationBuildsSpent": 0,
+      "correctionCyclesSpent": 0,
+      "outcome": "GO_FOR_COORDINATOR_CONTRACT_REVIEW",
+      "elapsedSeconds": 35.97703440001351,
+      "report": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-1/report.json",
+      "previousBoundLedgerSha256": "fd1abad37bb44044ca5c90757651759caffffeaa828b438517e3ce848db046f7",
+      "candidateServingAuthorized": false
+    },
+    {
+      "event": "coordinator-disposition1-go-initial-implementation-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "GO_FOR_FIXED_FRAME_IMPLEMENTATION_ONLY",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-1.md",
+      "evidenceSha256": "b8fa820e4c963fe5b7fed50f86611c226e67d770e50a047b336bcf5aa7747062",
+      "diagnostic1Status": "GO_FOR_COORDINATOR_CONTRACT_REVIEW",
+      "initialImplementationReserved": true,
+      "implementationBuildOrdinal": 1,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "luna-initial-implementation-completed",
+      "date": "2026-10-24",
+      "actor": "/root/corridor_continuation_luna",
+      "reviewedBy": "/root/sol_correction_reviewer",
+      "focusedTestsPassed": 8,
+      "ruffCheckPassed": true,
+      "ruffFormatCheckPassed": true,
+      "pyCompilePassed": true,
+      "exactVenvImportSmoke": "PASS_IMPORT_ONLY",
+      "candidateBuildRun": false,
+      "prebuildManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/prebuild-1/input-manifest.json"
+    },
+    {
+      "event": "independent-sol-review-1-no-go-build",
+      "date": "2026-10-24",
+      "actor": "/root/sol_correction_reviewer",
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-1.md",
+      "reviewEvidenceSha256": "a84d8e3ea9b517b985560506b2d5ab6d3ee9118800b44ab025d525b76213f50e",
+      "manifestFilesReverified": 184,
+      "outcome": "NO_GO_FOR_BUILD_1",
+      "candidateBuildRun": false,
+      "blockers": [
+        "section_QA_recasts_world_XZ_float32",
+        "failure_evidence_not_incremental",
+        "missing_enforced_deadline_resource_and_postrun_integrity_evidence",
+        "source_plane_and_serialization_displacement_claims_exceed_measurements"
+      ]
+    },
+    {
+      "event": "coordinator-disposition-2-luna-correction-1-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "NO_GO_BUILD_1_AUTHORIZE_LUNA_CORRECTION_1_ONLY",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-2.md",
+      "evidenceSha256": "0fcfa5bb44ec08cfa902241fb0399be3cb02127c4ff2dbf44a385aee234a7498",
+      "correctionOrdinal": 1,
+      "correctionReserved": true,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-3-correction-1-complete-awaiting-review",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "LUNA_CORRECTION_1_CONSUMED_FORWARD_FOR_DISTINCT_SOL_REVIEW_NO_BUILD_AUTHORIZED",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-3.md",
+      "evidenceSha256": "2de9104e0d5b438a2052aaed27170310a062635c167eb78eaf4b8b07abf4e5b1",
+      "manifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-1/input-manifest.json",
+      "manifestSha256": "9b7157e870bec871106ad676a6201e89a039cfd24dcaf5d3917b77d98c8c7fe9",
+      "focusedTestsReportedPassed": 12,
+      "initialRootCollectionFailureDisclosed": true,
+      "candidateBuildRun": false,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-sol-review-2-no-go-build",
+      "date": "2026-10-24",
+      "actor": "/root/sol_correction_reviewer",
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-2.md",
+      "reviewEvidenceSha256": "d3e6734c50d15b4019b7e865833a60afa2d66d2375065dc9689f29f3b08476cd",
+      "manifestFilesReverified": 188,
+      "outcome": "NO_GO_FOR_BUILD_1",
+      "candidateBuildRun": false,
+      "blockers": [
+        "serialized_position_order_is_XZY_instead_of_XYZ",
+        "serialization_displacement_baseline_axis_order_is_invalid"
+      ]
+    },
+    {
+      "event": "coordinator-disposition-4-luna-correction-2-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "NO_GO_BUILD_1_AUTHORIZE_LUNA_CORRECTION_2_ONLY",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-4.md",
+      "evidenceSha256": "49c00e8af057c6de45da57264b1140eee8ee26e132fb2b01c44fafc1a20d2067",
+      "correctionOrdinal": 2,
+      "correctionReserved": true,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-5-correction-2-complete-awaiting-review",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "LUNA_CORRECTION_2_CONSUMED_FORWARD_FOR_DISTINCT_SOL_REVIEW_NO_BUILD_AUTHORIZED",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-5.md",
+      "evidenceSha256": "0a3326f968de970a34f7887ff6e981425a4133d1126b5d9e4372c7b5e217220c",
+      "manifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/input-manifest.json",
+      "manifestSha256": "4f3c61472f6dad9e5de1f9a945fe391a5388f6b6f92adb2827790b70f19cc185",
+      "focusedTestsReportedPassed": 13,
+      "candidateBuildRun": false,
+      "sourceLoadRun": false,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-sol-review-3-go-build-1",
+      "date": "2026-10-24",
+      "actor": "/root/sol_correction_reviewer",
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-3.md",
+      "reviewEvidenceSha256": "4d827ee146cb16bb0268a63cba1372d26c6baf960262f78f17fa21e43a05bd3d",
+      "manifestFilesReverified": 193,
+      "outcome": "GO_FOR_COORDINATOR_RESERVATION_OF_OFFLINE_BUILD_1",
+      "candidateBuildRun": false,
+      "servingAuthorized": false
+    },
+    {
+      "event": "coordinator-disposition-6-build-1-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "GO_ONE_BOUNDED_OFFLINE_BUILD_1_ONLY",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-6.md",
+      "evidenceSha256": "f31e76689230a57c3d7fee30f5b8f4151d78a18dba3cc76b51ea3849125f7d5e",
+      "inputManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/input-manifest.json",
+      "inputManifestSha256": "4f3c61472f6dad9e5de1f9a945fe391a5388f6b6f92adb2827790b70f19cc185",
+      "independentlyVerifiedFiles": 193,
+      "mismatches": 0,
+      "candidateOutputAbsentBeforeReservation": true,
+      "maximumSeconds": 180,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-7-build-1-consumed-blocked-exception",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "BUILD_1_CONSUMED_BLOCKED_EXCEPTION_NO_RETRY_PENDING_INDEPENDENT_REVIEW",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-7.md",
+      "evidenceSha256": "7f087bbf35a72191998a6ff489d7fa9c6bb30064ad386ecf777ba7181e71d437",
+      "buildReport": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/build-report.json",
+      "buildReportSha256": "3d9012f05ec6641e106ccf87391d1da7b804eab78090bfeec054de1652960ae1",
+      "supervisorReport": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/supervisor-report.json",
+      "supervisorReportSha256": "481caa888a03b2c9af75a8b44605c4650527209739d3fcd5d9b036b78c36b0a8",
+      "elapsedSeconds": 16.182695900002727,
+      "peakWorkingSetBytes": 607260672,
+      "preAndPostPreservationPassed": true,
+      "completedGates": 0,
+      "unavailableGates": 8,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-sol-review-4-build-1-evidence-consistent",
+      "date": "2026-10-24",
+      "actor": "/root/sol_correction_reviewer",
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-4.md",
+      "reviewEvidenceSha256": "2b4b0acb689e73996bddfe1739ed941bbee77883c4a503b5a038b548a9c28094",
+      "outcome": "BLOCKED_EXCEPTION_EVIDENCE_CONSISTENT_NO_RETRY",
+      "resourceAndHashRecomputed": false,
+      "candidateBuildRun": false,
+      "correction3EligibleForCoordinatorConsiderationAfter-sol-diagnosis": true
+    },
+    {
+      "event": "coordinator-disposition-8-await-sol-chart-analysis",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "BUILD_1_CONSUMED_AWAIT_READ_ONLY_SOL_DIAGNOSIS_NO_NEW_EXECUTION_AUTHORIZED",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-8.md",
+      "evidenceSha256": "ad11bf326c809820960aaf793c64e507ee31089a9a585f43c1c1bdb7a17eeb56",
+      "implementationBuildsUsed": 1,
+      "implementationBuildReserved": false,
+      "lunaCorrectionsUsed": 2,
+      "lunaCorrectionsReserved": 0,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "sol-planner-chart-support-diagnosis-complete",
+      "date": "2026-10-24",
+      "actor": "/root/beamng_corridor_plan",
+      "plan": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-3.md",
+      "planSha256": "62cdb1930b484af528c48cb3e65da54866fa0d37a6a5bcd9d7d4db370d3b2ee6",
+      "candidateBuildRun": false,
+      "diagnosticRun": false,
+      "codeEdited": false
+    },
+    {
+      "event": "coordinator-disposition-9-luna-correction-3-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "AUTHORIZE_LUNA_CORRECTION_3_ONLY_NO_BUILD",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-9.md",
+      "evidenceSha256": "f6fe7e7580ecfc08613e817db18958e1f296f1d490524a96a0e835fb06b45b4b",
+      "correctionOrdinal": 3,
+      "correctionReserved": true,
+      "implementationBuildReserved": false,
+      "diagnosticReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-10-correction-3-complete-awaiting-review",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "LUNA_CORRECTION_3_CONSUMED_FORWARD_FOR_DISTINCT_SOL_REVIEW_NO_BUILD_AUTHORIZED",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-10.md",
+      "evidenceSha256": "d3d62a57396b35e98f8cfa9ff71ceccb20a0bcdf8a7e004795810d88ff81f080",
+      "manifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-3/input-manifest.json",
+      "manifestSha256": "dac24d33876344de102753f05b0840ffd8a237a7ba6b43f655f7af437bda6cef",
+      "boundFiles": 199,
+      "coordinatorRehashMissing": 0,
+      "coordinatorRehashMismatches": 0,
+      "focusedTestsReportedPassed": 18,
+      "candidateBuildRun": false,
+      "sourceLoadRun": false,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-sol-review-5-correction-3-code-go-manifest-no-go",
+      "date": "2026-10-24",
+      "actor": "/root/sol_correction_reviewer",
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-5.md",
+      "reviewEvidenceSha256": "78ab8a0a025da97c2297286d754662740ce3603748e4325c2e2d51ab15ec21e4",
+      "manifestFilesReverified": 199,
+      "outcome": "GO_CORRECTION_3_CODE_NO_GO_BUILD2_CURRENT_MANIFEST_MISSING_BUILD1_EVIDENCE",
+      "candidateBuildRun": false
+    },
+    {
+      "event": "coordinator-disposition-11-prepare-supplemental-build2-manifest",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "CORRECTION_3_GO_BUILD2_NOT_RESERVED_PREPARE_FULL_PRIOR_EVIDENCE_BINDING",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-11.md",
+      "evidenceSha256": "1693e3bbdbd61c40d13cba69bc321c3a16b176e78a1cd21659a57c868074fc80",
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-sol-review-6-build2-manifest-go",
+      "date": "2026-10-24",
+      "actor": "/root/sol_correction_reviewer",
+      "reviewEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-6.md",
+      "reviewEvidenceSha256": "b3d790d4c1785b0a85978d0b63657deb0c354ca58cf5b01b8d42c63b9d0ec166",
+      "manifestFileCount": 225,
+      "priorBuild1EvidenceFileCount": 20,
+      "outcome": "GO_FOR_BUILD2_RESERVATION",
+      "candidateBuildRun": false
+    },
+    {
+      "event": "coordinator-disposition-12-build2-reserved",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "decision": "GO_ONE_BOUNDED_OFFLINE_BUILD_2_ONLY",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-12.md",
+      "evidenceSha256": "988dddc2a040ac17fd9ddb42f6d5d091585ab98ba0f605fbc34c9a3eb86544e9",
+      "inputManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/build-2/input-manifest.json",
+      "inputManifestSha256": "95fd731cf2ca155a1b497ab82350021b4dcc65d5d2c71250447c076488faf7e2",
+      "implementationBuildOrdinal": 2,
+      "maximumSeconds": 180,
+      "candidateOutputAbsent": true,
+      "implementationBuildReserved": true,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-13-build2-consumed-pending-diagnostic-plan",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "BUILD2_CONSUMED_BLOCKED_EXCEPTION_AWAIT_DIAGNOSTIC_PLAN",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-13.md",
+      "evidenceSha256": "142588fd22898125025f2d7cc1710627e36fc2c00687ed96b0ae9e53b9a39494",
+      "implementationBuildOrdinal": 2,
+      "implementationBuildUsed": true,
+      "implementationBuildReserved": false,
+      "implementationBuildsUsed": 2,
+      "lunaCorrectionsUsed": 3,
+      "diagnosticsUsed": 1,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-14-diagnostic2-plan-accepted-preparation-only",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "PLAN_ACCEPTED_NO_DIAGNOSTIC_RESERVATION",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-14.md",
+      "evidenceSha256": "922c6471d747dfd36cc416d6b01a047ca1d9cba603806f88f8504f7295d9f378",
+      "planSha256": "396ef28bfe38fd1c693aeda38f8538cfd166f6ac6b52e450977ef1dee8d019df",
+      "diagnosticsUsed": 1,
+      "diagnosticsReserved": 0,
+      "implementationBuildsUsed": 2,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-15-harness-correction-complete-pending-review",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "HARNESS_PREPARATION_COMPLETE_NO_DIAGNOSTIC_RESERVATION",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-15.md",
+      "evidenceSha256": "da0608ffad5192b7a0714ede8de9bdca1809803bad4e9685b9f960dbaf53709a",
+      "planSha256": "017d81efdce6f2a6e8f28d29b3fb7b5fef34f8d0ff84e16c9bca5447bd9a219a",
+      "runnerSha256": "298f5865fc0cc3262e6e36ecde7383f01cd5ba91dd3e37199c16b5f573a7ff5c",
+      "supervisorSha256": "a35a474e05c7efc4aa001ad261ea93ba3431a513ff9fb056189b3fcfb3be9dc4",
+      "diagnosticsUsed": 1,
+      "diagnosticsReserved": 0,
+      "implementationBuildsUsed": 2,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "coordinator-disposition-16-diagnostic2-reserved-awaiting-manifest-review",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "RESERVE_ONE_DIAGNOSTIC2_ONLY_AFTER_MANIFEST_REVIEW",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-16.md",
+      "evidenceSha256": "41f16783a6b31f11d9bb5ec403b268469f6653fec5fa79154081a70015fe7b8e",
+      "diagnosticOrdinal": 2,
+      "diagnosticsUsed": 1,
+      "diagnosticsReserved": 1,
+      "implementationBuildsUsed": 2,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "diagnostic2-consumed-and-sol-correction-plan-only-authorized",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "RECORD_DIAGNOSTIC2_COMPLETE; CANDIDATE_NO_GO; SOL_PLAN_ONLY",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-18.md",
+      "evidenceSha256": "6818a10b23936a5df632cc4986df12c7fb1778e6e6f3b7c2eb1bd1d71ca48697",
+      "independentReview": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-11.md",
+      "independentReviewSha256": "13e1efe92dddf5b0d67949382a3266b6d320312eaeefb4a4f49c309bf5b5c3bb",
+      "diagnosticsUsed": 2,
+      "diagnosticsReserved": 0,
+      "lunaCorrectionsUsed": 3,
+      "lunaCorrectionsReserved": 0,
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "sol-plan-correction4-accepted-luna-cycle4-reserved",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "AUTHORIZE_ONE_LUNA_CORRECTION4_ONLY_NO_BUILD",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-19.md",
+      "evidenceSha256": "cd14808839e9176744529c43ba089d2fd45203294dfa1e5076ca5857c4d46d58",
+      "solPlan": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-4.md",
+      "solPlanSha256": "9d8b2671632a222d16641b83439e5717916eb5517432a26a9305c6c671a922b3",
+      "lunaCorrectionsUsed": 3,
+      "lunaCorrectionsReserved": 1,
+      "diagnosticsUsed": 2,
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "luna-correction4-implementation-complete-awaiting-sol-review",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "RECORD_CYCLE4_CONSUMED; FOCUSED_CHECKS_PASS; NO_BUILD",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-20.md",
+      "evidenceSha256": "14d2c6c4f6d100f856d9749b067c53bd331ebd8506e986e0fd61723674ab72ba",
+      "implementationSummary": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-4/implementation-summary.json",
+      "implementationSummarySha256": "e45f1a859fc6f309fd458e5eeb5a12870a63332e381610b1db14d113b5f9534a",
+      "lunaCorrectionsUsed": 4,
+      "lunaCorrectionsReserved": 0,
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-review12-fail-sol-correction1-reserved",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "RESERVE_ONE_SOL_FIX_TEST_FIXTURE_SCOPE_NO_BUILD",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-21.md",
+      "evidenceSha256": "5074d8b018a6adf473a48a1a0190720deff2c05410104fd9ab823bdd8c37206a",
+      "review": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-12.md",
+      "reviewSha256": "1b4b34864a27d8f5745e42557410ff77669402f9eb88bd4295a5656acfbf887d",
+      "lunaCorrectionsUsed": 4,
+      "lunaCorrectionsReviewed": 4,
+      "solCorrectionsUsed": 0,
+      "solCorrectionsReserved": 1,
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "sol-correction1-test-fixture-work-complete-awaiting-distinct-review",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "RECORD_SOL_FIX1_CONSUMED; FOCUSED_CHECKS_PASS; NO_BUILD",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-22.md",
+      "evidenceSha256": "c2349a6fa09a03b1899baf297499f3a6b716d0f72fdab47d9f4a2a61b94f22c8",
+      "implementationSummary": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-correction-1/implementation-summary.json",
+      "implementationSummarySha256": "68f8207fbe1e86bb1a34dc15f5f7b82d2fd97e11a6ea558d6092ffb8ce89ada9",
+      "solCorrectionsUsed": 1,
+      "solCorrectionsReserved": 0,
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-review13-pass-authorize-build3-proposal-only",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "ACCEPT_CORRECTION4_AND_SOL_FIX1; PLAN_ONLY; NO_BUILD",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-23.md",
+      "evidenceSha256": "1de41abbc4bdf15247eb555ed350c3fd629608c3a25cb6b5863f901be54bcad1",
+      "independentReview": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-13.md",
+      "independentReviewSha256": "b69ad8fcbc0a09bb62ffcde101a65e227a3d4c14d61909a15b96e89790f118f5",
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "build3-supervision-infrastructure-prep-authorized",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "AUTHORIZE_THREE_FIXED_INFRA_FILES_AND_CONDITIONAL_10S_SELF_CHECK_ONLY",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-24.md",
+      "evidenceSha256": "bbd30c64c9cac342ab287c5350ec3bf6058580d6a4d14ed400e11c1d6b477c2c",
+      "candidateCorrectionBudgetChanged": false,
+      "diagnosticBudgetChanged": false,
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "build3-supervisor-code-submitted-for-sol-review",
+      "actor": "/root",
+      "date": "2026-10-24",
+      "decision": "REVIEW_ONLY; SELF_CHECK_CONDITIONAL; NO_PREFLIGHT_OR_BUILD",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-25.md",
+      "evidenceSha256": "fefdced38096dc51f3adccf1f16e3e6bd4e19061abd763fb0323f7a80fc20384",
+      "build3SupervisorFiles": {
+        "pipeline/scripts/run_teignmouth_float32_build3.py": "6755594b4335dd4de7f2208904a00d61e95772e81ae645de148d3e6e69de39b4",
+        "pipeline/scripts/teignmouth_build3_runtime_preflight.py": "ab99f92e796ec699c81edac1067269daf210a638b5cbd64264a8001fa741c431",
+        "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py": "a9df90e3b680e4fc249171f5b63d92546f21532cd2d0577b265afe8b4603f7f3"
+      },
+      "implementationBuildsUsed": 2,
+      "implementationBuildReserved": false,
+      "candidateEligibleForServing": false
+    },
+    {
+      "event": "independent-supervisor-review17-fix-required-stop",
+      "date": "2026-10-24",
+      "actor": "/root/sol_review_face_diag",
+      "review": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-4.md",
+      "reviewSha256": "31868114ce73d72b4351f9d680d17fb89a1a081ec5b5019f33e35b55b439298a",
+      "outcome": "FIX_REQUIRED",
+      "runtimeModesExecuted": false,
+      "candidateBuildReserved": false,
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-37.md",
+      "coordinatorDispositionSha256": "4c9c126de244b5e0bc6697657b676fd18dbec40e48ffe07c7758e237c47fa0e4",
+      "candidateCountersChanged": false,
+      "nextAction": "Await explicit user direction; no further correction authorized"
+    },
+    {
+      "event": "user-authorized-new-bounded-plan-only",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "userAuthorization": "I authorise",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-38.md",
+      "evidenceSha256": "a8a576c694e80ec57924f05a7f12fe3b86262d6873be73a293124fb297a85c27",
+      "planner": "Sol 6.1 medium",
+      "scope": "Plan only for the two findings in independent supervisor review 17",
+      "implementationAuthorized": false,
+      "runtimeAuthorized": false,
+      "candidateBudgetChanged": false
+    },
+    {
+      "event": "sol-review17-plan-complete-returned-for-implementation-disposition",
+      "date": "2026-10-24",
+      "actor": "/root/sol_review17_plan",
+      "plan": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-plan.md",
+      "planSha256": "3e564b7ee6f099b54062794e7fb3468d08748f35c21a931abfae189634aa1c3a",
+      "plannerReportedFilesChanged": [
+        "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-plan.md"
+      ],
+      "implementationAuthorized": false,
+      "executionAuthorized": false,
+      "candidateCountersChanged": false,
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-39.md",
+      "coordinatorDispositionSha256": "a5f8decc43d014431321f48da138ed9d7ae730730321c9c4a15a078fd863d2fb"
+    },
+    {
+      "event": "user-authorized-builds-until-working",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "userAuthorization": "I authorise builds until this is working",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-40.md",
+      "implementationStage": "Luna cycle 1 reserved",
+      "staticChecksAuthorized": true,
+      "independentSolReviewRequired": true,
+      "runtimeAndBuildStages": "Conditionally authorized only after preceding gates pass",
+      "previousAttemptsReset": false,
+      "candidateCountersChanged": false
+    },
+    {
+      "event": "luna-correction-cycle1-complete-submitted-for-sol-review",
+      "date": "2026-10-24",
+      "actor": "/root/corridor_continuation_luna",
+      "implementerModel": "gpt-6-luna",
+      "changedFiles": [
+        "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "pipeline/scripts/teignmouth_build3_runtime_preflight.py"
+      ],
+      "unchangedHelper": "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+      "staticResults": "Ruff check/format PASS; PowerShell AST PASS without invocation; embedded C# compile-only PASS without method invocation",
+      "runtimeModesExecuted": false,
+      "candidateBuildReserved": false,
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-41.md",
+      "coordinatorDispositionSha256": "e847a8229959da7100bc2452a34e91d3867a73e02735079768c033ad1d5f15a4"
+    },
+    {
+      "event": "independent-sol-review5-dispatched",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "reviewer": "/root/sol_review_face_diag",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "implementationEdited": false,
+      "runtimeAuthorized": false
+    },
+    {
+      "event": "review5-fix-required-bounded-sol-diagnosis-authorized",
+      "date": "2026-10-24",
+      "actor": "/root",
+      "reviewSha256": "2a290a4c40ececba8486492301989643265f4c6d915d15acbd8c3910232332b2",
+      "outcome": "FIX_REQUIRED",
+      "solDiagnosisAgent": "/root/sol_review17_plan",
+      "maxSeconds": 120,
+      "lunaCycle1Used": 1,
+      "lunaCycle2Reserved": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "coordinatorDispositionSha256": "3f2578f4902e59a3a4e7cb04b2762eb24dfc0dc8d130f09866cd46d65cce72bd"
+    },
+    {
+      "event": "sol-diagnosis-requires-user-trust-boundary",
+      "date": "2026-10-24",
+      "actor": "/root/sol_review17_plan",
+      "diagnosis": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-diagnosis.md",
+      "diagnosisSha256": "cce878af32486a91b21168c82448ea805a3dcffadad7f4e1aa3ecde50830b9bb",
+      "outcome": "STOP_FOR_USER_BOUNDARY_DECISION",
+      "lunaCycle1Used": 1,
+      "lunaCycle2Reserved": false,
+      "candidateCountersChanged": false,
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-43.md",
+      "coordinatorDispositionSha256": "1724a203eab3e062a0539146acf76e986b95687da41c10b444bf36f1670eed91"
+    },
+    {
+      "event": "user-selected-finite-trusted-startup-profile",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "authorization": "User selected finite trusted profile; trust pinned CPython/OS loader and reviewed code; bind executable profile sources and refuse unknown paths",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-44.md",
+      "evidenceSha256": "ee9e4530aa4234affcb77e8d49d2af02461f3ed1614c02abc9630fb44f33ff59",
+      "planAddendumAuthorized": true,
+      "implementationDuringPlanning": false,
+      "runtimeAuthorized": false,
+      "candidateCountersChanged": false
+    },
+    {
+      "event": "finite-profile-reconciled-luna-cycle2-reserved",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "userBoundaryChoice": "Finite trusted startup/import profile",
+      "addendumSha256": "e3e6578421cef97b20983955c8bba9622e148204cdbacb29a4e8aae12e8259aa",
+      "implementationAgent": "/root/corridor_continuation_luna",
+      "implementationScope": "W/S/P only",
+      "lunaCyclesUsed": 1,
+      "lunaCyclesReserved": 1,
+      "staticChecksAuthorized": true,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "coordinatorDispositionSha256": "1202340abcb41b983b1433c84bc8a79a9835a0100e75b58d76b6df8ab9519e8e"
+    },
+    {
+      "event": "cycle2-partial-P-hash-reconciled",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "previousP": "086dafa5a59d68904c937d7d85ba3c8945294fd8effa08af5159e197ca383416",
+      "currentPartialP": "fd1dc3098fc8e93887da3e70139f1b8dfdc75dcd2ff246eefb23da0b50e7f3b7",
+      "w": "ab351b89aca3eb24231e946308c09d25e1165aaf03efeefc998987e194a75128",
+      "s": "9c502bf827250d74e6d1ba3c6fde02595e7cd46f725599a693f700bca4310332",
+      "h": "9fc73a8ed7aca3b4e223d3f23a7bd676f48011aa0abe98eb864f9e98a5191d20",
+      "cause": "Luna-reported partial work under already reserved cycle 2",
+      "coordinatorDispositionSha256": "91c3767fa6f387f3d8483453f8c4afde392575f53d24a91e712c4aed78338489"
+    },
+    {
+      "event": "luna-correction-cycle2-complete-submitted-for-sol-review",
+      "date": "2026-10-25",
+      "actor": "/root/corridor_continuation_luna",
+      "implementerModel": "gpt-6-luna",
+      "changedFiles": [
+        "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "pipeline/scripts/teignmouth_build3_runtime_preflight.py"
+      ],
+      "unchangedHelperSha256": "9fc73a8ed7aca3b4e223d3f23a7bd676f48011aa0abe98eb864f9e98a5191d20",
+      "staticResults": "Ruff check/format PASS; PowerShell AST PASS without invocation; embedded C# compile-only PASS without method invocation",
+      "runtimeProfileFits30Seconds": "UNMEASURED",
+      "runtimeModesExecuted": false,
+      "candidateBuildReserved": false,
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-47.md",
+      "coordinatorDispositionSha256": "ae8b8b3d71cda15a7efe6550d355b1ef96fe73b348aa003d940d087ff7785358"
+    },
+    {
+      "event": "independent-sol-review6-dispatched",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "reviewer": "/root/sol_review_face_diag",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "implementationEdited": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "review6-fix-required-bounded-sol-diagnosis-authorized",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "reviewSha256": "cec2f9dbff637f79025eecdf9b2f8c0221c68816bc9ed3374cab918232bde7b4",
+      "outcome": "FIX_REQUIRED",
+      "solDiagnosisAgent": "/root/sol_review17_plan",
+      "maxSeconds": 120,
+      "lunaCycle2Used": 2,
+      "lunaCycle3Reserved": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "coordinatorDispositionSha256": "b396a6b3c83427963b84d1519ba8e4b8b52add2b0ae6b17737e7fedc17f270c5"
+    },
+    {
+      "event": "cycle3-diagnosis-reconciled-archive-imports-refused",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "diagnosisSha256": "a718dfae49b9915d66ff2c5e0d49bfbc32f5ac14722ae80d6a37571352370b05",
+      "decision": "GO_FOR_LUNA_CYCLE3",
+      "activeArchiveImports": "Fail closed",
+      "lunaCyclesUsed": 2,
+      "lunaCyclesReserved": 1,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "coordinatorDispositionSha256": "c8c2f6cba03f22fac6e7b8bcdff2fb1e95f1a450e736b89c20ac47544f768b90"
+    },
+    {
+      "event": "luna-supervisor-correction-cycle3-submitted-for-independent-sol-review",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "implementationAgent": "/root/corridor_continuation_luna",
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-50.md",
+      "coordinatorDispositionSha256": "512cba1e085ed42e0b9b86631c09e7bec6e08eafc51ebd4c234f96cf757e21ec",
+      "submittedFiles": [
+        {
+          "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+          "sha256": "01c14c589359367e67e92f44699e8868af4deddd5eff2c499c4d3b3df7da2bf3"
+        },
+        {
+          "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+          "sha256": "919066815bf6cafb5ff207cd8326271899d75c6fa134630d3812a2c009313887"
+        },
+        {
+          "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+          "sha256": "aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b"
+        }
+      ],
+      "protectedHashesVerified": true,
+      "staticResultsWereReportedNotRerun": true,
+      "runtimeExecuted": false,
+      "candidateBuildReserved": false,
+      "operationalLunaCyclesUsed": 3
+    },
+    {
+      "event": "independent-supervisor-review7-dispatched",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "reviewer": "/root/sol_review_face_diag",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "implementationEdited": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "evidenceTarget": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-7.md"
+    },
+    {
+      "event": "review7-fix-required-bounded-sol-diagnosis-authorized",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "reviewSha256": "dbde8f8a79bc55bbaef6bb655225a1beb1339620f5c11490aa839688ce5fe88c",
+      "outcome": "FIX_REQUIRED",
+      "solDiagnosisAgent": "/root/sol_review17_plan",
+      "maxSeconds": 120,
+      "lunaCyclesUsed": 3,
+      "lunaCycle4Reserved": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "coordinatorDispositionSha256": "f42c042d16ca0314da0424f9a3409e1b31fbdd3338258ac73d7a50bcce06135e"
+    },
+    {
+      "event": "sol-supervisor-diagnosis3-dispatched",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "plannerAgent": "/root/sol_review17_plan",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "maxSeconds": 120,
+      "codeChangesAllowed": false,
+      "executionAllowed": false,
+      "lunaCycle4Reserved": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "luna-supervisor-correction-cycle4-reserved",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "diagnosis": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-diagnosis-3.md",
+      "diagnosisSha256": "0051daa983c4a9e251bad68979da19bc5c14d0095522133b779f054246a9d691",
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-52.md",
+      "coordinatorDispositionSha256": "0b049d79e1c5720f1f917b161c647081124375f3115ea8a064eb5446d8c79503",
+      "implementationFiles": [
+        "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "pipeline/scripts/run_teignmouth_float32_build3.py"
+      ],
+      "lunaCyclesUsed": 3,
+      "lunaCycle4Reserved": true,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "candidateCountersChanged": false
+    },
+    {
+      "event": "luna-supervisor-correction-cycle4-dispatched",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "implementer": "/root/corridor_continuation_luna",
+      "coordinatorDispositionSha256": "0b049d79e1c5720f1f917b161c647081124375f3115ea8a064eb5446d8c79503",
+      "implementationFiles": [
+        "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "pipeline/scripts/run_teignmouth_float32_build3.py"
+      ],
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "luna-supervisor-correction-cycle4-submitted-for-independent-sol-review",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "implementer": "/root/corridor_continuation_luna",
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-53.md",
+      "coordinatorDispositionSha256": "d8075427fcf963f2dba24ef54fdf1e6186a1f336b2049db46700bc36394b3d7e",
+      "submittedFiles": [
+        {
+          "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+          "sha256": "c707ebbda14c562083fb2485854b4d4d515bc809987d13136479f7cd5d597b06"
+        },
+        {
+          "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+          "sha256": "73345c89e9ec49c4c092a00a93b47c4642b32f7deecd7108c018b04910c3717c"
+        }
+      ],
+      "protectedHashesVerified": true,
+      "PUnchanged": true,
+      "staticResultsReportedNotRerun": true,
+      "runtimeExecuted": false,
+      "candidateBuildReserved": false,
+      "operationalLunaCyclesUsed": 4
+    },
+    {
+      "event": "independent-supervisor-review8-dispatched",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "reviewer": "/root/sol_review_face_diag",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "implementationEdited": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "supervisor-review8-pass-coordinator-gate-accept-selfcheck-authorized",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "review": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-8.md",
+      "reviewSha256": "17f58c5d021dca3b34fe54ecb7828aafc67dc94cc0a3322cc17e1c63e99743f1",
+      "coordinatorDispositionSha256": "fa561e0c5aaae68a8de351f37f694db5164cc8814ce9f3f28f174b77fc8b502b",
+      "operationalLunaCycles": "4/4-reviewed",
+      "solCorrectionNeeded": false,
+      "selfCheckMaximumSeconds": 10,
+      "runtimeAuthorized": false,
+      "standaloneCollectionAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "direct-supervisor-entry-rejected-before-self-check-reconciled",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "exitCode": 2,
+      "reason": "missing W-created fixed path/handoff",
+      "selfCheckBodyEntered": false,
+      "selfCheckOneShotConsumed": false,
+      "candidateBuildReserved": false,
+      "coordinatorDispositionSha256": "78c40264d26fcfa0abad49b6b49f8c7fce173addc57cec997946d0be3b72c1ee"
+    },
+    {
+      "event": "self-check-attempt1-blocked-before-launch-sol-diagnosis-authorized",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "exitCode": 2,
+      "callerRecordSha256": "e88b0527b5f44f4f34ed7448a00b3ea4cb1706b929a18f339ef83fde6dd4442e",
+      "pendingUpdateSha256": "78e7bb547fc718b57c9ab286afb92d37436b68bb894e0a22df02914936703b75",
+      "nativeLauncherStarted": false,
+      "containedSelfCheckBodyStarted": false,
+      "candidateBuildReserved": false,
+      "runtimeAuthorized": false,
+      "solDiagnosisMaxSeconds": 120,
+      "coordinatorDispositionSha256": "b2e0df3ba61188c270b1c01c8dbecc3dd55c0815c67687a3f77a65afb97855d3"
+    },
+    {
+      "event": "single-operational-sol-correction-reserved-for-selfcheck-persistence",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "diagnosisSha256": "685dbb46ec755910a93dcd7b9525b9f2dda1c6e0a0f14de85551f60456bb303f",
+      "lunaCyclesReviewed": "4/4",
+      "implementationFiles": [
+        "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py"
+      ],
+      "failedEvidencePreserved": true,
+      "newRetryRoot": ".codex/build3-supervisor-selfcheck-retry-1/",
+      "selfCheckRetryAuthorized": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false,
+      "coordinatorDispositionSha256": "c91005bf83f58100ec4855d959228335ac2ee9bddbf724bbdb3879a7ddcbe757"
+    },
+    {
+      "event": "operational-sol-correction-dispatched",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "implementer": "/root/sol_review17_plan",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "coordinatorDispositionSha256": "c91005bf83f58100ec4855d959228335ac2ee9bddbf724bbdb3879a7ddcbe757",
+      "implementationFiles": [
+        "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py"
+      ],
+      "runtimeAuthorized": false,
+      "selfCheckRetryAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "sol-operational-correction-submitted-for-independent-review",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "implementer": "/root/sol_review17_plan",
+      "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-58.md",
+      "coordinatorDispositionSha256": "3226f74d3b17977869d251dfa6404283c72c0e70ab66ff2a890efdaaf11436b7",
+      "solCorrectionUsed": 1,
+      "solCorrectionReserved": 0,
+      "retryRootAbsent": true,
+      "originalFailedEvidencePreserved": true,
+      "runtimeAuthorized": false,
+      "selfCheckRetryAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "independent-supervisor-review9-dispatched",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "reviewer": "/root/sol_review_face_diag",
+      "model": "gpt-6.1-sol",
+      "reasoning": "medium",
+      "implementationEdited": false,
+      "runtimeAuthorized": false,
+      "selfCheckRetryAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    {
+      "event": "operational-allowance-exhausted-stop-for-user-direction",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "review9Sha256": "e603b86ff5c1baff29af17f4084ff916dfe155f77cbbed4f8f64287a8ac9044a",
+      "outcome": "FIX_REQUIRED",
+      "blocker": "Caller-only update validator rejects distinct handoff destination at W1255 before Job assignment/resume.",
+      "lunaCyclesUsedReviewed": "4/4",
+      "solCorrectionUsed": "1/1",
+      "candidateBuildReserved": false,
+      "runtimeAuthorized": false,
+      "retryAuthorized": false,
+      "coordinatorDispositionSha256": "7659f6fb7aea57d4a178ef2dbabd5777e58095a58f4a94ddaacf76e355e40a23"
+    },
+    {
+      "event": "user-authorized-single-correction-after-disposition59-stop",
+      "date": "2026-10-25",
+      "actor": "/root",
+      "userAuthorization": "Authorize one bounded correction (Recommended)",
+      "scope": "W caller-versus-handoff ownership check; independent review; one fresh self-check attempt only",
+      "coordinatorDispositionSha256": "da34dd10f591f3158b500b4046f62e9bcecb4049e3a4f0c05498998ea50d40d8",
+      "oldFailedEvidencePreserved": true,
+      "retryRootAbsent": true,
+      "runtimeCollectionAuthorized": false,
+      "candidateBuildReserved": false
+    }
+  ],
+  "coordinatorAccepted": true,
+  "coordinatorAcceptanceEvidence": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-acceptance-1.md",
+    "sha256": "AEB8DEDBBF63EBAA98B00D319A6040F74D917610131BF1D7EF64E5919AB36A31"
+  },
+  "boundPlanHashes": {
+    "specificationSha256": "745EDE84DDF95ED697992514F0318BB9E512CE7069CEB9D495EF7D2CF133E208",
+    "solPlanSha256": "677FD973FCBD5F44641242931959A1202AB7EDC291F99E17CEABD60701F25DCF"
+  },
+  "diagnostic1Result": {
+    "status": "GO_FOR_COORDINATOR_CONTRACT_REVIEW",
+    "command": "pipeline/.venv/Scripts/python.exe -B pipeline/scripts/diagnose_teignmouth_float32_frame.py --input-manifest docs/milestones/artifacts/Teignmouth-float32-topology/input-manifest.json",
+    "report": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-1/report.json",
+    "reportSha256": "6401b6a5dcd64dde3c1d0cd907fe3548e96b86f971d9c8f60612cd497eaf36fe",
+    "inputManifestSha256": "9739be383d2118873a74f3422015b771f80f214578898fd7e0edf3213f34eab2",
+    "scriptSha256": "821914a737112382907cbaea6265cc3716fcc08b9275077733b85478a53186d2",
+    "elapsedSeconds": 35.97703440001351,
+    "boundInputCount": 179,
+    "boundInputsUnchangedAtDiagnosticEnd": true,
+    "globalCollisionGroups": 3,
+    "globalInvalidFloat32Triangles": 6,
+    "localCollisionGroups": 0,
+    "localInvalidFloat32Triangles": 0,
+    "localOracleCensusEquivalent": true,
+    "localOriginalDecodedBoundaryExact": true,
+    "localVertices": 64765,
+    "localTriangles": 129362,
+    "implementationBuildsSpent": 0,
+    "correctionCyclesSpent": 0,
+    "candidateEligibleForServing": false,
+    "limitations": [
+      "No graded Y field, full candidate terrain/road asset, source overlay, gradients, buildings, walking or runtime/browser acceptance.",
+      "Global and translated GEOS arrangements are separately noded; mathematical translation does not guarantee identical floating-point intersections/connectivity. Raw witnesses permit comparison; no equivalence is presumed."
+    ],
+    "authorizedPostExecutionLedgerUpdate": {
+      "preConsumptionLedgerSha256": "fd1abad37bb44044ca5c90757651759caffffeaa828b438517e3ce848db046f7",
+      "frozenSnapshot": "docs/milestones/artifacts/Teignmouth-float32-topology/attempt-ledger-before-diagnostic-1.json",
+      "meaning": "The runner verified all179 bindings unchanged before this authorized ledger-consumption update. Frozen input manifest and prior ledger snapshot remain immutable; current ledger intentionally changes after execution."
+    }
+  },
+  "coordinatorDisposition1": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "GO_FOR_FIXED_FRAME_IMPLEMENTATION_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-1.md",
+    "sha256": "b8fa820e4c963fe5b7fed50f86611c226e67d770e50a047b336bcf5aa7747062",
+    "implementationBuildReserved": false,
+    "diagnostic1Used": true,
+    "candidateEligibleForServing": false,
+    "limitsChanged": false
+  },
+  "implementationInputBindingPolicy": "Preserve diagnostic-1 and prebuild-1 manifests immutably. Each correction and each reserved candidate build must bind its exact input bytes in a fresh manifest.",
+  "coordinatorDisposition2": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "NO_GO_BUILD_1_AUTHORIZE_LUNA_CORRECTION_1_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-2.md",
+    "sha256": "0fcfa5bb44ec08cfa902241fb0399be3cb02127c4ff2dbf44a385aee234a7498",
+    "review": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-1.md",
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false,
+    "limitsChanged": false
+  },
+  "currentCorrectionInputManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-3/input-manifest.json",
+  "correction1EvidencePlan": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-1/evidence-plan.md",
+    "sha256": "ad410ced7e230f6897f6d873cc0d96514a8c6b1b5f5d906dc73b4b9785e59356",
+    "manifestSha256": "9b7157e870bec871106ad676a6201e89a039cfd24dcaf5d3917b77d98c8c7fe9",
+    "boundFiles": 188,
+    "prebuild1Preserved": true,
+    "candidateOutputExists": false
+  },
+  "coordinatorDisposition3": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CORRECTION_1_CONSUMED_FORWARD_FOR_REVIEW_NO_BUILD",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-3.md",
+    "sha256": "2de9104e0d5b438a2052aaed27170310a062635c167eb78eaf4b8b07abf4e5b1",
+    "manifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-1/input-manifest.json",
+    "manifestSha256": "9b7157e870bec871106ad676a6201e89a039cfd24dcaf5d3917b77d98c8c7fe9",
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentReview2": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-2.md",
+    "sha256": "d3e6734c50d15b4019b7e865833a60afa2d66d2375065dc9689f29f3b08476cd",
+    "outcome": "NO_GO_FOR_BUILD_1",
+    "reverifiedFiles": 188
+  },
+  "coordinatorDisposition4": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "NO_GO_BUILD_1_AUTHORIZE_LUNA_CORRECTION_2_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-4.md",
+    "sha256": "49c00e8af057c6de45da57264b1140eee8ee26e132fb2b01c44fafc1a20d2067",
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false,
+    "limitsChanged": false
+  },
+  "correction2EvidencePlan": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/evidence-plan.md",
+    "sha256": "f5bcc16639da261498e6aef3f79a334e10754969f6329783015549fd2606a4de",
+    "manifestSha256": "4f3c61472f6dad9e5de1f9a945fe391a5388f6b6f92adb2827790b70f19cc185",
+    "boundFiles": 193,
+    "correction1Preserved": true,
+    "candidateOutputExists": false
+  },
+  "coordinatorDisposition5": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CORRECTION_2_CONSUMED_FORWARD_FOR_REVIEW_NO_BUILD",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-5.md",
+    "sha256": "0a3326f968de970a34f7887ff6e981425a4133d1126b5d9e4372c7b5e217220c",
+    "manifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/input-manifest.json",
+    "manifestSha256": "4f3c61472f6dad9e5de1f9a945fe391a5388f6b6f92adb2827790b70f19cc185",
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentReview3": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-3.md",
+    "sha256": "4d827ee146cb16bb0268a63cba1372d26c6baf960262f78f17fa21e43a05bd3d",
+    "outcome": "GO_FOR_BUILD_1_RESERVATION",
+    "reverifiedFiles": 193
+  },
+  "coordinatorDisposition6": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "GO_ONE_BOUNDED_OFFLINE_BUILD_1_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-6.md",
+    "sha256": "f31e76689230a57c3d7fee30f5b8f4151d78a18dba3cc76b51ea3849125f7d5e",
+    "inputManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-2/input-manifest.json",
+    "inputManifestSha256": "4f3c61472f6dad9e5de1f9a945fe391a5388f6b6f92adb2827790b70f19cc185",
+    "implementationBuildOrdinal": 1,
+    "implementationBuildReserved": true,
+    "maximumSeconds": 180,
+    "candidateEligibleForServing": false
+  },
+  "build1Result": {
+    "status": "BLOCKED_EXCEPTION",
+    "report": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/build-report.json",
+    "reportSha256": "3d9012f05ec6641e106ccf87391d1da7b804eab78090bfeec054de1652960ae1",
+    "supervisorReport": "docs/milestones/artifacts/Teignmouth-float32-topology/build-1/supervisor-report.json",
+    "supervisorReportSha256": "481caa888a03b2c9af75a8b44605c4650527209739d3fcd5d9b036b78c36b0a8",
+    "coordinatorDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-7.md",
+    "coordinatorDispositionSha256": "7f087bbf35a72191998a6ff489d7fa9c6bb30064ad386ecf777ba7181e71d437",
+    "elapsedSeconds": 16.182695900002727,
+    "maximumSeconds": 180,
+    "peakWorkingSetBytes": 607260672,
+    "peakWorkingSetStatus": "measured via GetProcessMemoryInfo",
+    "preRunProtectedBindings": 193,
+    "preRunPreservationPassed": true,
+    "postRunProtectedBindings": 193,
+    "postRunPreservationPassed": true,
+    "vertices": 64765,
+    "triangles": 129362,
+    "constraintEdges": 136656,
+    "primaryError": "chart does not cover candidate vertex [-140.0, -63.0]",
+    "gatesCompleted": 0,
+    "gatesUnavailable": 8,
+    "partialOutputArchived": true,
+    "candidateOutputExists": false,
+    "outerExitCode": null,
+    "workerReturnCodeReported": 0,
+    "workerReturnCodeReportBug": true,
+    "candidateBuildSucceeded": false,
+    "candidateEligibleForServing": false,
+    "outerExitCodeReportedByLuna": 1,
+    "outerExitCodeVerified": false,
+    "runnerReturnCodeForNonPass": 2,
+    "workerReturnCodeReportIsSuccessEvidence": false,
+    "exitStatusLimitation": "worker entry discards _worker_build return; Luna reported outer code 1 but no raw capture; runner source returns 2 for non-PASS"
+  },
+  "coordinatorDisposition7": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "BUILD_1_CONSUMED_BLOCKED_EXCEPTION_NO_RETRY_PENDING_REVIEW",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-7.md",
+    "sha256": "7f087bbf35a72191998a6ff489d7fa9c6bb30064ad386ecf777ba7181e71d437",
+    "implementationBuildOrdinal": 1,
+    "implementationBuildUsed": true,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentReview4": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-4.md",
+    "sha256": "2b4b0acb689e73996bddfe1739ed941bbee77883c4a503b5a038b548a9c28094",
+    "outcome": "BUILD_1_EVIDENCE_CONSISTENT_BLOCKED_EXCEPTION_NO_RETRY",
+    "candidateBuildNotRerun": true
+  },
+  "coordinatorDisposition8": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AWAIT_SOL_DIAGNOSIS_NO_EXECUTION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-8.md",
+    "sha256": "ad11bf326c809820960aaf793c64e507ee31089a9a585f43c1c1bdb7a17eeb56",
+    "candidateEligibleForServing": false
+  },
+  "build1Review": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-4.md",
+    "sha256": "2b4b0acb689e73996bddfe1739ed941bbee77883c4a503b5a038b548a9c28094",
+    "outcome": "BLOCKED_EXCEPTION_EVIDENCE_CONSISTENT_NO_RETRY",
+    "solPlan": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-3.md",
+    "solPlanSha256": "62cdb1930b484af528c48cb3e65da54866fa0d37a6a5bcd9d7d4db370d3b2ee6"
+  },
+  "solPlanCorrection3": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-3.md",
+    "sha256": "62cdb1930b484af528c48cb3e65da54866fa0d37a6a5bcd9d7d4db370d3b2ee6",
+    "source": "read-only analysis of build-1 artifacts/code",
+    "numericDiagnosticRun": false
+  },
+  "coordinatorDisposition9": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_LUNA_CORRECTION_3_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-9.md",
+    "sha256": "f6fe7e7580ecfc08613e817db18958e1f296f1d490524a96a0e835fb06b45b4b",
+    "implementationBuildReserved": false,
+    "diagnosticReserved": false,
+    "candidateEligibleForServing": false,
+    "limitsChanged": false
+  },
+  "correction3EvidencePlan": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-3/evidence-plan.md",
+    "sha256": "fde51ba09ff3f9c355d492dd47c2cabaa927dbfacd078bcfe6aa3ebe1424f909",
+    "manifestSha256": "dac24d33876344de102753f05b0840ffd8a237a7ba6b43f655f7af437bda6cef",
+    "boundFiles": 199,
+    "candidateOutputExists": false
+  },
+  "coordinatorDisposition10": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CORRECTION_3_CONSUMED_FORWARD_FOR_REVIEW_NO_BUILD",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-10.md",
+    "sha256": "d3d62a57396b35e98f8cfa9ff71ceccb20a0bcdf8a7e004795810d88ff81f080",
+    "manifest": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-3/input-manifest.json",
+    "manifestSha256": "dac24d33876344de102753f05b0840ffd8a237a7ba6b43f655f7af437bda6cef",
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentReview5": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-5.md",
+    "sha256": "78ab8a0a025da97c2297286d754662740ce3603748e4325c2e2d51ab15ec21e4",
+    "codeOutcome": "GO",
+    "build2Reservation": "NO_GO_PENDING_FULL_BUILD1_EVIDENCE_BINDING",
+    "manifestFilesReverified": 199
+  },
+  "coordinatorDisposition11": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "BUILD2_MANIFEST_PREPARATION_NO_RESERVATION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-11.md",
+    "sha256": "1693e3bbdbd61c40d13cba69bc321c3a16b176e78a1cd21659a57c868074fc80",
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "build2InputManifest": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-2/input-manifest.json",
+    "sha256": "95fd731cf2ca155a1b497ab82350021b4dcc65d5d2c71250447c076488faf7e2",
+    "fileCount": 225,
+    "build1EvidenceFileCount": 20,
+    "executionEvidenceDirectory": "docs/milestones/artifacts/Teignmouth-float32-topology/build-2/run-1"
+  },
+  "independentReview6": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-6.md",
+    "sha256": "b3d790d4c1785b0a85978d0b63657deb0c354ca58cf5b01b8d42c63b9d0ec166",
+    "outcome": "GO_FOR_BUILD2_RESERVATION",
+    "reverifiedFiles": 225,
+    "priorBuild1FilesBound": 20
+  },
+  "coordinatorDisposition12": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "GO_ONE_BOUNDED_OFFLINE_BUILD_2_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-12.md",
+    "sha256": "988dddc2a040ac17fd9ddb42f6d5d091585ab98ba0f605fbc34c9a3eb86544e9",
+    "inputManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/build-2/input-manifest.json",
+    "inputManifestSha256": "95fd731cf2ca155a1b497ab82350021b4dcc65d5d2c71250447c076488faf7e2",
+    "implementationBuildOrdinal": 2,
+    "implementationBuildReserved": true,
+    "maximumSeconds": 180,
+    "candidateEligibleForServing": false
+  },
+  "build2Result": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-2/run-1/build-report.json",
+    "status": "BLOCKED_EXCEPTION",
+    "elapsedSeconds": 33.19761470000958,
+    "maximumSeconds": 180.0,
+    "peakWorkingSetBytes": 609505280,
+    "timeout": false,
+    "prePostPreservationFiles": 225,
+    "prePostPreservationPassed": true,
+    "passedGates": [
+      "chartSupportCompleteness",
+      "requiredTreatmentSupport",
+      "storedLocalTopology",
+      "treatmentSupportClassification"
+    ],
+    "unavailableAfterFailureGates": [
+      "actualFloat32Sections",
+      "completeBuildingContact",
+      "independentDeterministicConfirmation",
+      "influenceWideRoadOwnership",
+      "sharedRoadBuildingWalkSurface",
+      "sourceOverlayAndGradients",
+      "sourcePerimeterAndPlanes"
+    ],
+    "failure": {
+      "message": "patch face is not covered by the verified source triangle partition: face=19669, faceArea=0.020639419555664062, expectedOverlayArea=1.1028883815799223e-12, coveredArea=0",
+      "type": "TopologyError"
+    },
+    "logicalWorkerReturnCode": 2,
+    "actualChildExitCode": 2,
+    "runnerChosenExitCode": 2,
+    "runnerExternalExitCode": null,
+    "outerExitCodeReportedByLuna": 1,
+    "outerExitCodeVerifiedInBuildEvidence": false,
+    "partialOutput": "docs/milestones/artifacts/Teignmouth-float32-topology/build-2/run-1/partial-candidate-output",
+    "candidateOutputExists": false,
+    "candidateBuilt": false,
+    "candidateEligibleForServing": false,
+    "runEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/build-2/run-1"
+  },
+  "independentReview7": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-7.md",
+    "sha256": "c22363f5db18ef64f82e0f9687b1722c4be6bd464bcd281c691ba2b1f9d8fe73",
+    "outcome": "BLOCKED_EXCEPTION_EVIDENCE_CONSISTENT_CANDIDATE_NO_GO_DIAGNOSTIC_RECOMMENDED",
+    "readOnly": true,
+    "candidateBuildRerun": false
+  },
+  "coordinatorDisposition13": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "BUILD2_CONSUMED_BLOCKED_EXCEPTION_AWAIT_DIAGNOSTIC_PLAN",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-13.md",
+    "sha256": "142588fd22898125025f2d7cc1710627e36fc2c00687ed96b0ae9e53b9a39494",
+    "implementationBuildOrdinal": 2,
+    "implementationBuildUsed": true,
+    "implementationBuildReserved": false,
+    "diagnostic2Reserved": false,
+    "candidateEligibleForServing": false
+  },
+  "diagnostic2Plan": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/plan.md",
+    "sha256": "017d81efdce6f2a6e8f28d29b3fb7b5fef34f8d0ff84e16c9bca5447bd9a219a",
+    "author": "/root/beamng_corridor_plan",
+    "candidateBuildRun": false,
+    "diagnosticRun": false,
+    "diagnostic2Reserved": false,
+    "sourcePayloadExtractionAllowed": "single target OSM way 78455395 part 0 only from manifest-bound roads payload, using standard-library streaming decoder",
+    "externalSupervisor": "pipeline/scripts/run_teignmouth_overlay_face_diagnostic.py"
+  },
+  "independentReview8": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-8.md",
+    "sha256": "ca689f53ae27077780d4d38334d845de0ec5cf31bf21f57998210750ad437595",
+    "outcome": "FIX_REQUIRED_DIAGNOSTIC_HARNESS_NOT_SAFE_TO_FREEZE",
+    "harnessExecuted": false
+  },
+  "coordinatorDisposition14": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "DIAGNOSTIC2_PLAN_ACCEPTED_PREPARATION_ONLY_NO_RESERVATION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-14.md",
+    "sha256": "922c6471d747dfd36cc416d6b01a047ca1d9cba603806f88f8504f7295d9f378",
+    "diagnostic2Reserved": false,
+    "candidateEligibleForServing": false
+  },
+  "diagnostic2HarnessCorrection1": {
+    "runner": "pipeline/scripts/diagnose_teignmouth_overlay_face.py",
+    "runnerSha256": "298f5865fc0cc3262e6e36ecde7383f01cd5ba91dd3e37199c16b5f573a7ff5c",
+    "supervisor": "pipeline/scripts/run_teignmouth_overlay_face_diagnostic.py",
+    "supervisorSha256": "9f1d20086f0e2b26cd972101bda1b3d224f53e176c2f57e480e3dacb4ca7a17a",
+    "runtimeIdentitySchema": "pipeline/scripts/teignmouth_overlay_diagnostic_runtime_identity.schema.json",
+    "runtimeIdentitySchemaSha256": "7096ef9a9f6cf47ebe7d4b54a7edcdebf9e26ecd2d2ce75d63e286c52f8f804a",
+    "plan": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/plan.md",
+    "planSha256": "017d81efdce6f2a6e8f28d29b3fb7b5fef34f8d0ff84e16c9bca5447bd9a219a",
+    "candidateCorrectionCycleConsumed": false,
+    "scriptExecuted": false,
+    "testsRun": false,
+    "candidateBuilt": false,
+    "runEvidenceDirectoryAbsent": true,
+    "invocationRecordAbsent": true
+  },
+  "coordinatorDisposition15": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "DIAGNOSTIC_HARNESS_CORRECTION_COMPLETE_PENDING_INDEPENDENT_SOL_REVIEW",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-15.md",
+    "sha256": "da0608ffad5192b7a0714ede8de9bdca1809803bad4e9685b9f960dbaf53709a",
+    "diagnostic2Reserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentReview9": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-9.md",
+    "sha256": "51d9c9b9056bbf8dd81872b346e9ea03121d810359af9d34c511282663268461",
+    "outcome": "PASS_FOR_STATIC_REVIEW_AND_INPUT_FREEZE",
+    "diagnosticExecuted": false,
+    "candidateServingAuthorized": false
+  },
+  "coordinatorDisposition16": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "GO_ONE_READ_ONLY_DIAGNOSTIC2_AFTER_MANIFEST_REVIEW",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-16.md",
+    "sha256": "41f16783a6b31f11d9bb5ec403b268469f6653fec5fa79154081a70015fe7b8e",
+    "diagnosticOrdinal": 2,
+    "diagnosticReserved": true,
+    "maximumSeconds": 120,
+    "inputManifest": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/input-manifest.json",
+    "runEvidenceLeaf": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1",
+    "candidateEligibleForServing": false
+  },
+  "diagnostic2Reservation": {
+    "ordinal": 2,
+    "reserved": false,
+    "maximumSeconds": 120,
+    "externalSupervisor": "pipeline/scripts/run_teignmouth_overlay_face_diagnostic.py",
+    "command": "pipeline/.venv/Scripts/python.exe -B pipeline/scripts/run_teignmouth_overlay_face_diagnostic.py",
+    "runLeaf": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1",
+    "invocationRecord": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/invocation.json",
+    "diagnosticRun": true,
+    "consumed": true,
+    "status": "COMPLETE_DIAGNOSTIC_OBSERVATION",
+    "invocationSha256": "52a1c9fb84934b4be06e4b5856ba2f9c1a74c57a60c4a603e48434b666eb498a",
+    "runEvidenceLeaf": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1",
+    "workerReportSha256": "8fa783fda76781aa0463f5c3896e21f2dd3473db9d772ac22029a76d128e3859",
+    "runnerReportSha256": "5bdbee272aa8ce73f0f4ba49838e035a80a05ae5049ec9557b5665fad5da502a",
+    "elapsedWallSeconds": 63.26575180000509,
+    "timedOut": false,
+    "candidateBuilt": false,
+    "candidateEligibleForServing": false
+  },
+  "diagnostic2Result": {
+    "status": "COMPLETE_DIAGNOSTIC_OBSERVATION",
+    "invocation": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/invocation.json",
+    "invocationSha256": "52a1c9fb84934b4be06e4b5856ba2f9c1a74c57a60c4a603e48434b666eb498a",
+    "report": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1/report.json",
+    "reportSha256": "8fa783fda76781aa0463f5c3896e21f2dd3473db9d772ac22029a76d128e3859",
+    "runnerReport": "docs/milestones/artifacts/Teignmouth-float32-topology/diagnostic-2/run-1/runner-report.json",
+    "runnerReportSha256": "5bdbee272aa8ce73f0f4ba49838e035a80a05ae5049ec9557b5665fad5da502a",
+    "elapsedSecondsExternal": 63.26575180000509,
+    "maximumSeconds": 120,
+    "timedOut": false,
+    "candidateBuilt": false,
+    "candidateEligibleForServing": false,
+    "exactFaceClipAndFilteredFailureReproduced": true,
+    "faceId": 19669,
+    "expectedClipAreaM2": 1.1028883815799223e-12,
+    "filteredAccumulatedAreaM2": 0.0,
+    "filteredResidualM2": -1.1028883815799223e-12,
+    "fragmentAreasM2": [
+      9.50339172070107e-13,
+      1.5254924997951674e-13
+    ],
+    "discardedPositiveAreaSumM2": 1.1028884220496237e-12,
+    "sourceTriangleIds": [
+      894822,
+      894823
+    ],
+    "sourceGapAreaM2": 0.0,
+    "positiveAreaPairwiseOverlapCount": 0,
+    "sourcePartitionGapOrOverlapClassification": "not supported by saved explicit geometries; tiny clipping arithmetic residual exists",
+    "prePostPreservationPassed": true,
+    "protectedBindingCount": 225,
+    "checkedBindingCount": 291,
+    "changedBindingCount": 0,
+    "inputManifestSha256": "6e9b1b77b5451e40ea12be0787db3c025ff591d628a3fce7f99a55ea1c7e7b9e",
+    "reportLimitations": [
+      "report.json stageStatus remains IN_PROGRESS despite completed progress/status",
+      "4,927,488-byte peak is launcher-only and does not establish process-tree peak memory"
+    ]
+  },
+  "independentReview11": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-11.md",
+    "sha256": "13e1efe92dddf5b0d67949382a3266b6d320312eaeefb4a4f49c309bf5b5c3bb",
+    "outcome": "DIAGNOSIS_SUPPORTED_CANDIDATE_NO_GO",
+    "diagnosticRerun": false,
+    "candidateCorrectionAuthorizedByReview": false,
+    "candidateServingAuthorized": false
+  },
+  "coordinatorDisposition18": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CONSUME_DIAGNOSTIC2_AUTHORIZE_SOL_PLAN_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-18.md",
+    "sha256": "6818a10b23936a5df632cc4986df12c7fb1778e6e6f3b7c2eb1bd1d71ca48697",
+    "diagnostic2Consumed": true,
+    "solCorrectionPlanAuthorized": true,
+    "lunaCorrectionReserved": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "solPlanCorrection4": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-4.md",
+    "sha256": "9d8b2671632a222d16641b83439e5717916eb5517432a26a9305c6c671a922b3",
+    "author": "/root/sol_review_face_diag",
+    "outcome": "READY_FOR_COORDINATOR_REVIEW_AND_RESERVATION",
+    "implementationRun": false,
+    "testsRun": false,
+    "candidateBuildRun": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition19": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_AND_RESERVE_LUNA_CORRECTION_4_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-19.md",
+    "sha256": "cd14808839e9176744529c43ba089d2fd45203294dfa1e5076ca5857c4d46d58",
+    "plan": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-plan-correction-4.md",
+    "planSha256": "9d8b2671632a222d16641b83439e5717916eb5517432a26a9305c6c671a922b3",
+    "lunaCorrectionOrdinal": 4,
+    "lunaCorrectionReserved": true,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "correction4Result": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-4/implementation-summary.json",
+    "sha256": "e45f1a859fc6f309fd458e5eeb5a12870a63332e381610b1db14d113b5f9534a",
+    "handback": "docs/milestones/artifacts/Teignmouth-float32-topology/correction-4/handback.md",
+    "status": "ACCEPTED_AFTER_INDEPENDENT_REVIEWS_12_AND_13",
+    "candidateBuildRun": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition20": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CONSUME_LUNA_CORRECTION4_AUTHORIZE_INDEPENDENT_REVIEW_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-20.md",
+    "sha256": "14d2c6c4f6d100f856d9749b067c53bd331ebd8506e986e0fd61723674ab72ba",
+    "lunaCorrectionsUsed": 4,
+    "lunaCorrectionsReserved": 0,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentReview12": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-12.md",
+    "sha256": "1b4b34864a27d8f5745e42557410ff77669402f9eb88bd4295a5656acfbf887d",
+    "outcome": "FAIL_PENDING_FOCUSED_TEST_CORRECTIONS",
+    "candidateBuildRecommended": false,
+    "correctionRun": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition21": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "RESERVE_ONE_SOL_CORRECTION1_TEST_FIXTURES_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-21.md",
+    "sha256": "5074d8b018a6adf473a48a1a0190720deff2c05410104fd9ab823bdd8c37206a",
+    "solCorrectionOrdinal": 1,
+    "solCorrectionReserved": true,
+    "lunaCorrectionsUsed": 4,
+    "lunaCorrectionsReviewed": 4,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "solCorrection1Result": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-correction-1/implementation-summary.json",
+    "sha256": "68f8207fbe1e86bb1a34dc15f5f7b82d2fd97e11a6ea558d6092ffb8ce89ada9",
+    "handback": "docs/milestones/artifacts/Teignmouth-float32-topology/sol-correction-1/handback.md",
+    "status": "ACCEPTED_AFTER_DISTINCT_INDEPENDENT_REVIEW_13",
+    "changedImplementationCode": false,
+    "candidateBuildRun": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition22": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CONSUME_SOL_CORRECTION1_AUTHORIZE_DISTINCT_REVIEW_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-22.md",
+    "sha256": "c2349a6fa09a03b1899baf297499f3a6b716d0f72fdab47d9f4a2a61b94f22c8",
+    "solCorrectionsUsed": 1,
+    "solCorrectionsReserved": 0,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentReview13": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/independent-review-13.md",
+    "sha256": "b69ad8fcbc0a09bb62ffcde101a65e227a3d4c14d61909a15b96e89790f118f5",
+    "outcome": "PASS_SOL_CORRECTION1_VALIDATION_CLOSED",
+    "reviewerDistinctFromImplementer": true,
+    "testsRerun": false,
+    "buildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition23": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "ACCEPT_CORRECTIONS_AUTHORIZE_BUILD3_PROPOSAL_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-23.md",
+    "sha256": "1de41abbc4bdf15247eb555ed350c3fd629608c3a25cb6b5863f901be54bcad1",
+    "build3ProposalAuthorized": true,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "build3DispatchSupervisionPlan": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/dispatch-supervision-plan.md",
+    "sha256": "260b1d6d89ad364748c23419dc4e1ac575ff8bba12f212cbe99364f51489417e",
+    "outcome": "PROPOSAL_ONLY",
+    "implementationAuthorized": true,
+    "selfCheckAuthorizedConditionally": true,
+    "runtimePreflightAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition24": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_BUILD3_OPERATIONAL_SUPERVISION_PREP_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-24.md",
+    "sha256": "bbd30c64c9cac342ab287c5350ec3bf6058580d6a4d14ed400e11c1d6b477c2c",
+    "candidateCorrectionBudgetChanged": false,
+    "diagnosticBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "build3SupervisorImplementation": {
+    "files": [
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "6755594b4335dd4de7f2208904a00d61e95772e81ae645de148d3e6e69de39b4"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+        "sha256": "ab99f92e796ec699c81edac1067269daf210a638b5cbd64264a8001fa741c431"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+        "sha256": "a9df90e3b680e4fc249171f5b63d92546f21532cd2d0577b265afe8b4603f7f3"
+      }
+    ],
+    "ruffCheck": "PASS",
+    "ruffFormat": "PASS",
+    "selfCheckRun": false,
+    "runtimePreflightRun": false,
+    "candidateBuildRun": false
+  },
+  "coordinatorDisposition25": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "SUBMIT_BUILD3_SUPERVISOR_FOR_INDEPENDENT_REVIEW_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-25.md",
+    "sha256": "fefdced38096dc51f3adccf1f16e3e6bd4e19061abd763fb0323f7a80fc20384",
+    "selfCheckAuthorizedConditionally": true,
+    "runtimePreflightAuthorized": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentSupervisorReview14": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review.md",
+    "sha256": "79f6169bf35c9d20c6edbea89df77895bb851dcee4e42e76a95c35d578aceaa2",
+    "outcome": "FIX_REQUIRED",
+    "executionAllowed": false,
+    "candidateBuildReserved": false
+  },
+  "build3SupervisorCorrectionPlan": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-plan.md",
+    "sha256": "379e6f798a711171a28f78d7e724b9fcc5e2b9bfd19fae2407764050d53b2395",
+    "status": "ACCEPTED_FOR_ONE_BOUNDED_OPERATIONAL_CORRECTION",
+    "candidateCountersChanged": false
+  },
+  "coordinatorDisposition26": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_ONE_BOUNDED_BUILD3_SUPERVISION_CORRECTION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-26.md",
+    "sha256": "42cac84bc7faff275fce679f49b4b30767bf03df4f9887306d75ec510dc26037",
+    "candidateCorrectionBudgetChanged": false,
+    "diagnosticBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "build3SupervisionCorrection1": {
+    "status": "FIX_REQUIRED_NEEDS_USER_DECISION",
+    "maximumSubmissions": 1,
+    "used": 1,
+    "files": [
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "225d39476d3df0a40c39b18d22c5cab270e1d57777acbf441fab117bb91b1038"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+        "sha256": "f4b31ba14ce20c1f4471dd09fb751cbfb79f1d60bfa3e957188c4b722f277ff0"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+        "sha256": "8ee478c15a8d5c7fd02fc371663ea3edbf4615d0bb63a64727c9a3501693dfae"
+      },
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "71cc049002e3457f82d77c2314bfd6ea3419af63bd50aba720908a8a391eeed0"
+      }
+    ],
+    "ruffCheck": "PASS_PYTHON_FILES_ONLY",
+    "ruffFormat": "PASS_PYTHON_FILES_ONLY",
+    "powershellStaticValidation": "PENDING_INDEPENDENT_REVIEW",
+    "scriptsExecuted": false,
+    "selfCheckExecuted": false,
+    "runtimePreflightExecuted": false,
+    "candidateBuildReserved": false,
+    "candidateCountersChanged": false,
+    "selfCheckExecutionAllowed": "NO; conditional gate failed",
+    "runtimePreflightAuthorized": false
+  },
+  "coordinatorDisposition27": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CONSUME_OPERATIONAL_CORRECTION1_SUBMIT_FOR_SOL_REVIEW",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-27.md",
+    "sha256": "7f0645b15b2d5f8d8039ff1ee319fd91737ccecc3fbba017de7e50cb82caa20c",
+    "selfCheckAuthorizedConditionally": true,
+    "runtimePreflightAuthorized": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentSupervisorReview15": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-2.md",
+    "sha256": "d3a436805fe736f5096b16a5fca44bb5b5e2981157badd795c05a5b51e60db91",
+    "outcome": "FIX_REQUIRED",
+    "allSubmittedHashesVerified": true,
+    "scriptsExecuted": false,
+    "selfCheckAllowed": false
+  },
+  "coordinatorDisposition28": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "STOP_BUILD3_SUPERVISION_NEEDS_USER_DECISION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-28.md",
+    "sha256": "7410d3040529346701d9376b0445a4cbeaf0e1688ae69aada9aac24362e0bc28",
+    "candidateCorrectionBudgetChanged": false,
+    "diagnosticBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition29": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_SOL_REPLACEMENT_SUPERVISION_PLAN_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-29.md",
+    "sha256": "bdda9c596ef0de10216fac23b3ea2526fd705ba527d2c8066af34b9f2d62b30f",
+    "candidateBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "replacementSupervisionPlan": {
+    "status": "COMPLETE_AWAITING_USER_DIRECTION",
+    "requiredSource": "https://github.com/python/cpython/blob/main/PC/venvlauncher.c",
+    "noImplementationAuthorized": true,
+    "noExecutionAuthorized": true,
+    "failedCorrection1RemainsConsumed": true,
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-replacement-plan.md",
+    "sha256": "01be9327b245c8f3645e688f2d6590aa93dcd921d70596eec590466b3e0ddf1b",
+    "recommendation": "Retain approved venv entry; validate exact launcher/interpreter chain and Job membership"
+  },
+  "coordinatorDisposition30": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "RECORD_PLAN_AWAIT_EXPLICIT_IMPLEMENTATION_DIRECTION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-30.md",
+    "sha256": "633968f370e87dc0f89f3b3fa6416c0e21c1f561d115209ced2d31a7827ddbb9",
+    "candidateBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition31": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_ONE_OPERATIONAL_REPLACEMENT_IMPLEMENTATION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-31.md",
+    "sha256": "1912b92bdc820dcd380c4166300f41889c3729fe1fd8e3a805774b63ebf9d241",
+    "candidateBudgetChanged": false,
+    "selfCheckAuthorized": false,
+    "runtimePreflightAuthorized": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "supervisionReplacementSubmission1": {
+    "status": "FIX_REQUIRED_NEEDS_USER_DECISION",
+    "used": 1,
+    "maximum": 1,
+    "planPath": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-replacement-plan.md",
+    "planSha256": "01be9327b245c8f3645e688f2d6590aa93dcd921d70596eec590466b3e0ddf1b",
+    "exactFiles": [
+      "pipeline/scripts/run_teignmouth_float32_build3.py",
+      "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+      "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+      "pipeline/scripts/invoke_teignmouth_float32_build3.ps1"
+    ],
+    "staticChecks": [
+      "Ruff check/format for Python files",
+      "PowerShell AST parse only",
+      "interop compile-only when compiler available"
+    ],
+    "executionAllowed": false,
+    "candidateCountersChanged": false,
+    "filesSubmitted": [
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "a1792181a798b650e7692fa0d6a540b87b15a691a64c182310460c9a6beb295d"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+        "sha256": "6ab5dc1961364254582a0b8f581b497bb8d6cc74649a7daba648aa4765ba1cf7"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+        "sha256": "9e25a189efea6c76272310c5ee438ccbef4cf2554260b00347d5334c87824070"
+      },
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "97d710885e68966c1cadaaa114983b9f6ad2eef6604c7013039f570d89de58005"
+      }
+    ],
+    "ruffCheck": "PASS_PYTHON_FILES",
+    "ruffFormat": "PASS_PYTHON_FILES",
+    "powershellAst": "PASS_NO_INVOCATION",
+    "interopCompile": "PASS_METHODS_NOT_INVOKED"
+  },
+  "coordinatorDisposition32": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CONSUME_REPLACEMENT_SUBMISSION1_SUBMIT_FOR_SOL_REVIEW",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-32.md",
+    "sha256": "14c8b5e274b664ba6c913a6aaf0000d21a0ca7778939b2c854af23044b39325f",
+    "selfCheckAuthorized": false,
+    "runtimePreflightAuthorized": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentSupervisorReview16": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-3.md",
+    "sha256": "c2d0f8d270f5429e90d26dad596fffed23b0023402d1b2da51017c6a4f39b452",
+    "outcome": "FIX_REQUIRED",
+    "allFourHashesVerified": true,
+    "runtimeModesExecuted": false,
+    "selfCheckAllowed": false
+  },
+  "coordinatorDisposition33": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "STOP_REPLACEMENT_NEEDS_USER_DECISION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-33.md",
+    "sha256": "c3748282063a8d35c2412babb682ac40167a372ba351c6eb8437b1b21f55dce1",
+    "candidateBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition34": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_OPERATIONAL_SUPERVISION_CORRECTION2",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-34.md",
+    "sha256": "2a955a88d4bc43fffb84bc12be3b0467aeb7fd7c82ce233575fb22cbf41b0693",
+    "candidateBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "supervisionCorrection2": {
+    "status": "FIX_REQUIRED_NEEDS_USER_DECISION",
+    "used": 1,
+    "maximum": 1,
+    "sourceReview": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-3.md",
+    "planRequired": "Sol focused remediation plan",
+    "implementer": "Luna",
+    "exactFiles": [
+      "pipeline/scripts/run_teignmouth_float32_build3.py",
+      "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+      "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+      "pipeline/scripts/invoke_teignmouth_float32_build3.ps1"
+    ],
+    "executionAllowed": false,
+    "candidateCountersChanged": false,
+    "planPath": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-2-plan.md",
+    "planSha256": "b7e550295a7944d06bd830a6a971ae2a3826bc0f7fb6f673d3b98e029490af92",
+    "executionAuthorized": false,
+    "filesSubmitted": [
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "a76b2538d6b4147dc7be2d92708b1be9b6455cd6d695f0ca02d3c26ec27338e9"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+        "sha256": "2781f194ff9a1a962db382ecc93b3008d282bd9e7eb763d438d5e1fc1889fda1"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+        "sha256": "9fc73a8ed7aca3b4e223d3f23a7bd676f48011aa0abe98eb864f9e98a5191d20"
+      },
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "47802c57f8ba630c8268b97f93ffb83529856d60ece8816cac92376b4304d6da"
+      }
+    ],
+    "ruffCheck": "PASS_PYTHON_FILES",
+    "ruffFormat": "PASS_PYTHON_FILES",
+    "powershellAst": "PASS_NO_INVOCATION",
+    "interopCompile": "PASS_METHODS_NOT_INVOKED"
+  },
+  "coordinatorDisposition35": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "ACCEPT_CORRECTION2_PLAN_RELEASE_ONE_LUNA_SUBMISSION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-35.md",
+    "sha256": "2d469a338917e00df093198990d50d2e96483ea8e588aa6b84f85ab837ad4d76",
+    "candidateBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition36": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "CONSUME_OPERATIONAL_CORRECTION2_SUBMIT_FOR_REVIEW",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-36.md",
+    "sha256": "a37e4d3e7ba97820c4f84ebcb29372b4a2236e9efceda7ae359c4ded3dfc0b21",
+    "selfCheckAuthorized": false,
+    "runtimePreflightAuthorized": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "independentSupervisorReview17": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-4.md",
+    "sha256": "31868114ce73d72b4351f9d680d17fb89a1a081ec5b5019f33e35b55b439298a",
+    "outcome": "FIX_REQUIRED",
+    "allFourHashesVerified": true,
+    "runtimeModesExecuted": false,
+    "selfCheckAllowed": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition37": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "STOP_BUILD3_SUPERVISION_NEEDS_USER_DECISION_AFTER_REVIEW17",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-37.md",
+    "sha256": "4c9c126de244b5e0bc6697657b676fd18dbec40e48ffe07c7758e237c47fa0e4",
+    "operationalCorrection2Consumed": true,
+    "candidateBudgetChanged": false,
+    "diagnosticBudgetChanged": false,
+    "implementationBuildReserved": false,
+    "candidateEligibleForServing": false
+  },
+  "coordinatorDisposition38": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_NEW_BOUNDED_SOL_PLAN_ONLY_FOR_REVIEW17",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-38.md",
+    "sha256": "a8a576c694e80ec57924f05a7f12fe3b86262d6873be73a293124fb297a85c27",
+    "userAuthorization": "Latest I authorise in response to request for a new bounded plan",
+    "scope": [
+      "Review 17 finding 1: dependency/data inventory completeness",
+      "Review 17 finding 2: standalone verify-before-import"
+    ],
+    "implementationAuthorized": false,
+    "staticChecksAuthorized": false,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateBudgetChanged": false
+  },
+  "supervisionCorrection3Plan": {
+    "status": "ACCEPTED_FOR_IMPLEMENTATION_AND_GATED_BUILD_CONTINUATION",
+    "plannerModel": "gpt-6.1-sol",
+    "plannerReasoning": "medium",
+    "implementerDispatchAuthorized": false,
+    "executionAuthorized": false,
+    "correctionBudgetReserved": false,
+    "candidateBudgetChanged": false,
+    "sourceReview": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-4.md",
+    "sourceReviewSha256": "31868114ce73d72b4351f9d680d17fb89a1a081ec5b5019f33e35b55b439298a",
+    "outputPath": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-plan.md",
+    "planSha256": "3e564b7ee6f099b54062794e7fb3468d08748f35c21a931abfae189634aa1c3a",
+    "dispositionEvidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-39.md",
+    "implementationAuthorized": true,
+    "implementationDisposition": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-40.md",
+    "implementationDispositionSha256": "5e5a5a28a15b4ecd13711bbdddb0f962a0a6ba8c3b767ea6b9cb291b9bff55ff"
+  },
+  "coordinatorDisposition39": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "RETURN_PLAN_FOR_SEPARATE_IMPLEMENTATION_DISPOSITION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-39.md",
+    "sha256": "a5f8decc43d014431321f48da138ed9d7ae730730321c9c4a15a078fd863d2fb",
+    "plan": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-plan.md",
+    "planSha256": "3e564b7ee6f099b54062794e7fb3468d08748f35c21a931abfae189634aa1c3a",
+    "implementationAuthorized": false,
+    "correctionBudgetReserved": false,
+    "runtimeAuthorized": false,
+    "candidateBudgetChanged": false,
+    "candidateBuildReserved": false
+  },
+  "supervisionCorrection3": {
+    "status": "LUNA_CYCLE_3_SUBMITTED_FOR_INDEPENDENT_SOL_REVIEW",
+    "planPath": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-plan.md",
+    "planSha256": "3e564b7ee6f099b54062794e7fb3468d08748f35c21a931abfae189634aa1c3a",
+    "implementationFiles": [
+      "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+      "pipeline/scripts/run_teignmouth_float32_build3.py",
+      "pipeline/scripts/teignmouth_build3_runtime_preflight.py"
+    ],
+    "selfCheckHelperChangeAllowed": false,
+    "lunaCorrectionCycles": {
+      "maximum": 4,
+      "used": 4,
+      "reserved": 0
+    },
+    "solCorrection": {
+      "maximum": 1,
+      "used": 1,
+      "reserved": 0,
+      "eligibleAfterAllFourLunaCyclesReviewed": true
+    },
+    "staticChecksAuthorized": true,
+    "independentSolReviewRequired": true,
+    "runtimeOrBuildDispatchThisStage": false,
+    "previousSubmissionsReset": false,
+    "candidateCountersChanged": false,
+    "submittedFiles": [
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "01c14c589359367e67e92f44699e8868af4deddd5eff2c499c4d3b3df7da2bf3"
+      },
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "919066815bf6cafb5ff207cd8326271899d75c6fa134630d3812a2c009313887"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+        "sha256": "aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b"
+      }
+    ],
+    "unchangedHelperSha256": "9fc73a8ed7aca3b4e223d3f23a7bd676f48011aa0abe98eb864f9e98a5191d20",
+    "staticResults": {
+      "ruffCheck": "PASS",
+      "ruffFormat": "PASS",
+      "powershellAst": "PASS_NO_INVOCATION",
+      "embeddedCSharp": "PASS_COMPILE_ONLY_NO_METHODS_INVOKED",
+      "preliminaryRuffLineLength": "FAILED_THEN_CORRECTED",
+      "implementationOrRuntimeCodeExecuted": false
+    },
+    "protectedHashes": {
+      "candidate": "a6ecafc012efb425b04d36826f744db925cf47f07fc4b5c2498f2884b77fa61b",
+      "sharedHelper": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880",
+      "builder": "5c72a2bc7f51fee50c976f3e4dc28c38c24427649b8dcc9d76ecbd391cd24e3b",
+      "focusedTest": "34415a55d81ecaa754e189ccf63864d84f2e699918598d13592414b012d3f4e8",
+      "fixture": "4add13e5201edb5cd9115175eea49a5ae980d55c99f9294a347226cf08e15fea",
+      "candidateConfig": "e0e264a40f6b9dee334cb90b0ff76d366159bf49a0ca8bcdf3e4e65328f58228"
+    },
+    "metadataReconciliation": {
+      "planLedgerSha256": "ccf040e697e3e095044855adef3f75aebea4aded0659b4414a0c9dbe31c5da57",
+      "planCheckpointSha256": "093e3472526062904fdf303a119c94dfa011f4b88d9d4acf0811c987173aa0c9",
+      "currentAtSubmissionLedgerSha256": "cffe0c141ed032a17db4bb8704ff4c10870b8d64c9e33fdcc102fbd710db4edc",
+      "currentAtSubmissionCheckpointSha256": "5ec647d1a9fc126728ebc267e50facf9cfdabfb95cfd3aba721f9f56105edc60",
+      "reason": "Coordinator-only dispositions 39 and 40 recorded plan handback and user authorization; implementer did not edit metadata"
+    },
+    "reviewerAgent": "/root/sol_review_face_diag",
+    "partialWork": {
+      "file": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+      "previousCycle1Sha256": "086dafa5a59d68904c937d7d85ba3c8945294fd8effa08af5159e197ca383416",
+      "currentPartialSha256": "fd1dc3098fc8e93887da3e70139f1b8dfdc75dcd2ff246eefb23da0b50e7f3b7",
+      "agentReportedScope": "RECORD normalization/ownership and finite startup profile changes",
+      "exactPatchPayloadRetained": false,
+      "otherOperationalFilesChangedThisPass": false,
+      "staticChecksRunThisPass": false,
+      "runtimeChecksRunThisPass": false
+    },
+    "cycle2Files": [
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "b3623911fcece373706af237e294c90411913f7715102eae6c2cd1d25a0fcbfc"
+      },
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "7883669c05ec3ce165db6d0b0ff8d4832df931479bf10c63c1f0f049d7965d33"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+        "sha256": "2ec7a76b448f2235133fa96a2819f4b65058fca498081857578af51ad390de91"
+      }
+    ],
+    "cycle2StaticResults": {
+      "ruffCheck": "PASS",
+      "ruffFormat": "PASS_3_FILES_ALREADY_FORMATTED",
+      "powershellAst": "PASS_NO_INVOCATION",
+      "embeddedCSharp": "PASS_COMPILE_ONLY_NO_METHODS_INVOKED",
+      "preliminaryStaticFindings": "Duplicate conditional and Ruff style/import-order findings fixed before final pass",
+      "runtimeProfileFits30Seconds": "UNMEASURED",
+      "runtimeModesExecuted": false
+    },
+    "cycle2ReviewerAgent": "/root/sol_review_face_diag",
+    "latestReview": {
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-6.md",
+      "sha256": "cec2f9dbff637f79025eecdf9b2f8c0221c68816bc9ed3374cab918232bde7b4",
+      "outcome": "FIX_REQUIRED",
+      "cycle": 2
+    },
+    "cycle3Diagnosis": {
+      "path": "docs\\milestones\\artifacts\\Teignmouth-float32-topology\\build-3\\supervisor-correction-3-diagnosis-2.md",
+      "sha256": "a718dfae49b9915d66ff2c5e0d49bfbc32f5ac14722ae80d6a37571352370b05",
+      "outcome": "GO_FOR_LUNA_CYCLE3"
+    },
+    "archiveProfileAmendment": {
+      "activePythonArchiveSources": "UNSUPPORTED_FAIL_CLOSED",
+      "absentOptionalStdlibZip": "Allowed only when positively observed absent",
+      "passiveDataArchives": "Remain ordinary inventoried data unless used as executable/import source",
+      "userSelection": "Finite trusted startup/import profile",
+      "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-49.md"
+    },
+    "cycle3Files": [
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "01c14c589359367e67e92f44699e8868af4deddd5eff2c499c4d3b3df7da2bf3"
+      },
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "919066815bf6cafb5ff207cd8326271899d75c6fa134630d3812a2c009313887"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_runtime_preflight.py",
+        "sha256": "aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b"
+      }
+    ],
+    "cycle3StaticResults": {
+      "ruffCheck": "PASS_REPORTED_BY_IMPLEMENTER",
+      "ruffFormat": "PASS_REPORTED_BY_IMPLEMENTER",
+      "powershellAst": "PASS_NO_INVOCATION_REPORTED_BY_IMPLEMENTER",
+      "embeddedCSharp": "PASS_COMPILE_ONLY_NO_METHODS_INVOKED_REPORTED_BY_IMPLEMENTER",
+      "runtimeProfileFits30Seconds": "UNMEASURED",
+      "runtimeModesExecuted": false,
+      "candidateBuildReserved": false,
+      "coordinatorReexecutedStaticGates": false
+    },
+    "cycle3ProtectedHashes": {
+      "candidate": "a6ecafc012efb425b04d36826f744db925cf47f07fc4b5c2498f2884b77fa61b",
+      "sharedHelper": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880",
+      "builder": "5c72a2bc7f51fee50c976f3e4dc28c38c24427649b8dcc9d76ecbd391cd24e3b",
+      "focusedTest": "34415a55d81ecaa754e189ccf63864d84f2e699918598d13592414b012d3f4e8",
+      "fixture": "4add13e5201edb5cd9115175eea49a5ae980d55c99f9294a347226cf08e15fea",
+      "candidateConfig": "e0e264a40f6b9dee334cb90b0ff76d366159bf49a0ca8bcdf3e4e65328f58228"
+    },
+    "cycle3ManifestAvailability": {
+      "inputManifest": "ABSENT",
+      "externalRuntimeManifest": "ABSENT",
+      "runtimeIdentity": "ABSENT",
+      "reservedLedgerSnapshot": "ABSENT",
+      "hashesClaimed": false
+    },
+    "cycle3ReviewerAgent": "/root/sol_review_face_diag",
+    "coordinatorDisposition50": {
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-50.md",
+      "sha256": "512cba1e085ed42e0b9b86631c09e7bec6e08eafc51ebd4c234f96cf757e21ec",
+      "decision": "SUBMIT_CYCLE3_FOR_INDEPENDENT_SOL_STATIC_REVIEW_ONLY",
+      "candidateCountersChanged": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    "cycle4ImplementationFiles": [
+      "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+      "pipeline/scripts/run_teignmouth_float32_build3.py"
+    ],
+    "cycle4Diagnosis": {
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-diagnosis-3.md",
+      "sha256": "0051daa983c4a9e251bad68979da19bc5c14d0095522133b779f054246a9d691",
+      "outcome": "GO_FOR_BOUNDED_LUNA_CYCLE4_W_S_ONLY",
+      "preflightPUnchanged": true
+    },
+    "cycle4Status": "SUBMITTED_FOR_INDEPENDENT_SOL_REVIEW",
+    "cycle4ReviewerAgent": "/root/sol_review_face_diag",
+    "cycle4Files": [
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "c707ebbda14c562083fb2485854b4d4d515bc809987d13136479f7cd5d597b06"
+      },
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "73345c89e9ec49c4c092a00a93b47c4642b32f7deecd7108c018b04910c3717c"
+      }
+    ],
+    "cycle4StaticResults": {
+      "ruffCheck": "PASS_REPORTED_BY_IMPLEMENTER",
+      "ruffFormat": "PASS_REPORTED_BY_IMPLEMENTER",
+      "powershellAst": "PASS_NO_WRAPPER_INVOCATION_REPORTED_BY_IMPLEMENTER",
+      "embeddedCSharp": "PASS_COMPILE_ONLY_NO_METHODS_INVOKED_REPORTED_BY_IMPLEMENTER",
+      "preliminaryRuffFindings": "IMPORT_ORDER_UNUSED_LOCAL_FORMAT_CORRECTED_BEFORE_FINAL_PASS",
+      "runtimeProfileFits30Seconds": "UNMEASURED",
+      "runtimeModesExecuted": false,
+      "candidateBuildReserved": false,
+      "coordinatorReranStaticGates": false
+    },
+    "cycle4ProtectedHashes": {
+      "preflight": "aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b",
+      "supervisorSelfcheck": "9fc73a8ed7aca3b4e223d3f23a7bd676f48011aa0abe98eb864f9e98a5191d20",
+      "candidate": "a6ecafc012efb425b04d36826f744db925cf47f07fc4b5c2498f2884b77fa61b",
+      "sharedHelper": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880",
+      "builder": "5c72a2bc7f51fee50c976f3e4dc28c38c24427649b8dcc9d76ecbd391cd24e3b",
+      "focusedTest": "34415a55d81ecaa754e189ccf63864d84f2e699918598d13592414b012d3f4e8",
+      "fixture": "4add13e5201edb5cd9115175eea49a5ae980d55c99f9294a347226cf08e15fea",
+      "candidateConfig": "e0e264a40f6b9dee334cb90b0ff76d366159bf49a0ca8bcdf3e4e65328f58228"
+    },
+    "cycle4PUnchangedSha256": "aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b",
+    "cycle4HUnchangedSha256": "9fc73a8ed7aca3b4e223d3f23a7bd676f48011aa0abe98eb864f9e98a5191d20",
+    "coordinatorDisposition53": {
+      "path": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-53.md",
+      "sha256": "d8075427fcf963f2dba24ef54fdf1e6186a1f336b2049db46700bc36394b3d7e",
+      "decision": "SUBMIT_CYCLE4_FOR_INDEPENDENT_SOL_STATIC_REVIEW_ONLY",
+      "candidateCountersChanged": false,
+      "runtimeAuthorized": false,
+      "candidateBuildReserved": false
+    },
+    "solCorrectionStatus": "FIX_REQUIRED_AFTER_SINGLE_SOL_CORRECTION_ALLOWANCE_EXHAUSTED",
+    "solCorrectionFiles": [
+      {
+        "path": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+        "sha256": "1ef041092e304a6a7f270d0886e4529caeba615bf14a3fb654f92b9873a61604"
+      },
+      {
+        "path": "pipeline/scripts/run_teignmouth_float32_build3.py",
+        "sha256": "17a7a347b175bfa3ad1a1dcbdc4167d3d4b1c8a73da0dc09d537ec1c6d4a8ef6"
+      },
+      {
+        "path": "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py",
+        "sha256": "3419551b5c19e69c2487bb57c1bc49c102d4b7bfe1db1f93aea60cf038ebe05a"
+      }
+    ],
+    "solCorrectionProtectedHashes": {
+      "preflight": "aa1b4bffa526ce7351a6558f71b52e231d8b1b6e23d8545dcebc5700c525d96b",
+      "candidate": "a6ecafc012efb425b04d36826f744db925cf47f07fc4b5c2498f2884b77fa61b",
+      "sharedHelper": "88196f11ec0c46a31ddff9c342a89dec9b808407cd8018b968eecfdb7eed4880",
+      "builder": "5c72a2bc7f51fee50c976f3e4dc28c38c24427649b8dcc9d76ecbd391cd24e3b",
+      "focusedTest": "34415a55d81ecaa754e189ccf63864d84f2e699918598d13592414b012d3f4e8",
+      "fixture": "4add13e5201edb5cd9115175eea49a5ae980d55c99f9294a347226cf08e15fea",
+      "candidateConfig": "e0e264a40f6b9dee334cb90b0ff76d366159bf49a0ca8bcdf3e4e65328f58228"
+    },
+    "solCorrectionRuntimeExecuted": false,
+    "solCorrectionRetryRoot": ".codex/build3-supervisor-selfcheck-retry-1/",
+    "solCorrectionRetryRootAbsent": true
+  },
+  "userBuildContinuation": {
+    "authorization": "User: I authorise builds until this is working.",
+    "decision": "AUTHORIZE_SERIAL_GATED_CONTINUATION_TO_FIRST_ACCEPTED_RESULT",
+    "status": "CONDITIONALLY_AUTHORIZED_AFTER_SUPERVISOR_REVIEW_PASS",
+    "oneActiveAttemptAtATime": true,
+    "fixedStandaloneDeadlineSeconds": 30,
+    "fixedSelfCheckDeadlineSeconds": 10,
+    "fixedBuildDeadlineSeconds": 180,
+    "fixedNumericalCutoffSeconds": 150,
+    "candidateLimitsChanged": false,
+    "acceptanceCriteriaWeakened": false,
+    "runtimePhaseCanBeSkipped": false,
+    "parallelBuildsAllowed": false
+  },
+  "coordinatorDisposition40": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_LUNA_IMPLEMENTATION_AND_SERIAL_GATED_BUILDS_UNTIL_ACCEPTED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-40.md",
+    "sha256": "5e5a5a28a15b4ecd13711bbdddb0f962a0a6ba8c3b767ea6b9cb291b9bff55ff",
+    "plan": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-plan.md",
+    "planSha256": "3e564b7ee6f099b54062794e7fb3468d08748f35c21a931abfae189634aa1c3a",
+    "implementationAuthorized": true,
+    "staticChecksAuthorized": true,
+    "runtimeAndBuildAuthorizedConditionally": true,
+    "candidateCountersReset": false
+  },
+  "coordinatorDisposition41": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "SUBMIT_LUNA_CYCLE1_FOR_INDEPENDENT_SOL_REVIEW_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-41.md",
+    "sha256": "e847a8229959da7100bc2452a34e91d3867a73e02735079768c033ad1d5f15a4",
+    "implementationAuthorized": false,
+    "staticChecksAuthorized": false,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "independentSupervisorReview5": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-5.md",
+    "sha256": "2a290a4c40ececba8486492301989643265f4c6d915d15acbd8c3910232332b2",
+    "outcome": "FIX_REQUIRED",
+    "submittedHashesVerified": true,
+    "protectedHashesVerified": true,
+    "runtimeModesExecuted": false,
+    "candidateBuildReserved": false
+  },
+  "supervisionDiagnosis1": {
+    "status": "BOUNDARY_DECISION_RESOLVED_BY_USER_FINITE_PROFILE",
+    "plannerAgent": "/root/sol_review17_plan",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "sourceReview": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-5.md",
+    "sourceReviewSha256": "2a290a4c40ececba8486492301989643265f4c6d915d15acbd8c3910232332b2",
+    "question": "Find the smallest safe bounded correction for both review-5 findings or identify a scope boundary",
+    "maxSeconds": 120,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "candidateCountersChanged": false,
+    "diagnosisPath": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-diagnosis.md",
+    "diagnosisSha256": "cce878af32486a91b21168c82448ea805a3dcffadad7f4e1aa3ecde50830b9bb"
+  },
+  "coordinatorDisposition42": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "AUTHORIZE_BOUNDED_SOL_DIAGNOSIS_AFTER_CYCLE1",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-42.md",
+    "sha256": "3f2578f4902e59a3a4e7cb04b2762eb24dfc0dc8d130f09866cd46d65cce72bd",
+    "lunaCycle1Consumed": true,
+    "lunaCycle2Reserved": false,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition43": {
+    "actor": "/root",
+    "date": "2026-10-24",
+    "decision": "STOP_FOR_USER_STARTUP_TRUST_BOUNDARY_DECISION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-43.md",
+    "sha256": "1724a203eab3e062a0539146acf76e986b95687da41c10b444bf36f1670eed91",
+    "diagnosis": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-diagnosis.md",
+    "diagnosisSha256": "cce878af32486a91b21168c82448ea805a3dcffadad7f4e1aa3ecde50830b9bb",
+    "implementationCycle2Reserved": false,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateBudgetChanged": false
+  },
+  "coordinatorDisposition44": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "AUTHORIZE_SOL_FINITE_PROFILE_PLAN_ADDENDUM_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-44.md",
+    "sha256": "ee9e4530aa4234affcb77e8d49d2af02461f3ed1614c02abc9630fb44f33ff59",
+    "userBoundarySelected": true,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "candidateBuildReserved": false
+  },
+  "supervisionCorrection3ProfilePlan": {
+    "status": "RECONCILED_FOR_IMPLEMENTATION",
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-profile-addendum.md",
+    "sha256": "e3e6578421cef97b20983955c8bba9622e148204cdbacb29a4e8aae12e8259aa",
+    "userSelectedBoundary": "Finite trusted startup/import profile; trust pinned CPython/OS loader and reviewed frozen code; bind profile executable sources and fail closed outside it",
+    "implementationScope": [
+      "W",
+      "S",
+      "P"
+    ],
+    "noCommandOrEnvironmentChange": true,
+    "noNewSchemaOrRootOrMode": true,
+    "fixedStandaloneDeadlineSeconds": 30,
+    "noRuntimeDuringImplementation": true
+  },
+  "coordinatorDisposition45": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "RECONCILE_FINITE_PROFILE_AND_RESERVE_LUNA_CYCLE2",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-45.md",
+    "sha256": "1202340abcb41b983b1433c84bc8a79a9835a0100e75b58d76b6df8ab9519e8e",
+    "addendum": "docs\\milestones\\artifacts\\Teignmouth-float32-topology\\build-3\\supervisor-correction-3-profile-addendum.md",
+    "addendumSha256": "e3e6578421cef97b20983955c8bba9622e148204cdbacb29a4e8aae12e8259aa",
+    "lunaCycle2Reserved": true,
+    "candidateCountersChanged": false,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition46": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "RECONCILE_AUTHORIZED_PARTIAL_P_PATCH_RESUME_SAME_CYCLE2",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-46.md",
+    "sha256": "91c3767fa6f387f3d8483453f8c4afde392575f53d24a91e712c4aed78338489",
+    "cycle2RemainsReserved": true,
+    "newAttemptCreated": false,
+    "candidateCountersChanged": false,
+    "runtimeAuthorized": false
+  },
+  "coordinatorDisposition47": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "SUBMIT_LUNA_CYCLE2_FOR_INDEPENDENT_SOL_REVIEW_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-47.md",
+    "sha256": "ae8b8b3d71cda15a7efe6550d355b1ef96fe73b348aa003d940d087ff7785358",
+    "cycle2Consumed": true,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateCountersChanged": false
+  },
+  "independentSupervisorReview6": {
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-6.md",
+    "sha256": "cec2f9dbff637f79025eecdf9b2f8c0221c68816bc9ed3374cab918232bde7b4",
+    "outcome": "FIX_REQUIRED",
+    "inventoryFindingResolved": true,
+    "profileFindings": 7,
+    "submittedHashesVerified": true,
+    "protectedHashesVerified": true,
+    "runtimeModesExecuted": false,
+    "candidateBuildReserved": false
+  },
+  "supervisionDiagnosis2": {
+    "status": "AUTHORIZED_IN_PROGRESS",
+    "plannerAgent": "/root/sol_review17_plan",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "sourceReview": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-6.md",
+    "sourceReviewSha256": "cec2f9dbff637f79025eecdf9b2f8c0221c68816bc9ed3374cab918232bde7b4",
+    "question": "Smallest safe bounded cycle-3 correction for seven finite-profile findings or stop boundary",
+    "maxSeconds": 120,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "candidateCountersChanged": false
+  },
+  "coordinatorDisposition48": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "AUTHORIZE_BOUNDED_SOL_DIAGNOSIS_AFTER_CYCLE2",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-48.md",
+    "sha256": "b396a6b3c83427963b84d1519ba8e4b8b52add2b0ae6b17737e7fedc17f270c5",
+    "lunaCycle2Consumed": true,
+    "lunaCycle3Reserved": false,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition49": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "RECONCILE_ARCHIVE_REFUSAL_AND_RESERVE_LUNA_CYCLE3",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-49.md",
+    "sha256": "c8c2f6cba03f22fac6e7b8bcdff2fb1e95f1a450e736b89c20ac47544f768b90",
+    "diagnosis": "docs\\milestones\\artifacts\\Teignmouth-float32-topology\\build-3\\supervisor-correction-3-diagnosis-2.md",
+    "diagnosisSha256": "a718dfae49b9915d66ff2c5e0d49bfbc32f5ac14722ae80d6a37571352370b05",
+    "lunaCyclesUsed": 2,
+    "lunaCycle3Reserved": true,
+    "candidateCountersChanged": false,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "independentSupervisorReview7": {
+    "status": "FIX_REQUIRED",
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-7.md",
+    "sha256": "dbde8f8a79bc55bbaef6bb655225a1beb1339620f5c11490aa839688ce5fe88c",
+    "outcome": "FIX_REQUIRED",
+    "sixReview6FindingsResolved": true,
+    "remainingFinding": "Content-classify native PE images before archive-suffix exemptions; apply the same classification in discovery, expected-set reconciliation, and applicable sidecar refusal.",
+    "runtimeExecuted": false,
+    "candidateBuildReserved": false,
+    "runtimeProfileFits30Seconds": "UNMEASURED"
+  },
+  "supervisionDiagnosis3": {
+    "status": "COMPLETE_GO_FOR_COORDINATOR_CYCLE4_RELEASE",
+    "plannerAgent": "/root/sol_review17_plan",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "sourceReview": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-7.md",
+    "sourceReviewSha256": "dbde8f8a79bc55bbaef6bb655225a1beb1339620f5c11490aa839688ce5fe88c",
+    "question": "Smallest safe static-only diagnosis for the native PE/archive-suffix/sidecar classification inconsistency, preserving passive archives and existing profile and gates.",
+    "maxSeconds": 120,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "cycle4Reserved": false,
+    "candidateCountersChanged": false,
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-diagnosis-3.md",
+    "sha256": "0051daa983c4a9e251bad68979da19bc5c14d0095522133b779f054246a9d691",
+    "cycle4ImplementationAuthorized": false
+  },
+  "coordinatorDisposition51": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "AUTHORIZE_BOUNDED_SOL_DIAGNOSIS_AFTER_REVIEW7_FIX_REQUIRED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-51.md",
+    "sha256": "f42c042d16ca0314da0424f9a3409e1b31fbdd3338258ac73d7a50bcce06135e",
+    "review7Sha256": "dbde8f8a79bc55bbaef6bb655225a1beb1339620f5c11490aa839688ce5fe88c",
+    "maxSeconds": 120,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "cycle4Reserved": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition52": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "RESERVE_LUNA_OPERATIONAL_CORRECTION_CYCLE4_W_S_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-52.md",
+    "sha256": "0b049d79e1c5720f1f917b161c647081124375f3115ea8a064eb5446d8c79503",
+    "diagnosis": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-correction-3-diagnosis-3.md",
+    "diagnosisSha256": "0051daa983c4a9e251bad68979da19bc5c14d0095522133b779f054246a9d691",
+    "implementationFiles": [
+      "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+      "pipeline/scripts/run_teignmouth_float32_build3.py"
+    ],
+    "lunaCyclesUsed": 3,
+    "lunaCycle4Reserved": true,
+    "staticChecksAuthorized": true,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateCountersChanged": false
+  },
+  "independentSupervisorReview8": {
+    "status": "PASS_STATIC_ACCEPTANCE",
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-8.md",
+    "sha256": "17f58c5d021dca3b34fe54ecb7828aafc67dc94cc0a3322cc17e1c63e99743f1",
+    "outcome": "PASS",
+    "cycle4ReviewComplete": true,
+    "runtimeProfileFits30Seconds": "UNMEASURED",
+    "runtimeExecuted": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition54": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "ACCEPT_SUPERVISOR_REVIEW8_PASS_AUTHORIZE_ONE_SELF_CHECK_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-54.md",
+    "sha256": "fa561e0c5aaae68a8de351f37f694db5164cc8814ce9f3f28f174b77fc8b502b",
+    "review8Sha256": "17f58c5d021dca3b34fe54ecb7828aafc67dc94cc0a3322cc17e1c63e99743f1",
+    "selfCheckSeconds": 10,
+    "selfCheckReserved": true,
+    "standaloneCollectionAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateCountersChanged": false,
+    "supersededCommand": "pipeline/.venv/Scripts/python.exe -B pipeline/scripts/run_teignmouth_float32_build3.py --self-check",
+    "commandCorrection": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-55.md"
+  },
+  "serialContinuation": {
+    "userAuthorization": "Disposition 40: I authorise builds until this is working.",
+    "status": "POST_REVIEW9_CORRECTION_AUTHORIZED_PLAN_FIRST",
+    "nextStandaloneModeIfSelfCheckPasses": "collect-unreserved-runtime-identity",
+    "standaloneOneShotSlotUsed": false,
+    "runtimeIdentityMustComeFromActualCollection": true,
+    "inputManifestMustBindRuntimeIdentityAndExternalManifest": true,
+    "reservedLedgerSnapshot": "POST_RESERVATION_ONLY_NOT_PREPARED",
+    "runtimeProfileFits30Seconds": "UNMEASURED",
+    "candidateBuildReserved": false,
+    "selfCheckOneShotSlotUsed": true,
+    "selfCheckCommand": "pwsh -NoProfile -ExecutionPolicy Bypass -File pipeline/scripts/invoke_teignmouth_float32_build3.ps1 -Mode self-check",
+    "directSupervisorEntryRejected": {
+      "exitCode": 2,
+      "reason": "S requires the authenticated W-created parent handoff",
+      "selfCheckBodyEntered": false,
+      "evidenceCreated": false
+    },
+    "selfCheckAttempt1": {
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File pipeline/scripts/invoke_teignmouth_float32_build3.ps1 -Mode self-check",
+      "exitCode": 2,
+      "status": "BLOCKED_CALLER_SETUP",
+      "callerRecord": ".codex/build3-supervisor-selfcheck/caller-invocation.json",
+      "callerRecordSha256": "e88b0527b5f44f4f34ed7448a00b3ea4cb1706b929a18f339ef83fde6dd4442e",
+      "pendingUpdate": ".codex/build3-supervisor-selfcheck/caller-invocation.json.update",
+      "pendingUpdateSha256": "78e7bb547fc718b57c9ab286afb92d37436b68bb894e0a22df02914936703b75",
+      "nativeProcessLaunched": false,
+      "runLeafCreated": false,
+      "handoffCreated": false,
+      "candidateOutputCreated": false,
+      "preserveEvidence": true
+    },
+    "selfCheckRetryRootProposal": ".codex/build3-supervisor-selfcheck-retry-1/",
+    "selfCheckRetryAuthorized": false
+  },
+  "coordinatorDisposition55": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "RECONCILE_DIRECT_SUPERVISOR_ENTRY_REJECTION_AUTHORIZE_WRAPPER_SELF_CHECK",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-55.md",
+    "sha256": "78c40264d26fcfa0abad49b6b49f8c7fce173addc57cec997946d0be3b72c1ee",
+    "rejectedDirectEntryExit": 2,
+    "rejectedDirectEntryCreatedSelfCheckEvidence": false,
+    "selfCheckOneShotConsumed": false,
+    "wrapperDrivenSelfCheckAuthorized": true,
+    "selfCheckMaximumSeconds": 10,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition56": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "RECORD_SELF_CHECK_SETUP_BLOCK_AUTHORIZE_READ_ONLY_SOL_DIAGNOSIS",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-56.md",
+    "sha256": "b2e0df3ba61188c270b1c01c8dbecc3dd55c0815c67687a3f77a65afb97855d3",
+    "selfCheckExitCode": 2,
+    "selfCheckPassed": false,
+    "selfCheckOneShotConsumed": true,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "supervisionDiagnosis4": {
+    "status": "COMPLETE_GO_FOR_COORDINATOR_SOL_CORRECTION_CONSIDERATION",
+    "plannerAgent": "/root/sol_review17_plan",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "question": "Read-only diagnosis of caller persistence failure and safe fresh-path retry feasibility",
+    "maxSeconds": 120,
+    "codeChangesAllowed": false,
+    "executionAllowed": false,
+    "selfCheckPassed": false,
+    "candidateCountersChanged": false,
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-selfcheck-failure-diagnosis.md",
+    "sha256": "685dbb46ec755910a93dcd7b9525b9f2dda1c6e0a0f14de85551f60456bb303f",
+    "solCorrectionFeasible": true
+  },
+  "coordinatorDisposition57": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "RESERVE_SINGLE_OPERATIONAL_SOL_CORRECTION_AFTER_ALL_LUNA_CYCLES_REVIEWED",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-57.md",
+    "sha256": "c91005bf83f58100ec4855d959228335ac2ee9bddbf724bbdb3879a7ddcbe757",
+    "diagnosis": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/supervisor-selfcheck-failure-diagnosis.md",
+    "diagnosisSha256": "685dbb46ec755910a93dcd7b9525b9f2dda1c6e0a0f14de85551f60456bb303f",
+    "implementationFiles": [
+      "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+      "pipeline/scripts/run_teignmouth_float32_build3.py",
+      "pipeline/scripts/teignmouth_build3_supervisor_selfcheck.py"
+    ],
+    "solCorrectionUsed": 0,
+    "solCorrectionReserved": true,
+    "runtimeAuthorized": false,
+    "selfCheckRetryAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateCountersChanged": false
+  },
+  "coordinatorDisposition58": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "SUBMIT_SINGLE_SOL_CORRECTION_FOR_INDEPENDENT_REVIEW_ONLY",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-58.md",
+    "sha256": "3226f74d3b17977869d251dfa6404283c72c0e70ab66ff2a890efdaaf11436b7",
+    "candidateCountersChanged": false,
+    "selfCheckRetryAuthorized": false,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "independentSupervisorReview9": {
+    "status": "FIX_REQUIRED",
+    "path": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-9.md",
+    "sha256": "e603b86ff5c1baff29af17f4084ff916dfe155f77cbbed4f8f64287a8ac9044a",
+    "outcome": "FIX_REQUIRED",
+    "blocker": "W handoff Update-OwnedJson call is routed through caller-only destination validator and fails before Job assignment/resume.",
+    "originalFailedEvidencePreserved": true,
+    "retryRootAbsent": true,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false
+  },
+  "coordinatorDisposition59": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "STOP_AFTER_FAILED_OPERATIONAL_SOL_CORRECTION_AWAIT_USER_DIRECTION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-59.md",
+    "sha256": "7659f6fb7aea57d4a178ef2dbabd5777e58095a58f4a94ddaacf76e355e40a23",
+    "review9Sha256": "e603b86ff5c1baff29af17f4084ff916dfe155f77cbbed4f8f64287a8ac9044a",
+    "operationalLunaCycles": "4/4-reviewed",
+    "operationalSolCorrection": "1/1-used-FIX_REQUIRED",
+    "retryAuthorized": false,
+    "runtimeAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateCountersChanged": false
+  },
+  "coordinatorDisposition60": {
+    "actor": "/root",
+    "date": "2026-10-25",
+    "decision": "USER_AUTHORIZED_ONE_BOUNDED_POST_REVIEW9_CORRECTION",
+    "evidence": "docs/milestones/artifacts/Teignmouth-float32-topology/coordinator-disposition-60.md",
+    "sha256": "da34dd10f591f3158b500b4046f62e9bcecb4049e3a4f0c05498998ea50d40d8",
+    "userAuthorization": "Authorize one bounded correction for W caller-versus-handoff ownership, independent review, and one fresh self-check attempt.",
+    "implementationFiles": [
+      "pipeline/scripts/invoke_teignmouth_float32_build3.ps1"
+    ],
+    "implementationCorrectionMaximum": 1,
+    "implementationCorrectionUsed": 0,
+    "implementationCorrectionReserved": true,
+    "selfCheckRetryAuthorizedAfterIndependentPass": true,
+    "selfCheckRetryMaximum": 1,
+    "runtimeCollectionAuthorized": false,
+    "candidateBuildReserved": false,
+    "candidateCountersChanged": false
+  },
+  "postReview9Correction": {
+    "status": "SOL_PLAN_IN_PROGRESS",
+    "implementer": "/root/corridor_continuation_luna",
+    "planner": "/root/sol_review17_plan",
+    "reviewer": "/root/sol_review_face_diag",
+    "implementationFile": "pipeline/scripts/invoke_teignmouth_float32_build3.ps1",
+    "maximum": 1,
+    "used": 0,
+    "reserved": 1,
+    "planFile": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/post-review9-handoff-ownership-plan.md",
+    "reviewFile": "docs/milestones/artifacts/Teignmouth-float32-topology/build-3/independent-supervisor-review-10.md",
+    "retryRoot": ".codex/build3-supervisor-selfcheck-retry-1/",
+    "retryRootMustRemainAbsentUntilReviewPass": true,
+    "selfCheckRetryMaximum": 1,
+    "selfCheckRetryAuthorized": false,
+    "runtimeCollectionAuthorized": false,
+    "candidateBuildReserved": false
+  }
+}

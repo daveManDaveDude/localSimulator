@@ -1,0 +1,30 @@
+{
+  "config/road-surface-teignmouth-topology-transition-v2.json": {
+    "sha256": "0c7f34a813e117021a961b332eebb88785bc0caaae54e2c9d92b0e89aa5a6c6b",
+    "byteLength": 11855
+  },
+  "docs/milestones/Teignmouth-topology-validation-v2-spec.md": {
+    "sha256": "7dd807c0a8419a80f71858f570fbb41668f551b6e66980b184a8a0f16f6bdd77",
+    "byteLength": 11168
+  },
+  "pipeline/scripts/run_teignmouth_topology_validation_v2.py": {
+    "sha256": "efcce688abcf119d9996628e40a3fdf71a2ba8c98c7ff5055656af4f68eddc27",
+    "byteLength": 42714
+  },
+  "pipeline/torquay_pipeline/road_surface_validation_transition_v2.py": {
+    "sha256": "63cedbea812e6879c8f926e0a5f381f143f22c367dd32d800c1e5f3fae9cf0a2",
+    "byteLength": 23661
+  },
+  "pipeline/tests/test_teignmouth_cached_supervisor.py": {
+    "sha256": "b2f2afb0df423b96a171e10db7930b5dac70716c69b695d29a536c17a3ee36e8",
+    "byteLength": 6651
+  },
+  "pipeline/tests/test_road_surface_validation_transition_v2.py": {
+    "sha256": "5c9682c415e4ecb3eaf27756e644c3923197f08bffc82c04fee633201d62cd67",
+    "byteLength": 31954
+  },
+  "pipeline/tests/test_teignmouth_complete_profile.py": {
+    "sha256": "68389722d524835ab512ca9a1528ee6fc4d986fb363e5e505862f4ad76bb72de",
+    "byteLength": 2440
+  }
+}

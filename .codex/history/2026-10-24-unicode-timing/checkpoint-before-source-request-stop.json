@@ -1,0 +1,7 @@
+{
+  "source": ".codex/torquay-plan-implementation.md",
+  "beforeImage": ".codex/history/2026-10-24-unicode-timing/checkpoint-before-source-request-stop.md",
+  "sha256": "4d8d6c2a63479ca9755746609a2b2c9b617bcb7abf865dda7771ef88ccbfc3df",
+  "markerCountBefore": 1,
+  "reason": "Reconcile checkpoint with the approved Stage A source-request representability stop and independent Sol read-only confirmation."
+}

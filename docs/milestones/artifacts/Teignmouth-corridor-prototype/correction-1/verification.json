@@ -1,0 +1,58 @@
+{
+  "status": "STOP: necessary earthwork preflight failed; independent review pending",
+  "attempts": {
+    "diagnosticsConsumedTotal": 1,
+    "fullBuildsConsumedTotal": 2,
+    "solCorrectionsConsumedTotal": 1,
+    "extraProbes": 0,
+    "parameterSweeps": 0,
+    "retries": 0
+  },
+  "commands": [
+    {
+      "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe -m pytest pipeline/tests/test_teignmouth_corridor_continuous.py -q",
+      "result": "Synthetic controls only. First iteration 7 passed in 1.73s; final frozen implementation 8 passed in 1.95s. No real package was read."
+    },
+    {
+      "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuous.py --evidence docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/build-2",
+      "result": "Invoked exactly once. STOP at necessary earthwork preflight after 7990 samples. First violating absolute change 5.011101381301339m exceeds strict <5 m. Wall 3.1481524000118952s; actual peak working set 512299008 B. No final mesh assembly, ownership evaluation or browser work followed."
+    },
+    {
+      "command": "$env:PYTHONPATH='pipeline'; pipeline/.venv/Scripts/python.exe -m pytest pipeline/tests/test_teignmouth_corridor_continuous.py pipeline/tests/test_teignmouth_corridor_prototype.py pipeline/tests/test_road_surface.py pipeline/tests/test_road_surface_topology.py pipeline/tests/test_roads.py pipeline/tests/test_road_alignment.py pipeline/tests/test_terrain_export.py pipeline/tests/test_terrain_preview.py pipeline/tests/test_terrain_coverage.py pipeline/tests/test_terrain_sources.py -q",
+      "result": "131 passed, 1 skipped in 4.55s. Existing skip at test_road_surface.py:826: Windows account lacks directory-symlink privilege (WinError 1314). No v2 machinery invoked."
+    },
+    {
+      "command": "pipeline/.venv/Scripts/python.exe -m ruff check pipeline/torquay_pipeline/teignmouth_corridor_continuous.py pipeline/scripts/build_teignmouth_corridor_continuous.py pipeline/tests/test_teignmouth_corridor_continuous.py",
+      "result": "PASS: all checks passed."
+    },
+    {
+      "command": "pipeline/.venv/Scripts/python.exe -m ruff format --check pipeline/torquay_pipeline/teignmouth_corridor_continuous.py pipeline/scripts/build_teignmouth_corridor_continuous.py pipeline/tests/test_teignmouth_corridor_continuous.py",
+      "result": "PASS: 3 files already formatted."
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS (exit 0); existing CRLF conversion warnings on pre-existing modified files."
+    },
+    {
+      "command": "npx prettier --check docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/handback.md docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/verification.json docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/authorization-transition.json docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/invariants.json",
+      "result": "PASS: all matched files use Prettier code style."
+    }
+  ],
+  "notRunAfterStop": [
+    "Full final mesh assembly and Float32 terrain/road witness",
+    "Final source/candidate overlay and all-edge added-gradient validation",
+    "Real nearby-road ownership, junction and off-ground conflict checks",
+    "Building contact and local full-width/profile QA",
+    "Composite road/building/walk coherence",
+    "Standalone DEV harness and TypeScript/lint/Vitest harness gates",
+    "Chromium captures and visual checks",
+    "Runtime missing/malformed candidate fallback and product/share browser regressions",
+    "Independent second full build of corrected algorithm"
+  ],
+  "limitations": [
+    "The preflight witness is the first deterministic failure, not a completed global maximum.",
+    "Chart buffers are persisted; no final mesh existed at the stop point.",
+    "Only one corrected build was authorized/executed; independent reproducibility is not established.",
+    "Preservation hashes cover880 paths, not every ignored raw GIS byte."
+  ]
+}

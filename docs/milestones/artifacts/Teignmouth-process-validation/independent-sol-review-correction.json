@@ -1,0 +1,96 @@
+{
+  "activationPassArtifact": false,
+  "artifactWriteScope": "Only this separate independent review artifact is written; implementation/config/spec/checkpoint and prior evidence remain untouched.",
+  "budgetDisposition": "Sole Sol correction and single authorized replacement containment probe are consumed. No further execution is directed. Overall issue remains NEEDS USER DECISION; no receipts may be fabricated or bypassed.",
+  "checksEvidence": {
+    "notRun": "No containment probe, retained replay, solver, trial, candidate build, browser, activation or numerical validation.",
+    "qualityChecksSha256": "135916e0fe097c43465122b4c70af00f949a2115c009c795eb5276cd56367f1a",
+    "retainedResults": "109 passed, 1 Windows symlink-privilege skip in 3.27s; Ruff and format passed on three affected files; git diff --check passed with existing LF/CRLF warning.",
+    "reviewerActions": "Read actual corrected process/probe/tests/spec and all retained correction evidence; independently recomputed manifest/before-image/protected/source-history/consumed hashes and cross-compared replacement report/stdout/journal. No test/static commands were rerun."
+  },
+  "determinationA": {
+    "PV-1_perCaseContainmentDiagnostics": "RESOLVED: named outcomes, observations, checked cleanup and durable progress journal; all five recorded replacement cases passed. Original failed probe remains failed/indeterminate.",
+    "PV-2_boundedVerifiedStartupCleanup": "RESOLVED: ProcessStartupError carries ownership; checked unassigned termination and deadline-bounded wait; supervisor retains scratch and tracked handles until leader exit and empty Job confirmed.",
+    "PV-3_preallocationCombinedMemory": "PARTIALLY RESOLVED: checks now precede request encoding, worker decode, assembly, result encoding and parent decode, but the advertised conservative JSON metadata bound is false for admitted non-BMP strings. No measured overrun is asserted.",
+    "processImplementationSafeForAcceptance": false,
+    "status": "FIX REQUIRED"
+  },
+  "determinationB": {
+    "activationEnabled": false,
+    "allTwelveGateEquivalencePresent": false,
+    "genuineProductionReceiptPreflightEvidencePresent": false,
+    "genuineSuccessfulAssemblyValidationFinalizationEvidencePresent": false,
+    "implementerRetainedReplayUsed": 0,
+    "independentRetainedReplayUsed": 0,
+    "reason": "Passing synthetic containment does not qualify a real validation transaction. Existing retained witnesses fail offline gates and have no successful assembly path; both production receipt artifacts are absent. No fabricated receipt, forced success, synthetic test or proxy can replace the required evidence.",
+    "status": "UNQUALIFIED / FIX REQUIRED"
+  },
+  "formatVersion": 1,
+  "issue": "Teignmouth process-isolated offline validation and complete timing evidence",
+  "preservationAndIdentity": {
+    "allCorrectionManifestFileAndEvidenceHashesExact": true,
+    "candidateAbsent": true,
+    "consumedInventoriesExact": true,
+    "correctionManifest": {
+      "byteLength": 8205,
+      "sha256": "5cf4ce81909d2d6c8e21abe4ddf74e9c966a98f8ff78d89adb353dbbc9b651da"
+    },
+    "extensionPinsExact": true,
+    "initialEvidenceUnchanged": true,
+    "initialProbeProcessSha256": "a25e99564a594d2f2d9dd94b4df53dc281a57d61350e2b7150b652506ef7817b",
+    "initialProbeSha256": "64fd88315a38b8ec019de5a58e8027581bb1e69b845040cad78930296cbc9e48",
+    "initialReviewSha256": "951c391e3a7d39fccea9de7387c334c5d2f8a490a0bd93659597a62aab5dab48",
+    "numericGeographicAndResourceLimitsUnchanged": true,
+    "preservationDriftExceptAuthorizedConfig": [],
+    "protectedFilesCompared": 8164,
+    "qualificationLimitSeconds": 125,
+    "sixCorrectionBeforeImagesExact": true,
+    "solverIterations": 2000,
+    "timingActivationUnchanged": true,
+    "timingPolicySeconds": [
+      120,
+      125,
+      135
+    ]
+  },
+  "remainingCorrectionFinding": {
+    "category": "allocation-bound correctness/proof defect",
+    "detail": "canonical() calls json.dumps with default ensure_ascii=True. value_bound() budgets 2+6*len(value) for strings and uses the same six-byte rate for Paths. A string containing N non-BMP Unicode code points requires 2+12*N ASCII bytes because each is serialized as two six-byte surrogate escapes; the stated bound is only 2+6*N. Source-derived text is transported without an ASCII/BMP restriction. Therefore baseline=3*request_binary+4*request_metadata is not the promised conservative four-envelope-copy reservation for every admitted value. The worker understated-plan guard runs after parent Codec.encode/canonical have already allocated the encoded request. Existing preallocation regressions use ASCII and do not establish this missing bound.",
+    "file": "pipeline/torquay_pipeline/road_surface_validation_process_v1.py",
+    "id": "PV-3-remaining",
+    "lines": [
+      56,
+      70,
+      88,
+      96,
+      598,
+      851
+    ],
+    "priority": 2,
+    "requiredDisposition": "Stop with NEEDS USER DECISION; the sole correction and replacement probe are consumed. No further correction, probe or replay execution is directed by this review.",
+    "scopeOfConclusion": "No observed 64 MiB exceedance and no claim that the replacement containment probe failed. The combined allocation proof remains incomplete.",
+    "staticCounterexample": "For a single U+1F600 string, the string-node budget is 8 bytes while its ASCII JSON string representation is 14 bytes. This is a static encoding calculation, not an executed containment/codec probe."
+  },
+  "replacementProbe": {
+    "allFiveRecordedCasesPassWithCleanupConfirmed": true,
+    "exitCode": 0,
+    "externalElapsedSeconds": 0.7525050000112969,
+    "internalElapsedSeconds": 0.5875402999809012,
+    "journalSha256": "42fbe4ad40d76cc9a25c19862f801fc4db71bacad781db0b63620ff5d726f419",
+    "limitSeconds": 15,
+    "processSha256": "01e48acb6c002047419b05e4d399fbe9d579f94e00f14403a447c8033494c6c3",
+    "reportProcessStdoutAndFinalJournalCasesExact": true,
+    "reportSha256": "ed1fa94f6f39fdc3adc9f0ff7eca04d7eaaab3765be8130645d19df1d46d14c3",
+    "reviewerRerun": false
+  },
+  "reviewDate": "2026-10-24",
+  "reviewer": {
+    "actualModel": "unknown; runtime model not exposed",
+    "actualReasoningEffort": "unknown; runtime setting not exposed",
+    "agent": "/root/review_sol_escalation",
+    "independentOfImplementation": true,
+    "requestedModel": "gpt-6.1-sol",
+    "requestedReasoningEffort": "medium"
+  },
+  "verdict": "FIX REQUIRED"
+}

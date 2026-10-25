@@ -1,0 +1,61 @@
+{
+  "schema": "teignmouth-operational-memory-review-v1",
+  "recordedOn": "2026-10-24",
+  "reviewer": "/root/review_sol_escalation",
+  "verdict": "FIX_REQUIRED",
+  "reviewScope": "Actual operational-memory implementation; proposal review was separate and passed.",
+  "reportStatus": "Final review report received after checkpoint reconciliation. The reviewer did not rerun tests or execute a trial/profile. Coordinator source line references are recorded below.",
+  "correctionAllowanceRemaining": 0,
+  "findings": [
+    {
+      "id": "activation-no-disabled-evidence-path",
+      "severity": "blocking",
+      "summary": "The guardian requires activation.enabled=true, and the child invokes ordinary activation verification. The approved bootstrap requires false-activation evidence-only admission, but the submitted path has no such admission path.",
+      "locations": [
+        { "file": "pipeline/scripts/run_teignmouth_topology_guardian.py", "lines": "93-107" },
+        { "file": "pipeline/scripts/run_teignmouth_topology_validation_v2.py", "lines": "190-220, 687-691, 1052-1058" }
+      ]
+    },
+    {
+      "id": "job-membership-after-numerical-imports",
+      "severity": "blocking",
+      "summary": "The top-level import guard checks only for nonempty environment variables before importing NumPy and numerical modules. Actual outer Job membership is queried later in main(), so forged or stale environment values allow numerical startup before containment is verified.",
+      "locations": [
+        { "file": "pipeline/scripts/run_teignmouth_topology_validation_v2.py", "lines": "20-50, 1048-1058" }
+      ]
+    },
+    {
+      "id": "deadline-not-rechecked-after-job-close",
+      "severity": "blocking",
+      "summary": "Elapsed time and PASS are calculated before Job close, with no final deadline check. Termination exceptions can also skip the subsequent wait. Cleanup could therefore cross the deadline without invalidating PASS, or exit may go unconfirmed.",
+      "locations": [
+        { "file": "pipeline/scripts/run_teignmouth_topology_guardian.py", "lines": "277-280, 298-306" }
+      ]
+    },
+    {
+      "id": "permit-reparse-alias-hidden-by-resolve",
+      "severity": "blocking",
+      "summary": "_assert_plain_path resolves the requested permit path before inspecting its components. Resolving can erase an in-root reparse/symlink alias, so the original path components are not reliably rejected.",
+      "locations": [
+        { "file": "pipeline/scripts/run_teignmouth_topology_guardian.py", "lines": "78-90, 117" }
+      ]
+    }
+  ],
+  "executionState": {
+    "activationEnabled": false,
+    "trialOrProfileRun": false,
+    "browserRun": false,
+    "dispatchPermitCreated": false,
+    "implementationCodeOrConfigChangedAfterReview": false,
+    "checkpointMetadataUpdatedAfterReview": true
+  },
+  "preservation": {
+    "reviewerReportedAllListedSubmissionHashesMatchExceptCheckpoint": true,
+    "checkpointWasUpdatedToRecordReviewDisposition": true,
+    "transitionConfigSha256": "d73ff3db33cf28d3c23c1abae0784f413bb2863a75b6223403faa32a90a3bf95",
+    "candidateCollarDirectoryAndPermitFilesAbsent": true,
+    "broaderPreservationScan": "not certified; reviewer has no retained completed result"
+  },
+  "reviewerTests": "Not rerun; the 135 passing focused tests are from the implementation submission only.",
+  "disposition": "NEEDS USER DECISION. Stop. No correction or trial may follow under the exhausted allowance. A new explicit user authorization must establish a fresh bounded correction allowance before implementation resumes."
+}

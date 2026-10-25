@@ -1,0 +1,15 @@
+{
+  "importSmoke": "passed",
+  "gisDataRead": false,
+  "interpreterIdentity": {
+    "executable": "C:\\vibe\\localSimulator\\pipeline\\.venv\\Scripts\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "prefix": "C:\\vibe\\localSimulator\\pipeline\\.venv",
+    "smokeCommand": "pipeline/.venv/Scripts/python.exe pipeline/scripts/build_teignmouth_corridor_continuation.py --import-smoke"
+  },
+  "build5LeafExistedBeforeReservation": false,
+  "build4FilesSha256": {
+    "implementation-stop.json": "58e51e8dcaaab40958fc17aa5293bd98c39b883ff6c107ba403f851d1a698a09",
+    "preservation-at-stop.json": "6315f3c8476632359419ba614f38e4f57d2d1e359bc95fbf9a1d1b93bc739fbd"
+  }
+}

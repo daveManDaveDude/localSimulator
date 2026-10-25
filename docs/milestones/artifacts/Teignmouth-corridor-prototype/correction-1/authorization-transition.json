@@ -1,0 +1,58 @@
+{
+  "authorization": "User-authorized single Sol correction; continuous station/lateral topology; strict original global ceilings retained.",
+  "authorizedSpecSha256": "5f535bccd00cc3ac3fad957babd9fe7a0fcd66a345bfbd63f8875501b002125d",
+  "boundFiles": [
+    {
+      "byteLength": 14345,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/teignmouth_corridor_prototype.py",
+      "sha256": "ca2e57728a248034b4375a16b2e42b3aea8d3429daa4ce18efcd459e545e1007"
+    },
+    {
+      "byteLength": 5839,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/build_teignmouth_corridor_prototype.py",
+      "sha256": "2a079d632bc9d0f857e495ae9abbf50dc1bb6f433decf7feaf932c354fde4c93"
+    },
+    {
+      "byteLength": 2730,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/test_teignmouth_corridor_prototype.py",
+      "sha256": "cb9571e717adc670e99e307e549a8c6e0e475d8563f3ea9b7b9ad1fa4b390f1b"
+    },
+    {
+      "byteLength": 11941,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/spec-authorized-correction.md",
+      "sha256": "5f535bccd00cc3ac3fad957babd9fe7a0fcd66a345bfbd63f8875501b002125d"
+    },
+    {
+      "byteLength": 2186,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/initial-submission-hashes.json",
+      "sha256": "579aa1fa3d449e76b626ab92dc3ca1ed33646351bdd57d61757b3799e4702b6b"
+    },
+    {
+      "byteLength": 20162,
+      "path": "pipeline/torquay_pipeline/teignmouth_corridor_continuous.py",
+      "sha256": "62a13aaa4f605c325d70ac7cc2b07a0ae8f55d39115d66455448626d387de7f6"
+    },
+    {
+      "byteLength": 4298,
+      "path": "pipeline/scripts/build_teignmouth_corridor_continuous.py",
+      "sha256": "05f747046ca81fee8e5c68fe89c2e49273c77a8f4caf2298c248d48ad4acc3a7"
+    },
+    {
+      "byteLength": 4306,
+      "path": "pipeline/tests/test_teignmouth_corridor_continuous.py",
+      "sha256": "4ab6bb3c14efae6e12806c43c06abda312f54766b572462d414e64c0ff45122f"
+    },
+    {
+      "byteLength": 8010,
+      "path": "docs/milestones/artifacts/Teignmouth-corridor-prototype/correction-1/before-implementation/spec-before-correction.md",
+      "sha256": "b99ef20c065bd0ebefa597c110e98a9c336ab56c7bba464a5db2e1b8024c9f5b"
+    }
+  ],
+  "originalSpecRecovery": "Verified exact pre-amendment specification recovered as the unchanged prefix.",
+  "originalSpecSha256": "b99ef20c065bd0ebefa597c110e98a9c336ab56c7bba464a5db2e1b8024c9f5b",
+  "priorAttemptsConsumed": {
+    "diagnostic": 1,
+    "fullBuilds": 1
+  },
+  "remainingAuthorizedExecution": "One full build2 <=180s; no diagnostic, retry or sweep."
+}

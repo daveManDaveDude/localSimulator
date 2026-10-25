@@ -1,0 +1,15 @@
+# Coordinator disposition 60 — authorize one bounded correction after review 9
+
+Date: 2026-10-25
+
+The user explicitly responded to the stop at disposition 59: **“Authorize one bounded correction (Recommended)”** to fix the W caller-versus-handoff ownership check, followed by independent review and one fresh self-check attempt. This new user direction overrides disposition 59's stop only for that exact correction/review/self-check sequence; it does not reset historical counters or authorize candidate runtime, collection, verification, manifest preparation, GIS/numerical work, a candidate build, serving or browser actions.
+
+## One correction only
+
+Start with a bounded read-only Sol plan, then authorize Luna to implement one correction in W `pipeline/scripts/invoke_teignmouth_float32_build3.ps1` only. The change must let W persist its own caller record and its own distinct handoff record through separate exact, fixed-path ownership validation. Preserve caller-only validation for `.codex/build3-supervisor-selfcheck-retry-1/caller-invocation.json`; give the fixed handoff its own explicit ownership check tied to the existing handoff schema, mode, nonce, wrapper identity, QPC start/deadline, launcher/base paths and hashes. Do not broaden to arbitrary paths, weaken record ownership, change schemas/modes/commands/environment, or modify S/H/P. Keep the accepted `File.Move` persistence behavior, exclusive terminal fallback, failed-evidence preservation, exact retry root and all existing one-use/process/Job/cleanup/deadline gates unchanged.
+
+The original blocked attempt and the retry root are both protected. Do not modify/delete/promote anything under `.codex/build3-supervisor-selfcheck/`. Do not create the new retry root or any of its records during planning, implementation or review. No runtime/self-check reproduction is authorized in those stages. Luna may run only the existing authorized static gates (Ruff check/format for S/P/H, PowerShell AST without wrapper invocation and embedded C# compile-only without method invocation) and must report exact hashes/commands/results. Independent Sol review 10 must inspect the final W hash and unchanged S/H/P and preserved caller evidence. A failed review ends this new allowance; no additional correction follows without new user direction.
+
+After independent PASS, this disposition authorizes exactly one wrapper-driven self-check invocation via W at the already fixed new root `.codex/build3-supervisor-selfcheck-retry-1/`, with a fresh 10-second QPC deadline. Preserve its actual result and all evidence; no retry or reset. This is the only execution authorized here. No standalone identity collection/verification or candidate build follows without a later user instruction.
+
+Candidate remains **NO-GO and unservable**; build 3 remains **unreserved**. Historical candidate counters remain unchanged. Operational Luna cycle 4/4 and operational Sol correction 1/1 remain consumed; a new post-review-9 allowance is limited to exactly one Luna implementation correction, currently reserved, with no additional Sol implementation correction.

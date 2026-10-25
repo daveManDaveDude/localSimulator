@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teignmouth face-overlay diagnostic runtime identity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "resolvedExecutable",
+    "pythonVersion",
+    "pythonImplementation",
+    "interpreterSha256",
+    "numpyVersion",
+    "shapelyVersion",
+    "geosVersion"
+  ],
+  "properties": {
+    "schema": {"const": "teignmouth-overlay-runtime-identity-v1"},
+    "resolvedExecutable": {"type": "string", "minLength": 1},
+    "pythonVersion": {"type": "string", "minLength": 1},
+    "pythonImplementation": {"type": "string", "minLength": 1},
+    "interpreterSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "numpyVersion": {"type": "string", "minLength": 1},
+    "shapelyVersion": {"type": "string", "minLength": 1},
+    "geosVersion": {"type": "string", "minLength": 1}
+  }
+}

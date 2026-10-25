@@ -1,0 +1,102 @@
+{
+  "chartOwnedVertexCount": 48208,
+  "missingOwnerCount": 0,
+  "missingOwners": [],
+  "missingSupportInsideExpectedChartIsHardFailure": true,
+  "outsideChartSupportSourceDeltaM": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "outsideChartSupportSourceWitnesses": [
+    {
+      "candidateHeightM": -8.45970344543457,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": -8.45970344543457,
+      "vertexIndex": 4,
+      "worldXZ": [
+        -140.0,
+        -63.0
+      ]
+    },
+    {
+      "candidateHeightM": 1.6029701828956604,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": 1.6029701828956604,
+      "vertexIndex": 8,
+      "worldXZ": [
+        -140.0,
+        -127.0
+      ]
+    },
+    {
+      "candidateHeightM": -8.473870754241943,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": -8.473870754241943,
+      "vertexIndex": 9,
+      "worldXZ": [
+        -140.0,
+        -62.5
+      ]
+    },
+    {
+      "candidateHeightM": 1.8027667105197906,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": 1.8027667105197906,
+      "vertexIndex": 10,
+      "worldXZ": [
+        -140.0,
+        -127.5
+      ]
+    },
+    {
+      "candidateHeightM": -8.488038063049316,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": -8.488038063049316,
+      "vertexIndex": 11,
+      "worldXZ": [
+        -140.0,
+        -62.0
+      ]
+    },
+    {
+      "candidateHeightM": 2.002563238143921,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": 2.002563238143921,
+      "vertexIndex": 12,
+      "worldXZ": [
+        -140.0,
+        -128.0
+      ]
+    },
+    {
+      "candidateHeightM": -8.500107288360596,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": -8.500107288360596,
+      "vertexIndex": 13,
+      "worldXZ": [
+        -140.0,
+        -61.5
+      ]
+    },
+    {
+      "candidateHeightM": 2.1682870388031006,
+      "sourceDeltaM": 0.0,
+      "sourceHeightM": 2.1682870388031006,
+      "vertexIndex": 14,
+      "worldXZ": [
+        -140.0,
+        -128.5
+      ]
+    }
+  ],
+  "passes": true,
+  "sourceInsideInfluenceOutsideChartSupportVertexCount": 10188,
+  "sourceOutsideInfluenceVertexCount": 6369,
+  "status": "MEASURED_TREATMENT_SUPPORT_CLASSIFICATION"
+}
